@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types, tests and gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium chromium-headless-shell
+
+      - name: Lint
+        run: npx xo
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Reference fixture
+        run: npm run reference
+
+      - name: Tests
+        run: npx vitest run
+
+      - name: Parity calibration and mutation test
+        run: npm run parity:self
+
+      - name: Parity
+        run: npm run parity
+
+      - name: Server HTML
+        run: npm run check:ssr
+
+      - name: API
+        run: npm run check:api
+
+      - name: Reference sync
+        run: npm run check:sync
+
+      - name: Package and consumer app
+        run: npm run check:package
+
+      - name: Storybook
+        run: npm run build-storybook
+
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: reports/
+          if-no-files-found: ignore

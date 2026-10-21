@@ -20,12 +20,13 @@ const targets = {
 	},
 };
 
-const chromium = {
+// A fresh object per project: Vitest names each browser instance after its project.
+const chromium = () => ({
 	enabled: true,
 	provider: playwright(),
 	headless: true,
 	instances: [{ browser: "chromium" as const }],
-};
+});
 
 function behaviour(target: keyof typeof targets) {
 	return {
@@ -40,7 +41,7 @@ function behaviour(target: keyof typeof targets) {
 		test: {
 			name: `behaviour:${target}`,
 			include: ["tests/behaviour/**/*.test.tsx"],
-			browser: chromium,
+			browser: chromium(),
 		},
 	};
 }
@@ -65,7 +66,7 @@ export default defineConfig({
 				test: {
 					name: "browser",
 					include: ["src/**/*.test.tsx", "tests/browser/**/*.test.tsx"],
-					browser: chromium,
+					browser: chromium(),
 				},
 			},
 			behaviour("package"),
