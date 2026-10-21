@@ -52,7 +52,20 @@ export default defineConfig({
 				test: {
 					name: "unit",
 					environment: "node",
-					include: ["tests/unit/**/*.test.ts", "tests/api/**/*.test.ts"],
+					include: [
+						"tests/unit/**/*.test.ts",
+						"tests/api/**/*.test.ts",
+						"src/**/*.test.ts",
+					],
+				},
+			},
+			{
+				// Package-only tests that need a real browser: internals and adapters.
+				plugins: [react()],
+				test: {
+					name: "browser",
+					include: ["src/**/*.test.tsx", "tests/browser/**/*.test.tsx"],
+					browser: chromium,
 				},
 			},
 			behaviour("package"),

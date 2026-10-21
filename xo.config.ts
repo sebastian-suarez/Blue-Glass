@@ -12,7 +12,7 @@ const xoConfig: FlatXoConfig = [
 		// the rules that clash with Prettier, so .prettierrc stays the source of truth.
 		prettier: "compat",
 	},
-	...xoReact(),
+	...xoReact({ prettier: "compat" }),
 	{
 		files: ["package.json"],
 		rules: {
@@ -22,6 +22,28 @@ const xoConfig: FlatXoConfig = [
 				"error",
 				{ exceptions: ["prettier", "mermaid"] },
 			],
+		},
+	},
+	{
+		files: [
+			"src/**/*.{ts,tsx}",
+			"tests/**/*.{ts,tsx}",
+			".storybook/**/*.{ts,tsx}",
+		],
+		rules: {
+			// React's own contract uses null: refs are set to null, and components render null.
+			"unicorn/no-null": "off",
+			"@typescript-eslint/no-restricted-types": "off",
+			// This is browser code: `window` is the browser's global, typed as Window.
+			"unicorn/prefer-global-this": "off",
+		},
+	},
+	{
+		files: ["src/**/*.{ts,tsx}"],
+		rules: {
+			// The published code supports the browsers Base UI does ("Baseline Widely
+			// Available" at its last major), and the v flag isn't there yet: Safari 17 added it.
+			"require-unicode-regexp": ["error", { requireFlag: "u" }],
 		},
 	},
 	{
