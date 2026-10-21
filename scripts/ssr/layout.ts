@@ -186,10 +186,12 @@ function writeShell(name: string, html: string, scripts: string): string {
 async function check(
 	browser: Browser,
 	server: Server,
-	file: string,
-	story: string,
-	html: string,
-	browserBundle: string,
+	{
+		file,
+		story,
+		html,
+		browserBundle,
+	}: { file: string; story: string; html: string; browserBundle: string },
 ): Promise<Outcome[]> {
 	const base = `${slug(file)}--${story}`;
 	const staticUrl = writeShell(`${base}--nojs`, html, "");
@@ -296,14 +298,12 @@ async function main(): Promise<number> {
 			};
 			for (const story of compiled.names) {
 				outcomes.push(
-					...(await check(
-						browser,
-						server,
+					...(await check(browser, server, {
 						file,
 						story,
-						compiled.render(story),
-						bundles.browser,
-					)),
+						html: compiled.render(story),
+						browserBundle: bundles.browser,
+					})),
 				);
 			}
 		}

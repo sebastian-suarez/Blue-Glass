@@ -117,10 +117,20 @@ export function ownerOfModule(): Map<string, string> {
 	return owners;
 }
 
+// The reference doesn't change while a process runs, and the gates ask for these thousands of
+// times (each scope reads all 71 previews), so they're computed once.
+let valueOwnersCache: ReadonlyMap<string, string> | undefined;
+const previewUsesCache = new Map<string, readonly string[]>();
+
 /**
 The component folder that owns each exported value.
 */
-export function valueOwners(): Map<string, string> {
+export function valueOwners(): ReadonlyMap<string, string> {
+	valueOwnersCache ??= computeValueOwners();
+	return valueOwnersCache;
+}
+
+function computeValueOwners(): Map<string, string> {
 	const moduleOwners = ownerOfModule();
 	const owners = new Map<string, string>();
 	for (const [modulePath, { values }] of exportsByModule()) {
@@ -231,6 +241,11 @@ Exported values a preview's script reads. The scripts are minified, so this matc
 `x.Name` for every exported Name; a false positive only makes a preview wait longer.
 */
 export function previewUses(file: string): string[] {
+	const cached = previewUsesCache.get(file);
+	if (cached !== undefined) {
+		return [...cached];
+	}
+
 	const owners = valueOwners();
 	const used = new Set<string>();
 	for (const match of previewScript(file).matchAll(
@@ -242,5 +257,7 @@ export function previewUses(file: string): string[] {
 		}
 	}
 
-	return used.values().toArray().toSorted(byName);
+	const uses = used.values().toArray().toSorted(byName);
+	previewUsesCache.set(file, uses);
+	return [...uses];
 }
