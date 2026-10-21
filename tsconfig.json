@@ -1,0 +1,15 @@
+{
+	"extends": "@tsconfig/node24/tsconfig.json",
+	"compilerOptions": {
+		// Same libs as @tsconfig/node24, but ES2025.Collection instead of ESNext.Collection:
+		// since TypeScript 6 that also declares Map.getOrInsert, which Node 24 doesn't have.
+		"lib": [
+			"es2024",
+			"ESNext.Array",
+			"ES2025.Collection",
+			"ESNext.Error",
+			"ESNext.Iterator",
+			"ESNext.Promise"
+		]
+	}
+}
