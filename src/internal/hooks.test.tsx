@@ -56,7 +56,7 @@ test("useForkRef sets every ref", () => {
 	expect(fromCallback).toBe(objectRef.current);
 });
 
-test("usePrevious returns the value before the last change", () => {
+test("usePrevious returns the previous render's value, as the reference's does", () => {
 	const { result, rerender } = renderHook(
 		({ value }: { value: number }) => usePrevious(value),
 		{ initialProps: { value: 1 } },
@@ -64,6 +64,67 @@ test("usePrevious returns the value before the last change", () => {
 	expect(result.current).toBeUndefined();
 	rerender({ value: 2 });
 	expect(result.current).toBe(1);
+	// An unrelated re-render: the previous render already had 2.
 	rerender({ value: 2 });
-	expect(result.current).toBe(1);
+	expect(result.current).toBe(2);
+});
+
+function loggingRef(log: string[]) {
+	return (node: HTMLDivElement | null) => {
+		log.push(node === null ? "null" : "attach");
+		return () => {
+			log.push("cleanup");
+		};
+	};
+}
+
+test("useForkRef runs a callback ref's cleanup on unmount, and nulls object refs", () => {
+	const log: string[] = [];
+	const callbackRef = loggingRef(log);
+	const objectRef = React.createRef<HTMLDivElement>();
+	function Forked() {
+		const ref = useForkRef<HTMLDivElement>(objectRef, callbackRef);
+		return <div ref={ref} />;
+	}
+
+	const { unmount } = render(<Forked />);
+	expect(log).toEqual(["attach"]);
+	expect(objectRef.current).toBeInstanceOf(HTMLDivElement);
+	unmount();
+	expect(log).toEqual(["attach", "cleanup"]);
+	expect(objectRef.current).toBeNull();
+});
+
+test("useForkRef detaches the old ref with its cleanup when a ref changes", () => {
+	const first: string[] = [];
+	const second: string[] = [];
+	const firstRef = loggingRef(first);
+	const secondRef = loggingRef(second);
+	function Forked({ which }: { which: "first" | "second" }) {
+		const ref = useForkRef<HTMLDivElement>(
+			which === "first" ? firstRef : secondRef,
+		);
+		return <div ref={ref} />;
+	}
+
+	const { rerender } = render(<Forked which="first" />);
+	rerender(<Forked which="second" />);
+	expect(first).toEqual(["attach", "cleanup"]);
+	expect(second).toEqual(["attach"]);
+});
+
+test("useForkRef calls a callback ref without a cleanup with null on detach", () => {
+	const log: string[] = [];
+	const legacyRef = (node: HTMLDivElement | null) => {
+		log.push(node === null ? "null" : "attach");
+	};
+
+	function Forked() {
+		const ref = useForkRef<HTMLDivElement>(legacyRef);
+		return <div ref={ref} />;
+	}
+
+	const { unmount } = render(<Forked />);
+	unmount();
+	expect(log).toEqual(["attach", "null"]);
 });

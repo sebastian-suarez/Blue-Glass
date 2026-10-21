@@ -25,8 +25,35 @@ export function setRef<T>(
 }
 
 /**
+Attaches `instance` to a ref and returns what detaches it: the callback ref's own cleanup when
+it returns one (React 19), else a reset to null.
+*/
+function attach<T>(ref: React.Ref<T> | undefined, instance: T): () => void {
+	if (typeof ref === "function") {
+		const cleanup = ref(instance);
+		return () => {
+			if (typeof cleanup === "function") {
+				cleanup();
+			} else {
+				ref(null);
+			}
+		};
+	}
+
+	if (ref) {
+		ref.current = instance;
+		return () => {
+			ref.current = null;
+		};
+	}
+
+	return () => undefined;
+}
+
+/**
 Merges several refs into one callback ref. Its identity changes when a ref does, so React
-detaches the old ref and attaches the new one, as with MUI's useForkRef.
+detaches the old ref and attaches the new one, as with MUI's useForkRef. It returns a cleanup,
+so React 19 runs each callback ref's own cleanup on detach instead of calling it with null.
 */
 export function useForkRef<T>(
 	...refs: Array<React.Ref<T> | undefined>
@@ -37,10 +64,13 @@ export function useForkRef<T>(
 				return undefined;
 			}
 
-			return (instance: T | null) => {
-				for (const ref of refs) {
-					setRef(ref, instance);
-				}
+			return (instance: T) => {
+				const detachers = refs.map((ref) => attach(ref, instance));
+				return () => {
+					for (const detach of detachers) {
+						detach();
+					}
+				};
 			};
 		},
 		// The refs are the dependencies, however many there are.
@@ -130,17 +160,16 @@ export function useShouldReduceMotion(): boolean {
 }
 
 /**
-The value from the previous render where it differed, React's documented way to store
-information from previous renders.
+The value the previous render had, as the reference's usePrevious returns it. Its Select relies
+on that: `prevOpen === false` holds only on the render where the list opens, not on the
+re-renders after.
 */
 export function usePrevious<T>(value: T): T | undefined {
-	const [state, setState] = React.useState<{
-		current: T;
-		previous: T | undefined;
-	}>({ current: value, previous: undefined });
-	if (!Object.is(state.current, value)) {
-		setState({ current: value, previous: state.current });
-	}
-
-	return state.previous;
+	const previousRef = React.useRef<T | undefined>(undefined);
+	React.useEffect(() => {
+		previousRef.current = value;
+	});
+	// Returning the last render's value during this one is the hook's whole contract.
+	// eslint-disable-next-line react-hooks/refs
+	return previousRef.current;
 }
