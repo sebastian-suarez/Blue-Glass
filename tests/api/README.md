@@ -11,7 +11,7 @@ Checks that the package keeps the documented API in `design-system/source/index.
 What it checks:
 
 - **Exports:** every documented value in scope is exported and defined, and every documented type is exported. Anything else needs an entry in `allowlist.json` under `exports`, with the reason.
-- **Types**, by check id: `#keys` (no documented key missing: assignability alone misses removed optional props), `.<key>` and `#inherited` (each documented prop type is assignable to the package's, callbacks compared strictly), `#required` (no new required keys), `#assignable` for unions, and `#any`, `#any-props` (nothing turned into `any`).
+- **Types**, by check id: `#keys` (no documented key missing: assignability alone misses removed optional props), `.<key>` and `#inherited` (each documented prop type is assignable to the package's, callbacks compared strictly), `#required` (nothing required that the documentation leaves optional or doesn't have), `#assignable` for unions, and `#any`, `#any-props` (no `any` the documentation doesn't have, down to callbacks' parameters and returns, refs' elements and arrays' elements: `"onChange(0)"`, `"ref.current"`, `"items[]"`).
 - **Components:** `#jsx` (the documented props compile in JSX), `#keys`, `#props`, `#ref` (the documented ref is accepted), `#ref-element` (the ref still points at the documented element) and the `any` checks. Autocomplete and other generics are checked with their defaults and with `Probe`, a type nothing else matches.
 - **Functions and constants:** `#signature` (the package's function can stand in for the documented one), `#call/N` (each documented call compiles and returns the documented type), `#value` and `#any`.
 

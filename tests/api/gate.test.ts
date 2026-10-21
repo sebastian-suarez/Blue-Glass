@@ -43,8 +43,15 @@ const mutations: Record<string, Expectation> = {
 			"Button#keys",
 			"DividerProps#required",
 			"Divider#jsx",
+			"CardProps#required",
+			"Card#jsx",
 		],
-		says: [`Type '"href"' does not satisfy the constraint 'never'`, `"label"`],
+		says: [
+			`Type '"href"' does not satisfy the constraint 'never'`,
+			`"label"`,
+			`Type '"children"' does not satisfy the constraint 'never'`,
+			"Property 'children' is optional in type",
+		],
 	},
 	callback: {
 		// ToggleButton#jsx passes: JSX compares the method bivariantly.
@@ -67,8 +74,22 @@ const mutations: Record<string, Expectation> = {
 			"Badge#any",
 			"ChipProps#any-props",
 			"Chip#any-props",
+			"ToggleButtonProps#any-props",
+			"ToggleButton#any-props",
+			"ToggleButton#ref-element",
+			"PaneAccordionProps#any-props",
+			"useTransition#any",
 		],
-		says: [`Type '"label"' does not satisfy`, `"its props are any"`],
+		says: [
+			`Type '"label"' does not satisfy`,
+			`"its props are any"`,
+			`"onChange(0)"`,
+			`"onChange(1)"`,
+			`"ref.current"`,
+			`Type '"items[]"' does not satisfy`,
+			"Type 'RefElementIsAny' is missing the following properties from type 'HTMLButtonElement'",
+			`"useTransition(1).current"`,
+		],
 	},
 	refs: {
 		failing: [
@@ -229,9 +250,15 @@ test("a waiver lets its check fail, and fails itself once the check passes", () 
 		]),
 	};
 	const { failures, waived, stale } = judge(results.props, allowlist);
-	expect(failures.map((failure) => failure.id)).toEqual([
-		"DividerProps#required",
+	expect(
+		failures
+			.map((failure) => failure.id)
+			.toSorted((a, b) => a.localeCompare(b)),
+	).toEqual([
+		"Card#jsx",
+		"CardProps#required",
 		"Divider#jsx",
+		"DividerProps#required",
 	]);
 	expect(waived.map(({ id }) => id)).toEqual([
 		"ButtonProps#keys",
