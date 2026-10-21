@@ -15,18 +15,21 @@ The machine:
 - Callbacks, as in the reference: onEnter just before entering, after a forced reflow so the
   CSS transition starts from the exited style; onEntered once entered; onExit just before
   exiting; onExited once exited. A child that starts entered gets onEntered on mount, and one
-  that starts exited gets onExited on mount (overlays use onExited to unmount).
+  that starts exited (not unmounted) gets onExited on mount.
+- Overlays wait for onExited before they unmount, as the reference's Modal does. One on
+  Base UI can end its closing phase there: call details.preventUnmountOnClose() when it
+  closes, then actionsRef.current.unmount() in onExited (Base UI's handbook, animation.md).
 - `appear` (default true; Collapse passes false) makes a child that is `in` when it mounts
   enter from exited instead of starting entered.
 
 The one change from the reference, for server rendering and islands: a child that is `in`
 when React renders it on the server, or hydrates it, starts entered. Its server HTML is
 visible, and hydrating it changes nothing and animates nothing: it behaves as if `appear`
-were false. The reference started `<Fade in>` at exited, so its server HTML held the child at
-opacity 0 and visibility hidden until the script ran. `appear` still applies to client-side
-mounts: createRoot, a portal (which renders nothing on the server), a Suspense boundary that
-renders on the client, and anything mounted after hydration. Exits and later changes of `in`
-animate as before.
+were false (onEntered on mount, no onEnter). The reference started `<Fade in>` at exited, so
+its server HTML held the child at opacity 0 and visibility hidden until the script ran.
+`appear` still applies to client-side mounts: createRoot, a portal (which renders nothing on
+the server), a Suspense boundary that renders on the client, and anything mounted after
+hydration. Exits and later changes of `in` animate as before.
 
 Reduced motion (useShouldReduceMotion): nothing moves, but a change of state still fades.
 The machine runs the same way, with the same timings, because the fades need them; the
