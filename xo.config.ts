@@ -39,6 +39,30 @@ const xoConfig: FlatXoConfig = [
 		},
 	},
 	{
+		files: ["scripts/**/*.ts"],
+		rules: {
+			// The browser gates hand callbacks to page.evaluate, which run in the page, where
+			// these globals exist. The rule still catches a callback closing over Node values.
+			"unicorn/isolated-functions": [
+				"error",
+				{
+					overrideGlobals: {
+						document: "readonly",
+						window: "readonly",
+						getComputedStyle: "readonly",
+						requestAnimationFrame: "readonly",
+						// A DOM global, named by the DOM.
+						// eslint-disable-next-line @typescript-eslint/naming-convention
+						NodeFilter: "readonly",
+					},
+				},
+			],
+			// The harness drives DOM APIs, whose types use null.
+			"unicorn/no-null": "off",
+			"@typescript-eslint/no-restricted-types": "off",
+		},
+	},
+	{
 		files: ["src/**/*.{ts,tsx}"],
 		rules: {
 			// The published code supports the browsers Base UI does ("Baseline Widely

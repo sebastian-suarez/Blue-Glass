@@ -1,0 +1,5 @@
+{
+	"$comment": "Parity budgets. A region fails when more pixels differ than its budget (anti-aliasing excluded), and a page fails when its size differs by more than sizeTolerance px. The default comes from reference-against-itself runs and the mutation test (scripts/parity/run.ts --self --mutate). A preview gets its own budget only with a reason a reviewer can check.",
+	"default": { "regionPixels": 16, "sizeTolerance": 1 },
+	"previews": {}
+}

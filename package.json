@@ -45,7 +45,12 @@
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
 		"prepare": "husky",
-		"reference": "node scripts/reference.ts"
+		"reference": "node scripts/reference.ts",
+		"runtimes": "node scripts/runtimes.ts",
+		"parity": "npm run reference && node scripts/parity/run.ts",
+		"parity:self": "npm run reference && node scripts/parity/run.ts --self && node scripts/parity/run.ts --mutate",
+		"check:ssr": "npm run build && npm run reference && node scripts/ssr/run.ts",
+		"check:sync": "node scripts/check-sync.ts"
 	},
 	"files": [
 		"dist"
@@ -71,6 +76,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@tsconfig/node24": "^24.0.5",
 		"@types/node": "^24.19.2",
+		"@types/pngjs": "^6.0.5",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@typescript/native": "npm:typescript@^7.0.2",
