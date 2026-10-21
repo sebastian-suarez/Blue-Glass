@@ -14,6 +14,7 @@ The reference in `design-system/` is the spec, but it isn't flawless. Phase 0 qu
   - Some content is measured on the client: the "Scroll sideways" hints on Diagram and TimingChart (shown when the figure overflows), Mermaid's diagrams (laid out in the browser), and useMediaQuery's live value.
   - NoSsr hides its content by design.
 - **`<Fade in>` renders invisible on the server.** The same goes for the other transitions while `appear` is on, which is the default: they render at opacity 0 and visibility hidden until hydration. The previews don't show it, because their transitions start closed. `src/internal/transition.ts` fixes it, and its tests pin the fix.
+- **Modal makes the rest of the page `inert` whatever its flags say.** `syncStack` in `Modal/reference.tsx` marks every other body child `inert`. So `hideBackdrop` ("the page behind stays visible and clickable") and `disableEnforceFocus` ("let focus leave the content") can't do what their docs promise. The package uses `aria-hidden` instead, while focus is enforced (`docs/deviations.md`, entry 7).
 - **Known from the reference's README:**
   - Tooltip and the transitions read a child's ref from `props.ref`, which React 18 drops in development.
   - Select spreads a `key` into Option, which React 19 warns about in development.

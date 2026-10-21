@@ -198,3 +198,6 @@ reports/
 
 # The API gate writes its checks for the current phase on every run (tests/api/README.md).
 tests/api/generated/
+
+# Vitest browser mode's failure screenshots
+.vitest/

@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
@@ -20,6 +21,36 @@ const targets = {
 	},
 };
 
+// Every Base UI entry point and React, bundled before the first test. When Vite meets an entry
+// point mid-run it bundles again, and the test that hit it fails with "Invalid hook call"
+// because it gets a second copy of React.
+const baseUiExports = (
+	JSON.parse(
+		fs.readFileSync(
+			path.join(root, "node_modules/@base-ui/react/package.json"),
+			"utf8",
+		),
+	) as { exports: Record<string, unknown> }
+).exports;
+const optimizeDeps = {
+	include: [
+		"react",
+		"react-dom",
+		"react-dom/client",
+		"react/jsx-runtime",
+		"react/jsx-dev-runtime",
+		...Object.keys(baseUiExports)
+			.filter(
+				(key) =>
+					key.startsWith("./") &&
+					key !== "./package.json" &&
+					key !== "./types" &&
+					!key.startsWith("./internals"),
+			)
+			.map((key) => `@base-ui/react/${key.slice(2)}`),
+	],
+};
+
 // A fresh object per project: Vitest names each browser instance after its project.
 const chromium = () => ({
 	enabled: true,
@@ -31,6 +62,7 @@ const chromium = () => ({
 function behaviour(target: keyof typeof targets) {
 	return {
 		plugins: [react()],
+		optimizeDeps,
 		resolve: {
 			alias: [
 				{ find: /^#ui\/styles\.css$/v, replacement: targets[target].styles },
@@ -63,6 +95,7 @@ export default defineConfig({
 			{
 				// Package-only tests that need a real browser: internals and adapters.
 				plugins: [react()],
+				optimizeDeps,
 				test: {
 					name: "browser",
 					include: ["src/**/*.test.tsx", "tests/browser/**/*.test.tsx"],
