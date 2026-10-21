@@ -1,8 +1,16 @@
 {
-	"$comment": "Previews allowed to show text only after JavaScript, with the reason. The plan declares NoSsr, Portal and closed popups; portals and closed popups need no entry, because the gate only reads #root.",
+	"$comment": "Texts a preview may show only after JavaScript, with the reason. With `texts`, only those are excused; without it, all of the preview's. Text the reference didn't show before JavaScript either needs no entry (scripts/lib/ssr-rules.ts).",
 	"previews": {
 		"components/NoSsr": {
 			"reason": "NoSsr renders its children only after mount, by design."
+		},
+		"components/Diagram": {
+			"reason": "The hint appears only when the figure overflows its frame, which only the client can measure.",
+			"texts": ["Scroll sideways for the whole diagram."]
+		},
+		"components/TimingChart": {
+			"reason": "The hint appears only when the chart overflows its frame, which only the client can measure.",
+			"texts": ["Scroll sideways for the whole chart."]
 		}
 	}
 }

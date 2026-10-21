@@ -1,0 +1,12 @@
+{
+	"$comment": "Stories files whose server HTML must lay out as their hydrated page does at 390px and 1280px (scripts/ssr/layout.ts), with the phase each joins in: the site's sections, and the components whose layout changes with the viewport. A listed file that's missing by its phase fails the gate.",
+	"stories": [
+		{ "file": "stories/sections/SiteHeader.stories.tsx", "phase": 1 },
+		{ "file": "stories/sections/Hero.stories.tsx", "phase": 1 },
+		{ "file": "stories/sections/ClientWork.stories.tsx", "phase": 1 },
+		{ "file": "stories/sections/ProjectCard.stories.tsx", "phase": 1 },
+		{ "file": "stories/sections/ContactSlab.stories.tsx", "phase": 1 },
+		{ "file": "src/components/Tabs/Tabs.stories.tsx", "phase": 1 },
+		{ "file": "src/components/Accordion/Accordion.stories.tsx", "phase": 1 }
+	]
+}

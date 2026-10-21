@@ -1,18 +1,22 @@
 {
 	"components/Accordion": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Alert": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/AppBar": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Autocomplete": {
-		"clientOnly": [
+		"hidden": [],
+		"absent": [
 			"EP",
 			"A",
 			"M",
@@ -50,75 +54,91 @@
 		"hydrationErrors": 0
 	},
 	"components/Avatar": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Backdrop": {
-		"clientOnly": [
+		"hidden": [
 			"Press to dismiss",
 			"invisible: catches the press, shows nothing",
 			"Publishing…"
 		],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Badge": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/BarChart": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/BottomNavigation": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Box": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Breadcrumbs": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Button": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/ButtonGroup": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Card": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Checkbox": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Chip": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/ClickAwayListener": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Container": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/CssBaseline": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Diagram": {
-		"clientOnly": ["Scroll sideways for the whole diagram."],
+		"hidden": ["Scroll sideways for the whole diagram."],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Dialog": {
-		"clientOnly": [
+		"hidden": [
 			"Delete the RS50 bridge draft?",
 			"The write-up and its two capture files go. The repository on GitHub stays as it is.",
 			"Keep draft",
@@ -140,18 +160,21 @@
 			"Notes",
 			"Publish"
 		],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Divider": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/DonutChart": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Drawer": {
-		"clientOnly": [
+		"hidden": [
 			"Sebastian Suarez",
 			"Backend lead and architect",
 			"Work",
@@ -171,50 +194,62 @@
 			"Copy link",
 			"Email"
 		],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Fab": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Grid": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Icon": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/ImageList": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/LightField": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/LineChart": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Link": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/List": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Masonry": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Menu": {
-		"clientOnly": ["Open repository", "Copy link", "⌘C", "Share", "Delete"],
+		"hidden": [],
+		"absent": ["Open repository", "Copy link", "⌘C", "Share", "Delete"],
 		"hydrationErrors": 0
 	},
 	"components/Mermaid": {
-		"clientOnly": [
+		"hidden": [],
+		"absent": [
 			"Local dev",
 			"astro dev, check",
 			"into main",
@@ -305,16 +340,18 @@
 		"hydrationErrors": 0
 	},
 	"components/Modal": {
-		"clientOnly": [
+		"hidden": [
 			"A modal layer",
 			"Press outside, press Escape, or close.",
 			"Close",
 			"No backdrop"
 		],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/NoSsr": {
-		"clientOnly": [
+		"hidden": [],
+		"absent": [
 			"This frame is",
 			"1280",
 			"px wide.",
@@ -323,15 +360,18 @@
 		"hydrationErrors": 0
 	},
 	"components/Pagination": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Paper": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Popover": {
-		"clientOnly": [
+		"hidden": [],
+		"absent": [
 			"Anchored",
 			"bottom-start",
 			". Press outside or Escape to close."
@@ -339,39 +379,47 @@
 		"hydrationErrors": 0
 	},
 	"components/Popper": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Portal": {
-		"clientOnly": ["I'm the portal's child"],
+		"hidden": [],
+		"absent": ["I'm the portal's child"],
 		"hydrationErrors": 1
 	},
 	"components/Progress": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/RadioGroup": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Rating": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Select": {
-		"clientOnly": ["MongoDB"],
+		"hidden": ["MongoDB"],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Skeleton": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Slider": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Snackbar": {
-		"clientOnly": [
+		"hidden": [
 			"Published to S3. CloudFront picks it up in about a minute.",
 			"View site",
 			"Error:",
@@ -379,58 +427,72 @@
 			"Retry",
 			"Uploading build… 62%"
 		],
+		"absent": [],
 		"hydrationErrors": 1
 	},
 	"components/Sparkline": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/SpeedDial": {
-		"clientOnly": ["Email me", "Copy link", "Share", "Download résumé"],
+		"hidden": ["Email me", "Copy link", "Share", "Download résumé"],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Stack": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Stepper": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Switch": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Table": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Tabs": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/TextareaAutosize": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/TextField": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Timeline": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/TimingChart": {
-		"clientOnly": ["Scroll sideways for the whole chart."],
+		"hidden": ["Scroll sideways for the whole chart."],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/ToggleButton": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Tooltip": {
-		"clientOnly": [
+		"hidden": [],
+		"absent": [
 			"contact@sebastiansuarez.dev",
 			"Download résumé",
 			"Copy email",
@@ -441,39 +503,48 @@
 		"hydrationErrors": 0
 	},
 	"components/TransferList": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Transitions": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/Typography": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"components/useMediaQuery": {
-		"clientOnly": ["matches"],
+		"hidden": [],
+		"absent": ["matches"],
 		"hydrationErrors": 0
 	},
 	"sections/ClientWork": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"sections/ContactSlab": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"sections/Hero": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"sections/ProjectCard": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	},
 	"sections/SiteHeader": {
-		"clientOnly": [],
+		"hidden": [],
+		"absent": [],
 		"hydrationErrors": 0
 	}
 }

@@ -197,6 +197,98 @@ export async function regions(page: Page): Promise<Region[]> {
 	});
 }
 
+export type TextPosition = { text: string; x: number; y: number };
+
+/**
+Where each visible text inside `scope` sits, in document order and page coordinates. The layout
+checks compare these before and after hydration.
+*/
+export async function textPositions(
+	page: Page,
+	scope = "#root",
+): Promise<TextPosition[]> {
+	return page.evaluate((selector) => {
+		const out: Array<{ text: string; x: number; y: number }> = [];
+		const container = document.querySelector(selector);
+		if (container === null) {
+			return out;
+		}
+
+		const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+		for (
+			let node = walker.nextNode();
+			node !== null;
+			node = walker.nextNode()
+		) {
+			const text = node.textContent?.replaceAll(/\s+/gv, " ").trim() ?? "";
+			const range = document.createRange();
+			range.selectNodeContents(node);
+			const box = range.getBoundingClientRect();
+			if (text !== "" && box.width > 0 && box.height > 0) {
+				out.push({
+					text,
+					x: Math.round(box.left + globalThis.scrollX),
+					y: Math.round(box.top + globalThis.scrollY),
+				});
+			}
+		}
+
+		return out;
+	}, scope);
+}
+
+/**
+Compares text positions before and after hydration: texts that moved more than 2px, and
+whether the texts themselves changed.
+*/
+export function compareLayouts(
+	before: TextPosition[],
+	after: TextPosition[],
+): { moved: string[]; changed: boolean } {
+	const isChanged =
+		before.length !== after.length ||
+		before.some((box, index) => after[index]?.text !== box.text);
+	const moved = before
+		.filter((box, index) => {
+			const match = after[index];
+			return (
+				match?.text === box.text &&
+				(Math.abs(match.x - box.x) > 2 || Math.abs(match.y - box.y) > 2)
+			);
+		})
+		.map((box) => box.text);
+	return { moved, changed: isChanged };
+}
+
+/**
+Every text inside `scope`, seen or not. The server-HTML gate uses it to tell text the server
+HTML hides (a visibility defect) from text it doesn't contain (a portal, or content the client
+measures).
+*/
+export async function allTexts(page: Page, scope = "#root"): Promise<string[]> {
+	return page.evaluate((selector) => {
+		const container = document.querySelector(selector);
+		if (container === null) {
+			return [];
+		}
+
+		const texts: string[] = [];
+		const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+		for (
+			let node = walker.nextNode();
+			node !== null;
+			node = walker.nextNode()
+		) {
+			const text = node.textContent?.replaceAll(/\s+/gv, " ").trim() ?? "";
+			if (text !== "") {
+				texts.push(text);
+			}
+		}
+
+		return texts;
+	}, scope);
+}
+
 /**
 The text a reader can see inside `scope`: text nodes with a non-empty box whose element and
 ancestors aren't hidden by display, visibility or opacity. The server-HTML gate compares

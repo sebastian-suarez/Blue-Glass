@@ -9,11 +9,11 @@ The reference in `design-system/` is the spec, but it isn't flawless. Phase 0 qu
 - **Hydration:** two previews log a recoverable hydration error (React #418: the first client render doesn't match the server HTML). The package must hydrate both cleanly.
   - `components/Portal`: during hydration the portal's child renders into the page, where the server rendered nothing.
   - `components/Snackbar`: its open snackbar's markup differs between server and client.
-- **Text visible only after JavaScript,** in 17 previews. `tests/ssr/reference-baseline.json` records them; the package may match them but not add to them.
-  - Popups open on load render through portals, which need the DOM: Autocomplete, Backdrop, Dialog, Drawer, Menu, Modal, Popover, Portal, Select, Snackbar, SpeedDial and Tooltip.
-  - Some content is measured on the client: the "Scroll sideways" hints on Diagram and TimingChart (shown when the figure overflows), Mermaid's diagrams (laid out in the browser), and useMediaQuery's live value.
-  - NoSsr hides its content by design.
-- **`<Fade in>` renders invisible on the server.** The same goes for the other transitions while `appear` is on, which is the default: they render at opacity 0 and visibility hidden until hydration. The previews don't show it, because their transitions start closed. `src/internal/transition.ts` fixes it, and its tests pin the fix.
+- **Text visible only after JavaScript,** in 17 previews. `tests/ssr/reference-baseline.json` records it in two kinds.
+  - **Hidden** (in the server HTML, but invisible): Backdrop, Dialog, Drawer, Modal, Select's open list, Snackbar and SpeedDial. Their content is rendered at load inside a transition that starts at opacity 0 (the `<Fade in>` defect below). The "Scroll sideways" hints on Diagram and TimingChart are hidden by design, until the client measures an overflow.
+  - **Absent** (not in the server HTML at all): Autocomplete, Menu, Popover, Portal and Tooltip, whose popups render through portals that need the DOM; Mermaid, which lays its diagrams out in the browser; NoSsr, by design; and useMediaQuery's live value.
+  - **The package must render hidden text visibly, or not at all.** It may leave out what the reference didn't show either, but nothing the reference showed (`scripts/lib/ssr-rules.ts`).
+- **`<Fade in>` renders invisible on the server.** The same goes for the other transitions while `appear` is on, which is the default: they render at opacity 0 and visibility hidden until hydration. That's what hides the overlays above. `src/internal/transition.ts` fixes it, and its tests pin the fix.
 - **Modal makes the rest of the page `inert` whatever its flags say.** `syncStack` in `Modal/reference.tsx` marks every other body child `inert`. So `hideBackdrop` ("the page behind stays visible and clickable") and `disableEnforceFocus` ("let focus leave the content") can't do what their docs promise. The package uses `aria-hidden` instead, while focus is enforced (`docs/deviations.md`, entry 7).
 - **Known from the reference's README:**
   - Tooltip and the transitions read a child's ref from `props.ref`, which React 18 drops in development.

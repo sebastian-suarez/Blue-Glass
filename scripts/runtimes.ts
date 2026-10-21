@@ -28,6 +28,8 @@ const globals: Record<string, string> = {
 	"react-dom/client": "window.ReactDOM",
 	"react/jsx-runtime": "window.ReactJSXRuntime",
 	"react/jsx-dev-runtime": "window.ReactJSXRuntime",
+	// Storybook's renderer imports it lazily for act(), which the story checks never call.
+	"react-dom/test-utils": "{}",
 };
 
 // The filters run in Go's regexp engine inside esbuild, which rejects JavaScript flags.
@@ -39,7 +41,7 @@ const anyPath = /.*/;
 /**
 Resolves React's entry points to the globals react.js sets.
 */
-const reactGlobals: Plugin = {
+export const reactGlobals: Plugin = {
 	name: "react-globals",
 	setup(builder) {
 		builder.onResolve({ filter: reactEntryPoint }, (arguments_) => {

@@ -4,16 +4,14 @@ scope it:
 
 1. renders the preview in Node with no window or document (scripts/lib/server-render.ts);
 2. loads that HTML in Chromium with JavaScript off and lists the texts the client render
-   shows inside #root that the server HTML doesn't: islands hydrate late, so server HTML has
-   to stand on its own;
-3. hydrates the same HTML and records every recoverable error;
-4. counts texts that move by more than 2px when the page hydrates (reported; phase 1 gates
-   it for the section stories, whose layouts are CSS).
+   shows inside #root that the server HTML hides or lacks: islands hydrate late, so server
+   HTML has to stand on its own;
+3. hydrates the same HTML and records every recoverable error and every page error;
+4. counts texts that move by more than 2px when the page hydrates (reported here; the story
+   layout gate, scripts/ssr/layout.ts, fails layout shifts).
 
-The package fails on any hydration error, and on any text it shows only after JavaScript
-that the reference shows before (tests/ssr/reference-baseline.json, recorded from the
-reference) unless tests/ssr/exceptions.json allows it with a reason. So popups open on load,
-which render through portals on the client in both, don't fail; regressions do.
+What fails is in scripts/lib/ssr-rules.ts: any error, any text the server HTML hides, and any
+text it lacks that the reference's server HTML had (tests/ssr/reference-baseline.json).
 
 Usage:
   node scripts/ssr/run.ts                       the gate, on the package's build (npm run build first)
@@ -27,7 +25,16 @@ import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 import { chromium, type Browser } from "playwright";
-import { newContext, openPage, settle, visibleTexts } from "../lib/capture.ts";
+import {
+	allTexts,
+	compareLayouts,
+	newContext,
+	openPage,
+	settle,
+	textPositions,
+	visibleTexts,
+	type TextPosition,
+} from "../lib/capture.ts";
 import {
 	startServer,
 	writePage,
@@ -40,6 +47,7 @@ import { renderPreview } from "../lib/server-render.ts";
 import {
 	judge,
 	type Baseline,
+	type Exception,
 	type Observation,
 	type Result,
 	type Rules,
@@ -57,48 +65,21 @@ function argument(name: string): string | undefined {
 const firstLine = (text: string) => text.split("\n", 1)[0] ?? "";
 
 /**
-Text positions inside #root in document order, with JavaScript on (after settling) or off.
+Text positions inside #root on a page, with JavaScript on (after settling) or off.
 */
-async function textPositions(
+async function positionsOn(
 	browser: Browser,
 	server: Server,
 	url: string,
 	isScripted: boolean,
-): Promise<Array<{ text: string; x: number; y: number }>> {
+): Promise<TextPosition[]> {
 	const context = await newContext(browser, { javaScriptEnabled: isScripted });
 	const { page } = await openPage(context, `${server.origin}${url}`);
 	if (isScripted) {
 		await settle(page);
 	}
 
-	const positions = await page.evaluate(() => {
-		const out: Array<{ text: string; x: number; y: number }> = [];
-		const container = document.querySelector("#root");
-		if (container === null) {
-			return out;
-		}
-
-		const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-		for (
-			let node = walker.nextNode();
-			node !== null;
-			node = walker.nextNode()
-		) {
-			const text = node.textContent?.replaceAll(/\s+/gv, " ").trim() ?? "";
-			const range = document.createRange();
-			range.selectNodeContents(node);
-			const box = range.getBoundingClientRect();
-			if (text !== "" && box.width > 0 && box.height > 0) {
-				out.push({
-					text,
-					x: Math.round(box.left),
-					y: Math.round(box.top + globalThis.scrollY),
-				});
-			}
-		}
-
-		return out;
-	});
+	const positions = await textPositions(page);
 	await context.close();
 	return positions;
 }
@@ -117,8 +98,10 @@ async function observe(
 	const rendered = renderPreview(preview, blueGlass);
 	if ("error" in rendered) {
 		return {
-			clientOnly: [],
+			hidden: [],
+			absent: [],
 			hydrationErrors: [],
+			pageErrors: [],
 			shifted: 0,
 			serverError: rendered.error,
 		};
@@ -144,6 +127,7 @@ async function observe(
 		`${server.origin}${staticUrl}`,
 	);
 	const shownWithoutScript = new Set(await visibleTexts(staticPage.page));
+	const inServerHtml = new Set(await allTexts(staticPage.page));
 	await staticContext.close();
 
 	const hydrateUrl = writePage(preview, runtime, {
@@ -163,24 +147,24 @@ async function observe(
 				.__glHydrationErrors ?? [],
 	);
 	await hydrateContext.close();
-	const hydrationErrors = [
-		...recoverable.map((error) => firstLine(error)),
-		...hydrated.errors.filter((error) => /hydrat/iv.test(error)),
+	const hydrationErrors = recoverable.map((error) => firstLine(error));
+	// Every error counts: React's production build reports "Minified React error #…", which a
+	// filter on the word "hydration" would miss, and a crash is a failure whatever it says.
+	const pageErrors = [
+		...client.errors.map((error) => `client render: ${error}`),
+		...hydrated.errors.map((error) => `hydrated page: ${error}`),
 	];
 
-	const before = await textPositions(browser, server, staticUrl, false);
-	const after = await textPositions(browser, server, hydrateUrl, true);
-	const shifted = before.filter((box, index) => {
-		const match = after[index];
-		return (
-			match?.text === box.text &&
-			(Math.abs(match.x - box.x) > 2 || Math.abs(match.y - box.y) > 2)
-		);
-	}).length;
+	const before = await positionsOn(browser, server, staticUrl, false);
+	const after = await positionsOn(browser, server, hydrateUrl, true);
+	const shifted = compareLayouts(before, after).moved.length;
 
+	const clientOnly = shown.difference(shownWithoutScript);
 	return {
-		clientOnly: [...shown.difference(shownWithoutScript)],
+		hidden: [...clientOnly.intersection(inServerHtml)],
+		absent: [...clientOnly.difference(inServerHtml)],
 		hydrationErrors,
+		pageErrors,
 		shifted,
 	};
 }
@@ -240,7 +224,7 @@ async function main(): Promise<number> {
 			: candidates.filter((preview) => only.includes(preview.id));
 	const baseline = readJson<Baseline>(baselineFile, {});
 	const { previews: exceptions } = readJson<{
-		previews: Record<string, { reason: string }>;
+		previews: Record<string, Exception>;
 	}>(path.join(root, "tests/ssr/exceptions.json"), { previews: {} });
 
 	await buildRuntimes(runtime);
@@ -287,7 +271,8 @@ async function main(): Promise<number> {
 			results.map((result) => [
 				result.id,
 				{
-					clientOnly: result.clientOnly,
+					hidden: result.hidden,
+					absent: result.absent,
 					hydrationErrors: result.hydrationErrors.length,
 				},
 			]),

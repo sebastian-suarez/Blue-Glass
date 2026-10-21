@@ -52,7 +52,8 @@
 		"parity": "npm run reference && node scripts/parity/run.ts",
 		"parity:self": "npm run reference && node scripts/parity/run.ts --self && node scripts/parity/run.ts --mutate",
 		"check:ssr": "npm run build && npm run reference && node scripts/ssr/run.ts",
-		"check:sync": "node scripts/check-sync.ts"
+		"check:sync": "node scripts/check-sync.ts",
+		"check:layout": "node scripts/ssr/layout.ts --self && node scripts/ssr/layout.ts"
 	},
 	"files": [
 		"dist"

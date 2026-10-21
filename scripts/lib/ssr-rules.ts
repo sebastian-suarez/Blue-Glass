@@ -1,7 +1,17 @@
 /**
 The server-HTML gate's rules, apart from the browser work so they can be tested on their own.
-The package fails on any hydration error, and on any text it shows only after JavaScript that
-the reference shows before, unless an exception allows it with a reason.
+
+Text the client render shows that the server HTML doesn't comes in two kinds:
+
+- hidden: in the server HTML but not visible, such as a transition that starts invisible. That's
+  a visibility defect, and it always fails the package: it should render visibly, or not at all.
+- absent: not in the server HTML at all, such as a popup open on load that renders through a
+  portal, or content measured on the client. The package may leave out what the reference
+  didn't show before JavaScript either, absent or hidden (tests/ssr/reference-baseline.json),
+  but nothing the reference showed.
+
+The package also fails on any error in its pages and on any hydration error. An exception in
+tests/ssr/exceptions.json excuses a preview's named texts, or all of them, with its reason.
 */
 import type { Preview } from "./reference.ts";
 
@@ -9,10 +19,24 @@ export type Runtime = "reference" | "package";
 
 export type Observation = {
 	/**
-	Texts the client render shows inside #root that the server HTML doesn't.
+	Texts the client render shows inside #root that the server HTML holds but hides.
 	*/
-	clientOnly: string[];
+	hidden: string[];
+
+	/**
+	Texts the client render shows inside #root that the server HTML doesn't hold at all.
+	*/
+	absent: string[];
+
+	/**
+	Recoverable hydration errors.
+	*/
 	hydrationErrors: string[];
+
+	/**
+	Page and console errors on the client-rendered and hydrated pages.
+	*/
+	pageErrors: string[];
 
 	/**
 	Texts that move by more than 2px when the page hydrates.
@@ -23,8 +47,17 @@ export type Observation = {
 
 export type Baseline = Record<
 	string,
-	{ clientOnly: string[]; hydrationErrors: number }
+	{ hidden: string[]; absent: string[]; hydrationErrors: number }
 >;
+
+export type Exception = {
+	reason: string;
+
+	/**
+	The texts excused. Without it, every text of the preview is.
+	*/
+	texts?: string[];
+};
 
 export type Result = Observation & {
 	id: string;
@@ -36,8 +69,10 @@ export type Result = Observation & {
 export type Rules = {
 	runtime: Runtime;
 	baseline: Baseline;
-	exceptions: Record<string, { reason: string }>;
+	exceptions: Record<string, Exception>;
 };
+
+const sample = (texts: string[]) => `"${texts.slice(0, 3).join('", "')}"`;
 
 export function judge(
 	preview: Preview,
@@ -54,25 +89,52 @@ export function judge(
 		problems.push(`hydration: ${error}`);
 	}
 
+	for (const error of observation.pageErrors) {
+		problems.push(`page: ${error}`);
+	}
+
 	const exception = exceptions[preview.id];
-	const asInReference = new Set<string>(baseline[preview.id]?.clientOnly);
-	const regressions =
-		runtime === "reference"
-			? observation.clientOnly
-			: observation.clientOnly.filter((text) => !asInReference.has(text));
-	const inherited = observation.clientOnly.length - regressions.length;
-	if (regressions.length > 0) {
-		const summary = `${regressions.length} text(s) visible only after JavaScript, e.g. "${regressions.slice(0, 3).join('", "')}"`;
-		if (exception === undefined) {
-			problems.push(summary);
-		} else {
-			notes.push(`${summary} (allowed: ${exception.reason})`);
+	const isExcused = (text: string) =>
+		exception !== undefined &&
+		(exception.texts === undefined || exception.texts.includes(text));
+	const excused = (texts: string[], what: string) => {
+		const allowed = texts.filter((text) => isExcused(text));
+		if (allowed.length > 0) {
+			notes.push(
+				`${allowed.length} text(s) ${what}, allowed: ${exception?.reason ?? ""}`,
+			);
 		}
+
+		return texts.filter((text) => !isExcused(text));
+	};
+
+	const hidden = excused(observation.hidden, "hidden until JavaScript");
+	if (hidden.length > 0) {
+		problems.push(
+			`${hidden.length} text(s) in the server HTML but hidden until JavaScript, e.g. ${sample(hidden)}`,
+		);
+	}
+
+	const reference = baseline[preview.id];
+	const notShownByReference = new Set<string>([
+		...(reference?.absent ?? []),
+		...(reference?.hidden ?? []),
+	]);
+	const missing =
+		runtime === "reference"
+			? observation.absent
+			: observation.absent.filter((text) => !notShownByReference.has(text));
+	const inherited = observation.absent.length - missing.length;
+	const newlyMissing = excused(missing, "missing from the server HTML");
+	if (newlyMissing.length > 0) {
+		problems.push(
+			`${newlyMissing.length} text(s) missing from the server HTML${runtime === "package" ? " that the reference showed" : ""}, e.g. ${sample(newlyMissing)}`,
+		);
 	}
 
 	if (inherited > 0) {
 		notes.push(
-			`${inherited} text(s) visible only after JavaScript, as in the reference`,
+			`${inherited} text(s) missing from the server HTML, which the reference didn't show before JavaScript either`,
 		);
 	}
 

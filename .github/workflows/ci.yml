@@ -55,6 +55,9 @@ jobs:
       - name: Server HTML
         run: npm run check:ssr
 
+      - name: Story layout
+        run: npm run check:layout
+
       - name: API
         run: npm run check:api
 

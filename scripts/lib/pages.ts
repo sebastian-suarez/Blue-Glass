@@ -67,6 +67,7 @@ function resolveRequest(url: string): string | undefined {
 		["/pages/", pagesDirectory],
 		["/runtimes/", runtimesDirectory],
 		["/mermaid/", mermaidDirectory],
+		["/story/", path.join(root, ".cache/story-gate")],
 	];
 	for (const [prefix, directory] of mounts) {
 		if (pathname.startsWith(prefix)) {
