@@ -193,3 +193,5 @@ Temporary Items
 # Blue Glass: generated output
 storybook-static/
 reports/
+# The API gate writes its checks for the current phase on every run (tests/api/README.md).
+tests/api/generated/
