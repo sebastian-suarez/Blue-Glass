@@ -193,3 +193,5 @@ Temporary Items
 # Blue Glass: generated output
 storybook-static/
 reports/
+# Astro's generated types, in the consumer app under tests/consumer
+.astro/

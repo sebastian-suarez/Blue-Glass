@@ -1,0 +1,16 @@
+---
+// Phase 0: the stylesheet's cascade next to Tailwind, and the JS entry in an island.
+// scripts/lib/astro-consumer.ts checks this page by these ids.
+import Base from "../layouts/Base.astro";
+import { PackageExports } from "../components/PackageExports";
+---
+
+<Base title="Blue Glass in Astro">
+	<main>
+		<h1 id="utilities-win" class="text-heading text-2xl font-semibold">
+			Tailwind utilities over a type class
+		</h1>
+		<h2 id="type-class" class="text-heading">A type class on its own</h2>
+		<PackageExports client:visible />
+	</main>
+</Base>
