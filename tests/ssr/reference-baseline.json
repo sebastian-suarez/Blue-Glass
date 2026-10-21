@@ -1,0 +1,479 @@
+{
+	"components/Accordion": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Alert": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/AppBar": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Autocomplete": {
+		"clientOnly": [
+			"EP",
+			"A",
+			"M",
+			"Limber He",
+			"a",
+			"lth",
+			"Glob",
+			"nt",
+			"P",
+			"yPal",
+			"Gorill",
+			"Logic",
+			"Runtime",
+			"Languages",
+			"Data",
+			"PostgreSQL",
+			"MongoDB",
+			"Cloud",
+			"Terraform",
+			"Cloudflare",
+			"Frontend",
+			"React",
+			"New Y",
+			"o",
+			"rk",
+			"Full overlap",
+			"San Francisc",
+			"L",
+			"ndon",
+			"Overlap in my mornings",
+			"T",
+			"kyo",
+			"No working-hours overlap"
+		],
+		"hydrationErrors": 0
+	},
+	"components/Avatar": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Backdrop": {
+		"clientOnly": [
+			"Press to dismiss",
+			"invisible: catches the press, shows nothing",
+			"Publishing…"
+		],
+		"hydrationErrors": 0
+	},
+	"components/Badge": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/BarChart": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/BottomNavigation": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Box": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Breadcrumbs": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Button": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/ButtonGroup": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Card": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Checkbox": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Chip": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/ClickAwayListener": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Container": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/CssBaseline": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Diagram": {
+		"clientOnly": ["Scroll sideways for the whole diagram."],
+		"hydrationErrors": 0
+	},
+	"components/Dialog": {
+		"clientOnly": [
+			"Delete the RS50 bridge draft?",
+			"The write-up and its two capture files go. The repository on GitHub stays as it is.",
+			"Keep draft",
+			"Delete draft",
+			"What changed in v2.4",
+			"Client work tabs crossfade instead of jumping between panels.",
+			"Diagrams draw in on scroll; with reduced motion they arrive finished.",
+			"The résumé PDF rebuilds on every merge to main.",
+			"The light field rings are lighter on phones.",
+			"HTML is cached for 60 seconds at the edge, hashed assets for a year.",
+			"The 404 page has its own diagram of where the request went.",
+			"Done",
+			"Calibrate the wheel",
+			"Turn the RS50 from lock to lock once. The bridge reads the range and writes it to rs50d.toml.",
+			"Cancel",
+			"Publish to production",
+			"The build goes to the private S3 bucket; CloudFront serves it through Cloudflare.",
+			"Release name",
+			"Notes",
+			"Publish"
+		],
+		"hydrationErrors": 0
+	},
+	"components/Divider": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/DonutChart": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Drawer": {
+		"clientOnly": [
+			"Sebastian Suarez",
+			"Backend lead and architect",
+			"Work",
+			"Projects",
+			"Contact",
+			"Read résumé",
+			"Medellín, Colombia",
+			"VSebCode",
+			"My fork of microsoft/vscode on VSCodium's patch set.",
+			"Stack",
+			"TypeScript, Electron",
+			"Review",
+			"Codex reviews every Claude Code change",
+			"Repository",
+			"Share this project",
+			"https://sebastiansuarez.dev/#projects",
+			"Copy link",
+			"Email"
+		],
+		"hydrationErrors": 0
+	},
+	"components/Fab": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Grid": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Icon": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/ImageList": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/LightField": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/LineChart": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Link": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/List": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Masonry": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Menu": {
+		"clientOnly": ["Open repository", "Copy link", "⌘C", "Share", "Delete"],
+		"hydrationErrors": 0
+	},
+	"components/Mermaid": {
+		"clientOnly": [
+			"Local dev",
+			"astro dev, check",
+			"into main",
+			"Two checks",
+			"Build, Terraform plan",
+			"Merge to main",
+			"ruleset enforced",
+			"Deploy job",
+			"production env",
+			"S3 + CloudFront",
+			"sync, invalidate",
+			"Terraform applies",
+			"IAM, then site",
+			"AWS + Cloudflare",
+			"IAM and site stacks",
+			"push",
+			"runs",
+			"both pass",
+			"site change",
+			"publish",
+			"infra/ change",
+			"apply",
+			"Dashed",
+			"-.->",
+			"Plain",
+			"---",
+			"Both ways",
+			"<-->",
+			"Filled",
+			":::accentFill",
+			"Dot end",
+			"--o",
+			"Cross end",
+			"--x",
+			"Request",
+			"Cached?",
+			"Edge",
+			"yes",
+			"no",
+			"Queued",
+			"Running",
+			"Failed",
+			"Live",
+			"runner free",
+			"a check fails",
+			"retry",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+			"origin",
+			"CloudFront",
+			"CDN",
+			"Cloudflare",
+			"DNS, edge",
+			"Your browser",
+			"alt · cached",
+			"else · miss",
+			"bot and AI checks",
+			"GET sebastiansuarez.dev",
+			"proxied, Full (strict) TLS",
+			"200 from the edge",
+			"read, signed by OAC",
+			"index.html",
+			"security headers",
+			"the page",
+			"nodes",
+			"edges",
+			"*",
+			"DiagramData",
+			"+string id",
+			"+number width",
+			"+number height",
+			"+string label",
+			"DiagramNode",
+			"+number x",
+			"+number y",
+			"+lines",
+			"+tone",
+			"DiagramEdge",
+			"+points",
+			"+boolean dashed",
+			"Mermaid couldn't read this source, so here it is as written."
+		],
+		"hydrationErrors": 0
+	},
+	"components/Modal": {
+		"clientOnly": [
+			"A modal layer",
+			"Press outside, press Escape, or close.",
+			"Close",
+			"No backdrop"
+		],
+		"hydrationErrors": 0
+	},
+	"components/NoSsr": {
+		"clientOnly": [
+			"This frame is",
+			"1280",
+			"px wide.",
+			"Rendered a frame after mount."
+		],
+		"hydrationErrors": 0
+	},
+	"components/Pagination": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Paper": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Popover": {
+		"clientOnly": [
+			"Anchored",
+			"bottom-start",
+			". Press outside or Escape to close."
+		],
+		"hydrationErrors": 0
+	},
+	"components/Popper": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Portal": {
+		"clientOnly": ["I'm the portal's child"],
+		"hydrationErrors": 1
+	},
+	"components/Progress": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/RadioGroup": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Rating": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Select": {
+		"clientOnly": ["MongoDB"],
+		"hydrationErrors": 0
+	},
+	"components/Skeleton": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Slider": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Snackbar": {
+		"clientOnly": [
+			"Published to S3. CloudFront picks it up in about a minute.",
+			"View site",
+			"Error:",
+			"Couldn't reach the bucket. Try again.",
+			"Retry",
+			"Uploading build… 62%"
+		],
+		"hydrationErrors": 1
+	},
+	"components/Sparkline": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/SpeedDial": {
+		"clientOnly": ["Email me", "Copy link", "Share", "Download résumé"],
+		"hydrationErrors": 0
+	},
+	"components/Stack": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Stepper": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Switch": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Table": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Tabs": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/TextareaAutosize": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/TextField": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Timeline": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/TimingChart": {
+		"clientOnly": ["Scroll sideways for the whole chart."],
+		"hydrationErrors": 0
+	},
+	"components/ToggleButton": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Tooltip": {
+		"clientOnly": [
+			"contact@sebastiansuarez.dev",
+			"Download résumé",
+			"Copy email",
+			"Open repository",
+			"Share",
+			"A DirectInput proxy inside the Wine bottle, a Rust daemon on the host. Long titles wrap at 280px."
+		],
+		"hydrationErrors": 0
+	},
+	"components/TransferList": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Transitions": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/Typography": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"components/useMediaQuery": {
+		"clientOnly": ["matches"],
+		"hydrationErrors": 0
+	},
+	"sections/ClientWork": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"sections/ContactSlab": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"sections/Hero": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"sections/ProjectCard": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	},
+	"sections/SiteHeader": {
+		"clientOnly": [],
+		"hydrationErrors": 0
+	}
+}

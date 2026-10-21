@@ -1,0 +1,8 @@
+{
+	"$comment": "Previews allowed to show text only after JavaScript, with the reason. The plan declares NoSsr, Portal and closed popups; portals and closed popups need no entry, because the gate only reads #root.",
+	"previews": {
+		"components/NoSsr": {
+			"reason": "NoSsr renders its children only after mount, by design."
+		}
+	}
+}
