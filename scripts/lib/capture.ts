@@ -101,12 +101,42 @@ export async function freeze(page: Page): Promise<void> {
 }
 
 /**
-Waits for fonts, the network and two frames, then freezes motion.
+Waits until the page stops changing: its size and element count read the same three times in a
+row, 150ms apart, within 15s. Some previews lay out after load (Mermaid draws its diagrams
+asynchronously), and a capture taken mid-layout differs from the next one.
+*/
+async function waitForStableLayout(page: Page): Promise<void> {
+	await page.evaluate(async () => {
+		const read = () => {
+			const { documentElement } = document;
+			return `${documentElement.scrollWidth}×${documentElement.scrollHeight}:${document.querySelectorAll("*").length}`;
+		};
+
+		// Counted, not timed: the page's Date is fixed (openPage), so it never reaches a deadline.
+		let last = read();
+		let unchanged = 0;
+		for (let tries = 0; unchanged < 3 && tries < 100; tries++) {
+			// eslint-disable-next-line no-await-in-loop -- each reading waits for the previous one
+			await new Promise((resolve) => {
+				setTimeout(resolve, 150);
+			});
+			const now = read();
+			unchanged = now === last ? unchanged + 1 : 0;
+			last = now;
+		}
+	});
+}
+
+/**
+Waits for fonts, the network, a stable layout and two frames, then freezes motion.
 */
 export async function settle(page: Page): Promise<void> {
 	await page.waitForLoadState("networkidle");
 	await page.evaluate(async () => {
 		await document.fonts.ready;
+	});
+	await waitForStableLayout(page);
+	await page.evaluate(async () => {
 		await new Promise((resolve) => {
 			requestAnimationFrame(() => {
 				requestAnimationFrame(resolve);

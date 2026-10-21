@@ -170,7 +170,11 @@ async function compare(
 	const referenceUrl = writePage(preview, "reference");
 	const candidateUrl = writePage(preview, candidate, {
 		css,
-		variant: css === undefined ? undefined : "mutated",
+		// One page per mutation: two mutations of one preview run side by side in the pool.
+		variant:
+			css === undefined
+				? undefined
+				: `mutated-${(label ?? "css").replaceAll(/\W+/gv, "-")}`,
 	});
 	const reference = await capture(browser, server, referenceUrl, state);
 	const boxes = await regions(reference.page);
@@ -287,9 +291,10 @@ const mutations = [
 		css: ".gl-button-primary { border-radius: 12px !important; }",
 	},
 	{
-		name: "colour",
+		// Only the fill changes, to the hover token: the subtlest colour defect a port is likely to make.
+		name: "ink at rest",
 		preview: "components/Button",
-		css: ".gl-button-primary { background: #2a3a55 !important; }",
+		css: ".gl-button-primary { background-color: var(--ink-hover) !important; }",
 	},
 	{
 		name: "2px shift",

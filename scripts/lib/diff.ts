@@ -31,9 +31,11 @@ export type ImageDiff = {
 };
 
 /**
-The colour distance under which two pixels count as equal, on pixelmatch's 0–1 scale.
+The colour distance under which two pixels count as equal, on pixelmatch's 0–1 scale. 0.02 tells
+neighbouring tokens apart (ink from ink-hover, danger from danger-hover), which pixelmatch's
+default 0.1 doesn't, and still ignores one-step rounding noise.
 */
-export const pixelThreshold = 0.1;
+export const pixelThreshold = 0.02;
 
 // The option names are pixelmatch's.
 // eslint-disable-next-line @typescript-eslint/naming-convention
