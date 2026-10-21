@@ -1,0 +1,5 @@
+{
+	"$comment": "What the API gate accepts beyond design-system/source/index.d.ts, each with its reason (tests/api/README.md). exports: names the package may export that the reference doesn't. checks: ids from tests/api/generated that may fail, for a deviation recorded in docs/deviations.md.",
+	"exports": {},
+	"checks": {}
+}
