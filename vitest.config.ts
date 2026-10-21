@@ -110,9 +110,10 @@ export default defineConfig({
 				// preview's a11y.test is "error", so a violation fails the story. The plugin
 				// resolves configDir against the working directory, so it gets an absolute path.
 				plugins: [storybookTest({ configDir: path.join(root, ".storybook") })],
+				optimizeDeps,
 				test: {
 					name: "storybook",
-					browser: chromium,
+					browser: chromium(),
 				},
 			},
 		],
