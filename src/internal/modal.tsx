@@ -1,7 +1,7 @@
 "use client";
 /**
 The modal-flags adapter: Blue Glass's documented Modal flags (design-system/components/Modal)
-on Base UI's Dialog. Modal, Dialog and Drawer build on `ModalLayer`; Popover and Menu can reuse
+on Base UI's Dialog. Modal and Dialog build on `ModalLayer`; Drawer, Popover and Menu can reuse
 `resolveModalBehaviour` and `useScrollLock` with their own Base UI roots.
 
 Why an adapter: the documented flags are independent, but Base UI's `modal` couples them. `true`

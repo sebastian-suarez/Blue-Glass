@@ -595,6 +595,12 @@ describe("stacked layers", () => {
 		await frames();
 		expect(document.activeElement).toBe(byId("inner"));
 
+		// Base UI renders the inner layer inside the outer one's portal, not straight into body.
+		const outerRoot = byId("outer").closest(".gl-modal");
+		const innerRoot = byId("inner").closest(".gl-modal");
+		expect(outerRoot?.parentElement).toBe(document.body);
+		expect(innerRoot?.parentElement?.closest(".gl-modal")).toBe(outerRoot);
+
 		await userEvent.keyboard("{Escape}");
 		expect(calls).toEqual(["inner:escapeKeyDown"]);
 
