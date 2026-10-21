@@ -69,6 +69,53 @@ const xoConfig: FlatXoConfig = [
 		},
 	},
 	{
+		files: ["src/**/*.{ts,tsx}", "stories/**/*.tsx", ".storybook/**/*.tsx"],
+		rules: {
+			// The plugin's own recommended options. XO's React config drops them, which bans the
+			// standard ARIA list patterns the reference uses (ul role="listbox" with li role="option",
+			// ul role="menu", ul role="tablist") and the focusable tab panel.
+			"jsx-a11y-x/no-noninteractive-element-to-interactive-role": [
+				"error",
+				{
+					ul: [
+						"listbox",
+						"menu",
+						"menubar",
+						"radiogroup",
+						"tablist",
+						"tree",
+						"treegrid",
+					],
+					ol: [
+						"listbox",
+						"menu",
+						"menubar",
+						"radiogroup",
+						"tablist",
+						"tree",
+						"treegrid",
+					],
+					li: [
+						"menuitem",
+						"menuitemradio",
+						"menuitemcheckbox",
+						"option",
+						"row",
+						"tab",
+						"treeitem",
+					],
+					table: ["grid"],
+					td: ["gridcell"],
+					fieldset: ["radiogroup", "presentation"],
+				},
+			],
+			"jsx-a11y-x/no-noninteractive-tabindex": [
+				"error",
+				{ tags: [], roles: ["tabpanel"], allowExpressionValues: true },
+			],
+		},
+	},
+	{
 		files: ["src/**/*.{ts,tsx}"],
 		rules: {
 			// The published code supports the browsers Base UI does ("Baseline Widely
