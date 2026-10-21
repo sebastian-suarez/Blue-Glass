@@ -8,6 +8,11 @@ const xoConfig: FlatXoConfig = [
 		ignores: ["design-system/**", "scripts/build-tokens.mjs"],
 	},
 	{
+		// The consumer apps stand in for outside projects, with their own dependencies and
+		// config, outside the root tsconfig. Their builds in npm run check:package test them.
+		ignores: ["tests/consumer/**"],
+	},
+	{
 		// XO 5 formats with its own Prettier style over .prettierrc. "compat" turns off
 		// the rules that clash with Prettier, so .prettierrc stays the source of truth.
 		prettier: "compat",

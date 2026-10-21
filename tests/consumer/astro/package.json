@@ -1,0 +1,25 @@
+{
+	"name": "blue-glass-consumer-astro",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Stand-in for the portfolio: installs the packed @sebastian-suarez/blue-glass and builds it with Astro, React and Tailwind.",
+	"type": "module",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/react": "^7.1.0",
+		"@tailwindcss/vite": "^4.3.3",
+		"astro": "^7.4.1",
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1",
+		"tailwindcss": "^4.3.3"
+	},
+	"devDependencies": {
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0"
+	}
+}
