@@ -1,0 +1,52 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { ColorSwatches, TokenTable, TypeStyles } from "./blocks/tokens.tsx";
+
+<Meta title="Foundations/Tokens" />
+
+# Tokens
+
+Every value in Blue Glass comes from `design-system/tokens/tokens.json`, and this page is generated from it. The stylesheet declares each token as a custom property on `:root` and each type style as a `.text-*` class, so `var(--color-ink)` and `class="text-heading"` work anywhere it loads.
+
+## Colour
+
+One light theme. Each note gives the colour's role and the contrast it reaches on the canvas and on glass.
+
+<ColorSwatches />
+
+## Type
+
+The system stack, `--font-sans`, for everything and `--font-mono` for code. Each sample is set in its own class.
+
+<TypeStyles />
+
+## Spacing
+
+<TokenTable family="spacing" />
+
+## Radius
+
+<TokenTable family="radius" />
+
+## Shadow
+
+<TokenTable family="shadow" />
+
+## Blur
+
+<TokenTable family="blur" />
+
+## Easing
+
+<TokenTable family="easing" />
+
+## Duration
+
+<TokenTable family="duration" />
+
+## Z-index
+
+<TokenTable family="zIndex" />
+
+## Size
+
+<TokenTable family="size" />
