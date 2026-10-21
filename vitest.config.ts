@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
@@ -104,6 +105,16 @@ export default defineConfig({
 			},
 			behaviour("package"),
 			behaviour("reference"),
+			{
+				// Renders every story from .storybook/main.ts's globs, then runs axe on it; the
+				// preview's a11y.test is "error", so a violation fails the story. The plugin
+				// resolves configDir against the working directory, so it gets an absolute path.
+				plugins: [storybookTest({ configDir: path.join(root, ".storybook") })],
+				test: {
+					name: "storybook",
+					browser: chromium,
+				},
+			},
 		],
 	},
 });

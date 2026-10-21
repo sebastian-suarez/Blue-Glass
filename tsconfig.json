@@ -24,7 +24,8 @@
 		// Behaviour tests import the components as "#ui" (vitest.config.ts swaps the target).
 		"paths": { "#ui": ["./src/index.ts"] }
 	},
-	"include": ["src", "tests", "scripts", ".storybook", "*.ts"],
+	// A bare ".storybook" matches nothing: the implied **/* skips dot folders.
+	"include": ["src", "tests", "scripts", ".storybook/**/*", "stories", "*.ts"],
 	// tests/api compiles its generated checks and fixtures with its own tsconfig.
 	"exclude": [
 		"node_modules",

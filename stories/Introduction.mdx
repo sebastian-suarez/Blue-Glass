@@ -1,0 +1,69 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Blue Glass
+
+Blue Glass is the design system of sebastiansuarez.dev: frosted white panels on a pale blue canvas, over blurred rings of light. `@sebastian-suarez/blue-glass` brings it to React as components with the documented Blue Glass API, Base UI for behaviour and one stylesheet.
+
+## Install
+
+The package isn't on a registry yet. Build and pack it from its repository:
+
+```sh
+npm run build
+npm pack
+```
+
+Then install the tarball in your app:
+
+```sh
+npm install path/to/sebastian-suarez-blue-glass-0.1.0.tgz
+```
+
+## Styles
+
+Import the stylesheet once, at your app's entry point. It carries the tokens, the base layer and every component's styles.
+
+```ts
+import "@sebastian-suarez/blue-glass/styles.css";
+```
+
+### With Tailwind 4
+
+Declare the layer order before you import both stylesheets, so Tailwind's utilities override Blue Glass:
+
+```css
+@layer theme, base, gl-fallback, gl-base, components, gl-components, utilities;
+
+@import "tailwindcss";
+@import "@sebastian-suarez/blue-glass/styles.css";
+```
+
+Blue Glass keeps its rules in `gl-fallback`, `gl-base` and `gl-components`. In this order a utility such as `text-sm` wins over a `.text-*` class or a component's own styles, and Tailwind's preflight sits under Blue Glass's base layer.
+
+## Astro
+
+Astro renders the components to HTML on the server. Static ones, such as a `Button` link or a `Paper`, need no client JavaScript. Hydrate interactive ones as islands with `client:visible`, which loads their script when they scroll into view:
+
+```astro
+---
+import { Button } from "@sebastian-suarez/blue-glass";
+import ProjectTabs from "../components/ProjectTabs.tsx";
+import "@sebastian-suarez/blue-glass/styles.css";
+---
+
+<Button href="#work">See the work</Button>
+<ProjectTabs client:visible />
+```
+
+Put an interactive part together in a React component of your own, as `ProjectTabs` does with `Tabs`, `Tab` and `TabPanel`, and hydrate that. An island's children written in an Astro file arrive as static HTML, not as React elements.
+
+## React 19 only
+
+`react` and `react-dom` 19 are peer dependencies. React 18 isn't supported.
+
+## In this Storybook
+
+- **Foundations:** the brand book, the tokens, and the styles that components share.
+- **Components,** by group: each with its reference README, one story per section of its reference preview, and its props.
