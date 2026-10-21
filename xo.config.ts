@@ -29,6 +29,7 @@ const xoConfig: FlatXoConfig = [
 			"src/**/*.{ts,tsx}",
 			"tests/**/*.{ts,tsx}",
 			".storybook/**/*.{ts,tsx}",
+			"stories/**/*.{ts,tsx}",
 		],
 		rules: {
 			// React's own contract uses null: refs are set to null, and components render null.
@@ -50,6 +51,16 @@ const xoConfig: FlatXoConfig = [
 		files: ["src/components/**/*.{ts,tsx}"],
 		rules: {
 			// A component module is named after the component it exports.
+			"unicorn/filename-case": [
+				"error",
+				{ cases: { pascalCase: true, kebabCase: true } },
+			],
+		},
+	},
+	{
+		files: ["stories/*.stories.tsx"],
+		rules: {
+			// Like a component's stories, a docs entry's stories are named after what they show.
 			"unicorn/filename-case": [
 				"error",
 				{ cases: { pascalCase: true, kebabCase: true } },
