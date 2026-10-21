@@ -40,6 +40,7 @@
 		"build:css": "node scripts/build-css.ts",
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"check:package": "node scripts/check-package.ts",
+		"check:api": "npm run build && node scripts/api/generate.ts && node scripts/api/compile.ts && vitest run --project unit tests/api/exports.test.ts",
 		"test": "vitest",
 		"lint": "xo --fix",
 		"format": "prettier --write .",

@@ -25,5 +25,13 @@
 		"paths": { "#ui": ["./src/index.ts"] }
 	},
 	"include": ["src", "tests", "scripts", ".storybook", "*.ts"],
-	"exclude": ["node_modules", "dist", ".cache", "tests/consumer"]
+	// tests/api compiles its generated checks and fixtures with its own tsconfig.
+	"exclude": [
+		"node_modules",
+		"dist",
+		".cache",
+		"tests/consumer",
+		"tests/api/generated",
+		"tests/api/fixtures"
+	]
 }
