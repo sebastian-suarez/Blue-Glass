@@ -108,12 +108,12 @@ function checkType(writer: Writer, type: DocumentedType) {
 		const subject = label(type.name, typeArguments);
 		const documented = `Doc.${type.name}${typeArguments}`;
 		const ours = `Pkg.${type.name}${typeArguments}`;
-		writer.type(
-			`${subject}#any`,
-			"the package's type isn't any",
-			`Never<IfAny<${ours}, "is any">>`,
-		);
 		if (!type.isObject) {
+			writer.type(
+				`${subject}#any`,
+				"has no any that the documentation doesn't, inside functions and refs too",
+				`Never<AnyIn<${quote(subject)}, ${documented}, ${ours}>>`,
+			);
 			writer.type(
 				`${subject}#assignable`,
 				"accepts every documented value",
@@ -123,18 +123,23 @@ function checkType(writer: Writer, type: DocumentedType) {
 		}
 
 		writer.type(
+			`${subject}#any`,
+			"the package's type isn't any",
+			`Never<IfAny<${ours}, ${quote(`${subject} is any`)}>>`,
+		);
+		writer.type(
 			`${subject}#keys`,
 			"keeps every documented key",
 			`Never<MissingKeys<${documented}, ${ours}>>`,
 		);
 		writer.type(
 			`${subject}#required`,
-			"requires no key the documentation doesn't have",
+			"requires no key the documentation doesn't require",
 			`Never<NewRequiredKeys<${documented}, ${ours}>>`,
 		);
 		writer.type(
 			`${subject}#any-props`,
-			"types no documented key as any",
+			"has no any in a documented key that the documentation doesn't: in the prop, its callbacks or its refs",
 			`Never<AnyKeys<${documented}, ${ours}>>`,
 		);
 		for (const key of type.ownKeys) {
@@ -186,7 +191,7 @@ function checkComponent(
 		);
 		writer.type(
 			`${subject}#any-props`,
-			"types no documented prop as any",
+			"has no any in a documented prop that the documentation doesn't: in the prop, its callbacks or its ref",
 			`Never<AnyKeys<${documentedProps}, ${props}>>`,
 		);
 		writer.type(
@@ -236,8 +241,8 @@ function checkValue(writer: Writer, value: DocumentedValue) {
 			const parameters = writer.declare(`Parameters<typeof Doc.${name}>`);
 			writer.type(
 				`${name}#any`,
-				"has nothing typed any that the documentation doesn't",
-				`Never<AnyInSignature<typeof Pkg.${name}, typeof Doc.${name}>>`,
+				"has no any that the documentation doesn't, in its parameters, their refs and callbacks, or its return type",
+				`Never<AnyIn<${quote(name)}, typeof Doc.${name}, typeof Pkg.${name}>>`,
 			);
 			// The package's function in the documented one's place: it must take every
 			// documented call and return what the documentation promises. The reverse
@@ -266,8 +271,8 @@ function checkValue(writer: Writer, value: DocumentedValue) {
 		case "constant": {
 			writer.type(
 				`${name}#any`,
-				"isn't any",
-				`Never<IfAny<typeof Pkg.${name}, "is any">>`,
+				"has no any that the documentation doesn't",
+				`Never<AnyIn<${quote(name)}, typeof Doc.${name}, typeof Pkg.${name}>>`,
 			);
 			writer.type(
 				`${name}#value`,
@@ -313,7 +318,7 @@ function moduleText(
 		'import type * as React from "react";',
 		'import type * as Doc from "#api/documented";',
 		'import * as Pkg from "#api/package";',
-		`import type { AnyInSignature, AnyKeys, Assignable, IfAny, IncompatibleKeys, MissingKeys, Never, NewRequiredKeys, Probe, Prop, RefElement, Strict } from ${quote(options.assertImport)};`,
+		`import type { AnyIn, AnyKeys, Assignable, IfAny, IncompatibleKeys, MissingKeys, Never, NewRequiredKeys, Probe, Prop, RefElement, Strict } from ${quote(options.assertImport)};`,
 		"",
 		...writer.declarations,
 		"",
