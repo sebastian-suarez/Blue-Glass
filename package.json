@@ -39,6 +39,7 @@
 		"build:js": "node scripts/clean-dist.ts && tsc -p tsconfig.build.json",
 		"build:css": "node scripts/build-css.ts",
 		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"check:package": "node scripts/check-package.ts",
 		"test": "vitest",
 		"lint": "xo --fix",
 		"format": "prettier --write .",
