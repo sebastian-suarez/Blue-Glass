@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -463,9 +463,90 @@ describe("Radio group", () => {
 		await userEvent.click(screen.getByText("Vue"));
 		expect(screen.getByRole("radio", { name: "Vue" }).ariaChecked).toBe("true");
 	});
+
+	test("preventDefault in a radio's onChange stops the choice and the group's onChange", async () => {
+		const group = recorder<string>();
+		render(
+			<RadioGroupControl
+				name="stack"
+				aria-label="Stack"
+				onChange={group.onChange}
+			>
+				<RadioControl
+					value="react"
+					aria-label="React"
+					style={box}
+					onChange={(event) => {
+						event.preventDefault();
+					}}
+				/>
+			</RadioGroupControl>,
+		);
+		await userEvent.click(screen.getByRole("radio", { name: "React" }));
+		expect(group.onChange).not.toHaveBeenCalled();
+		expect(screen.getByRole("radio", { name: "React" }).ariaChecked).toBe(
+			"false",
+		);
+	});
 });
 
 describe("Radio outside a group", () => {
+	test.each(["click", "Space", "label", "input.click()"] as const)(
+		"%s on a lone radio reports onChange(event, true) on its input",
+		async (how) => {
+			const ref = React.createRef<HTMLInputElement>();
+			const { calls, onChange } = recorder<boolean>();
+			render(
+				<>
+					<RadioControl
+						ref={ref}
+						value="alone"
+						name="alone"
+						id="alone-input"
+						style={box}
+						onChange={onChange}
+					/>
+					<label htmlFor="alone-input">Alone</label>
+				</>,
+			);
+			switch (how) {
+				case "click": {
+					await userEvent.click(screen.getByRole("radio"));
+					break;
+				}
+
+				case "Space": {
+					await userEvent.tab();
+					await userEvent.keyboard("[Space]");
+					break;
+				}
+
+				case "label": {
+					await userEvent.click(screen.getByText("Alone"));
+					break;
+				}
+
+				case "input.click()": {
+					act(() => {
+						ref.current?.click();
+					});
+					break;
+				}
+			}
+
+			expect(calls).toEqual([
+				{
+					target: ref.current,
+					currentTarget: ref.current,
+					type: "change",
+					isNative: true,
+					inputChecked: true,
+					value: true,
+				},
+			]);
+		},
+	);
+
 	test("checked and defaultChecked work, with onChange(event, true)", async () => {
 		const { calls, onChange } = recorder<boolean>();
 		function Controlled() {

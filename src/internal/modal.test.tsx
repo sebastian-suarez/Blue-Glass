@@ -1,5 +1,8 @@
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import * as React from "react";
+import { createPortal } from "react-dom";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 // The real overlay layout: .gl-modal and .gl-backdrop cover the viewport.
@@ -10,6 +13,7 @@ import {
 	ModalLayer,
 	resolveModalBehaviour,
 } from "./modal.js";
+import { type TransitionOptions, useTransition } from "./transition.js";
 
 type Flags = Omit<ModalLayerProps, "open" | "onClose" | "children">;
 type CloseCall = {
@@ -181,18 +185,22 @@ test("resolveModalBehaviour maps each flag on its own", () => {
 	).toBe("none");
 });
 
-const combinations = [false, true].flatMap((disableEnforceFocus) =>
-	[false, true].flatMap((disableScrollLock) =>
-		[false, true].map((hideBackdrop) => ({
-			disableEnforceFocus,
-			disableScrollLock,
-			hideBackdrop,
-		})),
+// Every combination, through Base UI's portal and rendered in place, which has its own path.
+const combinations = [false, true].flatMap((disablePortal) =>
+	[false, true].flatMap((disableEnforceFocus) =>
+		[false, true].flatMap((disableScrollLock) =>
+			[false, true].map((hideBackdrop) => ({
+				disablePortal,
+				disableEnforceFocus,
+				disableScrollLock,
+				hideBackdrop,
+			})),
+		),
 	),
 );
 
 describe.each(combinations)(
-	"disableEnforceFocus=$disableEnforceFocus disableScrollLock=$disableScrollLock hideBackdrop=$hideBackdrop",
+	"disablePortal=$disablePortal disableEnforceFocus=$disableEnforceFocus disableScrollLock=$disableScrollLock hideBackdrop=$hideBackdrop",
 	(flags) => {
 		test("focus, Tab, scroll, outside clicks, Escape and focus return follow the flags", async () => {
 			const modal = setup(flags);
@@ -273,153 +281,161 @@ describe.each(combinations)(
 	},
 );
 
-describe("the remaining flags", () => {
-	test("disableEscapeKeyDown: Escape reports nothing and keeps propagating", async () => {
-		const modal = setup({ disableEscapeKeyDown: true });
-		await modal.open();
-		const seen: KeyboardEvent[] = [];
-		const listener = (event: KeyboardEvent) => {
-			seen.push(event);
-		};
+// The in-place path has its own Escape, focus and keepMounted code, so these run on both.
+describe.each([false, true])(
+	"the remaining flags, disablePortal=%s",
+	(disablePortal) => {
+		test("disableEscapeKeyDown: Escape reports nothing and keeps propagating", async () => {
+			const modal = setup({ disableEscapeKeyDown: true, disablePortal });
+			await modal.open();
+			const seen: KeyboardEvent[] = [];
+			const listener = (event: KeyboardEvent) => {
+				seen.push(event);
+			};
 
-		document.addEventListener("keydown", listener);
-		try {
-			await userEvent.keyboard("{Escape}");
-		} finally {
-			document.removeEventListener("keydown", listener);
-		}
+			document.addEventListener("keydown", listener);
+			try {
+				await userEvent.keyboard("{Escape}");
+			} finally {
+				document.removeEventListener("keydown", listener);
+			}
 
-		expect(modal.onClose).not.toHaveBeenCalled();
-		expect(seen.map((event) => [event.key, event.defaultPrevented])).toEqual([
-			["Escape", false],
-		]);
-	});
+			expect(modal.onClose).not.toHaveBeenCalled();
+			expect(seen.map((event) => [event.key, event.defaultPrevented])).toEqual([
+				["Escape", false],
+			]);
+		});
 
-	test("Escape is handled once and stops there", async () => {
-		const modal = setup();
-		await modal.open();
-		const seen: string[] = [];
-		const listener = (event: KeyboardEvent) => {
-			seen.push(event.key);
-		};
+		test("Escape is handled once and stops there", async () => {
+			const modal = setup({ disablePortal });
+			await modal.open();
+			const seen: string[] = [];
+			const listener = (event: KeyboardEvent) => {
+				seen.push(event.key);
+			};
 
-		document.addEventListener("keydown", listener);
-		try {
-			await userEvent.keyboard("{Escape}");
-		} finally {
-			document.removeEventListener("keydown", listener);
-		}
+			document.addEventListener("keydown", listener);
+			try {
+				await userEvent.keyboard("{Escape}");
+			} finally {
+				document.removeEventListener("keydown", listener);
+			}
 
-		expect(modal.calls.map((call) => call.reason)).toEqual(["escapeKeyDown"]);
-		expect(seen).toEqual([]);
-	});
+			expect(modal.calls.map((call) => call.reason)).toEqual(["escapeKeyDown"]);
+			expect(seen).toEqual([]);
+		});
 
-	test("a backdrop click reports backdropClick with the React event", async () => {
-		const modal = setup();
-		await modal.open();
-		const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
-		expect(backdrop).not.toBeNull();
-		await userEvent.click(backdrop!, { position: { x: 20, y: 20 } });
-		expect(modal.calls).toHaveLength(1);
-		const [call] = modal.calls;
-		expect(call?.reason).toBe("backdropClick");
-		expect(call?.event).not.toBeInstanceOf(Event);
-		expect((call?.event as React.MouseEvent).nativeEvent).toBeInstanceOf(
-			MouseEvent,
-		);
-		expect((call?.event as React.MouseEvent).target).toBe(backdrop);
-	});
+		test("a backdrop click reports backdropClick with the React event", async () => {
+			const modal = setup({ disablePortal });
+			await modal.open();
+			const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
+			expect(backdrop).not.toBeNull();
+			await userEvent.click(backdrop!, { position: { x: 20, y: 20 } });
+			expect(modal.calls).toHaveLength(1);
+			const [call] = modal.calls;
+			expect(call?.reason).toBe("backdropClick");
+			expect(call?.event).not.toBeInstanceOf(Event);
+			expect((call?.event as React.MouseEvent).nativeEvent).toBeInstanceOf(
+				MouseEvent,
+			);
+			expect((call?.event as React.MouseEvent).target).toBe(backdrop);
+		});
 
-	test("invisibleBackdrop: transparent, and still catches outside presses", async () => {
-		const modal = setup({ invisibleBackdrop: true });
-		await modal.open();
-		const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
-		expect(backdrop?.classList.contains("gl-backdrop-invisible")).toBe(true);
-		expect(getComputedStyle(backdrop!).backgroundColor).toBe(
-			"rgba(0, 0, 0, 0)",
-		);
-		await userEvent.click(byId("page-button"), { force: true });
-		expect(modal.pageClicks).toEqual([]);
-		expect(modal.calls.map((call) => call.reason)).toEqual(["backdropClick"]);
-	});
+		test("invisibleBackdrop: transparent, and still catches outside presses", async () => {
+			const modal = setup({ invisibleBackdrop: true, disablePortal });
+			await modal.open();
+			const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
+			expect(backdrop?.classList.contains("gl-backdrop-invisible")).toBe(true);
+			expect(getComputedStyle(backdrop!).backgroundColor).toBe(
+				"rgba(0, 0, 0, 0)",
+			);
+			await userEvent.click(byId("page-button"), { force: true });
+			expect(modal.pageClicks).toEqual([]);
+			expect(modal.calls.map((call) => call.reason)).toEqual(["backdropClick"]);
+		});
 
-	test("BackdropProps reach the backdrop, and its handlers still run", async () => {
-		const onClick = vi.fn<(event: React.MouseEvent<HTMLDivElement>) => void>();
-		const modal = setup({
-			BackdropProps: { className: "extra", "data-test": "backdrop", onClick },
-		} as Flags);
-		await modal.open();
-		const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
-		expect(backdrop?.classList.contains("extra")).toBe(true);
-		expect(backdrop?.dataset.test).toBe("backdrop");
-		await userEvent.click(backdrop!, { position: { x: 20, y: 20 } });
-		expect(onClick).toHaveBeenCalledTimes(1);
-		expect(modal.calls.map((call) => call.reason)).toEqual(["backdropClick"]);
-	});
+		test("BackdropProps reach the backdrop, and its handlers still run", async () => {
+			const onClick =
+				vi.fn<(event: React.MouseEvent<HTMLDivElement>) => void>();
+			const modal = setup({
+				BackdropProps: { className: "extra", "data-test": "backdrop", onClick },
+				disablePortal,
+			} as Flags);
+			await modal.open();
+			const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
+			expect(backdrop?.classList.contains("extra")).toBe(true);
+			expect(backdrop?.dataset.test).toBe("backdrop");
+			await userEvent.click(backdrop!, { position: { x: 20, y: 20 } });
+			expect(onClick).toHaveBeenCalledTimes(1);
+			expect(modal.calls.map((call) => call.reason)).toEqual(["backdropClick"]);
+		});
 
-	test("disableAutoFocus: focus stays where it was", async () => {
-		const modal = setup({ disableAutoFocus: true });
-		await modal.open();
-		await frames(3);
-		expect(document.activeElement).toBe(byId("opener"));
-	});
+		test("disableAutoFocus: focus stays where it was", async () => {
+			const modal = setup({ disableAutoFocus: true, disablePortal });
+			await modal.open();
+			await frames(3);
+			expect(document.activeElement).toBe(byId("opener"));
+		});
 
-	test("data-autofocus marks the element that takes focus", async () => {
-		const modal = setup(
-			{},
-			<Surface>
-				<button type="button" id="first">
-					First
-				</button>
-				<button data-autofocus type="button" id="marked">
-					Marked
-				</button>
-			</Surface>,
-		);
-		await modal.open();
-		expect(document.activeElement).toBe(byId("marked"));
-	});
+		test("data-autofocus marks the element that takes focus", async () => {
+			const modal = setup(
+				{ disablePortal },
+				<Surface>
+					<button type="button" id="first">
+						First
+					</button>
+					<button data-autofocus type="button" id="marked">
+						Marked
+					</button>
+				</Surface>,
+			);
+			await modal.open();
+			expect(document.activeElement).toBe(byId("marked"));
+		});
 
-	test("the surface gets tabindex -1 when it takes focus", async () => {
-		const modal = setup();
-		await modal.open();
-		expect(byId("surface").getAttribute("tabindex")).toBe("-1");
-		expect(document.activeElement).toBe(byId("surface"));
-	});
+		test("the surface gets tabindex -1 when it takes focus", async () => {
+			const modal = setup({ disablePortal });
+			await modal.open();
+			expect(byId("surface").getAttribute("tabindex")).toBe("-1");
+			expect(document.activeElement).toBe(byId("surface"));
+		});
 
-	test("disableRestoreFocus: focus doesn't go back to the opener", async () => {
-		const modal = setup({ disableRestoreFocus: true });
-		await modal.open();
-		await modal.close();
-		await frames(3);
-		expect(document.activeElement).not.toBe(byId("opener"));
-	});
+		test("disableRestoreFocus: focus doesn't go back to the opener", async () => {
+			const modal = setup({ disableRestoreFocus: true, disablePortal });
+			await modal.open();
+			await modal.close();
+			await frames(3);
+			expect(document.activeElement).not.toBe(byId("opener"));
+		});
 
-	test("keepMounted: the content stays in the DOM, hidden, and keeps its state", async () => {
-		const modal = setup(
-			{ keepMounted: true },
-			<Surface>
-				<input id="field" aria-label="Field" />
-			</Surface>,
-		);
-		await modal.open();
-		await userEvent.fill(byId("field"), "kept");
-		await modal.close();
-		expect(byId("surface").isConnected).toBe(true);
-		expect(byId("surface").checkVisibility()).toBe(false);
-		expect(modal.root().classList.contains("gl-modal-hidden")).toBe(true);
-		await modal.open();
-		expect(byId<HTMLInputElement>("field").value).toBe("kept");
-		expect(modal.root().classList.contains("gl-modal-hidden")).toBe(false);
-	});
+		test("keepMounted: the content stays in the DOM, hidden, and keeps its state", async () => {
+			const modal = setup(
+				{ keepMounted: true, disablePortal },
+				<Surface>
+					<input id="field" aria-label="Field" />
+				</Surface>,
+			);
+			await modal.open();
+			await userEvent.fill(byId("field"), "kept");
+			await modal.close();
+			expect(byId("surface").isConnected).toBe(true);
+			expect(byId("surface").checkVisibility()).toBe(false);
+			expect(modal.root().classList.contains("gl-modal-hidden")).toBe(true);
+			await modal.open();
+			expect(byId<HTMLInputElement>("field").value).toBe("kept");
+			expect(modal.root().classList.contains("gl-modal-hidden")).toBe(false);
+		});
 
-	test("without keepMounted the content leaves the DOM when closed", async () => {
-		const modal = setup();
-		await modal.open();
-		await modal.close();
-		expect(document.querySelector("#surface")).toBeNull();
-	});
+		test("without keepMounted the content leaves the DOM when closed", async () => {
+			const modal = setup({ disablePortal });
+			await modal.open();
+			await modal.close();
+			expect(document.querySelector("#surface")).toBeNull();
+		});
+	},
+);
 
+describe("where the layer renders", () => {
 	test("disablePortal: the layer renders in place", async () => {
 		const calls: string[] = [];
 		render(
@@ -622,4 +638,236 @@ describe("stacked layers", () => {
 		view.unmount();
 		expect(document.body.style.overflow).toBe("");
 	});
+});
+
+describe("disablePortal on the server", () => {
+	test("the server HTML holds the open layer in place, hydrates without errors, and then works", async () => {
+		const calls: ModalCloseReason[] = [];
+		const tree = (
+			<section id="host">
+				<button type="button" id="before">
+					Before
+				</button>
+				<ModalLayer
+					disablePortal
+					open
+					onClose={(_event, reason) => {
+						calls.push(reason);
+					}}
+				>
+					<Surface />
+				</ModalLayer>
+			</section>
+		);
+		const host = document.createElement("div");
+		document.body.append(host);
+		const errors: unknown[] = [];
+		let root: ReturnType<typeof hydrateRoot> | undefined;
+		try {
+			host.innerHTML = renderToString(tree);
+			const serverSurface = host.querySelector("#surface");
+			expect(serverSurface).not.toBeNull();
+			await act(async () => {
+				root = hydrateRoot(host, tree, {
+					onRecoverableError(error) {
+						errors.push(error);
+					},
+				});
+			});
+			await frames();
+			expect(errors).toEqual([]);
+			// Adopted, not rendered again.
+			expect(host.querySelector("#surface")).toBe(serverSurface);
+			expect(document.activeElement).toBe(serverSurface);
+			await userEvent.keyboard("{Escape}");
+			expect(calls).toEqual(["escapeKeyDown"]);
+		} finally {
+			act(() => {
+				root?.unmount();
+			});
+			host.remove();
+		}
+	});
+});
+
+describe("focus in content rendered elsewhere", () => {
+	function PortaledButton() {
+		return createPortal(
+			<button
+				type="button"
+				id="portaled"
+				style={{ position: "fixed", top: 0, right: 0, zIndex: 1500 }}
+			>
+				Portaled
+			</button>,
+			document.body,
+		);
+	}
+
+	test.each([false, true])(
+		"disablePortal=%s: focus may move into a popup the content portals to body",
+		async (disablePortal) => {
+			const modal = setup(
+				{ disablePortal },
+				<Surface>
+					<button type="button" id="first">
+						First
+					</button>
+					<PortaledButton />
+				</Surface>,
+			);
+			await modal.open();
+			byId("portaled").focus();
+			await frames();
+			expect(document.activeElement).toBe(byId("portaled"));
+			await userEvent.click(byId("portaled"));
+			await frames();
+			expect(document.activeElement).toBe(byId("portaled"));
+			// Focus on the page itself still comes back.
+			byId("page-button").focus();
+			expect(document.activeElement).not.toBe(byId("page-button"));
+		},
+	);
+});
+
+describe("exit transitions", () => {
+	const exitMs = 120;
+
+	// The reference's transition contract: Modal drives `in` and waits for onExited.
+	const TestFade = Object.assign(
+		(props: TransitionOptions & { readonly children: React.ReactNode }) => {
+			const nodeRef = React.useRef<HTMLDivElement | null>(null);
+			const status = useTransition(props, nodeRef, {
+				enter: 60,
+				exit: exitMs,
+			});
+			return (
+				<div ref={nodeRef} id="transition" data-transition={status}>
+					{props.children}
+				</div>
+			);
+		},
+		{ __glTransition: true },
+	);
+
+	function Harness({
+		flags,
+		onExited,
+	}: {
+		readonly flags: Flags;
+		readonly onExited: () => void;
+	}) {
+		const [isOpen, setIsOpen] = React.useState(false);
+		return (
+			<>
+				<button
+					type="button"
+					id="opener"
+					onClick={() => {
+						setIsOpen(true);
+					}}
+				>
+					Open
+				</button>
+				<button
+					type="button"
+					id="close"
+					onClick={() => {
+						setIsOpen(false);
+					}}
+				>
+					Close
+				</button>
+				<ModalLayer
+					open={isOpen}
+					onClose={() => {
+						setIsOpen(false);
+					}}
+					{...flags}
+				>
+					<TestFade onExited={onExited}>
+						<Surface />
+					</TestFade>
+				</ModalLayer>
+			</>
+		);
+	}
+
+	type Close = "controlled" | "backdrop" | "escape";
+
+	async function close(how: Close) {
+		switch (how) {
+			case "controlled": {
+				// A close from outside the layer, as a timer or another control would.
+				act(() => {
+					byId("close").click();
+				});
+				break;
+			}
+
+			case "backdrop": {
+				const backdrop = document.querySelector<HTMLElement>(".gl-backdrop");
+				await userEvent.click(backdrop!, { position: { x: 10, y: 10 } });
+				break;
+			}
+
+			case "escape": {
+				await userEvent.keyboard("{Escape}");
+				break;
+			}
+		}
+	}
+
+	const cases = (["controlled", "backdrop", "escape"] as const).flatMap((how) =>
+		[false, true].flatMap((disablePortal) =>
+			[false, true].map((keepMounted) => ({
+				how,
+				disablePortal,
+				keepMounted,
+			})),
+		),
+	);
+
+	test.each(cases)(
+		"close=$how disablePortal=$disablePortal keepMounted=$keepMounted: the layer stays until the child has exited",
+		async ({ how, disablePortal, keepMounted }) => {
+			const onExited = vi.fn<() => void>();
+			render(
+				<Harness flags={{ disablePortal, keepMounted }} onExited={onExited} />,
+			);
+			await userEvent.click(byId("opener"));
+			await expect
+				.poll(() => byId("transition").dataset.transition)
+				.toBe("entered");
+			// Kept mounted, the closed child mounted at exited, which already reported onExited.
+			const exitsBefore = onExited.mock.calls.length;
+			expect(exitsBefore).toBe(keepMounted ? 1 : 0);
+
+			await close(how);
+			// Closing: the child runs its exit inside the layer, which is still there.
+			expect(byId("transition").dataset.transition).toBe("exiting");
+			expect(document.querySelector(".gl-modal")).not.toBeNull();
+			expect(
+				document
+					.querySelector(".gl-modal")
+					?.classList.contains("gl-modal-hidden"),
+			).toBe(false);
+
+			await expect.poll(() => onExited.mock.calls.length).toBe(exitsBefore + 1);
+			await frames();
+			if (keepMounted) {
+				expect(byId("transition").dataset.transition).toBe("exited");
+				expect(
+					document
+						.querySelector(".gl-modal")
+						?.classList.contains("gl-modal-hidden"),
+				).toBe(true);
+			} else {
+				expect(document.querySelector(".gl-modal")).toBeNull();
+				expect(document.querySelector("#transition")).toBeNull();
+			}
+
+			expect(document.activeElement).toBe(byId("opener"));
+		},
+	);
 });

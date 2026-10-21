@@ -342,7 +342,10 @@ export function RadioGroupControl({
 
 					const event = createChangeEvent(input, details.event, details.cancel);
 					entry?.onChangeRef.current?.(event, true);
-					onChange?.(event, next);
+					// The radio's onChange cancelled the choice: the group's value didn't change.
+					if (!event.isDefaultPrevented()) {
+						onChange?.(event, next);
+					}
 				}}
 			>
 				{children}

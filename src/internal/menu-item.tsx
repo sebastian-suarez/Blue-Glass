@@ -19,22 +19,33 @@ inside `<li role="none" class="gl-menu-item-wrap">`. `dense` comes from the item
 
 The documented `onClick(event)` runs on click, Enter or Space in both modes. In a Base UI menu,
 calling `event.preventDefault()` keeps the menu open: the adapter then stops Base UI's close
-handler (`preventBaseUIHandler`). A disabled item stays reachable with the arrows but its
-`onClick` doesn't run.
+handler (`preventBaseUIHandler`). The item also remembers its React click event
+(`rememberReactEvent`), so the menu's close callback gets that same event from
+`documentedEvent(details.event, popup)`. A disabled item stays reachable with the arrows but
+its `onClick` doesn't run.
 
 `MenuList` here is the reference's, ready for the Menu port to grow: `autoFocusItem`, `dense`,
 `disableListWrap`, Up and Down, Home and End, typeahead (a word typed within 500ms, or one
-letter repeated to cycle), and Tab leaves it. Inside a Base UI menu the list is `Menu.Popup`
-itself (`MenuPopupList`), so `disableListWrap` becomes `Menu.Root`'s `loopFocus={false}`.
+letter repeated to cycle), and Tab leaves it. Its roving tab stop is set during render (the
+selected item, else the first enabled one, among the MenuItems it holds directly), so the server
+HTML already has one tabbable item and hydration matches it; once mounted, the list keeps the
+stop where focus last was. Inside a Base UI menu the list is `Menu.Popup` itself
+(`MenuPopupList`), so `disableListWrap` becomes `Menu.Root`'s `loopFocus={false}`.
 
 `BaseUiMenu` is the smallest controlled Base UI menu around `MenuPopupList`, enough for tests;
-the Menu port replaces it. Its `onClose` reports Base UI's native event: wrapping it as a
-SyntheticEvent is the events adapter's job.
+the Menu port replaces it. Its `onClose` gets `documentedEvent` and `menuCloseReason` from the
+events adapter.
 */
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import type { BaseUIEvent } from "@base-ui/react/types";
 import * as React from "react";
 import { cx } from "./cx.js";
+import {
+	documentedEvent,
+	type MenuCloseReason,
+	menuCloseReason,
+	rememberReactEvent,
+} from "./events.js";
 import { useForkRef, useId, useIsoLayoutEffect } from "./hooks.js";
 
 export type MenuItemMode = "menu" | "list";
@@ -43,15 +54,20 @@ type ListContextValue = {
 	mode: "list";
 	dense: boolean;
 	/**
-	Id of the item that holds tabindex 0 (the roving tab stop).
+	Id of the item that holds tabindex 0 (the roving tab stop), once the list has mounted.
 	*/
 	tabStop: string | undefined;
+	/**
+	Until then, the position among the list's children of the item that holds it.
+	*/
+	initialStop: number | undefined;
 	autoFocusItem: boolean;
 	setTabStop: (id: string) => void;
 	/**
-	True while a typeahead word is being typed, so Space extends it instead of activating.
+	Whether a typeahead word is being typed at this moment (a key event's timeStamp), so Space
+	extends it instead of activating. Typeahead reads every time from its key events.
 	*/
-	isTyping: () => boolean;
+	isTyping: (at: number) => boolean;
 };
 
 type MenuContextValue = { mode: "menu"; dense: boolean };
@@ -84,6 +100,40 @@ export function BaseMenuItems({
 		[dense],
 	);
 	return <MenuItemContext value={value}>{children}</MenuItemContext>;
+}
+
+// Each child's position in its MenuList, so the item there can tell it holds the first tab stop.
+const ChildIndexContext = React.createContext<number | undefined>(undefined);
+
+/**
+The position of the child that holds the tab stop before the list has mounted: the selected
+MenuItem, else the first enabled one, else the first. The same rule as the mounted list's, read
+from the elements instead of the DOM.
+*/
+function findInitialStop(children: React.ReactNode): number | undefined {
+	let first: number | undefined;
+	let firstEnabled: number | undefined;
+	let selected: number | undefined;
+	// Children.forEach counts positions the way Children.map does below.
+	// eslint-disable-next-line @eslint-react/no-children-for-each
+	React.Children.forEach(children, (child, index) => {
+		if (
+			!React.isValidElement<MenuItemProps>(child) ||
+			child.type !== MenuItem
+		) {
+			return;
+		}
+
+		first ??= index;
+		if (child.props.disabled !== true) {
+			firstEnabled ??= index;
+		}
+
+		if (child.props.selected === true) {
+			selected ??= index;
+		}
+	});
+	return selected ?? firstEnabled ?? first;
 }
 
 const itemSelector =
@@ -297,18 +347,19 @@ export function MenuList({
 		items[next]?.focus();
 	};
 
+	const initialStop = findInitialStop(children);
 	const context = React.useMemo<ListContextValue>(
 		() => ({
 			mode: "list",
 			dense,
 			tabStop,
+			initialStop,
 			autoFocusItem,
 			setTabStop,
-			isTyping: () =>
-				typedRef.current.keys !== "" &&
-				performance.now() - typedRef.current.at < typeaheadMs,
+			isTyping: (at) =>
+				typedRef.current.keys !== "" && at - typedRef.current.at < typeaheadMs,
 		}),
-		[dense, tabStop, autoFocusItem],
+		[dense, tabStop, initialStop, autoFocusItem],
 	);
 
 	return (
@@ -326,7 +377,11 @@ export function MenuList({
 				onKeyDown={handleKeyDown}
 				{...rest}
 			>
-				{children}
+				{/* Each item learns its position, for the tab stop the server HTML needs. */}
+				{/* eslint-disable-next-line @eslint-react/no-children-map */}
+				{React.Children.map(children, (child, index) => (
+					<ChildIndexContext value={index}>{child}</ChildIndexContext>
+				))}
 			</ul>
 		</MenuItemContext>
 	);
@@ -495,6 +550,24 @@ function pressOnKey(
 }
 
 /**
+Whether this item holds the list's tab stop: the one the mounted list chose, or before that,
+the one it picked during render.
+*/
+function isTabStop(
+	list: ListContextValue | undefined,
+	id: string,
+	childIndex: number | undefined,
+): boolean {
+	if (list === undefined) {
+		return false;
+	}
+
+	return list.tabStop === undefined
+		? list.initialStop !== undefined && list.initialStop === childIndex
+		: list.tabStop === id;
+}
+
+/**
 The reference's item: a roving tab stop in a standalone MenuList, a plain focusable row alone.
 */
 function ListMenuItem({
@@ -521,11 +594,12 @@ function ListMenuItem({
 }: MenuItemProps) {
 	const context = React.use(MenuItemContext);
 	const list = context?.mode === "list" ? context : undefined;
+	const childIndex = React.use(ChildIndexContext);
 	const id = useId(idProp);
 	const isDense = dense ?? list?.dense ?? false;
 	const role = itemRole(roleProp, selected);
 	const isLink = href !== undefined;
-	const isStop = list?.tabStop === id;
+	const isStop = isTabStop(list, id, childIndex);
 	const isAutoFocusTarget = list !== undefined && isStop && list.autoFocusItem;
 
 	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -539,7 +613,12 @@ function ListMenuItem({
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
 		onKeyDown?.(event);
-		pressOnKey(event, isLink, disabled, () => list?.isTyping() ?? false);
+		pressOnKey(
+			event,
+			isLink,
+			disabled,
+			() => list?.isTyping(event.timeStamp) ?? false,
+		);
 	};
 
 	const handleFocus = (event: React.FocusEvent<HTMLElement>) => {
@@ -637,6 +716,8 @@ function BaseMenuItem({
 			return;
 		}
 
+		// Base UI closes the menu in this dispatch; its close callback finds this React event.
+		rememberReactEvent(event);
 		onClick?.(event);
 		// The documented way to keep the menu open: skip Base UI's close handler.
 		if (event.defaultPrevented) {
@@ -743,22 +824,15 @@ export function MenuPopupList({
 	);
 }
 
-export type BaseUiMenuCloseReason =
-	"backdropClick" | "escapeKeyDown" | "itemClick" | "tabKeyDown";
-
-const closeReasons: Partial<Record<string, BaseUiMenuCloseReason>> = {
-	"outside-press": "backdropClick",
-	"escape-key": "escapeKeyDown",
-	"item-press": "itemClick",
-	"focus-out": "tabKeyDown",
-};
+export type BaseUiMenuCloseReason = MenuCloseReason;
 
 export type BaseUiMenuProps = MenuPopupListProps & {
 	open: boolean;
 	/**
-	Called with Base UI's native event and the documented reason.
+	Called with the documented event and reason: the item's React click event for itemClick, else
+	a SyntheticEvent-shaped wrapper (events.ts).
 	*/
-	onClose?: (event: Event, reason: BaseUiMenuCloseReason) => void;
+	onClose?: (event: React.SyntheticEvent, reason: MenuCloseReason) => void;
 	/**
 	The element the menu is placed against.
 	*/
@@ -775,22 +849,28 @@ export function BaseUiMenu({
 	onClose,
 	anchor,
 	disableListWrap = false,
+	ref,
 	...listProps
 }: BaseUiMenuProps) {
+	const popupRef = React.useRef<HTMLUListElement | null>(null);
+	const handleRef = useForkRef(popupRef, ref);
 	return (
 		<BaseMenu.Root
 			open={open}
 			loopFocus={!disableListWrap}
 			onOpenChange={(isOpen, details) => {
-				const reason = closeReasons[details.reason];
-				if (!isOpen && reason !== undefined) {
-					onClose?.(details.event, reason);
+				const reason = isOpen ? undefined : menuCloseReason(details.reason);
+				if (reason !== undefined) {
+					onClose?.(
+						documentedEvent(details.event, popupRef.current ?? undefined),
+						reason,
+					);
 				}
 			}}
 		>
 			<BaseMenu.Portal>
 				<BaseMenu.Positioner anchor={anchor} side="bottom" align="start">
-					<MenuPopupList {...listProps} />
+					<MenuPopupList ref={handleRef} {...listProps} />
 				</BaseMenu.Positioner>
 			</BaseMenu.Portal>
 		</BaseMenu.Root>

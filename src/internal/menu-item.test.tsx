@@ -1,5 +1,7 @@
-import { cleanup, render } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import * as React from "react";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import {
@@ -59,6 +61,24 @@ async function press(keys: string, expected: string[]) {
 	expect(seen).toEqual(expected);
 }
 
+/**
+Types one key on the focused element at a set moment, and returns the label focus lands on.
+Typeahead reads its 500ms window from key events' timeStamp, so setting it keeps the test off
+the real clock, whatever the machine's load.
+*/
+function typeAt(key: string, at: number): string | undefined {
+	const event = new KeyboardEvent("keydown", {
+		key,
+		bubbles: true,
+		cancelable: true,
+	});
+	Object.defineProperty(event, "timeStamp", { value: at });
+	act(() => {
+		(document.activeElement ?? document.body).dispatchEvent(event);
+	});
+	return activeLabel();
+}
+
 type OnClick = (event: React.MouseEvent<HTMLElement>) => void;
 
 type Clicks = {
@@ -107,6 +127,51 @@ function newClicks(): Clicks {
 }
 
 describe("standalone MenuList", () => {
+	test("its server HTML has one tabbable item, hydrates without errors, and Tab reaches it", async () => {
+		const tree = (
+			<>
+				<button type="button" id="before">
+					Before
+				</button>
+				<MenuList aria-label="Actions">
+					{items(newClicks(), { selected: "Cut" })}
+				</MenuList>
+			</>
+		);
+		const host = document.createElement("div");
+		document.body.append(host);
+		const errors: unknown[] = [];
+		let root: ReturnType<typeof hydrateRoot> | undefined;
+		try {
+			host.innerHTML = renderToString(tree);
+			const tabbable = [
+				...host.querySelectorAll<HTMLElement>('[role^="menuitem"]'),
+			].filter((element) => element.tabIndex === 0);
+			expect(
+				tabbable.map(
+					(element) =>
+						element.querySelector(".gl-menu-item-label")?.textContent,
+				),
+			).toEqual(["Cut"]);
+			await act(async () => {
+				root = hydrateRoot(host, tree, {
+					onRecoverableError(error) {
+						errors.push(error);
+					},
+				});
+			});
+			expect(errors).toEqual([]);
+			host.querySelector<HTMLElement>("#before")?.focus();
+			await userEvent.tab();
+			expect(activeLabel()).toBe("Cut");
+		} finally {
+			act(() => {
+				root?.unmount();
+			});
+			host.remove();
+		}
+	});
+
 	test("renders without a Base UI menu around it", () => {
 		const errors = vi.spyOn(console, "error").mockImplementation(() => {
 			// Silenced to assert on it.
@@ -185,14 +250,19 @@ describe("standalone MenuList", () => {
 	test("typeahead: a letter, the same letter again, a word, and Space inside a word", async () => {
 		render(<MenuList aria-label="Actions">{items(newClicks())}</MenuList>);
 		item("Copy link").focus();
+		// From the real keyboard: a letter again moves on, in or out of the window alike.
 		await press("d d", ["Delete", "Download"]);
-		await new Promise((resolve) => {
-			setTimeout(resolve, 600);
-		});
-		await press("c u", ["Copy link", "Cut"]);
-		await new Promise((resolve) => {
-			setTimeout(resolve, 600);
-		});
+		// Later than any real key so far, so the window starts over.
+		const start = performance.now() + 1000;
+		// Within 500ms the keys make a word; after it, they start over.
+		expect([typeAt("c", start), typeAt("u", start + 100)]).toEqual([
+			"Copy link",
+			"Cut",
+		]);
+		expect([typeAt("c", start + 1000), typeAt("u", start + 1600)]).toEqual([
+			"Copy link",
+			"Copy link",
+		]);
 		const clicks = newClicks();
 		cleanup();
 		render(
@@ -203,14 +273,14 @@ describe("standalone MenuList", () => {
 			</MenuList>,
 		);
 		item("Cut").focus();
-		await press("c o p y [Space] l", [
-			"Copy",
-			"Copy",
-			"Copy",
-			"Copy",
-			"Copy link",
-			"Copy link",
-		]);
+		// One key every 50ms, well inside the window.
+		const word = performance.now() + 1000;
+		const moments = [0, 50, 100, 150, 200, 250].map((offset) => word + offset);
+		expect(
+			["c", "o", "p", "y", " ", "l"].map((key, step) =>
+				typeAt(key, moments[step] ?? word),
+			),
+		).toEqual(["Copy", "Copy", "Copy", "Copy", "Copy link", "Copy link"]);
 		expect(clicks.onCopy).not.toHaveBeenCalled();
 		expect(clicks.onDelete).not.toHaveBeenCalled();
 	});
@@ -315,7 +385,10 @@ describe("MenuItem inside a Base UI menu", () => {
 		disableListWrap,
 	}: {
 		readonly clicks: Clicks;
-		readonly onClose: (event: Event, reason: BaseUiMenuCloseReason) => void;
+		readonly onClose: (
+			event: React.SyntheticEvent,
+			reason: BaseUiMenuCloseReason,
+		) => void;
 		readonly selected?: string;
 		readonly disableListWrap?: boolean;
 	}) {
@@ -345,9 +418,11 @@ describe("MenuItem inside a Base UI menu", () => {
 	) {
 		const clicks = newClicks();
 		const reasons: BaseUiMenuCloseReason[] = [];
-		const onClose = vi.fn((_event: Event, reason: BaseUiMenuCloseReason) => {
-			reasons.push(reason);
-		});
+		const onClose = vi.fn(
+			(_event: React.SyntheticEvent, reason: BaseUiMenuCloseReason) => {
+				reasons.push(reason);
+			},
+		);
 		const errors = vi.spyOn(console, "error").mockImplementation(() => {
 			// Silenced to assert on it.
 		});
@@ -453,4 +528,56 @@ describe("MenuItem inside a Base UI menu", () => {
 		await userEvent.keyboard("{Escape}");
 		expect(menu.reasons).toEqual(["escapeKeyDown"]);
 	});
+
+	test.each(["click", "Enter", "Space"] as const)(
+		"the menu's onClose gets the React event the item's onClick got, on %s",
+		async (how) => {
+			const menu = await open();
+			if (how === "click") {
+				await userEvent.click(item("Copy link"));
+			} else {
+				item("Copy link").focus();
+				await userEvent.keyboard(how === "Enter" ? "{Enter}" : "[Space]");
+			}
+
+			expect(menu.clicks.onCopy).toHaveBeenCalledTimes(1);
+			const clickEvent = menu.clicks.onCopy.mock.calls[0]?.[0];
+			expect(menu.reasons).toEqual(["itemClick"]);
+			expect(menu.onClose.mock.calls[0]?.[0]).toBe(clickEvent);
+		},
+	);
+
+	test.each(["click", "Enter", "Space"] as const)(
+		"%s activates a link item",
+		async (how) => {
+			// Calling preventDefault keeps the test page from following the link, and the menu open.
+			const onClick = vi.fn<OnClick>((event) => {
+				event.preventDefault();
+			});
+			const anchor = document.createElement("button");
+			document.body.append(anchor);
+			try {
+				render(
+					<BaseUiMenu open anchor={anchor} aria-label="Links">
+						<MenuItem href="#repository" onClick={onClick}>
+							Open repository
+						</MenuItem>
+					</BaseUiMenu>,
+				);
+				await frames();
+				const link = item("Open repository");
+				expect(link.tagName).toBe("A");
+				if (how === "click") {
+					await userEvent.click(link);
+				} else {
+					link.focus();
+					await userEvent.keyboard(how === "Enter" ? "{Enter}" : "[Space]");
+				}
+
+				expect(onClick).toHaveBeenCalledTimes(1);
+			} finally {
+				anchor.remove();
+			}
+		},
+	);
 });
