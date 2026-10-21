@@ -13,9 +13,9 @@ import {
 	anchorWidthStyle,
 	type Placement,
 	positionerVariables,
-	toBaseAnchor,
 	toPlacement,
 	toPositionerProps,
+	useBaseAnchor,
 } from "./anchor.js";
 
 const placements: Placement[] = [
@@ -102,8 +102,38 @@ function positionerOf(id: string): HTMLElement | null {
 }
 
 /**
-Opens one Base UI Popover per case, each positioned only through the adapter, and waits for
-all of them to settle.
+A Base UI Popover positioned only through the adapter, as the ports will position theirs.
+*/
+function Anchored({ id, anchor, placement, offset, popup, matchWidth }: Case) {
+	return (
+		<Popover.Root open>
+			<Popover.Portal>
+				<Popover.Positioner
+					data-case={id}
+					anchor={useBaseAnchor(anchor)}
+					style={positionerVariables}
+					{...toPositionerProps({ placement, offset })}
+				>
+					<Popover.Popup
+						data-popup={id}
+						initialFocus={false}
+						style={{
+							boxSizing: "border-box",
+							padding: 0,
+							...(popup ?? { width: "max-content" }),
+							...(matchWidth && anchorWidthStyle),
+						}}
+					>
+						{id}
+					</Popover.Popup>
+				</Popover.Positioner>
+			</Popover.Portal>
+		</Popover.Root>
+	);
+}
+
+/**
+Opens one Popover per case and waits for all of them to settle.
 */
 async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 	const container = document.createElement("div");
@@ -115,30 +145,8 @@ async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 	});
 	root.render(
 		<>
-			{cases.map(({ id, anchor, placement, offset, popup, matchWidth }) => (
-				<Popover.Root key={id} open>
-					<Popover.Portal>
-						<Popover.Positioner
-							data-case={id}
-							anchor={toBaseAnchor(anchor)}
-							style={positionerVariables}
-							{...toPositionerProps({ placement, offset })}
-						>
-							<Popover.Popup
-								data-popup={id}
-								initialFocus={false}
-								style={{
-									boxSizing: "border-box",
-									padding: 0,
-									...(popup ?? { width: "max-content" }),
-									...(matchWidth && anchorWidthStyle),
-								}}
-							>
-								{id}
-							</Popover.Popup>
-						</Popover.Positioner>
-					</Popover.Portal>
-				</Popover.Root>
+			{cases.map((anchored) => (
+				<Anchored key={anchored.id} {...anchored} />
 			))}
 		</>,
 	);
@@ -382,5 +390,98 @@ describe("anchors", () => {
 		expect(style.getPropertyValue("--gl-available-height")).toMatch(
 			/^\d+(?:\.\d+)?px$/u,
 		);
+	});
+
+	describe("a function anchor is asked again after every commit, as the reference asks it", () => {
+		/**
+		Renders one Popover into a root of its own, to render it again with new props.
+		*/
+		function rerenderable() {
+			const container = document.createElement("div");
+			document.body.append(container);
+			const root = createRoot(container);
+			cleanups.push(() => {
+				root.unmount();
+				container.remove();
+			});
+			return (props: Case) => {
+				root.render(<Anchored {...props} />);
+			};
+		}
+
+		/**
+		Waits for the popup to sit where the reference puts it against `box`, within 1px.
+		*/
+		async function expectAt(id: string, box: DOMRect): Promise<void> {
+			const expected = computePosition(box, card, {
+				placement: "bottom-start",
+			});
+			await vi.waitFor(
+				() => {
+					const rect = popupOf(id)?.getBoundingClientRect();
+					expect(rect, `${id} isn't open`).toBeDefined();
+					expect(Math.abs((rect?.left ?? 0) - expected.x)).toBeLessThanOrEqual(
+						1,
+					);
+					expect(Math.abs((rect?.top ?? 0) - expected.y)).toBeLessThanOrEqual(
+						1,
+					);
+				},
+				{ interval: 20, timeout: 2000 },
+			);
+		}
+
+		test("an open popup moves when its function anchor answers with another element", async () => {
+			const first = placeAnchor({
+				left: 100,
+				top: 100,
+				width: 120,
+				height: 40,
+			});
+			const second = placeAnchor({
+				left: 700,
+				top: 500,
+				width: 120,
+				height: 40,
+			});
+			const render = rerenderable();
+			const switching = (target: HTMLElement): Case => ({
+				id: "switching",
+				anchor: () => target,
+				placement: "bottom-start",
+				popup: card,
+			});
+
+			render(switching(first));
+			await expectAt("switching", first.getBoundingClientRect());
+			render(switching(second));
+			await expectAt("switching", second.getBoundingClientRect());
+		});
+
+		test("a fresh virtual element on every call settles, and the popup follows its box", async () => {
+			let point = new DOMRect(200, 150, 0, 0);
+			// A new object on each call, the way a selection popover builds its anchor.
+			const anchor = vi.fn(() => ({ getBoundingClientRect: () => point }));
+			const render = rerenderable();
+			const props: Case = {
+				id: "point",
+				anchor,
+				placement: "bottom-start",
+				popup: card,
+			};
+
+			render(props);
+			await expectAt("point", point);
+			// Settled: a box that didn't move doesn't make another render.
+			const calls = anchor.mock.calls.length;
+			await new Promise((done) => {
+				setTimeout(done, 100);
+			});
+			expect(anchor).toHaveBeenCalledTimes(calls);
+
+			point = new DOMRect(600, 400, 0, 0);
+			render(props);
+			await expectAt("point", point);
+		});
 	});
 });
