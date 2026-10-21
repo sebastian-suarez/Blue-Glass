@@ -2,15 +2,17 @@ import type { Combobox } from "@base-ui/react/combobox";
 import type { Menu } from "@base-ui/react/menu";
 import type { Select } from "@base-ui/react/select";
 import type { Tooltip } from "@base-ui/react/tooltip";
-import { describe, expect, expectTypeOf, test } from "vitest";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 import type * as Reference from "../../design-system/source/index.js";
 import {
 	type AnchorEl,
 	type Placement,
 	splitPlacement,
-	toBaseAnchor,
 	toPlacement,
 	toPositionerProps,
+	useBaseAnchor,
 	type VirtualElement,
 } from "./anchor.js";
 
@@ -84,17 +86,45 @@ describe("positioner props", () => {
 	});
 });
 
-test("every documented anchorEl shape passes to Base UI unchanged", () => {
+describe("useBaseAnchor on the server", () => {
 	const virtual: VirtualElement = {
 		getBoundingClientRect() {
-			throw new Error("Nothing is measured in Node");
+			throw new Error("Nothing is measured on the server");
 		},
 	};
-	const resolve = () => virtual;
-	expect(toBaseAnchor(virtual)).toBe(virtual);
-	expect(toBaseAnchor(resolve)).toBe(resolve);
-	expect(toBaseAnchor(null)).toBeNull();
-	expectTypeOf(toBaseAnchor).returns.toExtend<
-		Menu.Positioner.Props["anchor"]
-	>();
+
+	/**
+	Server-renders the hook and returns what it gave Base UI.
+	*/
+	function serverAnchor(anchor: AnchorEl): string {
+		// eslint-disable-next-line @typescript-eslint/naming-convention -- A component, in a Node test that can't hold JSX.
+		function Probe() {
+			const resolved = useBaseAnchor(anchor);
+			return createElement(
+				"output",
+				null,
+				resolved === null ? "none" : resolved === anchor ? "same" : "other",
+			);
+		}
+
+		return renderToString(createElement(Probe));
+	}
+
+	test("never calls a function anchor or measures anything while rendering", () => {
+		const anchor = vi.fn<() => VirtualElement>(() => virtual);
+		// No anchor until the browser has committed and asked the function.
+		expect(serverAnchor(anchor)).toBe("<output>none</output>");
+		expect(anchor).not.toHaveBeenCalled();
+	});
+
+	test("passes a virtual element or null through as it is", () => {
+		expect(serverAnchor(virtual)).toBe("<output>same</output>");
+		expect(serverAnchor(null)).toBe("<output>none</output>");
+	});
+
+	test("gives what Base UI's anchor takes", () => {
+		expectTypeOf(useBaseAnchor).returns.toExtend<
+			Menu.Positioner.Props["anchor"]
+		>();
+	});
 });

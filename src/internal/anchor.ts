@@ -4,11 +4,18 @@ Menu, Popper and Tooltip), mapped onto a Base UI positioner: Popover.Positioner,
 Menu.Positioner, Tooltip.Positioner, and Select's and Combobox's.
 
 Rules:
-- `anchorEl` → `anchor` through toBaseAnchor. Base UI takes the same shapes: an element, a
-  virtual element ({ getBoundingClientRect(), contextElement? }), a function returning either,
-  or null. Two differences from the reference: Base UI calls a function when the popup opens,
-  not on every update, so pass an element or a virtual element if the anchor changes while the
-  popup is open; and with no anchor it keeps the popup at opacity 0 rather than at -9999px.
+- `anchorEl` → `anchor` through the useBaseAnchor hook, never directly. The docs allow an
+  element, a virtual element ({ getBoundingClientRect(), contextElement? }), a function
+  returning either, or null. Base UI takes the same shapes, but it calls a function once, when
+  the popup opens, while the reference calls it again on every update. So the hook calls a
+  function anchor itself after each commit of the component that calls the hook, in a layout
+  effect, and hands Base UI what it returned: a popup open on `() => selected` follows
+  `selected`. (The reference also asks again on scroll and resize; here those only move the
+  popup with the anchor it already has.) Nothing is called during render, so server rendering
+  never reaches the function or the DOM. A virtual element a function returns is compared by
+  its box (a function may build a new one on every call), and a box that moved reaches Base UI
+  as a new anchor, so the popup follows it.
+- With no anchor, Base UI keeps the popup at opacity 0 rather than at the reference's -9999px.
 - `placement` → `side` and `align` ("bottom-start" is side "bottom", align "start"), and
   `offset` → `sideOffset`, the gap. alignOffset stays 0: the reference has no cross-axis offset.
 - Collisions as the reference's computePosition (design-system/shared/position.ts): flip to the
@@ -36,15 +43,17 @@ Where Base UI differs from the reference math, all at the edges:
   A 0.96 grow starts 4% of the distance between the two away: a few pixels.
 - --available-height has no floor; the reference's never drops below 80px.
 anchor.browser.test.tsx proves the position matches the reference math within 1px for every
-placement at offsets 0, 8 and 12, for flips and shifts, for virtual and function anchors and
-for matchWidth, and pins the earlier flip.
+placement at offsets 0, 8 and 12, for flips and shifts, for virtual and function anchors
+(including a function whose answer changes while the popup is open) and for matchWidth, and
+pins the earlier flip.
 
 There's no anchorOrigin or transformOrigin to map: Popover, Menu, Popper and Tooltip document
 `placement` instead. The reference's only anchorOrigin is Snackbar's screen corner, which is
 layout, not anchoring.
 */
-import type * as React from "react";
 import type { Popover } from "@base-ui/react/popover";
+import * as React from "react";
+import { useIsoLayoutEffect } from "./hooks.js";
 
 export type Side = "top" | "bottom" | "left" | "right";
 export type Align = "start" | "center" | "end";
@@ -68,11 +77,68 @@ export type AnchorEl =
 type PositionerProps = Popover.Positioner.Props;
 
 /**
-Base UI's `anchor` for a documented `anchorEl`: the same value, which Base UI accepts in every
-shape the docs allow.
+What an `anchorEl` resolves to: what Base UI's `anchor` gets.
 */
-export function toBaseAnchor(anchor: AnchorEl): PositionerProps["anchor"] {
-	return anchor;
+export type ResolvedAnchor = Element | VirtualElement | null;
+
+function isVirtual(anchor: Element | VirtualElement): anchor is VirtualElement {
+	return !("nodeType" in anchor);
+}
+
+function isSameBox(a: DOMRect, b: DOMRect): boolean {
+	return (
+		a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
+	);
+}
+
+/**
+Base UI's `anchor` for a documented `anchorEl`. An element, a virtual element or null passes
+through as it is. A function is called after each commit, as the reference calls it on every
+update, and Base UI gets its answer.
+*/
+export function useBaseAnchor(anchor: AnchorEl): ResolvedAnchor {
+	const isFunction = typeof anchor === "function";
+	const [resolved, setResolved] = React.useState<ResolvedAnchor>(null);
+	// The box of the virtual element last handed to Base UI, to see when it moves.
+	const boxRef = React.useRef<DOMRect | undefined>(undefined);
+
+	// No dependencies: the answer can change whenever anything renders, so ask after every
+	// commit. A layout effect, so Base UI positions against the new anchor before paint.
+	useIsoLayoutEffect(() => {
+		if (typeof anchor !== "function") {
+			return;
+		}
+
+		const next = anchor();
+		if (next === null || !isVirtual(next)) {
+			boxRef.current = undefined;
+			if (next !== resolved) {
+				setResolved(next);
+			}
+
+			return;
+		}
+
+		const box = next.getBoundingClientRect();
+		const isUnmoved =
+			resolved !== null &&
+			isVirtual(resolved) &&
+			resolved.contextElement === next.contextElement &&
+			boxRef.current !== undefined &&
+			isSameBox(boxRef.current, box);
+		if (isUnmoved) {
+			return;
+		}
+
+		boxRef.current = box;
+		// A new object, so Base UI takes it as a new anchor and measures it again.
+		setResolved({
+			getBoundingClientRect: () => next.getBoundingClientRect(),
+			contextElement: next.contextElement,
+		});
+	});
+
+	return isFunction ? resolved : anchor;
 }
 
 /**
