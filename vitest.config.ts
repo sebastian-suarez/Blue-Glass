@@ -38,6 +38,7 @@ const optimizeDeps = {
 		"react",
 		"react-dom",
 		"react-dom/client",
+		"react-dom/server",
 		"react/jsx-runtime",
 		"react/jsx-dev-runtime",
 		...Object.keys(baseUiExports)

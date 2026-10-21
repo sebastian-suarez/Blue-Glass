@@ -316,7 +316,6 @@ export function MenuList({
 			<ul
 				ref={handleRef}
 				// The documented MenuList is a role="menu" <ul>, as in the reference.
-				// eslint-disable-next-line jsx-a11y-x/no-noninteractive-element-to-interactive-role
 				role="menu"
 				className={cx(
 					"gl-listbox",
