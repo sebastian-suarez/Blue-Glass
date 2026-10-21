@@ -1,0 +1,141 @@
+/* Switch: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Switch — a native checkbox with role="switch": a radius-pill track (off: glass-control with a 1px dg-edge
+   border, 3:1; on: color-ink) and a white thumb on shadow-raised that slides over duration-state. */
+.gl-switch {
+  --gl-switch-w: 40px;
+  --gl-switch-h: 24px;
+  --gl-switch-thumb: 18px;
+  --gl-switch-line: 20px;
+  --gl-switch-gap: var(--space-sm);
+  --gl-switch-pad: 6px;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  vertical-align: top;
+  color: var(--color-ink);
+}
+.gl-switch-sm {
+  --gl-switch-w: 32px;
+  --gl-switch-h: 20px;
+  --gl-switch-thumb: 14px;
+  --gl-switch-line: 18px;
+  --gl-switch-gap: 10px;
+  --gl-switch-pad: 4px;
+}
+.gl-switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gl-switch-gap);
+  padding-block: var(--gl-switch-pad);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Label first: in a full-width row the switch sits at the far end, as in a settings list. */
+.gl-switch-start .gl-switch-row { justify-content: space-between; }
+.gl-switch-control {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  width: var(--gl-switch-w);
+  height: var(--gl-switch-h);
+  margin-block: calc((var(--gl-switch-line) - var(--gl-switch-h)) / 2);
+}
+/* The real input lies over the track, transparent: it takes clicks, focus and screen-reader touch. */
+.gl-switch-input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.gl-switch-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--dg-edge);
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  transition:
+    background-color var(--duration-state) ease,
+    border-color var(--duration-state) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+/* A white thumb 2px inside the border; a color-line hairline keeps it visible on the pale off track. */
+.gl-switch-thumb {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 2px;
+  width: var(--gl-switch-thumb);
+  height: var(--gl-switch-thumb);
+  margin-top: calc(var(--gl-switch-thumb) / -2);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--color-line), var(--shadow-raised);
+  transition: transform var(--duration-state) var(--ease-out-quint);
+}
+.gl-switch-input:checked + .gl-switch-track {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+}
+/* Travel: the track minus its two 1px borders, the thumb and 2px on each side. */
+.gl-switch-input:checked + .gl-switch-track .gl-switch-thumb {
+  transform: translateX(calc(var(--gl-switch-w) - var(--gl-switch-thumb) - 6px));
+}
+[dir="rtl"] .gl-switch-input:checked + .gl-switch-track .gl-switch-thumb {
+  transform: translateX(calc((var(--gl-switch-w) - var(--gl-switch-thumb) - 6px) * -1));
+}
+.gl-switch-input:focus-visible + .gl-switch-track {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.gl-switch-label {
+  min-width: 0;
+  font-size: 14px;
+  line-height: var(--gl-switch-line);
+}
+.gl-switch-sm .gl-switch-label { font-size: 13px; }
+/* Pulled up to its own label, so the hint groups with the setting it explains. */
+.gl-switch-helper {
+  margin-top: calc(1px - var(--gl-switch-pad));
+  padding-bottom: 4px;
+  padding-inline-start: calc(var(--gl-switch-w) + var(--gl-switch-gap));
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+.gl-switch-start .gl-switch-helper {
+  padding-inline-start: 0;
+  padding-inline-end: calc(var(--gl-switch-w) + var(--gl-switch-gap));
+}
+
+.gl-switch-disabled { opacity: 0.5; }
+.gl-switch-disabled .gl-switch-row { cursor: not-allowed; }
+
+/* Press: the 40px track gives a little (0.98 would be sub-pixel). */
+.gl-switch:not(.gl-switch-disabled) .gl-switch-row:active .gl-switch-track { transform: scale(0.96); }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-switch:not(.gl-switch-disabled) .gl-switch-row:hover .gl-switch-track {
+    border-color: var(--color-muted);
+    background: var(--glass-raised);
+  }
+  .gl-switch:not(.gl-switch-disabled) .gl-switch-row:hover .gl-switch-input:checked + .gl-switch-track {
+    border-color: var(--ink-hover);
+    background: var(--ink-hover);
+  }
+}
+/* Reduced motion: the thumb jumps instead of sliding, and nothing scales. */
+@media (prefers-reduced-motion: reduce) {
+  .gl-switch-track,
+  .gl-switch-thumb { transition: none; }
+  .gl-switch:not(.gl-switch-disabled) .gl-switch-row:active .gl-switch-track { transform: none; }
+}
+@media (forced-colors: active) {
+  .gl-switch-thumb { background: CanvasText; }
+}
+}

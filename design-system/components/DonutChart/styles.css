@@ -1,0 +1,71 @@
+/* DonutChart: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../shared/charts-chrome.css: gl-chart, gl-chart-svg, gl-chart-swatch */
+
+@layer gl-components {
+/* DonutChart — builds on the shared chart chrome in BarChart.css (.gl-chart-*).
+   Segments are separated by true 2px gaps (geometry, not a stroke), so any glass shows through.
+   The legend rows are the site's side-selector items (.project-tab): the hovered part lifts to glass-raised. */
+.gl-donut-chart-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-lg) var(--space-xl);
+  min-width: 0;
+}
+.gl-donut-chart-figure { position: relative; flex: none; }
+.gl-donut-chart-segment { transition: opacity var(--duration-hover) ease; }
+.gl-donut-chart-segment[data-dim] { opacity: 0.32; }
+.gl-donut-chart-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+.gl-donut-chart-total {
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+.gl-donut-chart-caption { font-size: 12px; line-height: 1.4; color: var(--color-muted); }
+.gl-donut-chart-legend {
+  flex: 1 1 220px;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.gl-donut-chart-row {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto 4ch;
+  align-items: center;
+  gap: 0 10px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  transition: background var(--duration-hover) ease, box-shadow var(--duration-hover) ease;
+}
+.gl-donut-chart-row[data-active] {
+  background: var(--glass-raised);
+  border-color: #fff;
+  box-shadow: var(--shadow-raised);
+}
+.gl-donut-chart-label { min-width: 0; color: var(--color-ink); }
+.gl-donut-chart-value { color: var(--color-ink); font-variant-numeric: tabular-nums; text-align: right; }
+.gl-donut-chart-pct { color: var(--color-muted); font-variant-numeric: tabular-nums; text-align: right; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-donut-chart-segment,
+  .gl-donut-chart-row { transition: none; }
+}
+}

@@ -1,0 +1,21 @@
+/* Container: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Container — the site's .wrap (global.css): width min(1180px, 90%), margin-inline auto; 88% under 700px */
+.gl-container {
+  --gl-container-max: var(--size-wrap);
+  --gl-container-fill: 90%;
+  width: min(var(--gl-container-max), var(--gl-container-fill));
+  margin-inline: auto;
+}
+/* header: the identity strip's cap (.identity-strip max-width 1380px) */
+.gl-container-header { --gl-container-max: var(--size-header); }
+/* prose: the site's longest reading measure (.card-head p, .hiw-head p: 62ch) */
+.gl-container-prose { --gl-container-max: 62ch; }
+.gl-container-uncapped { --gl-container-max: 100%; }
+.gl-container-flush { --gl-container-fill: 100%; }
+
+@media (max-width: 700px) {
+  .gl-container:not(.gl-container-flush) { --gl-container-fill: 88%; }
+}
+}

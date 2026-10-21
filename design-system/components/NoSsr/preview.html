@@ -1,0 +1,15 @@
+<!-- @dsCard group="Utils" height=300 subtitle="Render after mount · defer · fallback" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NoSsr — Blue Glass</title>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(()=>{var H=Object.create;var{getPrototypeOf:k,defineProperty:v,getOwnPropertyNames:I}=Object;var y=Object.prototype.hasOwnProperty;function z(e){return this[e]}var D,M,a=(e,r,o)=>{var n=e!=null&&typeof e==="object";if(n){var l=r?D??=new WeakMap:M??=new WeakMap,h=l.get(e);if(h)return h}o=e!=null?H(k(e)):{};let s=r||!e||!e.__esModule||!y.call(e,"default")?v(o,"default",{value:e,enumerable:!0}):o;if(e&&typeof e==="object"||typeof e==="function"){for(let p of I(e))if(!y.call(s,p))v(s,p,{get:z.bind(e,p),enumerable:!0})}if(n)l.set(e,s);return s};var c=(e,r)=>()=>(r||e((r={exports:{}}).exports,r),r.exports);var m=c(function(B,x){x.exports=window.React});var u=c(function(j,w){w.exports=window.BlueGlass});var b=c(function(G,S){S.exports=window.ReactDOM});var t=a(m()),d=a(u());var i=a(m()),P=a(b()),N=a(u());function W(e){let r=document.getElementById("root");if(r)P.createRoot(r).render(e)}function C({children:e,field:r=!0,width:o,minHeight:n}){return i.createElement("div",{style:{position:"relative",isolation:"isolate",overflow:"clip",minHeight:n??"100vh",padding:"28px 28px 36px",background:"var(--color-canvas)"}},r?i.createElement(N.LightField,{variant:"compact"}):null,i.createElement("div",{style:{display:"grid",gap:32,maxWidth:o,margin:o?"0 auto":void 0}},e))}function f({title:e,note:r,children:o}){return i.createElement("section",{style:{display:"grid",gap:14,minWidth:0}},i.createElement("div",{style:{display:"grid",gap:2}},i.createElement("h2",{style:{margin:0,fontSize:13,lineHeight:1.6,fontWeight:600,color:"var(--color-muted)",letterSpacing:0}},e),r?i.createElement("p",{style:{margin:0,fontSize:12,lineHeight:1.5,color:"var(--color-muted)",maxWidth:"62ch"}},r):null),o)}function R({children:e,gap:r=12,align:o="center",wrap:n=!0,style:l}){return i.createElement("div",{style:{display:"flex",flexWrap:n?"wrap":"nowrap",alignItems:o,gap:r,minWidth:0,...l}},e)}function g({children:e}){return i.createElement("span",{style:{fontSize:12,lineHeight:1.5,color:"var(--color-muted)"}},e)}function O(){return t.createElement("span",{className:"text-body"},"This frame is ",window.innerWidth,"px wide.")}W(t.createElement(C,null,t.createElement(f,{title:"Default",note:"Children render only in the browser, after mount: safe for anything that reads window or the DOM."},t.createElement(d.Paper,{style:{padding:22,maxWidth:520}},t.createElement(d.NoSsr,{fallback:t.createElement("span",{className:"text-body",style:{color:"var(--color-muted)"}},"Measuring…")},t.createElement(O,null)))),t.createElement(f,{title:"Variants",note:"defer waits one more animation frame, for heavy children that shouldn't block first paint."},t.createElement(R,null,t.createElement(d.NoSsr,{defer:!0,fallback:t.createElement(g,null,"deferred…")},t.createElement(g,null,"Rendered a frame after mount."))))));})();
+</script>
+</body>
+</html>

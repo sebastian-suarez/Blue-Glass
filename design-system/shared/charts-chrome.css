@@ -1,0 +1,122 @@
+@layer gl-components {
+/* Chart chrome shared by BarChart, LineChart, DonutChart and Sparkline (.gl-chart-*).
+   Axis and grid follow the site's diagrams: the axis is .dg-axis-line (rgba(88,108,143,0.35)),
+   gridlines are color-line hairlines, ticks are text-diagram-label (13px) in color-muted.
+   Text never wears a series colour: series colours appear only on marks, swatches and keys. */
+.gl-chart {
+  position: relative;
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+.gl-chart-plot { position: relative; min-width: 0; }
+.gl-chart-svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-chart-svg:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-code); }
+.gl-chart-gridline { stroke: var(--color-line); stroke-width: 1; shape-rendering: crispEdges; }
+.gl-chart-axis-line { stroke: rgba(88, 108, 143, 0.35); stroke-width: 1; shape-rendering: crispEdges; }
+.gl-chart-tick { fill: var(--color-muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.gl-chart-category { fill: var(--color-ink); font-size: 13px; }
+.gl-chart-value { fill: var(--color-ink); font-size: 13px; font-variant-numeric: tabular-nums; }
+.gl-chart-hit { fill: transparent; }
+
+/* Tooltip: the ink pill. Values lead in on-ink semibold; names follow at 72% white (8.6:1 on ink). */
+.gl-chart-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: var(--z-tooltip);
+  display: grid;
+  gap: 5px;
+  padding: 9px 12px;
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow-primary);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duration-press) ease, visibility 0s linear var(--duration-press);
+}
+.gl-chart-tooltip-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--duration-hover) ease;
+}
+.gl-chart-tooltip-pill { padding: 6px 12px; border-radius: var(--radius-pill); }
+.gl-chart-tooltip-head { color: rgba(255, 255, 255, 0.72); }
+.gl-chart-tooltip-row { display: flex; align-items: center; gap: 8px; }
+.gl-chart-tooltip-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+.gl-chart-tooltip-name { color: rgba(255, 255, 255, 0.72); }
+/* Keys: a short stroke of the series colour; the white ring keeps dark slots legible on ink. */
+.gl-chart-key {
+  flex: none;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gl-key);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9);
+}
+.gl-chart-key-rect { width: 9px; height: 9px; border-radius: 2px; }
+
+/* Legend: the mark's own shape beside ink text. Always present for two or more series. */
+.gl-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
+.gl-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  transition: opacity var(--duration-hover) ease;
+}
+.gl-chart-legend-item[data-dim] { opacity: 0.45; }
+.gl-chart-swatch { flex: none; width: 10px; height: 10px; border-radius: 3px; background: var(--gl-key); }
+.gl-chart-swatch-line { width: 16px; height: 2px; border-radius: 1px; }
+.gl-chart-legend-label { min-width: 0; }
+.gl-chart-legend-value { margin-left: auto; padding-left: var(--space-sm); color: var(--color-muted); font-variant-numeric: tabular-nums; }
+
+/* The table twin, when shown: hairline rows, numbers right-aligned in tabular figures. */
+.gl-chart-table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5; color: var(--color-ink); }
+/* Hidden twin: wrapping text and a fixed layout keep it the 1px box gl-sr-only asks for
+   (a table otherwise grows to fit an unwrapped caption). Screen readers read it cell by cell. */
+.gl-chart-table.gl-sr-only { width: 1px; table-layout: fixed; white-space: normal; }
+.gl-chart-table-caption { padding-bottom: var(--space-xs); text-align: left; font-size: 12px; color: var(--color-muted); }
+.gl-chart-table-col { padding: 6px 10px; border-bottom: 1px solid rgba(88, 108, 143, 0.35); font-weight: 600; text-align: right; }
+.gl-chart-table-col:first-child { text-align: left; padding-left: 0; }
+.gl-chart-table-head { padding: 6px 10px 6px 0; font-weight: 400; text-align: left; }
+.gl-chart-table-cell { padding: 6px 10px; text-align: right; font-variant-numeric: tabular-nums; }
+.gl-chart-table-row { border-bottom: 1px solid var(--color-line); }
+
+/* BarChart */
+.gl-bar-chart-bar { transition: opacity var(--duration-hover) ease; }
+.gl-bar-chart-bar[data-dim] { opacity: 0.4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-chart-tooltip,
+  .gl-chart-tooltip-open,
+  .gl-chart-legend-item,
+  .gl-bar-chart-bar { transition: none; }
+}
+@media print {
+  .gl-chart-tooltip { display: none; }
+}
+}

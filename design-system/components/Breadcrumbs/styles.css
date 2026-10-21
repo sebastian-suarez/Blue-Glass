@@ -1,0 +1,90 @@
+/* Breadcrumbs: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Breadcrumbs — crumbs in color-link with the prose underline (.hiw-asof a: 3px offset, here on hover),
+   the current page in color-ink, chevrons in color-muted; the "…" button is the site's chip (.chip) */
+.gl-breadcrumbs { color: var(--color-muted); line-height: 1.5; }
+.gl-breadcrumbs-md { font-size: 13px; }
+.gl-breadcrumbs-sm { font-size: 12px; }
+
+.gl-breadcrumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gl-breadcrumbs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  max-width: 100%;
+}
+.gl-breadcrumbs-separator { display: inline-flex; flex: none; color: var(--color-muted); }
+
+/* Crumbs: compound selectors so a Link's own underline and size give way inside the trail. */
+.gl-breadcrumbs .gl-breadcrumbs-link,
+.gl-breadcrumbs .gl-breadcrumbs-current,
+.gl-breadcrumbs .gl-breadcrumbs-text {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--size-control-sm);
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+.gl-breadcrumbs-sm .gl-breadcrumbs-link,
+.gl-breadcrumbs-sm .gl-breadcrumbs-current,
+.gl-breadcrumbs-sm .gl-breadcrumbs-text { min-height: 28px; }
+.gl-breadcrumbs .gl-breadcrumbs-link {
+  color: var(--color-link);
+  text-decoration: none;
+  border-radius: var(--radius-code);
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-breadcrumbs .gl-breadcrumbs-link:focus-visible,
+.gl-breadcrumbs .gl-breadcrumbs-current:focus-visible { outline-offset: 2px; }
+.gl-breadcrumbs .gl-breadcrumbs-current {
+  color: var(--color-ink);
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--radius-code);
+}
+.gl-breadcrumbs .gl-breadcrumbs-text { color: var(--color-muted); }
+
+/* The "…" button: a small chip pill (12px chip, glass-control, the chip hairline). */
+.gl-breadcrumbs-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 24px;
+  margin: 0;
+  padding: 0 8px;
+  border: 1px solid rgba(88, 108, 143, 0.16);
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  color: var(--ink-soft);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-breadcrumbs-collapse:focus-visible { outline-offset: 2px; }
+.gl-breadcrumbs-collapse:active { transform: scale(0.98); }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-breadcrumbs .gl-breadcrumbs-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  /* .plate:hover */
+  .gl-breadcrumbs-collapse:hover { background: rgba(255, 255, 255, 0.8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-breadcrumbs-collapse { transition: none; }
+  .gl-breadcrumbs-collapse:active { transform: none; }
+}
+}

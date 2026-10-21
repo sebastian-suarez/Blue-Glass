@@ -1,0 +1,21 @@
+/* LineChart: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../shared/charts-chrome.css: gl-chart, gl-chart-axis-line, gl-chart-gridline, gl-chart-plot, gl-chart-svg, gl-chart-tick, gl-chart-value */
+
+@layer gl-components {
+/* LineChart — builds on the shared chart chrome in BarChart.css (.gl-chart-*).
+   Lines are 2px with round joins; the area is a 10% wash of the series hue; markers and end dots
+   are 8px with a 2px white ring so they stay legible where lines cross. */
+.gl-line-chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.gl-line-chart-area { fill-opacity: 0.1; stroke: none; }
+.gl-line-chart-dot,
+.gl-line-chart-marker { stroke: #fff; stroke-width: 2; }
+.gl-line-chart-leader { fill: none; stroke-width: 1; stroke-linejoin: round; opacity: 0.7; }
+.gl-line-chart-end-value { fill: var(--color-muted); }
+/* The crosshair: the axis hairline (.dg-axis-line), standing up. */
+.gl-line-chart-crosshair { stroke: rgba(88, 108, 143, 0.35); stroke-width: 1; shape-rendering: crispEdges; }
+}

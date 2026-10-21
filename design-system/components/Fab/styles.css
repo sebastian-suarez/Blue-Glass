@@ -1,0 +1,84 @@
+/* Fab: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../SpeedDial/styles.css: gl-fab */
+
+@layer gl-components {
+/* Fab — the site's .btn-primary and .btn-glass (global.css) cut as a circle; extended is the .btn pill */
+.gl-fab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  gap: 10px;
+  width: var(--size-control);
+  height: var(--size-control);
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Keep in step with OWN_TRANSITION in Fab.tsx. */
+  transition:
+    background-color var(--duration-hover) ease,
+    box-shadow var(--duration-hover) ease,
+    color var(--duration-hover) ease,
+    scale var(--duration-press) var(--ease-out-quint);
+}
+.gl-fab .gl-icon { width: var(--size-icon); height: var(--size-icon); }
+/* Press. `scale`, not `transform`: Zoom owns transform on its child, and the two compose. */
+.gl-fab:active:not(:disabled):not([aria-disabled="true"]) { scale: 0.98; }
+
+/* primary: .btn-primary */
+.gl-fab-primary {
+  background: var(--color-ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow-primary);
+}
+/* glass: .btn-glass */
+.gl-fab-glass {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: #fffc;
+  box-shadow: var(--shadow-control);
+  -webkit-backdrop-filter: blur(var(--blur-control));
+  backdrop-filter: blur(var(--blur-control));
+}
+
+/* Sizes: md is the site's 46px control; sm and lg are additions on the same circle. */
+.gl-fab-sm { width: 36px; height: 36px; }
+.gl-fab-sm .gl-icon { width: 16px; height: 16px; }
+.gl-fab-lg { width: 56px; height: 56px; }
+.gl-fab-lg .gl-icon { width: 20px; height: 20px; }
+
+/* extended: the .btn pill (padding 0 24px, gap 10px), sized like Button's sm and lg */
+.gl-fab-extended { width: auto; padding: 0 var(--space-lg); }
+.gl-fab-extended.gl-fab-sm { padding: 0 var(--space-md); gap: var(--space-xs); font-size: 13px; }
+.gl-fab-extended.gl-fab-lg { padding: 0 30px; font-size: 15px; }
+
+.gl-fab:disabled,
+.gl-fab[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; box-shadow: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-fab-primary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ink-hover); }
+  .gl-fab-glass:hover:not(:disabled):not([aria-disabled="true"]) { background: rgba(255, 255, 255, 0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-fab { transition: none; }
+  .gl-fab:active:not(:disabled):not([aria-disabled="true"]) { scale: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-fab-glass { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .gl-fab-glass { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+}

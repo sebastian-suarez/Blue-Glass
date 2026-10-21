@@ -1,0 +1,87 @@
+<!-- @dsCard group="Charts" height=4640 subtitle="Laid out by Mermaid, drawn with Diagram's marks · flowchart, state and sequence · ==> accent path with pulse · subgraph regions · shapes and edge ends · other types themed · source fallback" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mermaid — Blue Glass</title>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(()=>{var N=Object.create;var{getPrototypeOf:q,defineProperty:f,getOwnPropertyNames:W}=Object;var w=Object.prototype.hasOwnProperty;function M(t){return this[t]}var I,B,d=(t,r,n)=>{var p=t!=null&&typeof t==="object";if(p){var y=r?I??=new WeakMap:B??=new WeakMap,v=y.get(t);if(v)return v}n=t!=null?N(q(t)):{};let h=r||!t||!t.__esModule||!w.call(t,"default")?f(n,"default",{value:t,enumerable:!0}):n;if(t&&typeof t==="object"||typeof t==="function"){for(let u of W(t))if(!w.call(h,u))f(h,u,{get:M.bind(t,u),enumerable:!0})}if(p)y.set(t,h);return h};var g=(t,r)=>()=>(r||t((r={exports:{}}).exports,r),r.exports);var m=g(function(H,x){x.exports=window.React});var b=g(function(J,C){C.exports=window.BlueGlass});var D=g(function(L,S){S.exports=window.ReactDOM});var e=d(m()),a=d(b());var i=d(m()),k=d(D()),P=d(b());function F(t){let r=document.getElementById("root");if(r)k.createRoot(r).render(t)}function T({children:t,field:r=!0,width:n,minHeight:p}){return i.createElement("div",{style:{position:"relative",isolation:"isolate",overflow:"clip",minHeight:p??"100vh",padding:"28px 28px 36px",background:"var(--color-canvas)"}},r?i.createElement(P.LightField,{variant:"compact"}):null,i.createElement("div",{style:{display:"grid",gap:32,maxWidth:n,margin:n?"0 auto":void 0}},t))}function c({title:t,note:r,children:n}){return i.createElement("section",{style:{display:"grid",gap:14,minWidth:0}},i.createElement("div",{style:{display:"grid",gap:2}},i.createElement("h2",{style:{margin:0,fontSize:13,lineHeight:1.6,fontWeight:600,color:"var(--color-muted)",letterSpacing:0}},t),r?i.createElement("p",{style:{margin:0,fontSize:12,lineHeight:1.5,color:"var(--color-muted)",maxWidth:"62ch"}},r):null),n)}function s({children:t,gap:r=12,style:n}){return i.createElement("div",{style:{display:"grid",gap:r,minWidth:0,...n}},t)}function o({children:t}){return i.createElement("span",{style:{fontSize:12,lineHeight:1.5,color:"var(--color-muted)"}},t)}var G=`flowchart TB
+  accTitle: From an edit to production
+  accDescr: Local dev pushes a pull request into main. Two checks, Build and Terraform plan, must pass before the merge. A site change runs the deploy job, which syncs to S3 and invalidates CloudFront; an infra change runs the Terraform applies for the IAM and site stacks.
+  dev["<b>Local dev</b><br>astro dev, check"] -->|push| pr["<b>Pull request</b><br>into main"]
+  pr -->|runs| checks["<b>Two checks</b><br>Build, Terraform plan"]
+  checks -->|both pass| merge["<b>Merge to main</b><br>ruleset enforced"]:::accent
+  merge ==>|site change| deploy["<b>Deploy job</b><br>production env"]
+  deploy ==>|publish| site["<b>S3 + CloudFront</b><br>sync, invalidate"]
+  merge -->|infra/ change| tf["<b>Terraform applies</b><br>IAM, then site"]
+  tf -->|apply| stacks["<b>AWS + Cloudflare</b><br>IAM and site stacks"]`,E={id:"publish-row",width:600,height:168,label:"Publish: a merged pull request runs GitHub Actions, which syncs the site to S3",description:"A pull request that passed its checks merges into main; GitHub Actions builds the site and syncs it to the private S3 bucket.",regions:[{x:0,y:0,w:600,h:168,radius:16,tone:"panel"}],nodes:[{x:20,y:64,w:150,h:72,lines:[{text:"Pull request",bold:!0},"checks must pass"]},{x:225,y:64,w:150,h:72,lines:[{text:"GitHub Actions",bold:!0},"OIDC, no keys"]},{x:430,y:64,w:150,h:72,lines:[{text:"S3 bucket",bold:!0},"private"],tone:"accent"}],edges:[{points:[[170,100],[220,100]]},{points:[[375,100],[425,100]],tone:"accent"}],labels:[{x:16,y:12,lines:["Publish: merge to main"]},{x:170,y:72,w:55,align:"middle",lines:["merge"]},{x:375,y:72,w:55,align:"middle",tone:"accent",lines:["sync"]}]},z=`flowchart LR
+  accTitle: Publish: a merged pull request runs GitHub Actions, which syncs the site to S3
+  accDescr: A pull request that passed its checks merges into main; GitHub Actions builds the site and syncs it to the private S3 bucket.
+  subgraph publish [Publish: merge to main]
+    direction LR
+    pr["<b>Pull request</b><br>checks must pass"] -->|merge| gha["<b>GitHub Actions</b><br>OIDC, no keys"]
+    gha ==>|sync| s3["<b>S3 bucket</b><br>private"]:::accent
+  end`,j=`flowchart LR
+  accTitle: Edge kinds
+  a["<b>Dashed</b><br>-.->"] -.-> b["<b>Plain</b><br>---"] --- c["<b>Both ways</b><br><-->"] <--> d["<b>Filled</b><br>:::accentFill"]:::accentFill
+  d --o e["<b>Dot end</b><br>--o"]
+  d --x f["<b>Cross end</b><br>--x"]`,O=`flowchart LR
+  accTitle: A decision with shapes
+  start([Request]) --> cached{Cached?}
+  cached -->|yes| edge((Edge))
+  cached -->|no| origin[(S3 bucket)]
+  origin --> edge`,Q=`stateDiagram-v2
+  accTitle: A deploy's states
+  [*] --> Queued
+  Queued --> Running: runner free
+  Running --> Failed: a check fails
+  Running --> Live: sync, invalidate
+  Failed --> Queued: retry
+  Live --> [*]`,A=`sequenceDiagram
+  accTitle: A request for sebastiansuarez.dev
+  accDescr: Your browser asks Cloudflare, which proxies to CloudFront over Full (strict) TLS. CloudFront reads the page from the private S3 bucket with requests signed by origin access control, and the page comes back the same way.
+  autonumber
+  actor B as Your browser
+  participant CF as Cloudflare<br>DNS, edge
+  participant FR as CloudFront<br>CDN
+  participant S3 as S3 bucket<br>origin
+  B->>CF: GET sebastiansuarez.dev
+  Note over CF: bot and AI checks
+  CF->>+FR: proxied, Full (strict) TLS
+  alt cached
+    FR-->>CF: 200 from the edge
+  else miss
+    FR->>S3: read, signed by OAC
+    S3-->>FR: index.html
+  end
+  FR-->>-CF: security headers
+  CF-->>B: the page`,V=`classDiagram
+  accTitle: Diagram's data, as a class diagram
+  class DiagramData {
+    +string id
+    +number width
+    +number height
+    +string label
+  }
+  class DiagramNode {
+    +number x
+    +number y
+    +lines
+    +tone
+  }
+  class DiagramEdge {
+    +points
+    +boolean dashed
+    +tone
+  }
+  DiagramData "1" --> "*" DiagramNode : nodes
+  DiagramData "1" --> "*" DiagramEdge : edges`,Y=`flowchart LR
+  review[Codex review gate] -->|approved| merge[VSebCode merge
+  claude --> codex`,l={padding:22,minWidth:0};F(e.createElement(T,null,e.createElement(c,{title:"Default",note:"The site's deploy pipeline as Mermaid. Mermaid lays it out; Diagram's marks draw it: glass boxes of one width, right-angled edges, labels beside the line, the accent path (==>) in blue with its pulse, and the same entrance."},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:G}))),e.createElement(c,{title:"Same marks as Diagram",note:"Above, Diagram with hand-placed data. Below, the same row written as Mermaid. The boxes, type, edges, heads, labels and region are the same marks."},e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.Diagram,{data:E,minScale:0.6})),e.createElement(o,null,"Diagram · data placed by hand")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:z})),e.createElement(o,null,"MermaidDiagram · subgraph → region, |label| → label above the line, ==> and :::accent → the accent tone"))),e.createElement(c,{title:"Variants",note:"Mermaid's syntax maps onto Diagram's options. Flowcharts, state and sequence diagrams are redrawn; other types keep Mermaid's drawing in the theme."},e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:j})),e.createElement(o,null,"-.-> dashed · --- no head · <--> both ways · --o dot · --x cross · :::accentFill the filled node")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:O})),e.createElement(o,null,"{decision}",", [(database)], ((circle)) and ([stadium]) keep their outlines in the glass box style; a fan-out shares one trunk")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:Q})),e.createElement(o,null,"stateDiagram-v2 · the start dot and end ring in dg-edge · in and out edges on one side take separate ports")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:A})),e.createElement(o,null,"sequenceDiagram · participants as boxes (actor in the accent) · dashed hairline lifelines · ink number badges · alt as a region with a dashed divider")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:V})),e.createElement(o,null,"other types (here classDiagram) keep Mermaid's drawing in mermaidTheme; restyle=","{false}"," does the same for any diagram")),e.createElement(s,{gap:8},e.createElement(a.Paper,{variant:"inset",style:l},e.createElement(a.MermaidDiagram,{chart:Y,title:"Review gate"})),e.createElement(o,null,"a source Mermaid can't parse: the code block stays, with a status line"))),e.createElement(c,{title:"Example",note:"A section of a how-it-works page: the claim, the diagram, the caption."},e.createElement(a.Paper,{style:{padding:40,display:"grid",gap:22}},e.createElement("div",{style:{display:"grid",gap:10}},e.createElement("h3",{className:"text-heading",style:{margin:0}},"Serving a request"),e.createElement("p",{className:"text-body",style:{margin:0,color:"var(--color-muted)",maxWidth:"62ch"}},"Three hops, each with one job: Cloudflare in front, CloudFront as the CDN, S3 as a private origin.")),e.createElement(a.Paper,{variant:"inset",component:"figure",style:{margin:0,padding:22,minWidth:0}},e.createElement(a.MermaidDiagram,{chart:A}),e.createElement("figcaption",{className:"text-micro",style:{marginTop:14,color:"var(--color-muted)"}},"What each hop does with your request.")),e.createElement("div",null,e.createElement(a.Button,{variant:"text",href:"#how-it-works",endIcon:e.createElement(a.Icon,{name:"arrow-ne"})},"See every service"))))));})();
+</script>
+</body>
+</html>

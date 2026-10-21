@@ -1,0 +1,125 @@
+/* BottomNavigation: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* BottomNavigation — the header's nav pill (.identity-strip nav: glass-faint, #ffffffc9 border, blur-control,
+   5px padding, 3px gap) holding icon-over-label actions; the selected action is the raised tab
+   (.project-tab[aria-pressed=true]: glass-raised, white border, shadow-raised) */
+/* Equal columns, each as wide as the widest action; they shrink together (labels ellipsize) only when space runs out. */
+.gl-bottom-nav {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 3px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid #ffffffc9;
+  border-radius: var(--radius-pill);
+  background: var(--glass-faint);
+  box-shadow: var(--shadow-control);
+  -webkit-backdrop-filter: blur(var(--blur-control));
+  backdrop-filter: blur(var(--blur-control));
+}
+/* fixed: it floats over page content, so it takes the panel's glass (fill and blur) to keep labels legible,
+   and the selected pill goes to white (.project-tab[aria-pressed=true]:hover) to stay distinct from it. */
+.gl-bottom-nav-fixed {
+  position: fixed;
+  z-index: var(--z-app-bar);
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  margin-inline: auto;
+  background: var(--glass);
+  box-shadow: var(--shadow-pane);
+  -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(115%);
+  backdrop-filter: blur(var(--blur-panel)) saturate(115%);
+}
+.gl-bottom-nav-fixed .gl-bottom-nav-action-selected { background: #fff; }
+
+.gl-bottom-nav-action {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--duration-state) ease,
+    border-color var(--duration-state) ease,
+    box-shadow var(--duration-state) ease,
+    color var(--duration-state) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-bottom-nav-action-selected {
+  background: var(--glass-raised);
+  border-color: #fff;
+  box-shadow: var(--shadow-raised);
+  color: var(--color-ink);
+}
+.gl-bottom-nav-action:focus-visible { outline-offset: 2px; }
+.gl-bottom-nav-action:active:not(:disabled):not([aria-disabled="true"]) { transform: scale(0.98); }
+.gl-bottom-nav-action:disabled,
+.gl-bottom-nav-action[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+.gl-bottom-nav-icon { display: inline-flex; }
+.gl-bottom-nav-icon .gl-icon { width: 20px; height: 20px; }
+
+/* The label folds away with the site's grid-rows reveal (.pane .more); it stays the accessible name. */
+.gl-bottom-nav-label {
+  display: grid;
+  grid-template-rows: 1fr;
+  max-width: 100%;
+  transition:
+    grid-template-rows var(--duration-state) var(--ease-out-quint),
+    opacity var(--duration-state) ease;
+}
+.gl-bottom-nav-label-clip { min-height: 0; min-width: 0; overflow: hidden; }
+.gl-bottom-nav-label-text {
+  display: block;
+  padding-top: 3px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gl-bottom-nav-action-icon-only .gl-bottom-nav-label { grid-template-rows: 0fr; opacity: 0; }
+
+/* Under 700px the site's nav links drop to 8px side padding (.identity-strip nav a), leaving room for labels. */
+@media (max-width: 700px) {
+  .gl-bottom-nav-action { padding-inline: 8px; }
+}
+@media (hover: hover) and (pointer: fine) {
+  /* .identity-strip nav a:hover */
+  .gl-bottom-nav-action:hover:not(:disabled):not([aria-disabled="true"]) { background: #fff7; color: var(--color-ink); }
+  /* .project-tab[aria-pressed=true]:hover */
+  .gl-bottom-nav-action-selected:hover:not(:disabled):not([aria-disabled="true"]) { background: #fff; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-bottom-nav-action,
+  .gl-bottom-nav-label { transition: none; }
+  .gl-bottom-nav-action:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-bottom-nav { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .gl-bottom-nav { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media print {
+  .gl-bottom-nav { display: none; }
+}
+}

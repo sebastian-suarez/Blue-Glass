@@ -1,0 +1,65 @@
+/* Divider: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Divider — the site's 1px color-line hairline (.employer-strip, .career-row, .project-outcome, .site-footer) */
+.gl-divider {
+  flex-shrink: 0;
+  margin: 0;
+  border: 0 solid var(--color-line);
+  background: none;
+}
+.gl-divider-horizontal { height: 0; border-top-width: 1px; }
+/* Vertical: one text line tall, centred on it, unless it's a flex item. */
+.gl-divider-vertical {
+  display: inline-block;
+  width: 0;
+  height: 1.25em;
+  align-self: center;
+  vertical-align: middle;
+  border-left-width: 1px;
+}
+.gl-divider-flex-item { height: auto; align-self: stretch; }
+
+/* inset lines up with list text after an 18px icon (13px padding + 18px + 11px gap). */
+.gl-divider-horizontal.gl-divider-inset { margin-inline-start: var(--gl-divider-inset, 42px); }
+.gl-divider-horizontal.gl-divider-middle { margin-inline: var(--space-md); }
+.gl-divider-vertical.gl-divider-middle { margin-block: var(--space-xs); }
+
+/* With a label: two hairlines around 12px muted text, or one after it. */
+.gl-divider-labelled {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: auto;
+  border-width: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.gl-divider-labelled::before,
+.gl-divider-labelled::after {
+  content: "";
+  flex: 1 1 0;
+  min-width: var(--space-md);
+  border-top: 1px solid var(--color-line);
+}
+.gl-divider-text-left::before { display: none; }
+.gl-divider-label { flex: 0 1 auto; min-width: 0; text-align: center; text-wrap: balance; }
+.gl-divider-text-left .gl-divider-label { text-align: start; }
+
+.gl-divider-labelled.gl-divider-vertical {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  min-height: 4em;
+  align-self: stretch;
+}
+.gl-divider-labelled.gl-divider-vertical::before,
+.gl-divider-labelled.gl-divider-vertical::after {
+  min-width: 0;
+  min-height: var(--space-xs);
+  border-top: 0;
+  border-left: 1px solid var(--color-line);
+}
+}

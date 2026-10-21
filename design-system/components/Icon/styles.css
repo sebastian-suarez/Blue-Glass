@@ -1,0 +1,26 @@
+/* Icon: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Accordion/styles.css: gl-icon */
+/* Also styled by ../AppBar/styles.css: gl-icon */
+/* Also styled by ../Autocomplete/styles.css: gl-icon */
+/* Also styled by ../BottomNavigation/styles.css: gl-icon */
+/* Also styled by ../Button/styles.css: gl-icon */
+/* Also styled by ../Card/styles.css: gl-icon */
+/* Also styled by ../Chip/styles.css: gl-icon */
+/* Also styled by ../Fab/styles.css: gl-icon */
+/* Also styled by ../Link/styles.css: gl-icon */
+/* Also styled by ../List/styles.css: gl-icon */
+/* Also styled by ../Menu/styles.css: gl-icon */
+/* Also styled by ../Rating/styles.css: gl-icon */
+/* Also styled by ../Select/styles.css: gl-icon */
+/* Also styled by ../Stepper/styles.css: gl-icon */
+/* Also styled by ../Tabs/styles.css: gl-icon */
+/* Also styled by ../TextField/styles.css: gl-icon */
+/* Also styled by ../Timeline/styles.css: gl-icon */
+/* Also styled by ../ToggleButton/styles.css: gl-icon */
+/* Also styled by ../TransferList/styles.css: gl-icon */
+/* Also styled by ../../foundation.css: gl-icon */
+
+@layer gl-components {
+/* Icon — the site's .icon box (18px, flex: none) */
+.gl-icon { display: inline-block; vertical-align: middle; flex: none; overflow: visible; }
+}

@@ -1,0 +1,186 @@
+/* Chip: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Chip — the site's .chip, .chip-sm and .plate (global.css), plus clickable, selected and deletable states */
+.gl-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 5px 11px; /* .chip */
+  border: 1px solid rgba(88, 108, 143, 0.16); /* .chip */
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: left;
+  text-decoration: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.gl-chip-icon,
+.gl-chip-avatar { display: inline-flex; flex: none; }
+.gl-chip-icon { margin-inline-start: -2px; }
+.gl-chip-icon .gl-icon { width: 14px; height: 14px; }
+.gl-chip-avatar { margin-block: -2px; margin-inline-start: -7px; }
+.gl-chip-avatar .gl-avatar { --gl-avatar-size: 20px; --gl-avatar-scale: 0.5; font-size: 9px; }
+
+/* sm: .chip-sm */
+.gl-chip-sm { padding: 4px 9px; font-size: 11.5px; }
+.gl-chip-sm .gl-chip-icon .gl-icon { width: 12px; height: 12px; }
+.gl-chip-sm .gl-chip-avatar { margin-inline-start: -6px; }
+.gl-chip-sm .gl-chip-avatar .gl-avatar { --gl-avatar-size: 18px; --gl-avatar-scale: 0.45; font-size: 8px; }
+
+/* plate: .plate, the employer strip's tag */
+.gl-chip-plate {
+  padding: 7px 15px;
+  border-color: var(--glass-edge);
+  background: var(--glass-inset);
+  box-shadow: var(--shadow-plate);
+  color: #33405a; /* .plate */
+  font-size: 13px;
+}
+.gl-chip-plate.gl-chip-sm { padding: 5px 11px; font-size: 12px; }
+.gl-chip-plate .gl-chip-icon .gl-icon { width: 15px; height: 15px; }
+.gl-chip-plate .gl-chip-avatar { margin-inline-start: -10px; }
+.gl-chip-plate .gl-chip-avatar .gl-avatar { --gl-avatar-size: 24px; --gl-avatar-scale: 0.6; font-size: 10px; }
+
+/* Tones: the *-soft grounds with status text, keeping the chip's hairline (info-soft is close to the
+   canvas); accent is the accent pane's wash (.pane-accent). */
+.gl-chip-accent {
+  border-color: var(--glass-edge);
+  background: linear-gradient(160deg, rgba(142, 184, 232, 0.5), rgba(255, 255, 255, 0.45));
+  color: var(--color-accent);
+}
+.gl-chip-danger { border-color: rgba(88, 108, 143, 0.16); background: var(--danger-soft); color: var(--danger); }
+.gl-chip-warning { border-color: rgba(88, 108, 143, 0.16); background: var(--warning-soft); color: var(--warning); }
+.gl-chip-success { border-color: rgba(88, 108, 143, 0.16); background: var(--success-soft); color: var(--success); }
+.gl-chip-info { border-color: rgba(88, 108, 143, 0.16); background: var(--info-soft); color: var(--info); }
+
+/* Clickable: a button or link with the button's hover and press. */
+.gl-chip-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--duration-hover) ease,
+    border-color var(--duration-hover) ease,
+    color var(--duration-hover) ease,
+    box-shadow var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-chip-clickable:not(.gl-chip-split):not(.gl-chip-disabled):active,
+.gl-chip-split:not(.gl-chip-disabled):has(> .gl-chip-action:active) { transform: scale(0.98); }
+
+/* Selected: the ink fill of .btn-primary. */
+.gl-chip-selected {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--on-ink);
+  box-shadow: none;
+}
+
+/* Focus: the base ring, offset 2px for a dense control. */
+.gl-chip:focus-visible,
+.gl-chip-split:has(> .gl-chip-action:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.gl-chip-action:focus-visible { outline: none; }
+
+/* Clickable and deletable: two sibling buttons in one pill. */
+.gl-chip.gl-chip-split { gap: 0; padding: 0 4px 0 0; }
+.gl-chip-sm.gl-chip-split { padding-inline-end: 3px; }
+.gl-chip-plate.gl-chip-split { padding-inline-end: 6px; }
+.gl-chip-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+  margin: 0;
+  padding: 5px 6px 5px 11px;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-chip-sm .gl-chip-action { padding: 4px 5px 4px 9px; }
+.gl-chip-plate .gl-chip-action { padding: 7px 8px 7px 15px; }
+.gl-chip-plate.gl-chip-sm .gl-chip-action { padding: 5px 6px 5px 11px; }
+
+/* Delete: an 18px close button with a 30px hit area. */
+.gl-chip-deletable { padding-inline-end: 4px; }
+.gl-chip-sm.gl-chip-deletable { padding-inline-end: 3px; }
+.gl-chip-plate.gl-chip-deletable { padding-inline-end: 6px; }
+.gl-chip-delete {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: -2px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-hover) ease,
+    color var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-chip-delete::before { content: ""; position: absolute; inset: -6px; }
+.gl-chip-delete .gl-icon { width: 12px; height: 12px; }
+.gl-chip-sm .gl-chip-delete { width: 16px; height: 16px; }
+.gl-chip-sm .gl-chip-delete .gl-icon { width: 11px; height: 11px; }
+.gl-chip-plate .gl-chip-delete { width: 20px; height: 20px; }
+.gl-chip-plate .gl-chip-delete .gl-icon { width: 13px; height: 13px; }
+.gl-chip-delete:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+.gl-chip-delete:not(:disabled):active { transform: scale(0.98); }
+
+/* Disabled: no hover, no press. */
+.gl-chip-disabled { opacity: 0.5; cursor: not-allowed; }
+.gl-chip-disabled .gl-chip-action,
+.gl-chip-disabled .gl-chip-delete { cursor: not-allowed; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-chip-clickable:not(.gl-chip-split):not(.gl-chip-disabled):not(.gl-chip-toned):not(.gl-chip-selected):hover,
+  .gl-chip-split:not(.gl-chip-disabled):not(.gl-chip-toned):not(.gl-chip-selected):has(> .gl-chip-action:hover) {
+    background-color: var(--glass-raised);
+  }
+  /* .plate:hover — the site lifts every plate, static ones too */
+  .gl-chip-plate:not(.gl-chip-disabled):not(.gl-chip-toned):not(.gl-chip-selected):hover { background-color: rgba(255, 255, 255, 0.8); }
+  /* Tones keep their ground under a white veil. */
+  .gl-chip-clickable.gl-chip-toned:not(.gl-chip-split):not(.gl-chip-disabled):not(.gl-chip-selected):hover,
+  .gl-chip-split.gl-chip-toned:not(.gl-chip-disabled):not(.gl-chip-selected):has(> .gl-chip-action:hover) {
+    box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.4);
+  }
+  .gl-chip-clickable.gl-chip-selected:not(.gl-chip-split):not(.gl-chip-disabled):hover,
+  .gl-chip-split.gl-chip-selected:not(.gl-chip-disabled):has(> .gl-chip-action:hover) {
+    border-color: var(--ink-hover);
+    background-color: var(--ink-hover);
+  }
+  .gl-chip-delete:not(:disabled):hover { background-color: var(--color-line); color: var(--color-ink); }
+  .gl-chip-selected .gl-chip-delete:not(:disabled):hover { background-color: rgba(255, 255, 255, 0.18); color: var(--on-ink); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gl-chip-clickable,
+  .gl-chip-delete { transition: background-color var(--duration-hover) ease, color var(--duration-hover) ease; }
+  .gl-chip-clickable:not(.gl-chip-split):not(.gl-chip-disabled):active,
+  .gl-chip-split:not(.gl-chip-disabled):has(> .gl-chip-action:active),
+  .gl-chip-delete:not(:disabled):active { transform: none; }
+}
+}

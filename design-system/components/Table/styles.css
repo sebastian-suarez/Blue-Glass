@@ -1,0 +1,172 @@
+/* Table: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* Table — on the site's career list surface (.career-surface inside .glass-panel), its rows separated
+   like .career-row: color-line hairlines, none under the last. */
+.gl-table-container {
+  --gl-table-pad-top: 8px;
+  position: relative;
+  max-width: 100%;
+  overflow: auto;
+  overscroll-behavior-x: contain;
+  padding: 8px 30px; /* .career-surface */
+  border: 1px solid rgba(255, 255, 255, 0.95); /* .glass-panel */
+  border-radius: var(--radius-pane);
+  /* The panel's diagonal sheen (.glass-panel::before) as a background layer, so it never scrolls away. */
+  background: linear-gradient(120deg, #fff4, transparent 40%, #fff1), rgba(255, 255, 255, 0.42);
+  box-shadow: var(--shadow-panel);
+  -webkit-backdrop-filter: blur(var(--blur-surface));
+  backdrop-filter: blur(var(--blur-surface));
+}
+.gl-table-container:focus-visible { outline-offset: 3px; }
+.gl-table-container-plain {
+  --gl-table-pad-top: 0px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* Rows reach 12px into the surface's padding so a highlight band has room; text still starts at 30px. */
+.gl-table-container:not(.gl-table-container-plain) > .gl-table { width: calc(100% + 24px); margin-inline: -12px; }
+
+.gl-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--color-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.gl-table-caption {
+  caption-side: bottom;
+  padding: 14px 12px 6px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: start;
+}
+.gl-table-caption-top { caption-side: top; padding: 10px 12px 2px; }
+
+.gl-table-cell {
+  position: relative;
+  padding: 14px 12px;
+  text-align: start;
+  vertical-align: middle;
+}
+/* The hairline is its own layer, so a lit row's rounded ends never bend it. */
+.gl-table-cell::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--color-line);
+  pointer-events: none;
+  transition: opacity var(--duration-state) ease;
+}
+.gl-table-cell-sm { padding-block: 8px; font-size: 13px; }
+/* Header: 12px, weight 600, color-muted (.project-story h4). */
+.gl-table-cell-head {
+  padding-block: 12px 10px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.gl-table-cell-head.gl-table-cell-sm { padding-block: 8px 6px; font-size: 12px; }
+.gl-table-cell-rowheader { font-weight: 500; }
+.gl-table-cell-align-left { text-align: left; }
+.gl-table-cell-align-center { text-align: center; }
+.gl-table-cell-align-right { text-align: right; }
+.gl-table-cell-numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gl-table-cell-pad-checkbox { width: 48px; padding-block: 0; padding-inline-end: 0; }
+.gl-table-cell-pad-none { padding: 0; }
+.gl-table-body > .gl-table-row:last-child > .gl-table-cell::after { opacity: 0; }
+
+/* Hover and selected: the side selector's tab states (.project-tab), as a rounded band. The hairlines
+   either side of a lit row step aside so the band reads as one piece. */
+.gl-table-row > .gl-table-cell { transition: background-color var(--duration-state) ease; }
+.gl-table-row-hover > .gl-table-cell:first-child,
+.gl-table-row-selected > .gl-table-cell:first-child { border-start-start-radius: var(--radius-control); border-end-start-radius: var(--radius-control); }
+.gl-table-row-hover > .gl-table-cell:last-child,
+.gl-table-row-selected > .gl-table-cell:last-child { border-start-end-radius: var(--radius-control); border-end-end-radius: var(--radius-control); }
+.gl-table-row-selected > .gl-table-cell { background-color: var(--glass-raised); }
+.gl-table-row-selected > .gl-table-cell::after,
+.gl-table-row:has(+ .gl-table-row-selected) > .gl-table-cell::after { opacity: 0; }
+
+/* Sticky header: an opaque band (glass-solid) the rows pass under. A scroll container's sticky edge is
+   its content box, so pull the band up over the surface's top padding. */
+.gl-table-sticky .gl-table-head .gl-table-cell {
+  position: sticky;
+  top: calc(-1 * var(--gl-table-pad-top, 0px));
+  z-index: 1;
+  background: var(--glass-solid);
+}
+
+/* Sort label: a header-styled button with a direction arrow. */
+.gl-table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: -2px -4px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: var(--radius-code);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--duration-hover) ease, transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-table-cell-numeric .gl-table-sort,
+.gl-table-cell-align-right .gl-table-sort { flex-direction: row-reverse; }
+.gl-table-sort:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.gl-table-sort:active { transform: scale(0.98); }
+.gl-table-sort-active { color: var(--color-ink); }
+.gl-table-sort-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  transition: opacity var(--duration-hover) ease, transform var(--duration-state) var(--ease-out-quint);
+}
+.gl-table-sort-asc .gl-table-sort-icon { transform: rotate(180deg); }
+.gl-table-sort-active .gl-table-sort-icon { opacity: 1; }
+.gl-table-sort:focus-visible .gl-table-sort-icon { opacity: 0.6; }
+.gl-table-sort-active:focus-visible .gl-table-sort-icon { opacity: 1; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-table-row-hover:hover > .gl-table-cell { background-color: #ffffff66; } /* .project-tab:hover */
+  .gl-table-row-hover:hover > .gl-table-cell::after,
+  .gl-table-row:has(+ .gl-table-row-hover:hover) > .gl-table-cell::after { opacity: 0; }
+  .gl-table-row-selected.gl-table-row-hover:hover > .gl-table-cell { background-color: #fff; } /* .project-tab[aria-pressed]:hover */
+  .gl-table-sort:hover { color: var(--color-ink); }
+  .gl-table-sort:hover .gl-table-sort-icon { opacity: 0.6; }
+  .gl-table-sort-active:hover .gl-table-sort-icon { opacity: 1; }
+}
+
+@media (max-width: 700px) {
+  .gl-table-container { --gl-table-pad-top: 3px; padding: 3px 22px; border-radius: var(--radius-panel-sm); } /* .career-surface under 700px */
+  .gl-table-container-plain { --gl-table-pad-top: 0px; padding: 0; border-radius: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-table-sort { transition: color var(--duration-hover) ease; }
+  .gl-table-sort:active { transform: none; }
+  .gl-table-sort-icon { transition: opacity var(--duration-hover) ease; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-table-container:not(.gl-table-container-plain) { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .gl-table-container:not(.gl-table-container-plain) { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media print {
+  .gl-table-container { background: white; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+}

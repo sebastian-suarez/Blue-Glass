@@ -1,0 +1,47 @@
+/* Sparkline: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Sparkline — the stat-tile trend: marks in the recessive dg-edge (3.1:1 on canvas, 3.4:1 on glass),
+   the last point in the accent (chart-1) as an 8px dot with a 2px white ring, or the last bar. */
+.gl-sparkline {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+  line-height: 0;
+}
+.gl-sparkline-svg { display: block; overflow: visible; }
+.gl-sparkline-line {
+  fill: none;
+  stroke: var(--dg-edge);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.gl-sparkline-area { fill-opacity: 0.1; stroke: none; }
+.gl-sparkline-dot { stroke: #fff; stroke-width: 2; }
+.gl-sparkline-bar { fill: var(--dg-edge); }
+.gl-sparkline-hover { fill: var(--color-ink); stroke: #fff; stroke-width: 1.5; }
+/* The hover readout: a small ink pill above the point. */
+.gl-sparkline-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  z-index: var(--z-tooltip);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--on-ink);
+  font-size: 11px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity var(--duration-press) ease;
+}
+.gl-sparkline-tip-open { opacity: 1; transition-duration: var(--duration-hover); }
+@media (prefers-reduced-motion: reduce) {
+  .gl-sparkline-tip { transition: none; }
+}
+}

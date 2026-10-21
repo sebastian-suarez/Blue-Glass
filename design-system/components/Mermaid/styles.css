@@ -1,0 +1,48 @@
+/* Mermaid: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Diagram/styles.css: gl-dg-box, gl-dg-pulses, gl-dg-region */
+
+@layer gl-components {
+/* MermaidDiagram. Flowcharts, state and sequence diagrams are drawn with Diagram's marks (Diagram.css);
+   these rules add what only sequences have, and dress Mermaid's own SVG for the other diagram types.
+   The source shows as a code block while Mermaid loads or when it can't draw: the site's inline code
+   (.hiw-section code) as a block, glass-control, a 16% hairline, radius-code, mono, wrapping anywhere. */
+.gl-mermaid { display: grid; gap: var(--space-xs); min-width: 0; }
+/* Never larger than drawn: Diagram's 15px type stays 15px. Centred when the column is wider. */
+.gl-mermaid-figure { width: 100%; margin-inline: auto; }
+/* Sequence marks: lifelines and section dividers are the box hairline, dashed; numbers are ink badges. */
+.gl-mm-lifeline,
+.gl-mm-divider { fill: none; stroke: rgba(88, 108, 143, 0.32); stroke-dasharray: 4 4; }
+.gl-mm-badge circle { fill: var(--color-ink); }
+.gl-mm-badge text { fill: var(--on-ink); font-family: var(--font-sans); font-weight: 600; }
+/* A node with a click link: the box is the target; the focus ring and hover go on the box. */
+.gl-mm-link { cursor: pointer; }
+.gl-mm-link:focus { outline: none; }
+.gl-mm-link:focus-visible .gl-dg-box { stroke: var(--focus); stroke-width: 3; }
+@media (hover: hover) and (pointer: fine) {
+  .gl-mm-link:hover .gl-dg-box { stroke: var(--color-blue); }
+}
+/* State diagrams: the start dot, the end ring and the fork bar in the edge colour. */
+.gl-mm-dot { fill: var(--dg-edge); }
+.gl-mm-ring { fill: none; stroke: var(--dg-edge); stroke-width: 2; }
+/* Mermaid's own drawing (other diagram types). */
+.gl-mermaid-diagram { min-width: 0; max-width: 100%; overflow-x: auto; border-radius: var(--radius-control); }
+.gl-mermaid-svg { display: block; height: auto; margin-inline: auto; }
+.gl-mermaid-source {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 14px 16px;
+  border: 1px solid rgba(88, 108, 143, 0.16);
+  border-radius: var(--radius-code);
+  background: var(--glass-control);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 2;
+}
+.gl-mermaid-code { font: inherit; }
+.gl-mermaid-status { margin: 0; font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+}

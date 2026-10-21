@@ -1,0 +1,4 @@
+/* BarChart: reference styles, copied from the design system's bundle.css. */
+/* BarChart has no section of its own: its rules are the shared chart chrome in ../../shared/charts-chrome.css. */
+/* Also styled by ../../shared/charts-chrome.css: gl-bar-chart-bar, gl-chart, gl-chart-axis-line, gl-chart-category, gl-chart-gridline, gl-chart-hit, gl-chart-plot, gl-chart-svg, gl-chart-tick, gl-chart-value */
+

@@ -1,0 +1,29 @@
+/* TimingChart: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Diagram/styles.css: gl-dg-label, gl-dg-text */
+
+@layer gl-components {
+/* TimingChart — the site's .dg-axis-line, .dg-bar-track, .dg-bar and their reveal (global.css), renamed .gl-dg-*.
+   Builds on Diagram.css (the host, labels and reveal states). */
+.gl-dg-axis-line { stroke: rgba(88, 108, 143, 0.35); stroke-width: 1; }
+.gl-dg-bar-track {
+  fill: rgba(142, 184, 232, 0.14);
+  stroke: rgba(88, 108, 143, 0.14);
+  stroke-width: 1;
+}
+/* dg-bar: 2.7:1 on glass, so every bar carries its value label. */
+.gl-dg-bar {
+  fill: var(--dg-bar);
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+.gl-dg-tone-accent .gl-dg-bar { fill: var(--color-blue); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .gl-dg-bar { transition: transform 900ms var(--ease-out-quint) calc(250ms + var(--i) * 250ms); }
+  .gl-dg-bar-row .gl-dg-label { transition-delay: calc(900ms + var(--i) * 250ms); }
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  :is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal])) .gl-dg-bar { transform: scaleX(0); }
+  :root.gl-js .gl-dg-wrap:not([data-reveal]) .gl-dg-bar { animation: gl-dg-failsafe 400ms ease 2500ms both; }
+}
+}

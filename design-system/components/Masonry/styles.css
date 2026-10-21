@@ -1,0 +1,46 @@
+/* Masonry: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Masonry — an addition matching MUI Lab's Masonry. Before it measures (or without script), CSS columns lay the
+   items out; then each item goes to the shortest column and the columns become flex lines ordered with `order`,
+   so the DOM keeps reading order. Columns follow the site's breakpoints (sm >=361px, md >=701px, lg >=900px, xl >=1001px). */
+.gl-masonry { --gl-masonry-columns: 3; display: block; min-width: 0; }
+.gl-masonry-columns-xs-1{--gl-masonry-columns:1} .gl-masonry-columns-xs-2{--gl-masonry-columns:2} .gl-masonry-columns-xs-3{--gl-masonry-columns:3} .gl-masonry-columns-xs-4{--gl-masonry-columns:4} .gl-masonry-columns-xs-5{--gl-masonry-columns:5} .gl-masonry-columns-xs-6{--gl-masonry-columns:6} .gl-masonry-columns-xs-7{--gl-masonry-columns:7} .gl-masonry-columns-xs-8{--gl-masonry-columns:8} .gl-masonry-columns-xs-9{--gl-masonry-columns:9} .gl-masonry-columns-xs-10{--gl-masonry-columns:10} .gl-masonry-columns-xs-11{--gl-masonry-columns:11} .gl-masonry-columns-xs-12{--gl-masonry-columns:12}
+@media (min-width: 361px) {
+  .gl-masonry-columns-sm-1{--gl-masonry-columns:1} .gl-masonry-columns-sm-2{--gl-masonry-columns:2} .gl-masonry-columns-sm-3{--gl-masonry-columns:3} .gl-masonry-columns-sm-4{--gl-masonry-columns:4} .gl-masonry-columns-sm-5{--gl-masonry-columns:5} .gl-masonry-columns-sm-6{--gl-masonry-columns:6} .gl-masonry-columns-sm-7{--gl-masonry-columns:7} .gl-masonry-columns-sm-8{--gl-masonry-columns:8} .gl-masonry-columns-sm-9{--gl-masonry-columns:9} .gl-masonry-columns-sm-10{--gl-masonry-columns:10} .gl-masonry-columns-sm-11{--gl-masonry-columns:11} .gl-masonry-columns-sm-12{--gl-masonry-columns:12}
+}
+@media (min-width: 701px) {
+  .gl-masonry-columns-md-1{--gl-masonry-columns:1} .gl-masonry-columns-md-2{--gl-masonry-columns:2} .gl-masonry-columns-md-3{--gl-masonry-columns:3} .gl-masonry-columns-md-4{--gl-masonry-columns:4} .gl-masonry-columns-md-5{--gl-masonry-columns:5} .gl-masonry-columns-md-6{--gl-masonry-columns:6} .gl-masonry-columns-md-7{--gl-masonry-columns:7} .gl-masonry-columns-md-8{--gl-masonry-columns:8} .gl-masonry-columns-md-9{--gl-masonry-columns:9} .gl-masonry-columns-md-10{--gl-masonry-columns:10} .gl-masonry-columns-md-11{--gl-masonry-columns:11} .gl-masonry-columns-md-12{--gl-masonry-columns:12}
+}
+@media (min-width: 900px) {
+  .gl-masonry-columns-lg-1{--gl-masonry-columns:1} .gl-masonry-columns-lg-2{--gl-masonry-columns:2} .gl-masonry-columns-lg-3{--gl-masonry-columns:3} .gl-masonry-columns-lg-4{--gl-masonry-columns:4} .gl-masonry-columns-lg-5{--gl-masonry-columns:5} .gl-masonry-columns-lg-6{--gl-masonry-columns:6} .gl-masonry-columns-lg-7{--gl-masonry-columns:7} .gl-masonry-columns-lg-8{--gl-masonry-columns:8} .gl-masonry-columns-lg-9{--gl-masonry-columns:9} .gl-masonry-columns-lg-10{--gl-masonry-columns:10} .gl-masonry-columns-lg-11{--gl-masonry-columns:11} .gl-masonry-columns-lg-12{--gl-masonry-columns:12}
+}
+@media (min-width: 1001px) {
+  .gl-masonry-columns-xl-1{--gl-masonry-columns:1} .gl-masonry-columns-xl-2{--gl-masonry-columns:2} .gl-masonry-columns-xl-3{--gl-masonry-columns:3} .gl-masonry-columns-xl-4{--gl-masonry-columns:4} .gl-masonry-columns-xl-5{--gl-masonry-columns:5} .gl-masonry-columns-xl-6{--gl-masonry-columns:6} .gl-masonry-columns-xl-7{--gl-masonry-columns:7} .gl-masonry-columns-xl-8{--gl-masonry-columns:8} .gl-masonry-columns-xl-9{--gl-masonry-columns:9} .gl-masonry-columns-xl-10{--gl-masonry-columns:10} .gl-masonry-columns-xl-11{--gl-masonry-columns:11} .gl-masonry-columns-xl-12{--gl-masonry-columns:12}
+}
+/* Before measuring: balanced CSS columns at the same item width. */
+.gl-masonry-inner {
+  column-count: var(--gl-masonry-columns);
+  column-gap: var(--gl-masonry-gap);
+}
+.gl-masonry-item {
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0 0 var(--gl-masonry-gap);
+  break-inside: avoid;
+}
+/* Measured: flex columns of a computed height; half-gap margins so empty break lines add no space. */
+.gl-masonry-inner[data-ready] {
+  column-count: auto;
+  column-gap: 0;
+  display: flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+  margin: calc(var(--gl-masonry-gap) / -2);
+}
+.gl-masonry-inner[data-ready] > .gl-masonry-item {
+  width: calc(100% / var(--gl-masonry-columns) - var(--gl-masonry-gap));
+  margin: calc(var(--gl-masonry-gap) / 2);
+}
+.gl-masonry-break { flex-basis: 100%; width: 0; margin: 0; padding: 0; }
+}

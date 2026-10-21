@@ -1,0 +1,54 @@
+/* Skeleton: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Skeleton — an addition, matching MUI's Skeleton. Placeholders in color-line (the site's hairline)
+   on the glass: text lines are pills (the .chip shape), rounded blocks take radius-well
+   (.project-figure), and the wave is a white-alpha sheen like the panel's (.glass-panel::before). */
+.gl-skeleton {
+  position: relative;
+  display: block;
+  height: 1.2em;
+  overflow: hidden;
+  background: var(--color-line);
+}
+/* One line of the surrounding text: the line box, squeezed to 60% so lines keep their rhythm.
+   The 600/1000 radius stays a true pill after the squeeze. */
+.gl-skeleton-text {
+  height: auto;
+  margin: 0;
+  transform: scale(1, 0.6);
+  transform-origin: 0 55%;
+  border-radius: 600px / 1000px;
+}
+.gl-skeleton-text:empty::before { content: "\00a0"; }
+.gl-skeleton-rectangular { border-radius: 0; }
+.gl-skeleton-rounded { border-radius: var(--radius-well); }
+.gl-skeleton-circular { border-radius: 50%; }
+.gl-skeleton-with-children > * { visibility: hidden; }
+.gl-skeleton-fit-width { max-width: fit-content; }
+.gl-skeleton-fit-height { height: auto; }
+
+.gl-skeleton-pulse { animation: gl-skeleton-pulse 1800ms ease-in-out 400ms infinite; }
+@keyframes gl-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.gl-skeleton-wave::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: translateX(-100%);
+  animation: gl-skeleton-wave 1800ms linear 400ms infinite;
+}
+@keyframes gl-skeleton-wave {
+  0% { transform: translateX(-100%); }
+  60%, 100% { transform: translateX(100%); }
+}
+
+/* Reduced motion: still placeholders. */
+@media (prefers-reduced-motion: reduce) {
+  .gl-skeleton-pulse { animation: none; }
+  .gl-skeleton-wave::after { display: none; animation: none; }
+}
+}

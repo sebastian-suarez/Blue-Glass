@@ -1,0 +1,87 @@
+/* Pagination: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Pagination — chip pills (.chip: glass-control, the rgba(88, 108, 143, 0.16) hairline, ink-soft text);
+   the current page is the ink pill (.btn-primary: color-ink, on-ink, shadow-primary) */
+.gl-pagination-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gl-pagination-sm .gl-pagination-list { gap: var(--space-3xs); }
+.gl-pagination-cell { display: flex; }
+
+.gl-pagination-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--duration-hover) ease,
+    border-color var(--duration-hover) ease,
+    color var(--duration-hover) ease,
+    box-shadow var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-pagination-item-sm { min-width: 28px; height: 28px; padding: 0 7px; font-size: 12px; }
+.gl-pagination-item-step { padding: 0; }
+.gl-pagination-item-glass {
+  background: var(--glass-control);
+  border-color: rgba(88, 108, 143, 0.16);
+}
+.gl-pagination-item.gl-pagination-item-selected {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow-primary);
+}
+.gl-pagination-item:focus-visible { outline-offset: 2px; }
+.gl-pagination-item:active:not(:disabled):not([aria-disabled="true"]) { transform: scale(0.98); }
+.gl-pagination-item:disabled,
+.gl-pagination-item[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+.gl-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+}
+.gl-pagination-ellipsis-sm { min-width: 28px; height: 28px; font-size: 12px; }
+
+@media (hover: hover) and (pointer: fine) {
+  /* .plate:hover */
+  .gl-pagination-item-glass:hover:not(:disabled):not([aria-disabled="true"]) { background: rgba(255, 255, 255, 0.8); }
+  .gl-pagination-item-text:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--glass-control); }
+  /* .btn-primary:hover */
+  .gl-pagination-item.gl-pagination-item-selected:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ink-hover); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-pagination-item { transition: none; }
+  .gl-pagination-item:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+}
+}

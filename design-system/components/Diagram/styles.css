@@ -1,0 +1,127 @@
+/* Diagram: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Mermaid/styles.css: gl-dg-box */
+/* Also styled by ../TimingChart/styles.css: gl-dg-label, gl-dg-wrap, gl-js */
+
+@layer gl-components {
+/* Diagram — the site's .dg-* rules (global.css "Diagram: one SVG per diagram"), renamed .gl-dg-*.
+   Colours are the site's exact values: the region tints, box fill and hairlines are its rgba() literals. */
+.gl-dg-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.gl-dg-host {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-control);
+}
+.gl-dg-hint {
+  display: none;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+.gl-dg-host[data-scrollable] + .gl-dg-hint { display: block; }
+.gl-dg {
+  --i: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  font-family: var(--font-sans);
+}
+/* .dg-region, .dg-region-panel, .dg-region-ring, .dg-region-ring-inner */
+.gl-dg-region { stroke-width: 1; vector-effect: non-scaling-stroke; }
+.gl-dg-region-panel { fill: rgba(142, 184, 232, 0.13); stroke: rgba(88, 108, 143, 0.2); }
+.gl-dg-region-ring { fill: rgba(142, 184, 232, 0.12); stroke: rgba(88, 108, 143, 0.24); }
+.gl-dg-region-ring-inner { fill: rgba(142, 184, 232, 0.22); stroke: rgba(88, 108, 143, 0.3); }
+/* .dg-box and the node tones */
+.gl-dg-box {
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: rgba(88, 108, 143, 0.32);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 3px 8px rgba(64, 82, 125, 0.1));
+}
+.gl-dg-node-accent .gl-dg-box { stroke: var(--color-blue); stroke-width: 1.5; }
+.gl-dg-node-accent-fill .gl-dg-box { fill: var(--dg-node-accent); stroke: none; }
+.gl-dg-text { fill: var(--color-ink); }
+.gl-dg-node-accent-fill .gl-dg-text { fill: var(--on-ink); }
+/* .dg-edge, .dg-edge-draw, .dg-head and the accent tone */
+.gl-dg-edge {
+  fill: none;
+  stroke: var(--dg-edge);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.gl-dg-edge-draw { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.gl-dg-head { fill: var(--dg-edge); }
+.gl-dg-tone-accent .gl-dg-edge { stroke: var(--color-blue); }
+.gl-dg-tone-accent .gl-dg-head { fill: var(--color-blue); }
+/* The cross end (Mermaid's --x) is two strokes, not a fill. */
+.gl-dg-head-cross { fill: none; stroke: var(--dg-edge); stroke-width: 2; stroke-linecap: round; }
+.gl-dg-tone-accent .gl-dg-head-cross { stroke: var(--color-blue); }
+/* .dg-label */
+.gl-dg-label { fill: var(--color-muted); }
+.gl-dg-label-accent { fill: var(--color-blue-deep); }
+/* .dg-pulse */
+.gl-dg-pulse {
+  fill: #fff;
+  stroke: var(--color-blue);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px rgba(77, 124, 201, 0.7));
+}
+
+/* Entrance (the site's diagram-reveal), staggered by --i. Transitions exist only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .gl-dg-region { transition: opacity 600ms ease; }
+  .gl-dg-node {
+    transition:
+      opacity 500ms var(--ease-out-quint) calc(120ms + var(--i) * 90ms),
+      transform 700ms var(--ease-out-quint) calc(120ms + var(--i) * 90ms);
+  }
+  .gl-dg-edge-group { transition: opacity 200ms ease calc(380ms + var(--i) * 160ms); }
+  .gl-dg-edge-draw { transition: stroke-dashoffset 560ms var(--ease-in-out-quart) calc(380ms + var(--i) * 160ms); }
+  .gl-dg-head { transition: opacity 200ms ease calc(860ms + var(--i) * 160ms); }
+  .gl-dg-label { transition: opacity 450ms ease calc(600ms + var(--i) * 80ms); }
+  .gl-dg-pulses { transition: opacity 400ms ease 1500ms; }
+}
+
+/* Hidden entrance states: screen only, so print never catches a diagram mid-entrance.
+   `armed` is set by the component; `gl-js` on <html> is the site's `.js` pre-state for server-rendered pages. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  :is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal])) :is(.gl-dg-region, .gl-dg-label, .gl-dg-edge-group, .gl-dg-head, .gl-dg-pulses) {
+    opacity: 0;
+  }
+  :is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal])) .gl-dg-node {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  :is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal])) .gl-dg-edge-draw {
+    stroke-dashoffset: 1;
+  }
+  /* The failsafe: if the reveal never runs, everything lands after 2.5 s. */
+  :root.gl-js .gl-dg-wrap:not([data-reveal]) :is(.gl-dg-region, .gl-dg-label, .gl-dg-edge-group, .gl-dg-head, .gl-dg-pulses, .gl-dg-node, .gl-dg-edge-draw) {
+    animation: gl-dg-failsafe 400ms ease 2500ms both;
+  }
+  @keyframes gl-dg-failsafe {
+    to {
+      opacity: 1;
+      transform: none;
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* SMIL ignores CSS transitions; the component pauses the pulses too. */
+@media (prefers-reduced-motion: reduce) {
+  .gl-dg-pulses { display: none; }
+}
+@media print {
+  .gl-dg-pulses { display: none; }
+}
+}

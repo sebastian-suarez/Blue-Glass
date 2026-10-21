@@ -1,0 +1,273 @@
+/* Stepper: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* Stepper — 28px step marks: completed is the ink fill with an on-ink check (.btn-primary), active an ink ring,
+   upcoming a dg-edge ring (the diagram edge), error a danger ring; connectors are color-line hairlines that
+   turn color-ink once the step before is done. MobileStepper's fixed bar is the glass pill (.btn-glass). */
+.gl-stepper {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-ink);
+}
+.gl-step { min-width: 0; }
+
+/* The mark */
+.gl-step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--duration-state) ease,
+    box-shadow var(--duration-state) ease,
+    color var(--duration-state) ease;
+}
+.gl-step-icon .gl-icon { width: 16px; height: 16px; }
+.gl-step-icon-upcoming {
+  background: var(--glass-control);
+  box-shadow: inset 0 0 0 1.5px var(--dg-edge);
+  color: var(--color-muted);
+}
+.gl-step-icon-active {
+  background: var(--glass-raised);
+  box-shadow: inset 0 0 0 2px var(--color-ink);
+  color: var(--color-ink);
+}
+.gl-step-icon-completed { background: var(--color-ink); color: var(--on-ink); }
+.gl-step-icon-error { background: var(--danger-soft); color: var(--danger); }
+.gl-step-icon-error .gl-icon { width: 28px; height: 28px; }
+
+/* The label */
+.gl-step-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.gl-step-text { display: grid; gap: 1px; min-width: 0; }
+.gl-step-title {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--color-muted);
+  overflow-wrap: break-word;
+  transition: color var(--duration-state) ease;
+}
+.gl-step-label-active .gl-step-title { color: var(--color-ink); font-weight: 500; }
+.gl-step-label-completed .gl-step-title { color: var(--color-ink); }
+.gl-step-label-error .gl-step-title { color: var(--danger); font-weight: 500; }
+.gl-step-optional { font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+.gl-step-label-error .gl-step-optional { color: var(--danger); }
+
+/* nonLinear: the label is a button. Its fill and focus ring sit on a pseudo-element that reaches past the
+   label, so the layout matches the linear stepper and the hit area grows. */
+.gl-step-label-button {
+  position: relative;
+  isolation: isolate;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-step-label-button::before {
+  content: "";
+  position: absolute;
+  inset: -6px -12px -6px -6px;
+  z-index: -1;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  transition: background var(--duration-hover) ease;
+}
+.gl-step-label-button:focus-visible { outline: none; }
+.gl-step-label-button:focus-visible::before { outline: 3px solid var(--focus); outline-offset: 2px; }
+.gl-step-label-button:active:not(:disabled) { transform: scale(0.98); }
+.gl-step-label-button:disabled { cursor: not-allowed; opacity: 0.5; }
+
+/* Connectors */
+.gl-step-connector {
+  display: block;
+  flex: none;
+  background: var(--color-line);
+  transition: background var(--duration-state) ease;
+}
+.gl-step-connector.gl-step-connector-completed { background: var(--color-ink); }
+
+/* Horizontal: the connector lives in the step after it and takes the free width. */
+.gl-stepper-horizontal { flex-direction: row; align-items: center; }
+.gl-stepper-horizontal .gl-step { display: flex; align-items: center; flex: 1 1 auto; }
+.gl-stepper-horizontal .gl-step:first-child { flex: 0 1 auto; }
+.gl-stepper-horizontal .gl-step-label { flex: 0 1 auto; }
+.gl-stepper-horizontal .gl-step-connector { flex: 1 1 auto; min-width: 12px; height: 1px; margin: 0 10px; }
+
+/* alternativeLabel: equal columns, labels under the marks, the connector between mark centres. */
+.gl-stepper-alt { align-items: flex-start; }
+.gl-stepper-alt .gl-step,
+.gl-stepper-alt .gl-step:first-child {
+  position: relative;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+}
+.gl-stepper-alt .gl-step-connector {
+  position: absolute;
+  top: 13.5px;
+  left: calc(-50% + 24px);
+  right: calc(50% + 24px);
+  min-width: 0;
+  margin: 0;
+}
+.gl-stepper-alt .gl-step-label { flex-direction: column; gap: 8px; padding: 0 6px; text-align: center; }
+.gl-stepper-alt .gl-step-text { justify-items: center; }
+.gl-stepper-alt .gl-step-label-button::before { inset: -6px -4px; border-radius: var(--radius-control); }
+
+/* Vertical: each step draws its own segment of the line, from just under its mark to just above the next
+   one, so the line stays whole whatever the label or StepContent height. Marks align with the title's
+   first line. */
+.gl-stepper-vertical { flex-direction: column; }
+.gl-stepper-vertical .gl-step { position: relative; display: block; padding-bottom: 14px; }
+.gl-stepper-vertical .gl-step-last { padding-bottom: 0; }
+.gl-stepper-vertical .gl-step-connector { display: none; }
+.gl-stepper-vertical .gl-step:not(.gl-step-last)::after {
+  content: "";
+  position: absolute;
+  left: 13.5px;
+  top: 40px; /* 6px margin + 28px mark + 6px gap */
+  bottom: 0;
+  width: 1px;
+  background: var(--color-line);
+  transition: background var(--duration-state) ease;
+}
+.gl-stepper-vertical .gl-step-completed:not(.gl-step-last)::after { background: var(--color-ink); }
+.gl-stepper-vertical .gl-step-label { align-items: flex-start; margin: 6px 0; }
+/* (28px mark - 19px title line) / 2: the title's first line sits on the mark's centre. */
+.gl-stepper-vertical .gl-step-text { padding-top: 4.5px; }
+/* The indent and the bottom space sit inside Collapse's clipping box, so button shadows aren't cut off. */
+.gl-step-content-body { padding: 4px 0 28px 38px; }
+
+/* Phones (media.phone): a plain horizontal stepper keeps every mark but shows only the current or failed
+   step's label; the others stay readable to screen readers. Vertical or MobileStepper suit phones better. */
+@media (max-width: 700px) {
+  .gl-stepper-horizontal:not(.gl-stepper-alt) .gl-step-label { position: relative; }
+  /* Visually hidden, still read; parked to the left of its label so its box never runs past the row's end. */
+  .gl-stepper-horizontal:not(.gl-stepper-alt) .gl-step:not(.gl-step-active) .gl-step-label:not(.gl-step-label-error) .gl-step-text {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: max-content;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* MobileStepper */
+.gl-mobile-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.gl-mobile-stepper-status { flex: 1 1 auto; display: flex; justify-content: center; min-width: 0; }
+.gl-mobile-stepper-dots { display: flex; align-items: center; gap: 6px; }
+.gl-mobile-stepper-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--dg-edge);
+  transition:
+    width var(--duration-state) var(--ease-out-quint),
+    background var(--duration-state) ease;
+}
+.gl-mobile-stepper-dot-active { width: 20px; background: var(--color-ink); }
+.gl-mobile-stepper-track {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+.gl-mobile-stepper-bar {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-blue);
+  transition: transform var(--duration-tab) var(--ease-out-quint);
+}
+.gl-mobile-stepper-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* top / bottom: the glass pill, pinned. */
+.gl-mobile-stepper-bottom,
+.gl-mobile-stepper-top {
+  position: fixed;
+  z-index: var(--z-mobile-stepper);
+  left: 12px;
+  right: 12px;
+  padding: 6px;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  box-shadow: var(--shadow-pane);
+  -webkit-backdrop-filter: blur(var(--blur-control)) saturate(115%);
+  backdrop-filter: blur(var(--blur-control)) saturate(115%);
+}
+.gl-mobile-stepper-bottom { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.gl-mobile-stepper-top { top: calc(12px + env(safe-area-inset-top, 0px)); }
+/* No glass on glass: glass buttons inside the bar drop their own blur. */
+.gl-mobile-stepper-bottom .gl-button-glass,
+.gl-mobile-stepper-top .gl-button-glass {
+  background: var(--glass-control);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-step-label-button:hover:not(:disabled)::before { background: var(--glass-control); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-step-icon,
+  .gl-step-title,
+  .gl-step-connector,
+  .gl-stepper-vertical .gl-step:not(.gl-step-last)::after,
+  .gl-step-label-button,
+  .gl-step-label-button::before,
+  .gl-mobile-stepper-dot,
+  .gl-mobile-stepper-bar { transition: none; }
+  .gl-step-label-button:active:not(:disabled) { transform: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .gl-mobile-stepper-bottom,
+  .gl-mobile-stepper-top { background: var(--glass-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .gl-mobile-stepper-bottom,
+  .gl-mobile-stepper-top { background: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+}

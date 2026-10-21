@@ -1,0 +1,41 @@
+/* Menu: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Autocomplete/styles.css: gl-option-end */
+/* Also styled by ../List/styles.css: gl-option */
+/* Also styled by ../Select/styles.css: gl-listbox, gl-option-end */
+/* Also styled by ../TransferList/styles.css: gl-option, gl-option-end */
+/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-icon, gl-option-secondary, gl-option-text */
+
+@layer gl-components {
+/* Menu — base .gl-popover (the side selector's material: glass, blur-selector, radius-well, the
+   selector's 7px padding) holding .gl-option rows (.project-tab, denser) from base.css */
+.gl-menu { min-width: 200px; max-width: min(340px, calc(100vw - 16px)); }
+.gl-menu-list { min-width: 0; }
+.gl-menu-item-wrap { display: block; min-width: 0; }
+
+.gl-menu-item .gl-option-icon .gl-icon { width: 16px; height: 16px; }
+.gl-menu-item .gl-option-end .gl-icon { width: 14px; height: 14px; }
+.gl-menu-item .gl-option-end { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gl-menu-item[aria-checked="true"] .gl-option-end { color: var(--color-ink); }
+
+/* dense: 32px rows, the size-control-sm tap target */
+.gl-menu-item-dense { min-height: var(--size-control-sm); padding: 5px 10px; gap: 9px; font-size: 13px; }
+.gl-menu-item-dense .gl-option-secondary { font-size: 11px; }
+
+/* danger: destructive items read in danger and highlight on danger-soft */
+.gl-menu-item-danger,
+.gl-menu-item-danger .gl-option-icon { color: var(--danger); }
+.gl-menu-item-danger:focus-visible { background: var(--danger-soft); }
+
+/* Separators: the site's hairline (color-line), between groups */
+.gl-menu-separator,
+.gl-menu-list > [role="separator"] {
+  display: block;
+  height: 1px;
+  margin: 4px 10px;
+  background: var(--color-line);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-menu-item-danger:hover:not([aria-disabled="true"]) { background: var(--danger-soft); }
+}
+}

@@ -1,0 +1,19 @@
+<!-- @dsCard group="Utils" height=420 subtitle="Grows with content · minRows · maxRows" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TextareaAutosize — Blue Glass</title>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(()=>{var k=Object.create;var{getPrototypeOf:z,defineProperty:w,getOwnPropertyNames:T}=Object;var y=Object.prototype.hasOwnProperty;function V(i){return this[i]}var F,B,l=(i,o,r)=>{var a=i!=null&&typeof i==="object";if(a){var s=o?F??=new WeakMap:B??=new WeakMap,v=s.get(i);if(v)return v}r=i!=null?k(z(i)):{};let d=o||!i||!i.__esModule||!y.call(i,"default")?w(r,"default",{value:i,enumerable:!0}):r;if(i&&typeof i==="object"||typeof i==="function"){for(let c of T(i))if(!y.call(d,c))w(d,c,{get:V.bind(i,c),enumerable:!0})}if(a)s.set(i,d);return d};var g=(i,o)=>()=>(o||i((o={exports:{}}).exports,o),o.exports);var u=g(function(D,b){b.exports=window.React});var f=g(function(M,S){S.exports=window.BlueGlass});var P=g(function(E,R){R.exports=window.ReactDOM});var e=l(u()),n=l(f());var t=l(u()),C=l(P()),N=l(f());function W(i){let o=document.getElementById("root");if(o)C.createRoot(o).render(i)}function H({children:i,field:o=!0,width:r,minHeight:a}){return t.createElement("div",{style:{position:"relative",isolation:"isolate",overflow:"clip",minHeight:a??"100vh",padding:"28px 28px 36px",background:"var(--color-canvas)"}},o?t.createElement(N.LightField,{variant:"compact"}):null,t.createElement("div",{style:{display:"grid",gap:32,maxWidth:r,margin:r?"0 auto":void 0}},i))}function p({title:i,note:o,children:r}){return t.createElement("section",{style:{display:"grid",gap:14,minWidth:0}},t.createElement("div",{style:{display:"grid",gap:2}},t.createElement("h2",{style:{margin:0,fontSize:13,lineHeight:1.6,fontWeight:600,color:"var(--color-muted)",letterSpacing:0}},i),o?t.createElement("p",{style:{margin:0,fontSize:12,lineHeight:1.5,color:"var(--color-muted)",maxWidth:"62ch"}},o):null),r)}function I({children:i,gap:o=12,align:r="center",wrap:a=!0,style:s}){return t.createElement("div",{style:{display:"flex",flexWrap:a?"wrap":"nowrap",alignItems:r,gap:o,minWidth:0,...s}},i)}function x({children:i,gap:o=12,style:r}){return t.createElement("div",{style:{display:"grid",gap:o,minWidth:0,...r}},i)}function h({children:i}){return t.createElement("span",{style:{fontSize:12,lineHeight:1.5,color:"var(--color-muted)"}},i)}var m={width:"100%",padding:"10px 14px",borderRadius:"var(--radius-control)",border:"1px solid var(--dg-edge)",background:"var(--glass-control)",color:"var(--color-ink)",font:"inherit",fontSize:15,lineHeight:1.6};W(e.createElement(H,null,e.createElement(p,{title:"Default",note:"Unstyled on its own (TextField's multiline mode styles it). It grows with its content from minRows."},e.createElement("div",{style:{maxWidth:460}},e.createElement(n.TextareaAutosize,{"aria-label":"Notes",minRows:2,placeholder:"Type a few lines…",style:m}))),e.createElement(p,{title:"Variants",note:"maxRows caps the height; past it the textarea scrolls."},e.createElement(I,{gap:20,align:"flex-start"},e.createElement(x,{gap:6,style:{flex:"1 1 220px"}},e.createElement(n.TextareaAutosize,{"aria-label":"One row",minRows:1,defaultValue:"minRows 1",style:m}),e.createElement(h,null,"minRows 1")),e.createElement(x,{gap:6,style:{flex:"1 1 220px"}},e.createElement(n.TextareaAutosize,{"aria-label":"Capped",minRows:2,maxRows:4,defaultValue:`maxRows 4
+line two
+line three
+line four
+line five scrolls`,style:m}),e.createElement(h,null,"minRows 2 · maxRows 4")))),e.createElement(p,{title:"Example"},e.createElement(n.Paper,{style:{padding:22,display:"grid",gap:10,maxWidth:520}},e.createElement("label",{htmlFor:"ta-msg",className:"text-label"},"Message"),e.createElement(n.TextareaAutosize,{id:"ta-msg",minRows:3,maxRows:8,defaultValue:"Hi Sebastian, we're hiring a backend lead for a product team.",style:m})))));})();
+</script>
+</body>
+</html>

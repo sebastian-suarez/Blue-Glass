@@ -1,0 +1,6 @@
+/* Transitions: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Transitions — styles are inline per status; Collapse uses the site's grid-rows reveal (.pane .more). */
+.gl-collapse { min-width: 0; }
+}

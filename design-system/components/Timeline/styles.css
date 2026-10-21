@@ -1,0 +1,111 @@
+/* Timeline: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Timeline — an addition matching MUI Lab's Timeline, drawn with the site's marks: dots in color-ink or
+   dg-edge, the glass orb (.tab-orb / .orb-1), color-line connectors and dates like .career-date. */
+.gl-timeline {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+}
+.gl-timeline-item { position: relative; display: flex; min-height: 70px; list-style: none; }
+/* alternate without dates: an empty half keeps the line centred */
+.gl-timeline-item-spacer::before { content: ""; flex: 1 1 0; padding: 6px 16px; }
+
+/* The first line of content is centred on the dot: 6px + 24px / 2 = 18px from the top. */
+.gl-timeline-opposite {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 16px 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  text-align: right;
+}
+.gl-timeline-content {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 16px 18px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-ink);
+  text-align: left;
+}
+/* A fixed column, so a dot with an icon (24px) keeps the line where plain 12px dots put it. */
+.gl-timeline-separator { flex: none; display: flex; flex-direction: column; align-items: center; min-width: 24px; }
+
+.gl-timeline-dot {
+  box-sizing: border-box;
+  flex: none;
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 12px 0;
+  border-radius: 50%;
+}
+.gl-timeline-dot-filled { background: var(--gl-timeline-dot, var(--color-ink)); }
+.gl-timeline-dot-outlined { background: transparent; border: 2px solid var(--gl-timeline-dot, var(--dg-edge)); }
+/* .tab-orb: the glass orb */
+.gl-timeline-dot-orb {
+  background: linear-gradient(135deg, #f6fbff, #93afcf);
+  box-shadow:
+    inset 0 0 1px #ffffff,
+    0 1px 4px #546b8e25;
+}
+/* .orb-1 */
+.gl-timeline-dot-orb.gl-timeline-dot-accent { background: linear-gradient(135deg, #f1f8ff, #77a5d8); }
+.gl-timeline-dot-accent { --gl-timeline-dot: var(--color-blue); }
+.gl-timeline-dot-danger { --gl-timeline-dot: var(--danger); }
+.gl-timeline-dot-warning { --gl-timeline-dot: var(--warning); }
+.gl-timeline-dot-success { --gl-timeline-dot: var(--success); }
+.gl-timeline-dot-info { --gl-timeline-dot: var(--info); }
+.gl-timeline-dot-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  margin: 6px 0;
+  padding: 4px;
+}
+.gl-timeline-dot-icon .gl-icon { width: 16px; height: 16px; }
+.gl-timeline-dot-filled.gl-timeline-dot-icon { color: var(--on-ink); }
+.gl-timeline-dot-outlined.gl-timeline-dot-icon { color: var(--gl-timeline-dot, var(--color-muted)); padding: 2px; }
+.gl-timeline-dot-orb.gl-timeline-dot-icon { color: var(--color-ink); }
+
+.gl-timeline-connector { flex: 1 1 auto; width: 2px; border-radius: 1px; background: var(--color-line); }
+
+/* left: content on the left of the line, dates on the right */
+.gl-timeline-left > .gl-timeline-item { flex-direction: row-reverse; }
+.gl-timeline-left .gl-timeline-content { text-align: right; }
+.gl-timeline-left .gl-timeline-opposite { text-align: left; }
+/* alternate: odd items right, even items left; alternate-reverse the opposite */
+.gl-timeline-alternate > .gl-timeline-item:nth-child(even),
+.gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+.gl-timeline-alternate > .gl-timeline-item:nth-child(even) > .gl-timeline-content,
+.gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(odd) > .gl-timeline-content { text-align: right; }
+.gl-timeline-alternate > .gl-timeline-item:nth-child(even) > .gl-timeline-opposite,
+.gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(odd) > .gl-timeline-opposite { text-align: left; }
+
+/* A fixed date column (oppositeWidth) for left and right. */
+.gl-timeline-fixed-opposite.gl-timeline-left .gl-timeline-opposite,
+.gl-timeline-fixed-opposite.gl-timeline-right .gl-timeline-opposite { flex: 0 0 var(--gl-timeline-opposite-width); }
+
+/* Under 700px alternate folds to right (dates left, content right) and a fixed date column gives way, to at most 32%. */
+@media (max-width: 700px) {
+  .gl-timeline-alternate > .gl-timeline-item:nth-child(n),
+  .gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(n) { flex-direction: row; }
+  .gl-timeline-alternate > .gl-timeline-item:nth-child(n) > .gl-timeline-content,
+  .gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(n) > .gl-timeline-content { text-align: left; }
+  .gl-timeline-alternate > .gl-timeline-item:nth-child(n) > .gl-timeline-opposite,
+  .gl-timeline-alternate-reverse > .gl-timeline-item:nth-child(n) > .gl-timeline-opposite { text-align: right; }
+  .gl-timeline-item-spacer::before { display: none; }
+  .gl-timeline-fixed-opposite .gl-timeline-opposite { flex: 0 0 min(var(--gl-timeline-opposite-width), 32%); }
+  .gl-timeline-opposite,
+  .gl-timeline-content { padding-left: 12px; padding-right: 12px; }
+}
+}

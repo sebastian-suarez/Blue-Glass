@@ -1,0 +1,43 @@
+/* Paper: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-glass */
+
+@layer gl-components {
+/* Paper — the site's .glass-panel and its inset wells (.project-figure, .notfound-figure) */
+.gl-paper { position: relative; isolation: isolate; color: var(--color-ink); }
+.gl-paper-glass {
+  --gl-fill: var(--glass);
+  --gl-blur: var(--blur-panel);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+}
+/* The diagonal sheen across the glass (.glass-panel::before). */
+.gl-paper-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #fff4, transparent 40%, #fff1);
+  pointer-events: none;
+}
+.gl-paper-inset { background: var(--glass-inset); border: 1px solid var(--glass-edge); box-shadow: var(--shadow-inset); }
+.gl-paper-solid { background: var(--glass-solid); border: 1px solid var(--glass-edge); }
+.gl-paper-outlined { background: transparent; border: 1px solid var(--color-line); }
+
+.gl-radius-panel { border-radius: var(--radius-panel); }
+.gl-radius-pane { border-radius: var(--radius-pane); }
+.gl-radius-well { border-radius: var(--radius-well); }
+.gl-radius-control { border-radius: var(--radius-control); }
+.gl-radius-none { border-radius: 0; }
+
+.gl-paper.gl-elevation-0 { box-shadow: none; }
+.gl-paper-inset.gl-elevation-0 { box-shadow: var(--shadow-inset); }
+.gl-paper.gl-elevation-1 { box-shadow: var(--shadow-pane); }
+.gl-paper.gl-elevation-2 { box-shadow: var(--shadow-panel); }
+
+@media (max-width: 700px) {
+  .gl-paper.gl-radius-panel { border-radius: var(--radius-panel-sm); }
+}
+@media print {
+  .gl-paper-glass { background: white; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+}

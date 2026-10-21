@@ -1,0 +1,71 @@
+/* TransferList: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Autocomplete/styles.css: gl-option-end */
+/* Also styled by ../List/styles.css: gl-option */
+/* Also styled by ../Menu/styles.css: gl-option, gl-option-end, gl-option-secondary */
+/* Also styled by ../Select/styles.css: gl-listbox, gl-option-end */
+/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-secondary, gl-option-text, gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* TransferList — an addition matching MUI's transfer list. Two inset wells (.project-figure, Paper inset) whose
+   rows are the side selector's tabs (.project-tab, via gl-option), and a column of glass pills (.btn-glass). */
+.gl-transfer-list { container-type: inline-size; min-width: 0; color: var(--color-ink); }
+.gl-transfer-list-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-md);
+}
+.gl-transfer-list-pane { display: flex; flex-direction: column; min-width: 0; padding: 7px; }
+.gl-transfer-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: 7px;
+  padding: 7px 12px 10px;
+  border-bottom: 1px solid var(--color-line);
+}
+.gl-transfer-list-title { min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.6; }
+.gl-transfer-list-count {
+  flex: none;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gl-transfer-list-body { position: relative; min-height: 0; }
+.gl-transfer-list-list {
+  height: 100%;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-control);
+}
+.gl-transfer-list-list .gl-option-end { color: var(--color-ink); }
+.gl-transfer-list-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-md);
+  color: var(--color-muted);
+  font-size: 13px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.gl-transfer-list-actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-xs); }
+.gl-transfer-list-button { width: 36px; padding: 0; }
+
+.gl-transfer-list-disabled { opacity: 0.5; }
+.gl-transfer-list-disabled .gl-option { cursor: not-allowed; }
+
+/* Narrow: the wells stack, the buttons line up between them and point down and up. */
+@container (max-width: 480px) {
+  .gl-transfer-list-grid { grid-template-columns: minmax(0, 1fr); }
+  .gl-transfer-list-actions { flex-direction: row; justify-content: center; }
+  .gl-transfer-list-actions .gl-icon { transform: rotate(90deg); }
+}
+}

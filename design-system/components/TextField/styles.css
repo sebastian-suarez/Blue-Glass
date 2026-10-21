@@ -1,0 +1,154 @@
+/* TextField: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* TextField — an addition: the site has no form fields. Built in its language: the .btn pill (size-control,
+   radius-pill), the .chip's glass-control fill, a dg-edge border (3:1, the diagram edge), the .education h3
+   label (13px/600). Shared by Select and Autocomplete (gl-field-*). */
+.gl-field {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: top;
+  color: var(--color-ink);
+}
+.gl-field-full { display: flex; width: 100%; }
+
+/* Label: text-label, always visible, above the control. */
+.gl-field-label {
+  align-self: flex-start;
+  margin: 0 0 var(--space-xs);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+.gl-field-asterisk { margin-left: 3px; }
+
+/* The pill. */
+.gl-field-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: var(--size-control);
+  padding: 0 20px;
+  border: 1px solid var(--dg-edge);
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  color: var(--color-ink);
+  font-size: 15px;
+  line-height: 1.6;
+  cursor: text;
+  transition:
+    background var(--duration-hover) ease,
+    border-color var(--duration-hover) ease;
+}
+/* filled: the inset well (.project-figure) as a pill; the edge darkens on hover and focus. */
+.gl-field-filled .gl-field-control {
+  background: var(--glass-inset);
+  border-color: var(--glass-edge);
+  box-shadow: var(--shadow-inset);
+}
+/* Focus: ink edge plus the focus ring at the dense offset. Error keeps its danger edge. */
+.gl-field-control[data-focused] {
+  border-color: var(--color-ink);
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.gl-field-error .gl-field-control { border-color: var(--danger); }
+
+.gl-field-input {
+  flex: 1 1 auto;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-overflow: ellipsis;
+  /* The pill draws the focus ring (data-focused). */
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.gl-field-input::placeholder { color: var(--color-muted); opacity: 1; }
+.gl-field-input[type="password"] { text-overflow: clip; }
+.gl-field-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.gl-field-input::-webkit-inner-spin-button,
+.gl-field-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.gl-field-input::-webkit-search-decoration,
+.gl-field-input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+/* Adornments: icons at 16px in color-muted, units in 14px. */
+.gl-field-adornment {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.gl-field-adornment > .gl-icon { width: 16px; height: 16px; }
+
+/* Multiline: the well radius, text from the top, aligned with single-line text. */
+.gl-field-multiline .gl-field-control {
+  align-items: flex-start;
+  padding: 12px 20px;
+  border-radius: var(--radius-well);
+}
+.gl-field-multiline .gl-field-input { display: block; align-self: auto; resize: none; }
+.gl-field-multiline .gl-field-adornment { min-height: 24px; }
+
+/* sm: the 36px pill, like .gl-button-sm. */
+.gl-field-sm .gl-field-control { min-height: 36px; padding: 0 var(--space-md); gap: var(--space-xs); font-size: 14px; }
+.gl-field-sm.gl-field-multiline .gl-field-control { padding: 8px var(--space-md); }
+.gl-field-sm.gl-field-multiline .gl-field-adornment { min-height: 22px; }
+
+/* Helper, error and counter: one line under the control. */
+.gl-field-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+.gl-field-helper { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+.gl-field-helper > .gl-icon { width: 14px; height: 14px; margin-top: 2px; }
+.gl-field-helper-error { color: var(--danger); }
+.gl-field-counter { margin-left: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Read-only: an inset well with a dashed edge (still 3:1), no hover. */
+.gl-field-readonly .gl-field-control { background: var(--glass-inset); border-style: dashed; cursor: default; }
+
+/* Disabled. */
+.gl-field-disabled { opacity: 0.5; }
+.gl-field-disabled .gl-field-control,
+.gl-field-disabled .gl-field-input,
+.gl-field-disabled .gl-field-label { cursor: not-allowed; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-field:not(.gl-field-disabled):not(.gl-field-readonly) .gl-field-control:hover { background: var(--glass-raised); }
+  .gl-field-filled:not(.gl-field-disabled):not(.gl-field-readonly):not(.gl-field-error) .gl-field-control:not([data-focused]):hover { border-color: var(--dg-edge); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .gl-field-control,
+  .gl-field-filled .gl-field-control,
+  .gl-field-readonly .gl-field-control { background: var(--glass-solid); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-field-control { transition: none; }
+}
+}

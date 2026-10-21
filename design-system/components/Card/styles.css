@@ -1,0 +1,181 @@
+/* Card: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-glass */
+
+@layer gl-components {
+/* Card — the site's .card.glass-panel, .card-head, .card-foot, .chips/.chip and .card-links (global.css) */
+.gl-card {
+  --gl-card-radius: var(--radius-panel);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 26px; /* .card */
+  min-width: 0;
+  padding: var(--space-2xl); /* .card: 40px */
+  border-radius: var(--gl-card-radius);
+  color: var(--color-ink);
+  transition:
+    box-shadow var(--duration-surface) ease,
+    background-color var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+/* glass: .glass-panel — glass fill, blur-panel, a near-white edge, shadow-panel and the diagonal sheen */
+.gl-card-glass {
+  --gl-fill: var(--glass);
+  --gl-blur: var(--blur-panel);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-panel);
+}
+.gl-card-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #fff4, transparent 40%, #fff1);
+  pointer-events: none;
+}
+.gl-card-outlined { background: transparent; border: 1px solid var(--color-line); }
+/* inset: a well (.project-figure) — glass-inset, glass-edge, shadow-inset, radius-well */
+.gl-card-inset {
+  --gl-card-radius: var(--radius-well);
+  background: var(--glass-inset);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-inset);
+}
+
+/* .card-head */
+.gl-card-header { display: flex; align-items: flex-start; gap: var(--space-md); min-width: 0; }
+.gl-card-header-avatar { flex: none; display: inline-flex; align-items: center; min-height: 34px; }
+.gl-card-header-text { flex: 1 1 auto; min-width: 0; }
+.gl-card-header-action { flex: none; margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-xs); }
+.gl-card-title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  color: var(--color-ink);
+}
+.gl-card-subheader {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  text-wrap: pretty;
+}
+
+.gl-card-content {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+.gl-card-content > * { margin: 0; }
+
+/* CardMedia: an inset well, like .project-figure / .hiw-figure-inline */
+.gl-card-media {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px;
+  border-radius: var(--radius-well);
+  background: var(--glass-inset);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-inset);
+}
+.gl-card-media-flush { padding: 0; }
+.gl-card-media-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* .card-foot */
+.gl-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+/* .chips */
+.gl-card-chips { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin: 0; padding: 0; list-style: none; }
+.gl-card-chips-item { display: inline-flex; }
+/* .chip */
+.gl-card-chip {
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  border: 1px solid rgba(88, 108, 143, 0.16);
+  color: var(--ink-soft);
+}
+/* .card-links: above a CardActionArea's stretched hit area */
+.gl-card-links {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 22px;
+}
+.gl-card-links:only-child { margin-left: auto; }
+/* .replink .icon is 14px */
+.gl-card-links .gl-button-icon .gl-icon { width: 14px; height: 14px; }
+
+/* CardActionArea: a link or button whose hit area and focus ring cover the whole card */
+.gl-card-action-area {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-card-action-area::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--gl-card-radius);
+}
+.gl-card-action-area:focus-visible { outline: none; }
+.gl-card-action-area:focus-visible::after { outline: 3px solid var(--focus); outline-offset: 5px; }
+.gl-card:has(.gl-card-action-area:active:not(:disabled):not([aria-disabled="true"])) { transform: scale(0.98); }
+.gl-card:has(.gl-card-action-area:disabled),
+.gl-card:has(.gl-card-action-area[aria-disabled="true"]) { opacity: 0.5; }
+.gl-card-action-area:disabled,
+.gl-card-action-area[aria-disabled="true"] { cursor: not-allowed; }
+
+@media (hover: hover) and (pointer: fine) {
+  /* .card:hover */
+  .gl-card-glass:hover { box-shadow: var(--shadow-panel-hover); }
+  .gl-card-glass:has(.gl-card-action-area:disabled):hover,
+  .gl-card-glass:has(.gl-card-action-area[aria-disabled="true"]):hover { box-shadow: var(--shadow-panel); }
+  .gl-card-outlined:has(.gl-card-action-area:not(:disabled):not([aria-disabled="true"])):hover { background: var(--glass-faint); }
+  .gl-card-inset:has(.gl-card-action-area:not(:disabled):not([aria-disabled="true"])):hover { background: var(--glass-control); }
+}
+
+@media (max-width: 700px) {
+  .gl-card { padding: 26px 22px; }
+  .gl-card-glass,
+  .gl-card-outlined { --gl-card-radius: var(--radius-panel-sm); }
+  .gl-card-title { font-size: 26px; }
+  .gl-card-media { padding: 16px; }
+  .gl-card-media.gl-card-media-flush { padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-card { transition: none; }
+  .gl-card:has(.gl-card-action-area:active) { transform: none; }
+}
+@media print {
+  .gl-card-glass { background: white; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+}

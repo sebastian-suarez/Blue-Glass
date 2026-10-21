@@ -1,0 +1,107 @@
+/* Rating: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../../foundation.css: gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* Rating — the star glyph (Icon "star"): filled stars in color-blue (a mark, 3.7:1 on the canvas),
+   empty stars as a dg-edge outline (3:1). Partial stars clip the filled glyph over the outline. */
+.gl-rating {
+  --gl-rating-size: 24px;
+  --gl-rating-h: var(--size-control-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+  vertical-align: middle;
+  color: var(--color-ink);
+}
+.gl-rating-sm { --gl-rating-size: 18px; --gl-rating-h: 24px; }
+.gl-rating-lg { --gl-rating-size: 32px; --gl-rating-h: 44px; }
+.gl-rating-stars {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--radius-code);
+}
+/* Each star is a full-height slot with no gaps between, so every point of the row picks a value. */
+.gl-rating-star {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gl-rating-size);
+  height: var(--gl-rating-h);
+}
+.gl-rating-icon {
+  position: relative;
+  display: inline-flex;
+  width: var(--gl-rating-size);
+  height: var(--gl-rating-size);
+  border-radius: var(--radius-code);
+  transition: transform var(--duration-state) var(--ease-out-quint);
+}
+.gl-rating-icon .gl-icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.gl-rating-empty { color: var(--dg-edge); }
+.gl-rating-fill {
+  color: var(--color-blue);
+  clip-path: inset(0 calc(100% - var(--gl-rating-fill, 100%)) 0 0);
+}
+[dir="rtl"] .gl-rating-fill { clip-path: inset(0 0 0 calc(100% - var(--gl-rating-fill, 100%))); }
+
+/* The hit area for one step: the whole slot, or its half at precision 0.5. */
+.gl-rating-hit {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.gl-rating-disabled { opacity: 0.5; }
+.gl-rating-disabled .gl-rating-hit { cursor: not-allowed; }
+.gl-rating-readonly .gl-rating-stars { cursor: default; }
+
+/* Focus: the ring sits on the focused star; on "No rating", around the whole row. */
+.gl-rating-star:has(.gl-rating-input:focus-visible) .gl-rating-icon {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.gl-rating-stars:has(.gl-rating-none:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+@supports not selector(:has(*)) {
+  .gl-rating-input:focus-visible + .gl-rating-hit {
+    outline: 3px solid var(--focus);
+    outline-offset: -2px;
+    border-radius: var(--radius-code);
+  }
+}
+
+.gl-rating-label {
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+.gl-rating-sm .gl-rating-label { font-size: 13px; }
+.gl-rating-lg .gl-rating-label { font-size: 15px; }
+
+/* The star under the mouse lifts a little; a press settles it. */
+.gl-rating-star-hover .gl-rating-icon { transform: scale(1.1); }
+.gl-rating:not(.gl-rating-disabled):not(.gl-rating-readonly) .gl-rating-star:active .gl-rating-icon {
+  transform: scale(0.92);
+  transition-duration: var(--duration-press);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-rating-icon { transition: none; }
+  .gl-rating-star-hover .gl-rating-icon,
+  .gl-rating:not(.gl-rating-disabled):not(.gl-rating-readonly) .gl-rating-star:active .gl-rating-icon { transform: none; }
+}
+}

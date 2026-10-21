@@ -1,0 +1,129 @@
+/* Autocomplete: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../List/styles.css: gl-option, gl-option-group */
+/* Also styled by ../Menu/styles.css: gl-option, gl-option-end, gl-option-secondary, gl-popover */
+/* Also styled by ../Select/styles.css: gl-listbox, gl-option-end */
+/* Also styled by ../TextField/styles.css: gl-field-control, gl-field-input */
+/* Also styled by ../TransferList/styles.css: gl-option, gl-option-end */
+/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-group, gl-option-secondary, gl-option-text, gl-popover, gl-popover-pad-sm, gl-sr-only */
+/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
+
+@layer gl-components {
+/* Autocomplete — an addition matching MUI's Autocomplete. The input sits in the TextField pill (gl-field-control);
+   suggestions float in a Popper on the shared popover material (.gl-popover); chips are the site's .chip. */
+
+/* Room for the end buttons, which sit concentric with the pill's end (23px - 15px = 8px from the edge). */
+.gl-autocomplete-control { padding-right: 44px; }
+.gl-autocomplete-control[data-end="2"] { padding-right: 76px; }
+.gl-autocomplete-control[data-end="0"] { padding-right: 20px; }
+.gl-autocomplete-end {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  display: flex;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+.gl-autocomplete-button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--duration-hover) ease,
+    color var(--duration-hover) ease,
+    transform var(--duration-press) var(--ease-out-quint);
+}
+.gl-autocomplete-button:active:not(:disabled) { transform: scale(0.98); }
+.gl-autocomplete-button:disabled { cursor: not-allowed; }
+.gl-autocomplete-button > .gl-icon { width: 16px; height: 16px; }
+.gl-autocomplete-popup-indicator > .gl-icon { transition: transform var(--duration-state) var(--ease-out-quint); }
+.gl-autocomplete-control[data-open] .gl-autocomplete-popup-indicator > .gl-icon { transform: rotate(180deg); }
+/* Clear shows while focused (or hovered) and there is something to clear; it keeps its space either way. */
+.gl-autocomplete-clear[data-empty],
+.gl-autocomplete-control:not([data-focused]) .gl-autocomplete-clear { visibility: hidden; }
+
+/* multiple: chips before the input, inset concentric with the pill; the radius holds 23px once they wrap. */
+.gl-autocomplete-multiple .gl-autocomplete-control {
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 7px;
+  border-radius: calc(var(--size-control) / 2);
+}
+.gl-autocomplete-multiple .gl-autocomplete-input { flex: 1 1 30px; min-width: 30px; min-height: 30px; padding-left: 13px; }
+.gl-autocomplete-has-tags .gl-autocomplete-input { padding-left: 4px; }
+/* .chip, with a remove button */
+.gl-autocomplete-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 5px 5px 11px;
+  border: 1px solid rgba(88, 108, 143, 0.16);
+  border-radius: var(--radius-pill);
+  background: var(--glass-control);
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+  cursor: default;
+}
+.gl-autocomplete-tag-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gl-autocomplete-tag-remove {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition:
+    background var(--duration-hover) ease,
+    color var(--duration-hover) ease;
+}
+.gl-autocomplete-tag-remove > .gl-icon { width: 12px; height: 12px; }
+.gl-autocomplete-tag-remove:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+/* The popup: rows are gl-option; the match is set in 600. */
+.gl-autocomplete-popup { max-height: min(var(--gl-available-height, 320px), 320px); }
+.gl-autocomplete-listbox .gl-option-end { color: var(--color-ink); }
+.gl-autocomplete-group + .gl-autocomplete-group { margin-top: 6px; }
+.gl-autocomplete-match { font-weight: 600; }
+.gl-autocomplete-status { padding: 10px 12px; font-size: 14px; line-height: 1.3; color: var(--color-muted); }
+
+/* sm */
+.gl-field-sm .gl-autocomplete-control { padding-right: 36px; }
+.gl-field-sm .gl-autocomplete-control[data-end="2"] { padding-right: 62px; }
+.gl-field-sm .gl-autocomplete-control[data-end="0"] { padding-right: var(--space-md); }
+.gl-field-sm .gl-autocomplete-end { right: 4px; }
+.gl-field-sm .gl-autocomplete-button { width: 26px; height: 26px; }
+.gl-field-sm.gl-autocomplete-multiple .gl-autocomplete-control { padding-top: 2px; padding-bottom: 2px; padding-left: 2px; border-radius: 18px; }
+.gl-field-sm.gl-autocomplete-multiple .gl-autocomplete-input { padding-left: 14px; }
+.gl-field-sm.gl-autocomplete-has-tags .gl-autocomplete-input { padding-left: 4px; }
+
+.gl-field-disabled .gl-autocomplete-tag { cursor: not-allowed; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gl-autocomplete-control:hover .gl-autocomplete-clear:not([data-empty]) { visibility: visible; }
+  .gl-autocomplete-button:hover:not(:disabled),
+  .gl-autocomplete-tag-remove:hover { background: var(--color-line); color: var(--color-ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gl-autocomplete-button,
+  .gl-autocomplete-popup-indicator > .gl-icon,
+  .gl-autocomplete-tag-remove { transition: none; }
+  .gl-autocomplete-button:active:not(:disabled) { transform: none; }
+}
+}

@@ -1,0 +1,91 @@
+/* Grid: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+/* Grid — a 12-column CSS grid on the site's breakpoints: xs 0, sm >=361px, md >=701px, lg >=900px,
+   xl >=1001px, the inverse of global.css's max-width queries (360, 700, 899, 1000).
+   The breakpoint classes below are generated (columns 1-12, size 1-12, offset 0-11 per breakpoint);
+   gaps take spacing tokens. An offset pushes the item from where it would sit, as in MUI: the item
+   spans size + offset tracks and a margin covers the offset tracks, so auto-placement still flows. */
+.gl-grid-item { min-width: 0; grid-column: 1 / -1; }
+.gl-grid-container {
+  --gl-grid-columns: 12;
+  display: grid;
+  grid-template-columns: repeat(var(--gl-grid-columns), minmax(0, 1fr));
+}
+.gl-grid-container > .gl-grid-item { --gl-grid-item-gap: 0px; }
+.gl-grid-sized { --gl-grid-size: var(--gl-grid-columns, 12); --gl-grid-offset: 0; }
+
+/* Gaps: spacing, then rowSpacing / columnSpacing (which win on order). Items read the column gap for offsets. */
+.gl-grid-spacing-0 { gap: 0px; } .gl-grid-spacing-0 > .gl-grid-item { --gl-grid-item-gap: 0px; }
+.gl-grid-spacing-3xs { gap: var(--space-3xs); } .gl-grid-spacing-3xs > .gl-grid-item { --gl-grid-item-gap: var(--space-3xs); }
+.gl-grid-spacing-2xs { gap: var(--space-2xs); } .gl-grid-spacing-2xs > .gl-grid-item { --gl-grid-item-gap: var(--space-2xs); }
+.gl-grid-spacing-xs { gap: var(--space-xs); } .gl-grid-spacing-xs > .gl-grid-item { --gl-grid-item-gap: var(--space-xs); }
+.gl-grid-spacing-sm { gap: var(--space-sm); } .gl-grid-spacing-sm > .gl-grid-item { --gl-grid-item-gap: var(--space-sm); }
+.gl-grid-spacing-md { gap: var(--space-md); } .gl-grid-spacing-md > .gl-grid-item { --gl-grid-item-gap: var(--space-md); }
+.gl-grid-spacing-lg { gap: var(--space-lg); } .gl-grid-spacing-lg > .gl-grid-item { --gl-grid-item-gap: var(--space-lg); }
+.gl-grid-spacing-xl { gap: var(--space-xl); } .gl-grid-spacing-xl > .gl-grid-item { --gl-grid-item-gap: var(--space-xl); }
+.gl-grid-spacing-2xl { gap: var(--space-2xl); } .gl-grid-spacing-2xl > .gl-grid-item { --gl-grid-item-gap: var(--space-2xl); }
+.gl-grid-spacing-3xl { gap: var(--space-3xl); } .gl-grid-spacing-3xl > .gl-grid-item { --gl-grid-item-gap: var(--space-3xl); }
+.gl-grid-spacing-4xl { gap: var(--space-4xl); } .gl-grid-spacing-4xl > .gl-grid-item { --gl-grid-item-gap: var(--space-4xl); }
+.gl-grid-spacing-section-sm { gap: var(--space-section-sm); } .gl-grid-spacing-section-sm > .gl-grid-item { --gl-grid-item-gap: var(--space-section-sm); }
+.gl-grid-spacing-section { gap: var(--space-section); } .gl-grid-spacing-section > .gl-grid-item { --gl-grid-item-gap: var(--space-section); }
+.gl-grid-row-spacing-0 { row-gap: 0px; }
+.gl-grid-row-spacing-3xs { row-gap: var(--space-3xs); }
+.gl-grid-row-spacing-2xs { row-gap: var(--space-2xs); }
+.gl-grid-row-spacing-xs { row-gap: var(--space-xs); }
+.gl-grid-row-spacing-sm { row-gap: var(--space-sm); }
+.gl-grid-row-spacing-md { row-gap: var(--space-md); }
+.gl-grid-row-spacing-lg { row-gap: var(--space-lg); }
+.gl-grid-row-spacing-xl { row-gap: var(--space-xl); }
+.gl-grid-row-spacing-2xl { row-gap: var(--space-2xl); }
+.gl-grid-row-spacing-3xl { row-gap: var(--space-3xl); }
+.gl-grid-row-spacing-4xl { row-gap: var(--space-4xl); }
+.gl-grid-row-spacing-section-sm { row-gap: var(--space-section-sm); }
+.gl-grid-row-spacing-section { row-gap: var(--space-section); }
+.gl-grid-column-spacing-0 { column-gap: 0px; } .gl-grid-column-spacing-0 > .gl-grid-item { --gl-grid-item-gap: 0px; }
+.gl-grid-column-spacing-3xs { column-gap: var(--space-3xs); } .gl-grid-column-spacing-3xs > .gl-grid-item { --gl-grid-item-gap: var(--space-3xs); }
+.gl-grid-column-spacing-2xs { column-gap: var(--space-2xs); } .gl-grid-column-spacing-2xs > .gl-grid-item { --gl-grid-item-gap: var(--space-2xs); }
+.gl-grid-column-spacing-xs { column-gap: var(--space-xs); } .gl-grid-column-spacing-xs > .gl-grid-item { --gl-grid-item-gap: var(--space-xs); }
+.gl-grid-column-spacing-sm { column-gap: var(--space-sm); } .gl-grid-column-spacing-sm > .gl-grid-item { --gl-grid-item-gap: var(--space-sm); }
+.gl-grid-column-spacing-md { column-gap: var(--space-md); } .gl-grid-column-spacing-md > .gl-grid-item { --gl-grid-item-gap: var(--space-md); }
+.gl-grid-column-spacing-lg { column-gap: var(--space-lg); } .gl-grid-column-spacing-lg > .gl-grid-item { --gl-grid-item-gap: var(--space-lg); }
+.gl-grid-column-spacing-xl { column-gap: var(--space-xl); } .gl-grid-column-spacing-xl > .gl-grid-item { --gl-grid-item-gap: var(--space-xl); }
+.gl-grid-column-spacing-2xl { column-gap: var(--space-2xl); } .gl-grid-column-spacing-2xl > .gl-grid-item { --gl-grid-item-gap: var(--space-2xl); }
+.gl-grid-column-spacing-3xl { column-gap: var(--space-3xl); } .gl-grid-column-spacing-3xl > .gl-grid-item { --gl-grid-item-gap: var(--space-3xl); }
+.gl-grid-column-spacing-4xl { column-gap: var(--space-4xl); } .gl-grid-column-spacing-4xl > .gl-grid-item { --gl-grid-item-gap: var(--space-4xl); }
+.gl-grid-column-spacing-section-sm { column-gap: var(--space-section-sm); } .gl-grid-column-spacing-section-sm > .gl-grid-item { --gl-grid-item-gap: var(--space-section-sm); }
+.gl-grid-column-spacing-section { column-gap: var(--space-section); } .gl-grid-column-spacing-section > .gl-grid-item { --gl-grid-item-gap: var(--space-section); }
+/* xs: every width */
+.gl-grid-columns-xs-1{--gl-grid-columns:1} .gl-grid-columns-xs-2{--gl-grid-columns:2} .gl-grid-columns-xs-3{--gl-grid-columns:3} .gl-grid-columns-xs-4{--gl-grid-columns:4} .gl-grid-columns-xs-5{--gl-grid-columns:5} .gl-grid-columns-xs-6{--gl-grid-columns:6} .gl-grid-columns-xs-7{--gl-grid-columns:7} .gl-grid-columns-xs-8{--gl-grid-columns:8} .gl-grid-columns-xs-9{--gl-grid-columns:9} .gl-grid-columns-xs-10{--gl-grid-columns:10} .gl-grid-columns-xs-11{--gl-grid-columns:11} .gl-grid-columns-xs-12{--gl-grid-columns:12}
+.gl-grid-size-xs-1{--gl-grid-size:1} .gl-grid-size-xs-2{--gl-grid-size:2} .gl-grid-size-xs-3{--gl-grid-size:3} .gl-grid-size-xs-4{--gl-grid-size:4} .gl-grid-size-xs-5{--gl-grid-size:5} .gl-grid-size-xs-6{--gl-grid-size:6} .gl-grid-size-xs-7{--gl-grid-size:7} .gl-grid-size-xs-8{--gl-grid-size:8} .gl-grid-size-xs-9{--gl-grid-size:9} .gl-grid-size-xs-10{--gl-grid-size:10} .gl-grid-size-xs-11{--gl-grid-size:11} .gl-grid-size-xs-12{--gl-grid-size:12}
+.gl-grid-offset-xs-0{--gl-grid-offset:0} .gl-grid-offset-xs-1{--gl-grid-offset:1} .gl-grid-offset-xs-2{--gl-grid-offset:2} .gl-grid-offset-xs-3{--gl-grid-offset:3} .gl-grid-offset-xs-4{--gl-grid-offset:4} .gl-grid-offset-xs-5{--gl-grid-offset:5} .gl-grid-offset-xs-6{--gl-grid-offset:6} .gl-grid-offset-xs-7{--gl-grid-offset:7} .gl-grid-offset-xs-8{--gl-grid-offset:8} .gl-grid-offset-xs-9{--gl-grid-offset:9} .gl-grid-offset-xs-10{--gl-grid-offset:10} .gl-grid-offset-xs-11{--gl-grid-offset:11}
+/* sm: 361px and up */
+@media (min-width: 361px) {
+  .gl-grid-columns-sm-1{--gl-grid-columns:1} .gl-grid-columns-sm-2{--gl-grid-columns:2} .gl-grid-columns-sm-3{--gl-grid-columns:3} .gl-grid-columns-sm-4{--gl-grid-columns:4} .gl-grid-columns-sm-5{--gl-grid-columns:5} .gl-grid-columns-sm-6{--gl-grid-columns:6} .gl-grid-columns-sm-7{--gl-grid-columns:7} .gl-grid-columns-sm-8{--gl-grid-columns:8} .gl-grid-columns-sm-9{--gl-grid-columns:9} .gl-grid-columns-sm-10{--gl-grid-columns:10} .gl-grid-columns-sm-11{--gl-grid-columns:11} .gl-grid-columns-sm-12{--gl-grid-columns:12}
+  .gl-grid-size-sm-1{--gl-grid-size:1} .gl-grid-size-sm-2{--gl-grid-size:2} .gl-grid-size-sm-3{--gl-grid-size:3} .gl-grid-size-sm-4{--gl-grid-size:4} .gl-grid-size-sm-5{--gl-grid-size:5} .gl-grid-size-sm-6{--gl-grid-size:6} .gl-grid-size-sm-7{--gl-grid-size:7} .gl-grid-size-sm-8{--gl-grid-size:8} .gl-grid-size-sm-9{--gl-grid-size:9} .gl-grid-size-sm-10{--gl-grid-size:10} .gl-grid-size-sm-11{--gl-grid-size:11} .gl-grid-size-sm-12{--gl-grid-size:12}
+  .gl-grid-offset-sm-0{--gl-grid-offset:0} .gl-grid-offset-sm-1{--gl-grid-offset:1} .gl-grid-offset-sm-2{--gl-grid-offset:2} .gl-grid-offset-sm-3{--gl-grid-offset:3} .gl-grid-offset-sm-4{--gl-grid-offset:4} .gl-grid-offset-sm-5{--gl-grid-offset:5} .gl-grid-offset-sm-6{--gl-grid-offset:6} .gl-grid-offset-sm-7{--gl-grid-offset:7} .gl-grid-offset-sm-8{--gl-grid-offset:8} .gl-grid-offset-sm-9{--gl-grid-offset:9} .gl-grid-offset-sm-10{--gl-grid-offset:10} .gl-grid-offset-sm-11{--gl-grid-offset:11}
+}
+/* md: 701px and up */
+@media (min-width: 701px) {
+  .gl-grid-columns-md-1{--gl-grid-columns:1} .gl-grid-columns-md-2{--gl-grid-columns:2} .gl-grid-columns-md-3{--gl-grid-columns:3} .gl-grid-columns-md-4{--gl-grid-columns:4} .gl-grid-columns-md-5{--gl-grid-columns:5} .gl-grid-columns-md-6{--gl-grid-columns:6} .gl-grid-columns-md-7{--gl-grid-columns:7} .gl-grid-columns-md-8{--gl-grid-columns:8} .gl-grid-columns-md-9{--gl-grid-columns:9} .gl-grid-columns-md-10{--gl-grid-columns:10} .gl-grid-columns-md-11{--gl-grid-columns:11} .gl-grid-columns-md-12{--gl-grid-columns:12}
+  .gl-grid-size-md-1{--gl-grid-size:1} .gl-grid-size-md-2{--gl-grid-size:2} .gl-grid-size-md-3{--gl-grid-size:3} .gl-grid-size-md-4{--gl-grid-size:4} .gl-grid-size-md-5{--gl-grid-size:5} .gl-grid-size-md-6{--gl-grid-size:6} .gl-grid-size-md-7{--gl-grid-size:7} .gl-grid-size-md-8{--gl-grid-size:8} .gl-grid-size-md-9{--gl-grid-size:9} .gl-grid-size-md-10{--gl-grid-size:10} .gl-grid-size-md-11{--gl-grid-size:11} .gl-grid-size-md-12{--gl-grid-size:12}
+  .gl-grid-offset-md-0{--gl-grid-offset:0} .gl-grid-offset-md-1{--gl-grid-offset:1} .gl-grid-offset-md-2{--gl-grid-offset:2} .gl-grid-offset-md-3{--gl-grid-offset:3} .gl-grid-offset-md-4{--gl-grid-offset:4} .gl-grid-offset-md-5{--gl-grid-offset:5} .gl-grid-offset-md-6{--gl-grid-offset:6} .gl-grid-offset-md-7{--gl-grid-offset:7} .gl-grid-offset-md-8{--gl-grid-offset:8} .gl-grid-offset-md-9{--gl-grid-offset:9} .gl-grid-offset-md-10{--gl-grid-offset:10} .gl-grid-offset-md-11{--gl-grid-offset:11}
+}
+/* lg: 900px and up */
+@media (min-width: 900px) {
+  .gl-grid-columns-lg-1{--gl-grid-columns:1} .gl-grid-columns-lg-2{--gl-grid-columns:2} .gl-grid-columns-lg-3{--gl-grid-columns:3} .gl-grid-columns-lg-4{--gl-grid-columns:4} .gl-grid-columns-lg-5{--gl-grid-columns:5} .gl-grid-columns-lg-6{--gl-grid-columns:6} .gl-grid-columns-lg-7{--gl-grid-columns:7} .gl-grid-columns-lg-8{--gl-grid-columns:8} .gl-grid-columns-lg-9{--gl-grid-columns:9} .gl-grid-columns-lg-10{--gl-grid-columns:10} .gl-grid-columns-lg-11{--gl-grid-columns:11} .gl-grid-columns-lg-12{--gl-grid-columns:12}
+  .gl-grid-size-lg-1{--gl-grid-size:1} .gl-grid-size-lg-2{--gl-grid-size:2} .gl-grid-size-lg-3{--gl-grid-size:3} .gl-grid-size-lg-4{--gl-grid-size:4} .gl-grid-size-lg-5{--gl-grid-size:5} .gl-grid-size-lg-6{--gl-grid-size:6} .gl-grid-size-lg-7{--gl-grid-size:7} .gl-grid-size-lg-8{--gl-grid-size:8} .gl-grid-size-lg-9{--gl-grid-size:9} .gl-grid-size-lg-10{--gl-grid-size:10} .gl-grid-size-lg-11{--gl-grid-size:11} .gl-grid-size-lg-12{--gl-grid-size:12}
+  .gl-grid-offset-lg-0{--gl-grid-offset:0} .gl-grid-offset-lg-1{--gl-grid-offset:1} .gl-grid-offset-lg-2{--gl-grid-offset:2} .gl-grid-offset-lg-3{--gl-grid-offset:3} .gl-grid-offset-lg-4{--gl-grid-offset:4} .gl-grid-offset-lg-5{--gl-grid-offset:5} .gl-grid-offset-lg-6{--gl-grid-offset:6} .gl-grid-offset-lg-7{--gl-grid-offset:7} .gl-grid-offset-lg-8{--gl-grid-offset:8} .gl-grid-offset-lg-9{--gl-grid-offset:9} .gl-grid-offset-lg-10{--gl-grid-offset:10} .gl-grid-offset-lg-11{--gl-grid-offset:11}
+}
+/* xl: 1001px and up */
+@media (min-width: 1001px) {
+  .gl-grid-columns-xl-1{--gl-grid-columns:1} .gl-grid-columns-xl-2{--gl-grid-columns:2} .gl-grid-columns-xl-3{--gl-grid-columns:3} .gl-grid-columns-xl-4{--gl-grid-columns:4} .gl-grid-columns-xl-5{--gl-grid-columns:5} .gl-grid-columns-xl-6{--gl-grid-columns:6} .gl-grid-columns-xl-7{--gl-grid-columns:7} .gl-grid-columns-xl-8{--gl-grid-columns:8} .gl-grid-columns-xl-9{--gl-grid-columns:9} .gl-grid-columns-xl-10{--gl-grid-columns:10} .gl-grid-columns-xl-11{--gl-grid-columns:11} .gl-grid-columns-xl-12{--gl-grid-columns:12}
+  .gl-grid-size-xl-1{--gl-grid-size:1} .gl-grid-size-xl-2{--gl-grid-size:2} .gl-grid-size-xl-3{--gl-grid-size:3} .gl-grid-size-xl-4{--gl-grid-size:4} .gl-grid-size-xl-5{--gl-grid-size:5} .gl-grid-size-xl-6{--gl-grid-size:6} .gl-grid-size-xl-7{--gl-grid-size:7} .gl-grid-size-xl-8{--gl-grid-size:8} .gl-grid-size-xl-9{--gl-grid-size:9} .gl-grid-size-xl-10{--gl-grid-size:10} .gl-grid-size-xl-11{--gl-grid-size:11} .gl-grid-size-xl-12{--gl-grid-size:12}
+  .gl-grid-offset-xl-0{--gl-grid-offset:0} .gl-grid-offset-xl-1{--gl-grid-offset:1} .gl-grid-offset-xl-2{--gl-grid-offset:2} .gl-grid-offset-xl-3{--gl-grid-offset:3} .gl-grid-offset-xl-4{--gl-grid-offset:4} .gl-grid-offset-xl-5{--gl-grid-offset:5} .gl-grid-offset-xl-6{--gl-grid-offset:6} .gl-grid-offset-xl-7{--gl-grid-offset:7} .gl-grid-offset-xl-8{--gl-grid-offset:8} .gl-grid-offset-xl-9{--gl-grid-offset:9} .gl-grid-offset-xl-10{--gl-grid-offset:10} .gl-grid-offset-xl-11{--gl-grid-offset:11}
+}
+/* Placement: span size + offset tracks, then a start margin past the offset tracks (% of the item's own area). */
+.gl-grid-sized {
+  grid-column: auto / span calc(var(--gl-grid-size) + var(--gl-grid-offset));
+  margin-inline-start: calc((100% + var(--gl-grid-item-gap, 0px)) * var(--gl-grid-offset) / (var(--gl-grid-size) + var(--gl-grid-offset)));
+}
+}
