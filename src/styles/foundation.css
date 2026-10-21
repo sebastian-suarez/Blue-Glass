@@ -1,0 +1,287 @@
+/* Blue Glass — foundation: layer order, token fallbacks, the base layer, glass material,
+   popover surface, option rows and overlay layers. Copied from design-system/foundation.css.
+   Tokens come from tokens.css; this file never redeclares a colour, spacing, radius or shadow token. */
+
+@layer gl-fallback, gl-base, gl-components;
+
+/* Defaults for the token families a page may not emit (blur, easing, duration, zIndex, size).
+   Layered, so the unlayered tokens.css always wins. */
+
+@layer gl-fallback {
+	:root {
+		--blur-panel: 28px;
+		--blur-selector: 20px;
+		--blur-pane: 18px;
+		--blur-control: 16px;
+		--blur-surface: 15px;
+		--ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+		--ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+		--ease-folio: cubic-bezier(0.22, 1, 0.36, 1);
+		--duration-press: 120ms;
+		--duration-hover: 160ms;
+		--duration-state: 180ms;
+		--duration-surface: 220ms;
+		--duration-tab: 280ms;
+		--duration-expand: 450ms;
+		--duration-enter: 600ms;
+		--z-mobile-stepper: 1000;
+		--z-fab: 1050;
+		--z-app-bar: 1100;
+		--z-drawer: 1200;
+		--z-modal: 1300;
+		--z-snackbar: 1400;
+		--z-tooltip: 1500;
+		--size-wrap: 1180px;
+		--size-header: 1380px;
+		--size-control: 46px;
+		--size-control-sm: 32px;
+		--size-icon: 18px;
+	}
+}
+
+/* The site's base layer (global.css @layer base), on tokens. */
+
+@layer gl-base {
+	*,
+	::before,
+	::after {
+		box-sizing: border-box;
+	}
+	body {
+		margin: 0;
+		background: var(--color-canvas);
+		color: var(--color-ink);
+		font-family: var(--font-sans);
+		font-size: 16px;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+	}
+	:focus-visible {
+		outline: 3px solid var(--focus);
+		outline-offset: 5px;
+	}
+	::selection {
+		background: var(--selection);
+		color: var(--on-selection);
+	}
+}
+
+@layer gl-components {
+	.gl-icon {
+		flex: none;
+	}
+
+	/* Glass material, shared by every glass surface. --gl-fill and --gl-blur pick the level. */
+	.gl-glass {
+		background: var(--gl-fill, var(--glass));
+		-webkit-backdrop-filter: blur(var(--gl-blur, var(--blur-panel)))
+			saturate(115%);
+		backdrop-filter: blur(var(--gl-blur, var(--blur-panel))) saturate(115%);
+	}
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-glass {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-glass {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+
+	/* Visually hidden, still read. */
+	.gl-sr-only {
+		position: absolute !important;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	/* Overlay layers */
+	.gl-modal {
+		position: fixed;
+		inset: 0;
+	}
+	.gl-modal-hidden {
+		visibility: hidden;
+	}
+	.gl-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		background: var(--scrim);
+		-webkit-backdrop-filter: blur(6px);
+		backdrop-filter: blur(6px);
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-backdrop-invisible {
+		background: transparent;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+	.gl-modal > :not(.gl-backdrop):not([data-gl-sentinel]) {
+		outline: none;
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-backdrop:not(.gl-backdrop-invisible) {
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+
+	/* Popover surface: the side selector's material (.project-selector), raised for floating use. */
+	.gl-popover {
+		--gl-fill: var(--glass);
+		--gl-blur: var(--blur-selector);
+		overflow: auto;
+		overscroll-behavior: contain;
+		border: 1px solid var(--glass-edge);
+		border-radius: var(--radius-well);
+		box-shadow: var(--shadow-panel);
+		outline: none;
+		background: var(--gl-fill);
+		-webkit-backdrop-filter: blur(var(--gl-blur)) saturate(115%);
+		backdrop-filter: blur(var(--gl-blur)) saturate(115%);
+	}
+	.gl-popover-pad-none {
+		padding: 0;
+	}
+	.gl-popover-pad-sm {
+		padding: 7px;
+	}
+	.gl-popover-pad-md {
+		padding: var(--space-md);
+	}
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-popover {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-popover {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+
+	/* Option rows — shared by Menu, Select, Autocomplete, List and TransferList.
+     The side selector's tab (.project-tab), denser: 40px rows on radius-control. */
+	.gl-listbox {
+		display: grid;
+		gap: 2px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		outline: none;
+	}
+	.gl-option {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 11px;
+		min-height: 40px;
+		padding: 8px 12px;
+		border: 1px solid transparent;
+		border-radius: var(--radius-control);
+		background: transparent;
+		color: var(--color-ink);
+		font: inherit;
+		font-size: 14px;
+		line-height: 1.3;
+		text-align: left;
+		text-decoration: none;
+		cursor: pointer;
+		user-select: none;
+		width: 100%;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background var(--duration-state) ease,
+			box-shadow var(--duration-state) ease,
+			border-color var(--duration-state) ease;
+	}
+	/* Keyboard position in an aria-activedescendant list: fill plus a focus-coloured inner ring. */
+	.gl-option[data-active] {
+		background: var(--glass-raised);
+		outline: 2px solid var(--focus);
+		outline-offset: -2px;
+	}
+	.gl-option:focus-visible {
+		background: var(--glass-raised);
+		outline: 2px solid var(--focus);
+		outline-offset: -2px;
+	}
+	/* Selected: the raised tab (.project-tab[aria-pressed=true]); pair it with a check or a word. */
+	.gl-option[aria-selected="true"],
+	.gl-option[data-selected] {
+		background: var(--glass-raised);
+		border-color: #fff;
+		box-shadow: var(--shadow-raised);
+	}
+	.gl-option[aria-disabled="true"],
+	.gl-option:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.gl-option-icon {
+		display: inline-flex;
+		flex: none;
+		color: var(--color-muted);
+	}
+	.gl-option-text {
+		flex: 1 1 auto;
+		min-width: 0;
+		display: grid;
+		gap: 1px;
+	}
+	.gl-option-secondary {
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+	.gl-option-end {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		color: var(--color-muted);
+		font-size: 12px;
+	}
+	.gl-option-group {
+		padding: 10px 12px 4px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--color-muted);
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.gl-option:hover:not([aria-disabled="true"]):not(:disabled) {
+			background: var(--glass-raised);
+		}
+		.gl-option[aria-selected="true"]:hover,
+		.gl-option[data-selected]:hover {
+			background: #fff;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[class*="gl-"],
+		[class*="gl-"]::before,
+		[class*="gl-"]::after {
+			scroll-behavior: auto !important;
+		}
+		.gl-option {
+			transition: none;
+		}
+	}
+}

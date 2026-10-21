@@ -49,7 +49,7 @@ This is the default. A deviation needs a reason in the phase's notes.
 | Button                          | Button, Fab                                        |
 | Dialog                          | Dialog, Modal                                      |
 | Drawer                          | Drawer                                             |
-| Popover (`anchor` ← `anchorEl`)  | Popover                                            |
+| Popover (`anchor` ← `anchorEl`) | Popover                                            |
 | Menu                            | Menu, and MenuItem inside a Menu                   |
 | Tooltip                         | Tooltip                                            |
 | Toast                           | Snackbar, if it fits the controlled API; else port |

@@ -1,46 +1,108 @@
 {
-	"name": "typescript-template",
-	"version": "2.0.0",
+	"name": "@sebastian-suarez/blue-glass",
+	"version": "0.1.0",
 	"private": true,
-	"description": "TypeScript template for Node.js with ESM, Vitest, XO, and Prettier.",
+	"description": "Blue Glass, the design system of sebastiansuarez.dev, as React components with Base UI for behaviour.",
 	"license": "MIT",
-	"repository": "github:sebastian-suarez/TypeScript-template",
-	"homepage": "https://github.com/sebastian-suarez/TypeScript-template#readme",
-	"bugs": "https://github.com/sebastian-suarez/TypeScript-template/issues",
+	"repository": "github:sebastian-suarez/Blue-Glass",
+	"homepage": "https://github.com/sebastian-suarez/Blue-Glass#readme",
+	"bugs": "https://github.com/sebastian-suarez/Blue-Glass/issues",
 	"author": "Sebastian Suarez <261091557+sebastian-suarez@users.noreply.github.com> (https://www.sebastiansuarez.dev)",
 	"type": "module",
-	"imports": {
-		"#src/*": "./src/*"
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./styles.css": "./dist/styles.css",
+		"./tokens.css": "./dist/tokens.css",
+		"./baseline.css": "./dist/baseline.css",
+		"./tokens.json": "./dist/tokens.json",
+		"./package.json": "./package.json"
 	},
+	"sideEffects": [
+		"*.css"
+	],
 	"engines": {
-		"node": "^24.15.0 || >=26.0.0"
+		"node": ">=22.12.0"
+	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": "^24.15.0 || >=26.0.0",
+			"onFail": "error"
+		}
 	},
 	"scripts": {
-		"start": "tsx ./src/index.js",
+		"build": "npm run build:tokens && npm run build:js && npm run build:css",
+		"build:tokens": "node scripts/build-tokens.mjs --strict",
+		"build:js": "node scripts/clean-dist.ts && tsc -p tsconfig.build.json",
+		"build:css": "node scripts/build-css.ts",
+		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"test": "vitest",
 		"lint": "xo --fix",
 		"format": "prettier --write .",
-		"prepare": "husky"
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build",
+		"prepare": "husky",
+		"reference": "node scripts/reference.ts"
 	},
-	"keywords": [
-		"typescript",
-		"template",
-		"node.js",
-		"esm",
-		"vitest",
-		"xo",
-		"prettier"
+	"files": [
+		"dist"
 	],
+	"keywords": [
+		"blue-glass",
+		"design-system",
+		"react",
+		"base-ui",
+		"components"
+	],
+	"dependencies": {
+		"@base-ui/react": "^1.9.0"
+	},
 	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
+		"@eslint/compat": "^2.1.1",
+		"@storybook/addon-a11y": "^10.6.3",
+		"@storybook/addon-docs": "^10.6.3",
+		"@storybook/addon-vitest": "^10.6.3",
+		"@storybook/react-vite": "^10.6.3",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/react": "^16.3.3",
 		"@tsconfig/node24": "^24.0.5",
 		"@types/node": "^24.19.2",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
 		"@typescript/native": "npm:typescript@^7.0.2",
+		"@vitejs/plugin-react": "^6.1.2",
+		"@vitest/browser": "^5.0.5",
+		"@vitest/browser-playwright": "^5.0.5",
+		"esbuild": "^0.28.2",
+		"eslint-config-xo-react": "^0.32.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^17.6.0",
+		"mermaid": "11.16.1",
+		"pixelmatch": "^8.0.0",
+		"playwright": "^1.64.1",
+		"pngjs": "^7.0.0",
 		"prettier": "3.9.10",
-		"tsx": "^4.23.15",
+		"publint": "^0.3.25",
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1",
+		"storybook": "^10.6.3",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
+		"vite": "^8.3.5",
 		"vitest": "^5.0.5",
 		"xo": "^5.0.1"
+	},
+	"peerDependencies": {
+		"mermaid": "^11.16.1",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0"
+	},
+	"peerDependenciesMeta": {
+		"mermaid": {
+			"optional": true
+		}
 	}
 }

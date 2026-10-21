@@ -1,4 +1,3 @@
-// Test file to check if the module resolution works correctly with the "imports" field in package.json
-import greet from "#src/modules/greet.js";
-
-console.log(greet("World"));
+// Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
+// and tests/api checks the exports against design-system/source/index.d.ts.
+export {};

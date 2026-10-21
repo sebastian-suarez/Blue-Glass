@@ -1,0 +1,5 @@
+/* Blue Glass — the whole stylesheet. scripts/build-css.mjs inlines these imports into
+   dist/styles.css. Component stylesheets follow the reference bundle's cascade order,
+   which the build checks. */
+@import "./tokens.css";
+@import "./foundation.css";

@@ -1,0 +1,303 @@
+/* Blue Glass — generated from design-system/tokens/tokens.json by scripts/build-tokens.mjs. Do not edit by hand. */
+
+:root, [data-theme="light"] {
+  --color-canvas: #e8f1fa;
+  --color-ink: #233047;
+  --color-muted: #45546c;
+  --color-accent: #3a4b75;
+  --color-link: #4e5f91;
+  --color-blue: #4d7cc9;
+  --color-blue-deep: #2f5aa3;
+  --color-line: rgba(88, 108, 143, 0.17);
+  --color-line-strong: #ccd5e3;
+  --color-ring: #8eb8e8;
+  --color-secondary: #bedff1;
+  --color-wash: #cfdef4;
+  --glass: rgba(255, 255, 255, 0.66);
+  --glass-solid: #f4f8fc;
+  --shadow: rgba(64, 82, 125, 0.09);
+  --scrub-from: #7d8aa3;
+  --dg-edge: #7a89a4;
+  --focus: #46588d;
+  --selection: #bcc9e7;
+  --on-selection: #192842;
+  --ink-hover: #2f3f5d;
+  --ink-soft: #3b4862;
+  --on-ink: #ffffff;
+  --glass-raised: rgba(255, 255, 255, 0.82);
+  --glass-control: rgba(255, 255, 255, 0.55);
+  --glass-inset: rgba(255, 255, 255, 0.45);
+  --glass-faint: rgba(255, 255, 255, 0.35);
+  --glass-edge: rgba(255, 255, 255, 0.9);
+  --dg-node-accent: #3d68b0;
+  --dg-bar: #8b9bb8;
+  --danger: #a8322d;
+  --danger-soft: #f9e7e5;
+  --danger-hover: #8f2a26;
+  --warning: #8c5a0b;
+  --warning-soft: #fbf0dc;
+  --success: #1f6f66;
+  --success-soft: #e0f1ee;
+  --info: var(--color-blue-deep);
+  --info-soft: #e3ecf8;
+  --scrim: rgba(35, 48, 71, 0.32);
+  --chart-1: #4d7cc9;
+  --chart-2: #424986;
+  --chart-3: #2994ae;
+  --chart-4: #5857b9;
+  --shadow-panel: 0 22px 65px rgba(64, 82, 125, 0.09), 0 2px 5px #7e8faa0a, inset 0 1px 0 #ffffff;
+  --shadow-panel-hover: 0 28px 80px rgba(64, 82, 125, 0.14), 0 2px 5px #7e8faa0a, inset 0 1px 0 #ffffff;
+  --shadow-pane: 0 14px 40px rgba(64, 82, 125, 0.07), inset 0 1px 0 #ffffff;
+  --shadow-primary: 0 8px 22px rgba(35, 48, 71, 0.18);
+  --shadow-control: 0 6px 20px #6477970d, inset 0 1px 0 #ffffff;
+  --shadow-raised: 0 3px 10px #7083a319, inset 0 1px 0 #ffffff;
+  --shadow-plate: inset 0 1px 0 #ffffff, 0 2px 8px rgba(97, 116, 163, 0.06);
+  --shadow-inset: inset 0 1px 0 #ffffff;
+  --shadow-tile: 0 2px 8px #6174a318, inset 0 1px 0 #ffffff;
+  --shadow-selector: 0 8px 24px #8190af0b;
+}
+
+:root {
+  --space-3xs: 4px;
+  --space-2xs: 6px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 28px;
+  --space-2xl: 40px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+  --space-section-sm: 88px;
+  --space-section: 105px;
+  --radius-panel: 28px;
+  --radius-pane: 24px;
+  --radius-panel-sm: 23px;
+  --radius-well: 22px;
+  --radius-tab: 15px;
+  --radius-tile: 14px;
+  --radius-control: 12px;
+  --radius-node: 10px;
+  --radius-code: 6px;
+  --radius-pill: 999px;
+  --blur-panel: 28px;
+  --blur-selector: 20px;
+  --blur-pane: 18px;
+  --blur-control: 16px;
+  --blur-surface: 15px;
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-folio: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-press: 120ms;
+  --duration-hover: 160ms;
+  --duration-state: 180ms;
+  --duration-surface: 220ms;
+  --duration-tab: 280ms;
+  --duration-expand: 450ms;
+  --duration-enter: 600ms;
+  --z-mobile-stepper: 1000;
+  --z-fab: 1050;
+  --z-app-bar: 1100;
+  --z-drawer: 1200;
+  --z-modal: 1300;
+  --z-snackbar: 1400;
+  --z-tooltip: 1500;
+  --size-wrap: 1180px;
+  --size-header: 1380px;
+  --size-control: 46px;
+  --size-control-sm: 32px;
+  --size-icon: 18px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@layer gl-fallback, gl-base, gl-components;
+
+@layer gl-base {
+  .text-display {
+    font-family: var(--font-sans);
+    font-size: 80px;
+    line-height: 1.02;
+    font-weight: 400;
+    letter-spacing: -0.05em;
+  }
+
+  .text-title-xl {
+    font-family: var(--font-sans);
+    font-size: 72px;
+    line-height: 1.04;
+    font-weight: 400;
+    letter-spacing: -0.05em;
+  }
+
+  .text-title-lg {
+    font-family: var(--font-sans);
+    font-size: 60px;
+    line-height: 1.04;
+    font-weight: 400;
+    letter-spacing: -0.05em;
+  }
+
+  .text-title-md {
+    font-family: var(--font-sans);
+    font-size: 50px;
+    line-height: 1.09;
+    font-weight: 400;
+    letter-spacing: -0.05em;
+  }
+
+  .text-statement {
+    font-family: var(--font-sans);
+    font-size: 42px;
+    line-height: 1.3;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  .text-heading {
+    font-family: var(--font-sans);
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+
+  .text-card-title {
+    font-family: var(--font-sans);
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+  }
+
+  .text-title-sm {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+
+  .text-subtitle {
+    font-family: var(--font-sans);
+    font-size: 19px;
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .text-lede {
+    font-family: var(--font-sans);
+    font-size: 19px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-lede-sm {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-body-lg {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .text-body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-body-sm {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-small {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-micro {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .text-nano {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    line-height: 1.7;
+    font-weight: 400;
+  }
+
+  .text-button {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  .text-kicker {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .text-label {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .text-name {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .text-code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-diagram-node {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .text-diagram-label {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 400;
+  }
+}

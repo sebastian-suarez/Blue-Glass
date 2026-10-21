@@ -190,3 +190,6 @@ Temporary Items
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,visualstudiocode,node
+# Blue Glass: generated output
+storybook-static/
+reports/

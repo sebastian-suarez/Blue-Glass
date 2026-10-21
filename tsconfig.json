@@ -3,13 +3,27 @@
 	"compilerOptions": {
 		// Same libs as @tsconfig/node24, but ES2025.Collection instead of ESNext.Collection:
 		// since TypeScript 6 that also declares Map.getOrInsert, which Node 24 doesn't have.
+		// The components run in browsers, so the DOM libs join them.
 		"lib": [
 			"es2024",
 			"ESNext.Array",
 			"ES2025.Collection",
 			"ESNext.Error",
 			"ESNext.Iterator",
-			"ESNext.Promise"
-		]
-	}
+			"ESNext.Promise",
+			"DOM",
+			"DOM.Iterable"
+		],
+		"jsx": "react-jsx",
+		"verbatimModuleSyntax": true,
+		"noEmit": true,
+		"types": ["node", "vite/client"],
+		// Scripts and tests run as TypeScript straight from Node 24, which strips types.
+		"allowImportingTsExtensions": true,
+		"erasableSyntaxOnly": true,
+		// Behaviour tests import the components as "#ui" (vitest.config.ts swaps the target).
+		"paths": { "#ui": ["./src/index.ts"] }
+	},
+	"include": ["src", "tests", "scripts", ".storybook", "*.ts"],
+	"exclude": ["node_modules", "dist", ".cache", "tests/consumer"]
 }
