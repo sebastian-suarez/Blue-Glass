@@ -7,9 +7,9 @@ export type LinkProps = Omit<
 	"color"
 > & {
 	/**
-	always: the inline prose link, underlined 3px below the text (.hiw-asof a), the default.
-	hover: the "go" link (.replink, .figure-link): 13px, no underline until a fine-pointer
-	hover (5px offset), a 32px tap target. none: never underlined.
+	`always`: the inline prose link, underlined 3px below the text (.hiw-asof a), the default.
+	`hover`: the "go" link (.replink, .figure-link): 13px, no underline until a fine-pointer
+	hover (5px offset), a 32px tap target. `none`: never underlined.
 	*/
 	underline?: "always" | "hover" | "none";
 	/**
@@ -68,10 +68,12 @@ export function Link({
 	ref,
 	...rest
 }: LinkProps & { ref?: React.Ref<HTMLAnchorElement> }) {
-	const isExternal = external ?? target === "_blank";
+	const isNewTab = target === "_blank";
+	const isExternal = external ?? isNewTab;
 	const tone = color ?? (underline === "always" ? "link" : "ink");
 	const isButton = Component === "button";
 	const icon = endIcon ?? (isExternal ? <Icon name="arrow-ne" /> : null);
+	const hasIcon = Boolean(icon);
 	return (
 		<Component
 			ref={ref}
@@ -88,10 +90,10 @@ export function Link({
 			{...rest}
 		>
 			{children}
-			{icon ? (
+			{hasIcon ? (
 				<span className="gl-link-icon" aria-hidden="true">
 					{/* A word joiner, so the arrow never wraps onto a line of its own. */}
-					{"\u2060"}
+					{"\u{2060}"}
 					{icon}
 				</span>
 			) : null}

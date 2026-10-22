@@ -67,7 +67,7 @@ function Bridge() {
 				["RS50 wheel", "HID reports"],
 			].map(([name, note], index) => (
 				<Fragment key={name}>
-					{index ? (
+					{index > 0 ? (
 						<Icon
 							name="arrow-right"
 							size={16}
@@ -126,7 +126,7 @@ function ProjectViews() {
 					value={view}
 					aria-label="Show the project as"
 					onChange={(_event, next: string | null) => {
-						if (next) {
+						if (next !== null && next !== "") {
 							setView(next);
 						}
 					}}

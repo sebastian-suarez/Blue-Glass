@@ -4,8 +4,8 @@ import { cx } from "../../internal/cx.js";
 
 export type AppBarProps = React.HTMLAttributes<HTMLElement> & {
 	/**
-	static: in the flow with no fill, the site's header over the light field (default).
-	sticky: sticks to the top of its scroll container, on glass. fixed: fixed to the
+	`static`: in the flow with no fill, the site's header over the light field (default).
+	`sticky`: sticks to the top of its scroll container, on glass. `fixed`: fixed to the
 	viewport (or the nearest transformed ancestor), on glass. Both sit at z-app-bar.
 	*/
 	position?: "static" | "sticky" | "fixed";
@@ -94,7 +94,7 @@ export function AppBar({
 
 export type ToolbarProps = React.HTMLAttributes<HTMLElement> & {
 	/**
-	regular: the site's identity strip, 38px 5% (28px from 1000px down). dense: 12px tall padding, for sticky bars.
+	`regular`: the site's identity strip, 38px 5% (28px from 1000px down). `dense`: 12px tall padding, for sticky bars.
 	*/
 	variant?: "regular" | "dense";
 	/**

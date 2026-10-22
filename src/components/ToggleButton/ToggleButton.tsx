@@ -32,7 +32,7 @@ export type ToggleButtonProps = Omit<
 		value: string,
 	) => void;
 	/**
-	sm, md (default) or lg. Inherits the group's.
+	`sm`, `md` (default) or `lg`. Inherits the group's.
 	*/
 	size?: "sm" | "md" | "lg";
 	/**
@@ -81,7 +81,8 @@ export type ToggleButtonGroupProps = Omit<
 	Called with the click event and the new value: when exclusive, the pressed string, or null when the
 	pressed button is pressed again (ignore null to keep one always pressed); otherwise the new array.
 	*/
-	onChange?: (event: React.MouseEvent<HTMLButtonElement>, value: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any -- The documented type: its shape follows exclusive.
+	// The documented type: its shape follows exclusive.
+	onChange?: (event: React.MouseEvent<HTMLButtonElement>, value: any) => void;
 	/**
 	One button pressed at a time.
 	*/
@@ -91,7 +92,7 @@ export type ToggleButtonGroupProps = Omit<
 	*/
 	orientation?: "horizontal" | "vertical";
 	/**
-	sm 36px, md 46px (the site's nav track, default), lg 54px. Sets every button's size.
+	`sm` 36px, `md` 46px (the site's nav track, default), `lg` 54px. Sets every button's size.
 	*/
 	size?: "sm" | "md" | "lg";
 	/**
@@ -269,10 +270,10 @@ export function ToggleButtonGroup({
 	const tabStop = enabled.some((item) => item.value === focused)
 		? focused
 		: (fallback?.value ?? null);
-	const roving = items.length > 0;
+	const isRoving = items.length > 0;
 	const context = React.useMemo(
-		() => ({ size, tabStop, roving, onItemFocus }),
-		[size, tabStop, roving, onItemFocus],
+		() => ({ size, tabStop, roving: isRoving, onItemFocus }),
+		[size, tabStop, isRoving, onItemFocus],
 	);
 
 	return (

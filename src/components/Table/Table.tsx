@@ -13,7 +13,7 @@ const SectionContext = React.createContext<"head" | "body" | undefined>(
 
 export type TableContainerProps = React.HTMLAttributes<HTMLDivElement> & {
 	/**
-	surface: the site's career list surface (.career-surface), default. plain: only the scroll box.
+	`surface`: the site's career list surface (.career-surface), default. `plain`: only the scroll box.
 	*/
 	variant?: "surface" | "plain";
 	/**
@@ -101,7 +101,7 @@ export function TableContainer({
 
 export type TableProps = React.TableHTMLAttributes<HTMLTableElement> & {
 	/**
-	md: 14px rows with room (default). sm: dense 13px rows.
+	`md`: 14px rows with room (default). `sm`: dense 13px rows.
 	*/
 	size?: TableSize;
 	/**
@@ -259,7 +259,7 @@ export type TableCellProps = Omit<
 	*/
 	numeric?: boolean;
 	/**
-	head or body look. Default from the section: head inside TableHead.
+	`head` or `body` look. Default from the section: `head` inside TableHead.
 	*/
 	variant?: "head" | "body";
 	/**
@@ -267,7 +267,7 @@ export type TableCellProps = Omit<
 	*/
 	size?: TableSize;
 	/**
-	normal, checkbox (tight, for a selection control) or none.
+	`normal`, `checkbox` (tight, for a selection control) or `none`.
 	*/
 	padding?: "normal" | "checkbox" | "none";
 	/**
@@ -275,7 +275,7 @@ export type TableCellProps = Omit<
 	*/
 	sortDirection?: "asc" | "desc" | false;
 	/**
-	th or td. Default th in TableHead, td elsewhere; pass "th" for a row header.
+	`th` or `td`. Default `th` in TableHead, `td` elsewhere; pass "th" for a row header.
 	*/
 	component?: React.ElementType;
 	children?: React.ReactNode;
@@ -313,7 +313,9 @@ export function TableCell({
 			ref={ref}
 			scope={isHeader ? (scope ?? (section === "head" ? "col" : "row")) : scope}
 			aria-sort={
-				isHeader && sortDirection ? ariaSort[sortDirection] : undefined
+				isHeader && sortDirection !== false
+					? ariaSort[sortDirection]
+					: undefined
 			}
 			className={cx(
 				"gl-table-cell",
@@ -339,7 +341,7 @@ export type TableSortLabelProps =
 		*/
 		active?: boolean;
 		/**
-		asc (arrow up) or desc (arrow down). Default asc.
+		`asc` (arrow up) or `desc` (arrow down). Default `asc`.
 		*/
 		direction?: "asc" | "desc";
 		/**

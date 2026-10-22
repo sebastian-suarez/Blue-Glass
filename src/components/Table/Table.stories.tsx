@@ -126,7 +126,12 @@ The first "Mon YYYY" in a role's dates, as a month count, so roles sort by start
 function monthOf(dates: string): number {
 	const { month = "", year = "" } =
 		/(?<month>[A-Z][a-z]{2}) (?<year>\d{4})/u.exec(dates)?.groups ?? {};
-	return month === "" ? 0 : Number(year) * 12 + months.indexOf(month);
+	if (month === "") {
+		return 0;
+	}
+
+	const yearMonths = Number(year) * 12;
+	return yearMonths + months.indexOf(month);
 }
 
 const muted = { color: "var(--color-muted)" };
@@ -150,7 +155,7 @@ function Outcomes() {
 						<TableCell component="th">Limber Health</TableCell>
 						<TableCell>PDF generation for a training specification</TableCell>
 						{/* An en dash and a word joiner, so the range never breaks. */}
-						<TableCell numeric>{"10–⁠20 ms"}</TableCell>
+						<TableCell numeric>10–⁠20 ms</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell component="th">Intive</TableCell>
@@ -184,16 +189,16 @@ function Experience() {
 	const rows = React.useMemo(() => {
 		const valueOf = (role: Role) =>
 			orderBy === "dates" ? monthOf(role.dates) : role[orderBy];
-		const sorted = [...roles].sort((first, second) => {
+		const sorted = roles.toSorted((first, second) => {
 			const a = valueOf(first);
 			const b = valueOf(second);
 			const order =
 				typeof a === "number" && typeof b === "number"
 					? a - b
 					: String(a).localeCompare(String(b));
-			return order || monthOf(second.dates) - monthOf(first.dates);
+			return order === 0 ? monthOf(second.dates) - monthOf(first.dates) : order;
 		});
-		return direction === "asc" ? sorted : sorted.reverse();
+		return direction === "asc" ? sorted : sorted.toReversed();
 	}, [orderBy, direction]);
 	const sortBy = (column: Column) => {
 		if (column === orderBy) {

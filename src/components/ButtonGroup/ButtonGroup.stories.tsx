@@ -49,7 +49,7 @@ function Pipeline() {
 			{["GitHub Actions", "S3", "CloudFront", "Cloudflare"].map(
 				(name, index) => (
 					<Fragment key={name}>
-						{index ? (
+						{index > 0 ? (
 							<Icon
 								name="arrow-right"
 								size={16}

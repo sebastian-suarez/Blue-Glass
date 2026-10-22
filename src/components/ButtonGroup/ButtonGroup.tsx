@@ -3,13 +3,13 @@ import { cx } from "../../internal/cx.js";
 
 export type ButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
 	/**
-	glass: the site's pill nav track (.identity-strip nav) holding nav-weight buttons, the default.
-	primary: one ink pill split by on-ink hairlines. text: link-weight actions split by short hairlines.
+	`glass`: the site's pill nav track (.identity-strip nav) holding nav-weight buttons, the default.
+	`primary`: one ink pill split by on-ink hairlines. `text`: link-weight actions split by short hairlines.
 	The group sets this variant on every child Button.
 	*/
 	variant?: "glass" | "primary" | "text";
 	/**
-	sm 36px, md 46px (the site's nav), lg 54px. The group sets this size on every child Button.
+	`sm` 36px, `md` 46px (the site's nav), `lg` 54px. The group sets this size on every child Button.
 	*/
 	size?: "sm" | "md" | "lg";
 	/**
@@ -49,7 +49,7 @@ export function ButtonGroup({
 	// Button reads no context, so the group hands its variant, size and disabled state to each
 	// child, as the reference does; a child's own disabled still disables it.
 	// eslint-disable-next-line @eslint-react/no-children-map -- The documented group sets these on every child Button.
-	const items = React.Children.map(children, (child) => {
+	const items = React.Children.map(children, (child): React.ReactNode => {
 		if (
 			!React.isValidElement<ChildProps>(child) ||
 			typeof child.type === "string"

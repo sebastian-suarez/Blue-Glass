@@ -25,11 +25,11 @@ export type AvatarProps = React.HTMLAttributes<HTMLSpanElement> & {
 	*/
 	alt?: string;
 	/**
-	circle: initials on the site's orb gradient (default). tile: the monogram glass tile (.signature).
+	`circle`: initials on the site's orb gradient (default). `tile`: the monogram glass tile (.signature).
 	*/
 	variant?: AvatarVariant;
 	/**
-	xs 24px · sm 32px · md 40px, the signature tile's size (default) · lg 56px.
+	`xs` 24px · `sm` 32px · `md` 40px, the signature tile's size (default) · `lg` 56px.
 	*/
 	size?: AvatarSize;
 	/**
@@ -102,7 +102,7 @@ type ImageReport = {
 const nothing: ReadonlySet<unknown> = new Set([undefined, null, false, ""]);
 
 // Lowercase letters on a tile are a monogram, set like the header's "ss" (.signature).
-const monogramPattern = /^\p{Ll}{1,3}$/u;
+const monogramPattern = /^\p{Lowercase_Letter}{1,3}$/u;
 
 /**
 First letters of the first and last words: "Sebastian Suarez" → "SS", "EPAM" → "E".
@@ -159,10 +159,10 @@ export function Avatar({
 	const [report, setReport] = React.useState<ImageReport>();
 	const status = report?.source === source ? report.status : "idle";
 	// The photo stays until it fails, as in the reference: the orb shows through while it loads.
-	const showImage = Boolean(src || srcSet) && status !== "error";
+	const isImageShown = (Boolean(src) || Boolean(srcSet)) && status !== "error";
 
 	let content: React.ReactNode;
-	if (showImage) {
+	if (isImageShown) {
 		content = (
 			<BaseAvatar.Image
 				className="gl-avatar-img"
@@ -184,7 +184,8 @@ export function Avatar({
 			/>
 		);
 	} else if (nothing.has(children)) {
-		const initials = alt ? initialsOf(alt) : "";
+		const initials =
+			typeof alt === "string" && alt !== "" ? initialsOf(alt) : "";
 		content =
 			initials === "" ? (
 				<Icon name="user" className="gl-avatar-fallback" />
@@ -202,7 +203,7 @@ export function Avatar({
 		typeof content === "string" &&
 		monogramPattern.test(content);
 	// A lettered avatar with a name reads as one image named after the person, not as "S S".
-	const isNamed = Boolean(alt) && !showImage;
+	const isNamed = Boolean(alt) && !isImageShown;
 	return (
 		<BaseAvatar.Root
 			ref={ref}
@@ -215,7 +216,7 @@ export function Avatar({
 				size !== "md" && `gl-avatar-${size}`,
 				variant === "circle" && orbIndex > 0 && `gl-avatar-orb-${orbIndex}`,
 				isMonogram && "gl-avatar-monogram",
-				showImage && "gl-avatar-has-img",
+				isImageShown && "gl-avatar-has-img",
 				className,
 			)}
 			{...rest}

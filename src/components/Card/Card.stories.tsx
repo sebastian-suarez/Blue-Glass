@@ -87,6 +87,10 @@ function GateNode({
 	readonly detail: string;
 	readonly isHighlighted?: boolean;
 }) {
+	const halfWidth = width / 2;
+	const halfHeight = height / 2;
+	const centreX = x + halfWidth;
+	const centreY = y + halfHeight;
 	return (
 		<g>
 			<rect
@@ -98,10 +102,10 @@ function GateNode({
 				style={isHighlighted ? highlightedBox : box}
 			/>
 			<text textAnchor="middle" style={nodeText}>
-				<tspan x={x + width / 2} y={y + height / 2 - 4} fontWeight={600}>
+				<tspan x={centreX} y={centreY - 4} fontWeight={600}>
 					{title}
 				</tspan>
-				<tspan x={x + width / 2} y={y + height / 2 + 16}>
+				<tspan x={centreX} y={centreY + 16}>
 					{detail}
 				</tspan>
 			</text>

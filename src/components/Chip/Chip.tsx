@@ -13,11 +13,11 @@ export type ChipProps = Omit<React.HTMLAttributes<HTMLElement>, "onClick"> & {
 	*/
 	label: React.ReactNode;
 	/**
-	chip: the site's stack tag (.chip, default). plate: the employer plate (.plate), larger and lifted.
+	`chip`: the site's stack tag (.chip, default). `plate`: the employer plate (.plate), larger and lifted.
 	*/
 	variant?: "chip" | "plate";
 	/**
-	md (default) or sm (.chip-sm).
+	`md` (default) or `sm` (.chip-sm).
 	*/
 	size?: "sm" | "md";
 	/**
@@ -92,8 +92,8 @@ export function Chip({
 	target,
 	rel,
 	onDelete,
-	deleteLabel,
-	deleteIcon,
+	deleteLabel: closeLabel,
+	deleteIcon: closeIcon,
 	selected,
 	disabled = false,
 	component: Root = "span",
@@ -109,10 +109,12 @@ export function Chip({
 	const name =
 		typeof label === "string" || typeof label === "number" ? String(label) : "";
 
+	const hasAvatar = Boolean(avatar);
+	const hasIcon = Boolean(icon);
 	let start: React.ReactNode = null;
-	if (avatar) {
+	if (hasAvatar) {
 		start = <span className="gl-chip-avatar">{avatar}</span>;
-	} else if (icon) {
+	} else if (hasIcon) {
 		start = <span className="gl-chip-icon">{icon}</span>;
 	}
 
@@ -140,7 +142,7 @@ export function Chip({
 	// Backspace or Delete on the chip removes it (MUI); Escape lets go of focus.
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
 		onKeyDown?.(event);
-		if (event.defaultPrevented || disabled) {
+		if (disabled || event.defaultPrevented) {
 			return;
 		}
 
@@ -175,7 +177,7 @@ export function Chip({
 
 						onClick?.(event);
 					}}
-					{...(attributes as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+					{...attributes}
 				>
 					{content}
 				</a>
@@ -189,25 +191,25 @@ export function Chip({
 				disabled={disabled}
 				aria-pressed={selected}
 				onClick={onClick}
-				{...(attributes as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+				{...attributes}
 			>
 				{content}
 			</button>
 		);
 	};
 
-	const deleteButton = isDeletable ? (
+	const closeButton = isDeletable ? (
 		<button
 			type="button"
 			className="gl-chip-delete"
-			aria-label={deleteLabel ?? (name ? `Remove ${name}` : "Remove")}
+			aria-label={closeLabel ?? (name === "" ? "Remove" : `Remove ${name}`)}
 			disabled={disabled}
 			onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
 				event.stopPropagation();
 				onDelete?.(event);
 			}}
 		>
-			{deleteIcon ?? <Icon name="close" />}
+			{closeIcon ?? <Icon name="close" />}
 		</button>
 	) : null;
 
@@ -216,13 +218,14 @@ export function Chip({
 		return (
 			<Root ref={ref} className={classes} onKeyDown={handleKeyDown} {...rest}>
 				{action({ className: "gl-chip-action" }, inner)}
-				{deleteButton}
+				{closeButton}
 			</Root>
 		);
 	}
 
 	if (isInteractive) {
 		return action(
+			// eslint-disable-next-line react-hooks/refs -- action only hands the ref to the element it renders; nothing reads it during render.
 			{ ref, className: classes, onKeyDown: handleKeyDown, ...rest },
 			inner,
 		);
@@ -236,7 +239,7 @@ export function Chip({
 			{...rest}
 		>
 			{inner}
-			{deleteButton}
+			{closeButton}
 		</Root>
 	);
 }

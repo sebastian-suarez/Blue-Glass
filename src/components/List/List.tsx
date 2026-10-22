@@ -93,7 +93,7 @@ export type ListItemProps = React.HTMLAttributes<HTMLElement> & {
 	*/
 	disableGutters?: boolean;
 	/**
-	center (default), or flex-start for rows whose text runs to several lines.
+	`center` (default), or `flex-start` for rows whose text runs to several lines.
 	*/
 	alignItems?: "center" | "flex-start";
 	/**
@@ -175,7 +175,7 @@ export type ListItemButtonProps = React.HTMLAttributes<HTMLElement> & {
 	*/
 	end?: React.ReactNode;
 	/**
-	center (default), or flex-start for multi-line rows.
+	`center` (default), or `flex-start` for multi-line rows.
 	*/
 	alignItems?: "center" | "flex-start";
 	/**
@@ -295,7 +295,7 @@ export function ListItemButton({
 		</Component>
 	);
 	// A button can't be a direct child of a ul: give it the row's <li>.
-	return list.inList && !isInItem ? (
+	return !isInItem && list.inList ? (
 		<li className="gl-list-item gl-list-item-flush">{row}</li>
 	) : (
 		row

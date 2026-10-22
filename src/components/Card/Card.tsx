@@ -6,9 +6,9 @@ import { cx } from "../../internal/cx.js";
 
 export type CardProps = React.HTMLAttributes<HTMLElement> & {
 	/**
-	glass: the site's project card (.card.glass-panel), the default.
-	outlined: a hairline and no fill, for grouping without depth.
-	inset: a glass-inset well, for a card that sits inside a glass panel.
+	`glass`: the site's project card (.card.glass-panel), the default.
+	`outlined`: a hairline and no fill, for grouping without depth.
+	`inset`: a glass-inset well, for a card that sits inside a glass panel.
 	*/
 	variant?: "glass" | "outlined" | "inset";
 	/**
@@ -86,10 +86,12 @@ export function CardHeader({
 	...rest
 }: CardHeaderProps & { ref?: React.Ref<HTMLDivElement> | undefined }) {
 	const Heading = `h${headingLevel}` as const;
+	const hasAvatar = Boolean(avatar);
+	const hasAction = Boolean(action);
 	return (
 		<div ref={ref} className={cx("gl-card-header", className)} {...rest}>
 			{/* As in the reference, an empty avatar or action (0, "") draws no slot. */}
-			{avatar ? <div className="gl-card-header-avatar">{avatar}</div> : null}
+			{hasAvatar ? <div className="gl-card-header-avatar">{avatar}</div> : null}
 			<div className="gl-card-header-text">
 				{title === undefined || title === null ? null : (
 					<Heading className="gl-card-title">{title}</Heading>
@@ -99,7 +101,7 @@ export function CardHeader({
 				)}
 				{children}
 			</div>
-			{action ? <div className="gl-card-header-action">{action}</div> : null}
+			{hasAction ? <div className="gl-card-header-action">{action}</div> : null}
 		</div>
 	);
 }
@@ -303,7 +305,7 @@ export function CardActionArea({
 
 					onClick?.(event);
 				}}
-				{...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+				{...rest}
 			>
 				{children}
 			</a>
@@ -317,7 +319,7 @@ export function CardActionArea({
 			className={classes}
 			disabled={disabled}
 			onClick={onClick}
-			{...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+			{...rest}
 		>
 			{children}
 		</button>

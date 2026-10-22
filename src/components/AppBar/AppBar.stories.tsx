@@ -136,15 +136,15 @@ function ScrollingPage({
 }) {
 	const pageRef = React.useRef<HTMLDivElement>(null);
 	React.useEffect(() => {
-		if (pageRef.current && initialScroll) {
+		if (initialScroll !== 0 && pageRef.current) {
 			pageRef.current.scrollTop = initialScroll;
 		}
 	}, [initialScroll]);
 	return (
-		// The keyboard scrolls the page, so it's a named stop of its own.
-		// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
 		<div
 			ref={pageRef}
+			// The keyboard scrolls the page, so it's a named stop of its own.
+			// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
 			tabIndex={0}
 			role="region"
 			aria-label="Scrolling page"

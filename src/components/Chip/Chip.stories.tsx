@@ -55,16 +55,7 @@ The preview's removable stack: deleting a chip moves focus to the next close but
 */
 function DeletableStack() {
 	const [tags, setTags] = useState(stack);
-	const chips = useRef<Array<HTMLElement | null>>([]);
-	const remove = (index: number) => {
-		setTags((current) => current.filter((_tag, at) => at !== index));
-		requestAnimationFrame(() => {
-			(chips.current[index] ?? chips.current[index - 1])
-				?.querySelector<HTMLElement>(".gl-chip-delete")
-				?.focus();
-		});
-	};
-
+	const chipsRef = useRef<Array<HTMLElement | null>>([]);
 	if (tags.length === 0) {
 		return (
 			<Chip
@@ -77,13 +68,22 @@ function DeletableStack() {
 		);
 	}
 
+	const remove = (index: number) => {
+		setTags((current) => current.filter((_tag, at) => at !== index));
+		requestAnimationFrame(() => {
+			(chipsRef.current[index] ?? chipsRef.current[index - 1])
+				?.querySelector<HTMLElement>(".gl-chip-delete")
+				?.focus();
+		});
+	};
+
 	return (
 		<ul style={chipList} aria-label="Stack">
 			{tags.map((tag, index) => (
 				<Chip
 					key={tag}
 					ref={(element) => {
-						chips.current[index] = element;
+						chipsRef.current[index] = element;
 					}}
 					component="li"
 					label={tag}
