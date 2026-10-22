@@ -35,13 +35,11 @@ export default meta;
 // the required open.
 type Story = StoryObj<Partial<DialogProps>>;
 
-// The preview's stages grow on phones, where the surface takes the card's phone padding and its
-// actions stack: it picks their heights with useMediaQuery(media.phone). Here CSS picks them under
-// the same query, so the server HTML lays out as the hydrated page does. On phones the notes'
-// default text also wraps to three rows, while TextareaAutosize's server HTML is minRows rows tall
-// and the browser measures the rest, so CSS holds the field at three rows there (past the field
-// style's inline min-height): otherwise the centred surface grows, and every text moves, as the
-// page hydrates.
+// The preview grows its stages on phones with useMediaQuery(media.phone); here CSS does, under the
+// same query, so the server HTML lays out as the hydrated page does. On phones the notes' default
+// text wraps to three rows, but TextareaAutosize's server HTML is minRows rows tall, so CSS holds
+// the field at three rows there, past the field style's inline min-height: otherwise the centred
+// surface grows as the page hydrates, and every text in it moves.
 const styles = `
 .dialog-stage-confirm {
 	height: 320px;

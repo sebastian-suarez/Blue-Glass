@@ -891,9 +891,9 @@ export function ModalLayer(props: ModalLayerProps) {
 	useEscapeListener(isOpenInPlace, closeOnEscape);
 
 	// Android's back gesture, which only Base UI's Drawer reports: Escape's reason, wrapped.
-	const closeOnCloseRequest = useEventCallback((event: Event): boolean => {
+	const reportCloseRequest = useEventCallback((event: Event) => {
 		if (!open || !behaviour.shouldCloseOnEscape || !isTopLayer(layer)) {
-			return false;
+			return;
 		}
 
 		const content = contentRef.current;
@@ -901,7 +901,6 @@ export function ModalLayer(props: ModalLayerProps) {
 			toSyntheticEvent(event, findSurface(content) ?? content ?? undefined),
 			"escapeKeyDown",
 		);
-		return true;
 	});
 
 	const handleOpenChange = useEventCallback(
@@ -914,11 +913,11 @@ export function ModalLayer(props: ModalLayerProps) {
 				return;
 			}
 
-			if (
-				!isOpen &&
-				details.reason === "close-watcher" &&
-				closeOnCloseRequest(details.event)
-			) {
+			if (!isOpen && details.reason === "close-watcher") {
+				reportCloseRequest(details.event);
+				// The parent decides. Cancelling keeps Base UI's watcher for the next back gesture
+				// while the layer stays open.
+				details.cancel();
 				return;
 			}
 
