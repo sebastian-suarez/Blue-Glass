@@ -61,6 +61,12 @@ const minimumBar = 2;
 The baseline sits this fraction of the font size below the row's centre, as Diagram's text does.
 */
 const baselineShift = 0.36;
+/**
+A row's centre below its top, and the baselines of its name (15px) and value (13px) below that.
+*/
+const halfBar = barHeight / 2;
+const nameBaseline = 15 * baselineShift;
+const valueBaseline = 13 * baselineShift;
 
 export type TimingChartProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
@@ -109,11 +115,16 @@ export function TimingChart({
 }: TimingChartProps & { readonly ref?: React.Ref<HTMLDivElement> }) {
 	const count = data.rows.length;
 	// The site's AXIS_Y = 2 × BAR_H + ROW_GAP + 40 and HEIGHT 168, written for any row count.
-	const axisY = top + count * barHeight + (count - 1) * rowGap + 28;
+	const barsHeight = count * barHeight;
+	const gapsHeight = (count - 1) * rowGap;
+	const axisY = top + barsHeight + gapsHeight + 28;
 	const height = axisY + 36;
-	const x = (value: number) =>
-		barX +
-		(Math.max(0, Math.min(value, data.axisMax)) / data.axisMax) * barWidth;
+	const x = (value: number) => {
+		const share = Math.max(0, Math.min(value, data.axisMax)) / data.axisMax;
+		const offset = share * barWidth;
+		return barX + offset;
+	};
+
 	return (
 		<DiagramHost
 			ref={ref}
@@ -158,7 +169,9 @@ export function TimingChart({
 				))}
 			</g>
 			{data.rows.map((row, index) => {
-				const y = top + index * (barHeight + rowGap);
+				const rowOffset = index * (barHeight + rowGap);
+				const y = top + rowOffset;
+				const centreY = y + halfBar;
 				const width = Math.max(minimumBar, x(row.value) - barX);
 				const tone = row.tone ?? "muted";
 				return (
@@ -170,7 +183,7 @@ export function TimingChart({
 						<text
 							className="gl-dg-text"
 							x={0}
-							y={y + barHeight / 2 + 15 * baselineShift}
+							y={centreY + nameBaseline}
 							fontSize={15}
 							fontWeight={600}
 						>
@@ -195,7 +208,7 @@ export function TimingChart({
 						<text
 							className={`gl-dg-label gl-dg-label-${tone} gl-dg-bar-value`}
 							x={barX + width + 12}
-							y={y + barHeight / 2 + 13 * baselineShift}
+							y={centreY + valueBaseline}
 							fontSize={13}
 						>
 							{row.text}

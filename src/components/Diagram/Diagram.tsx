@@ -180,12 +180,10 @@ function baseline(
 	lineHeight: number,
 	fontSize: number,
 ): number {
-	return (
-		centreY -
-		((count - 1) * lineHeight) / 2 +
-		index * lineHeight +
-		fontSize * baselineShift
-	);
+	const firstLineOffset = ((count - 1) * lineHeight) / 2;
+	const lineOffset = index * lineHeight;
+	const baselineOffset = fontSize * baselineShift;
+	return centreY - firstLineOffset + lineOffset + baselineOffset;
 }
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
@@ -216,9 +214,6 @@ function endMark(
 	}
 
 	const [endX, endY] = end;
-	const length = Math.hypot(endX - previous[0], endY - previous[1]) || 1;
-	const unitX = (endX - previous[0]) / length;
-	const unitY = (endY - previous[1]) / length;
 	if (kind === "circle") {
 		return (
 			<circle
@@ -231,13 +226,23 @@ function endMark(
 		);
 	}
 
+	const distance = Math.hypot(endX - previous[0], endY - previous[1]);
+	// A zero-length edge still gets a direction to draw its mark along.
+	const length = distance > 0 ? distance : 1;
+	const unitX = (endX - previous[0]) / length;
+	const unitY = (endY - previous[1]) / length;
 	if (kind === "cross") {
 		const arm = head * 0.85;
+		// Each stroke runs from the end point minus its offset to the end point plus it.
+		const firstX = arm * (unitX - unitY);
+		const firstY = arm * (unitY + unitX);
+		const secondX = arm * (unitX + unitY);
+		const secondY = arm * (unitY - unitX);
 		const strokes = [
-			`M ${round2(endX - arm * (unitX - unitY))} ${round2(endY - arm * (unitY + unitX))}`,
-			`L ${round2(endX + arm * (unitX - unitY))} ${round2(endY + arm * (unitY + unitX))}`,
-			`M ${round2(endX - arm * (unitX + unitY))} ${round2(endY - arm * (unitY - unitX))}`,
-			`L ${round2(endX + arm * (unitX + unitY))} ${round2(endY + arm * (unitY - unitX))}`,
+			`M ${round2(endX - firstX)} ${round2(endY - firstY)}`,
+			`L ${round2(endX + firstX)} ${round2(endY + firstY)}`,
+			`M ${round2(endX - secondX)} ${round2(endY - secondY)}`,
+			`L ${round2(endX + secondX)} ${round2(endY + secondY)}`,
 		];
 		return (
 			<path
@@ -248,15 +253,11 @@ function endMark(
 		);
 	}
 
-	const tip = [endX + head * unitX, endY + head * unitY];
-	const left = [
-		endX - head * unitX - head * unitY,
-		endY - head * unitY + head * unitX,
-	];
-	const right = [
-		endX - head * unitX + head * unitY,
-		endY - head * unitY - head * unitX,
-	];
+	const headX = head * unitX;
+	const headY = head * unitY;
+	const tip = [endX + headX, endY + headY];
+	const left = [endX - headX - headY, endY - headY + headX];
+	const right = [endX - headX + headY, endY - headY - headX];
 	return (
 		<path
 			key={key}
@@ -278,13 +279,15 @@ export function DgRegion({
 }) {
 	const className = `gl-dg-region gl-dg-region-${region.tone}`;
 	if (region.shape === "circle") {
+		const radius = region.w / 2;
+		const halfHeight = region.h / 2;
 		return (
 			<circle
 				className={className}
 				style={dgOrder(i)}
-				cx={region.x + region.w / 2}
-				cy={region.y + region.h / 2}
-				r={region.w / 2}
+				cx={region.x + radius}
+				cy={region.y + halfHeight}
+				r={radius}
 			/>
 		);
 	}
@@ -414,13 +417,20 @@ function NodeShape({
 }: Pick<DgNodeProps, "x" | "y" | "w" | "h" | "outline"> & {
 	readonly shape: NonNullable<DgNodeProps["shape"]>;
 	readonly radius: number;
-}) {
+}): React.ReactNode {
 	if (shape === "outline") {
 		return outline;
 	}
 
+	const halfWidth = w / 2;
+	const halfHeight = h / 2;
 	return shape === "circle" ? (
-		<circle className="gl-dg-box" cx={x + w / 2} cy={y + h / 2} r={w / 2} />
+		<circle
+			className="gl-dg-box"
+			cx={x + halfWidth}
+			cy={y + halfHeight}
+			r={halfWidth}
+		/>
 	) : (
 		<rect className="gl-dg-box" x={x} y={y} width={w} height={h} rx={radius} />
 	);
@@ -443,8 +453,12 @@ export function DgNode({
 	textY,
 	i,
 }: DgNodeProps) {
-	const centreX = textX ?? x + w / 2;
-	const centreY = textY ?? y + h / 2;
+	const halfWidth = w / 2;
+	const halfHeight = h / 2;
+	const boxCentreX = x + halfWidth;
+	const boxCentreY = y + halfHeight;
+	const centreX = textX ?? boxCentreX;
+	const centreY = textY ?? boxCentreY;
 	const lineY = (index: number) =>
 		baseline(centreY, index, lines.length, DG_NODE_LINE, DG_NODE_FONT);
 	return (
@@ -466,9 +480,9 @@ export function DgNode({
 				>
 					{lines.map((runs, index) =>
 						runs.length === 1 ? (
-							// Lines are positional: the data gives them no other identity.
-							// eslint-disable-next-line @eslint-react/no-array-index-key
 							<tspan
+								// Lines are positional: the data gives them no other identity.
+								// eslint-disable-next-line @eslint-react/no-array-index-key
 								key={index}
 								x={centreX}
 								y={lineY(index)}
@@ -505,9 +519,12 @@ export function DgLabel({
 	readonly i: number;
 }) {
 	const isMiddle = label.align === "middle";
-	const x = isMiddle ? label.x + (label.w ?? 0) / 2 : label.x;
+	const halfWidth = (label.w ?? 0) / 2;
+	const x = isMiddle ? label.x + halfWidth : label.x;
 	// Labels are placed by their top-left, like the comp's text blocks.
-	const centreY = label.y + DG_LABEL_LINE / 2;
+	const halfLine = DG_LABEL_LINE / 2;
+	const centreY = label.y + halfLine;
+	const baselineOffset = DG_LABEL_FONT * baselineShift;
 	return (
 		<text
 			className={`gl-dg-label gl-dg-label-${label.tone ?? "muted"}`}
@@ -515,16 +532,20 @@ export function DgLabel({
 			textAnchor={isMiddle ? "middle" : "start"}
 			fontSize={DG_LABEL_FONT}
 		>
-			{label.lines.map((text, index) => (
-				// eslint-disable-next-line @eslint-react/no-array-index-key
-				<tspan
-					key={index}
-					x={x}
-					y={centreY + index * DG_LABEL_LINE + DG_LABEL_FONT * baselineShift}
-				>
-					{text}
-				</tspan>
-			))}
+			{label.lines.map((text, index) => {
+				const lineOffset = index * DG_LABEL_LINE;
+				return (
+					<tspan
+						// Lines are positional: the data gives them no other identity.
+						// eslint-disable-next-line @eslint-react/no-array-index-key
+						key={index}
+						x={x}
+						y={centreY + lineOffset + baselineOffset}
+					>
+						{text}
+					</tspan>
+				);
+			})}
 		</text>
 	);
 }
@@ -534,7 +555,7 @@ function subscribeToNothing(): () => void {
 }
 
 function isAutomated(): boolean {
-	return typeof navigator !== "undefined" && navigator.webdriver === true;
+	return typeof navigator !== "undefined" && navigator.webdriver;
 }
 
 /**
@@ -570,6 +591,16 @@ function useDiagramReveal(
 			return;
 		}
 
+		if (
+			!isEnabled ||
+			typeof IntersectionObserver === "undefined" ||
+			typeof window.matchMedia !== "function" ||
+			isAutomated()
+		) {
+			wrap.dataset.reveal = "in";
+			return;
+		}
+
 		const svg = wrap.querySelector("svg");
 		const run = (isRunning: boolean) => {
 			// Not every DOM has SMIL (jsdom doesn't).
@@ -583,16 +614,6 @@ function useDiagramReveal(
 				svg.pauseAnimations();
 			}
 		};
-
-		if (
-			!isEnabled ||
-			isAutomated() ||
-			typeof IntersectionObserver === "undefined" ||
-			typeof window.matchMedia !== "function"
-		) {
-			wrap.dataset.reveal = "in";
-			return;
-		}
 
 		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 		wrap.dataset.reveal = reduced.matches ? "in" : "armed";
@@ -652,6 +673,7 @@ function useHostOverflow(
 
 		update();
 		if (typeof ResizeObserver === "undefined") {
+			// eslint-disable-next-line unicorn/prefer-observer-apis -- The reference's fallback for a DOM without ResizeObserver, such as jsdom.
 			window.addEventListener("resize", update);
 			return () => {
 				window.removeEventListener("resize", update);
@@ -786,7 +808,9 @@ export function DiagramHost({
 				data-scrollable={isScrollable && overflows ? "" : undefined}
 				data-fits={isScrollable && overflows === false ? "" : undefined}
 				tabIndex={isScrollable && overflows !== false ? 0 : undefined}
-				{...(isScrollable ? naming : {})}
+				role={isScrollable ? "group" : undefined}
+				aria-label={isScrollable ? label : undefined}
+				aria-describedby={isScrollable ? descriptionId : undefined}
 			>
 				<svg
 					className="gl-dg"
@@ -855,8 +879,7 @@ export function Diagram({
 	const accentEdges = pulses
 		? data.edges.filter((edge) => edge.tone === "accent")
 		: [];
-	// The data's marks have no ids, so their places in the data are their keys.
-	/* eslint-disable @eslint-react/no-array-index-key */
+	/* eslint-disable @eslint-react/no-array-index-key -- The data's marks have no ids, so their places in the data are their keys. */
 	return (
 		<DiagramHost
 			ref={ref}

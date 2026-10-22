@@ -192,7 +192,7 @@ export const Example: Story = {
 				</span>
 				<p className="text-body-lg" style={{ margin: 0 }}>
 					{
-						"Cut PDF generation time from about 6 seconds to 10–⁠20 milliseconds."
+						"Cut PDF generation time from about 6 seconds to 10–\u{2060}20 milliseconds."
 					}
 				</p>
 			</div>

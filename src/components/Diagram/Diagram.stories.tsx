@@ -6,7 +6,19 @@ import { Caption, Row, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Icon } from "../Icon/index.js";
 import { Paper } from "../Paper/index.js";
-import { Diagram, DiagramHost, type DiagramData } from "./Diagram.js";
+import {
+	Diagram,
+	DiagramHost,
+	type DiagramData,
+	type DiagramNodeLine,
+} from "./Diagram.js";
+
+/**
+A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
+*/
+function boldLine(text: string): Exclude<DiagramNodeLine, string> {
+	return { text, bold: true };
+}
 
 // The site's datasets, as the preview draws them.
 const siteFlow: DiagramData = {
@@ -27,42 +39,42 @@ const siteFlow: DiagramData = {
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Pull request", bold: true }, "checks must pass"],
+			lines: [boldLine("Pull request"), "checks must pass"],
 		},
 		{
 			x: 225,
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "GitHub Actions", bold: true }, "OIDC, no keys"],
+			lines: [boldLine("GitHub Actions"), "OIDC, no keys"],
 		},
 		{
 			x: 430,
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "S3 bucket", bold: true }, "private"],
+			lines: [boldLine("S3 bucket"), "private"],
 		},
 		{
 			x: 430,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "CloudFront", bold: true }, "cache, HTTPS"],
+			lines: [boldLine("CloudFront"), "cache, HTTPS"],
 		},
 		{
 			x: 225,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Cloudflare", bold: true }, "DNS, proxy, TLS"],
+			lines: [boldLine("Cloudflare"), "DNS, proxy, TLS"],
 		},
 		{
 			x: 20,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Your browser", bold: true }, "this page"],
+			lines: [boldLine("Your browser"), "this page"],
 			tone: "accent",
 		},
 	],
@@ -130,28 +142,28 @@ const requestPath: DiagramData = {
 			y: 20,
 			w: 160,
 			h: 72,
-			lines: [{ text: "Your browser", bold: true }, "any device"],
+			lines: [boldLine("Your browser"), "any device"],
 		},
 		{
 			x: 200,
 			y: 20,
 			w: 160,
 			h: 72,
-			lines: [{ text: "Cloudflare", bold: true }, "DNS, edge"],
+			lines: [boldLine("Cloudflare"), "DNS, edge"],
 		},
 		{
 			x: 400,
 			y: 20,
 			w: 160,
 			h: 72,
-			lines: [{ text: "CloudFront", bold: true }, "CDN"],
+			lines: [boldLine("CloudFront"), "CDN"],
 		},
 		{
 			x: 600,
 			y: 20,
 			w: 160,
 			h: 72,
-			lines: [{ text: "S3 bucket", bold: true }, "origin"],
+			lines: [boldLine("S3 bucket"), "origin"],
 		},
 	],
 	edges: [
@@ -232,28 +244,28 @@ const pipeline: DiagramData = {
 			y: 20,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Local dev", bold: true }, "astro dev, check"],
+			lines: [boldLine("Local dev"), "astro dev, check"],
 		},
 		{
 			x: 290,
 			y: 20,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Pull request", bold: true }, "into main"],
+			lines: [boldLine("Pull request"), "into main"],
 		},
 		{
 			x: 580,
 			y: 20,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Two checks", bold: true }, "Build, Terraform plan"],
+			lines: [boldLine("Two checks"), "Build, Terraform plan"],
 		},
 		{
 			x: 580,
 			y: 150,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Merge to main", bold: true }, "ruleset enforced"],
+			lines: [boldLine("Merge to main"), "ruleset enforced"],
 			tone: "accent",
 		},
 		{
@@ -261,28 +273,28 @@ const pipeline: DiagramData = {
 			y: 150,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Deploy job", bold: true }, "production env"],
+			lines: [boldLine("Deploy job"), "production env"],
 		},
 		{
 			x: 0,
 			y: 150,
 			w: 180,
 			h: 72,
-			lines: [{ text: "S3 + CloudFront", bold: true }, "sync, invalidate"],
+			lines: [boldLine("S3 + CloudFront"), "sync, invalidate"],
 		},
 		{
 			x: 290,
 			y: 260,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Terraform applies", bold: true }, "IAM, then site"],
+			lines: [boldLine("Terraform applies"), "IAM, then site"],
 		},
 		{
 			x: 0,
 			y: 260,
 			w: 180,
 			h: 72,
-			lines: [{ text: "AWS + Cloudflare", bold: true }, "IAM and site stacks"],
+			lines: [boldLine("AWS + Cloudflare"), "IAM and site stacks"],
 		},
 	],
 	edges: [
@@ -389,7 +401,7 @@ const rings: DiagramData = {
 			y: 110,
 			w: 100,
 			h: 100,
-			lines: [{ text: "Domain", bold: true }],
+			lines: [boldLine("Domain")],
 			tone: "accent-fill",
 		},
 		{ x: 0, y: 40, w: 150, h: 48, lines: ["MCP servers"] },
@@ -463,14 +475,14 @@ const iacSplit: DiagramData = {
 			y: 40,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Laptop", bold: true }, "admin sign-in"],
+			lines: [boldLine("Laptop"), "admin sign-in"],
 		},
 		{
 			x: 290,
 			y: 40,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Bootstrap stack", bold: true }, "by hand, rarely"],
+			lines: [boldLine("Bootstrap stack"), "by hand, rarely"],
 		},
 		{
 			x: 580,
@@ -478,7 +490,7 @@ const iacSplit: DiagramData = {
 			w: 180,
 			h: 80,
 			lines: [
-				{ text: "The ceiling", bold: true },
+				boldLine("The ceiling"),
 				"permissions boundary",
 				"OIDC, IAM-apply role",
 			],
@@ -489,25 +501,21 @@ const iacSplit: DiagramData = {
 			y: 188,
 			w: 180,
 			h: 72,
-			lines: [{ text: "GitHub Actions", bold: true }, "one role per job"],
+			lines: [boldLine("GitHub Actions"), "one role per job"],
 		},
 		{
 			x: 290,
 			y: 188,
 			w: 180,
 			h: 72,
-			lines: [{ text: "IAM stack", bold: true }, "capped CI roles"],
+			lines: [boldLine("IAM stack"), "capped CI roles"],
 		},
 		{
 			x: 580,
 			y: 184,
 			w: 180,
 			h: 80,
-			lines: [
-				{ text: "Site stack", bold: true },
-				"S3, CloudFront,",
-				"ACM, Cloudflare DNS",
-			],
+			lines: [boldLine("Site stack"), "S3, CloudFront,", "ACM, Cloudflare DNS"],
 		},
 	],
 	edges: [
@@ -589,14 +597,14 @@ const notFound: DiagramData = {
 			y: 30,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Your browser", bold: true }, "old or mistyped link"],
+			lines: [boldLine("Your browser"), "old or mistyped link"],
 		},
 		{
 			x: 290,
 			y: 30,
 			w: 180,
 			h: 72,
-			lines: [{ text: "CloudFront", bold: true }, "sebastiansuarez.dev"],
+			lines: [boldLine("CloudFront"), "sebastiansuarez.dev"],
 			tone: "accent",
 		},
 		{
@@ -604,7 +612,7 @@ const notFound: DiagramData = {
 			y: 30,
 			w: 180,
 			h: 72,
-			lines: [{ text: "S3 bucket", bold: true }, "no such page"],
+			lines: [boldLine("S3 bucket"), "no such page"],
 		},
 	],
 	edges: [
@@ -664,14 +672,14 @@ const reviewGate: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Claude Code", bold: true }, "implements"],
+			lines: [boldLine("Claude Code"), "implements"],
 		},
 		{
 			x: 290,
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Codex review gate", bold: true }, "GPT-6 Astra, xhigh"],
+			lines: [boldLine("Codex review gate"), "GPT-6 Astra, xhigh"],
 			tone: "accent",
 		},
 		{
@@ -679,21 +687,21 @@ const reviewGate: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "VSebCode", bold: true }, "merge"],
+			lines: [boldLine("VSebCode"), "merge"],
 		},
 		{
 			x: 280,
 			y: 180,
 			w: 200,
 			h: 64,
-			lines: [{ text: "AGENTS.md", bold: true }, "imported from CLAUDE.md"],
+			lines: [boldLine("AGENTS.md"), "imported from CLAUDE.md"],
 		},
 		{
 			x: 580,
 			y: 180,
 			w: 180,
 			h: 64,
-			lines: [{ text: "Antigravity", bold: true }, "reads the same file"],
+			lines: [boldLine("Antigravity"), "reads the same file"],
 		},
 	],
 	edges: [
@@ -797,6 +805,14 @@ function order(index: number): CSSProperties {
 }
 
 /**
+Where gate `index` sits on the line: 70 units in, then 153.3 apart.
+*/
+function gateX(index: number): number {
+	const offset = index * 153.3;
+	return 70 + offset;
+}
+
+/**
 The RS50 bridge's gates, drawn by hand inside DiagramHost with the gl-dg classes.
 */
 function BridgeGates() {
@@ -821,12 +837,7 @@ function BridgeGates() {
 					className={`gl-dg-node gl-dg-node-${gate.isDone ? "accent-fill" : "default"}`}
 					style={order(index)}
 				>
-					<circle
-						className="gl-dg-box"
-						cx={70 + index * 153.3}
-						cy={34}
-						r={14}
-					/>
+					<circle className="gl-dg-box" cx={gateX(index)} cy={34} r={14} />
 				</g>
 			))}
 			{gates.map((gate, index) => (
@@ -834,7 +845,7 @@ function BridgeGates() {
 					key={gate.name}
 					className={`gl-dg-label${gate.isDone ? " gl-dg-label-accent" : ""}`}
 					style={order(index)}
-					x={70 + index * 153.3}
+					x={gateX(index)}
 					y={76}
 					textAnchor="middle"
 					fontSize={13}
