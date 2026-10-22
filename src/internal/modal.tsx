@@ -226,6 +226,15 @@ export function isTopLayer(layer: Layer): boolean {
 	return openLayers.at(-1) === layer;
 }
 
+/**
+Whether the element is inside the top open layer. A part that takes presses of its own, such as
+Dialog's centring layer, reports them only then, as the backdrop does: a layer opened over it
+with no backdrop lets presses through to the one below.
+*/
+export function isInTopLayer(element: Element): boolean {
+	return isInside(openLayers.at(-1)?.rootRef.current, element);
+}
+
 function findSurface(content: HTMLElement | null): HTMLElement | undefined {
 	const surface =
 		content?.querySelector('[role="dialog"], [role="alertdialog"]') ??

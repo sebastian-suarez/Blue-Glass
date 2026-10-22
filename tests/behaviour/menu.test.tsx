@@ -43,9 +43,9 @@ type ProjectMenuProps = Omit<MenuProps, "open" | "anchorEl" | "onClose"> & {
 	*/
 	readonly closes?: boolean;
 	/**
-	Where the button sits, fixed in the viewport.
+	Where the button sits, fixed in the viewport, and how wide it is if not its text's width.
 	*/
-	readonly at?: { left: number; top: number };
+	readonly at?: { left: number; top: number; width?: number };
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -728,6 +728,60 @@ describe("Menu", () => {
 		await frames();
 		expect(menu).toBeVisible();
 		expect(button).toHaveFocus();
+	});
+
+	test("disableRestoreFocus, from Popover, leaves focus off the button once it closes", async () => {
+		render(<ProjectMenu disableRestoreFocus>{projectActions()}</ProjectMenu>);
+		const { button, menu } = await openMenu();
+		await expect.poll(() => menu.contains(document.activeElement)).toBe(true);
+		await userEvent.keyboard("{Escape}");
+		await expectClosed();
+		await frames();
+		expect(button).not.toHaveFocus();
+	});
+
+	test("keepMounted, from Popover, keeps the items in the document while closed, hidden, and opens them again", async () => {
+		render(<ProjectMenu keepMounted>{projectActions()}</ProjectMenu>);
+		const copy = screen.getByText("Copy link");
+		expect(copy).not.toBeVisible();
+		const { button } = await openMenu();
+		await expect.element(copy).toBeVisible();
+		await userEvent.keyboard("{Escape}");
+		await expectClosed();
+		await expect.element(copy).not.toBeVisible();
+		expect(copy.isConnected).toBe(true);
+		await userEvent.click(button);
+		await expect.element(copy).toBeVisible();
+	});
+
+	test("matchWidth, from Popover, makes the menu at least as wide as its button", async () => {
+		const ref = React.createRef<HTMLDivElement>();
+		render(
+			<ProjectMenu ref={ref} matchWidth at={{ ...menuButtonAt, width: 360 }}>
+				{projectActions()}
+			</ProjectMenu>,
+		);
+		const { button } = await openMenu();
+		await expect
+			.poll(() => Math.round(ref.current?.getBoundingClientRect().width ?? 0))
+			.toBeGreaterThanOrEqual(Math.round(button.getBoundingClientRect().width));
+	});
+
+	test("transitionDuration, from Popover, sets how long the menu takes to leave", async () => {
+		render(
+			<ProjectMenu transitionDuration={{ exit: 600 }}>
+				{projectActions()}
+			</ProjectMenu>,
+		);
+		const { menu } = await openMenu();
+		await expect.poll(() => menu.contains(document.activeElement)).toBe(true);
+		const closedAt = performance.now();
+		await userEvent.keyboard("{Escape}");
+		// Well before 600ms it's still on its way out...
+		expect(menu.isConnected).toBe(true);
+		// ...and it's gone once the exit has run.
+		await expect.poll(() => menu.isConnected, { timeout: 3000 }).toBe(false);
+		expect(performance.now() - closedAt).toBeGreaterThanOrEqual(500);
 	});
 
 	test("a click on an item runs its onClick, then onClose gets the click and itemClick; once closed, focus is back on the button", async () => {

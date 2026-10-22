@@ -23,7 +23,7 @@ import {
 	useId,
 	useIsoLayoutEffect,
 } from "../../internal/hooks.js";
-import { ModalLayer } from "../../internal/modal.js";
+import { isInTopLayer, ModalLayer } from "../../internal/modal.js";
 import { durations, getTimeout } from "../../internal/transition.js";
 import type { BackdropProps } from "../Backdrop/Backdrop.js";
 import { Paper, type PaperProps } from "../Paper/Paper.js";
@@ -290,7 +290,11 @@ export function Dialog({
 							}
 						}}
 						onClick={(event) => {
-							if (pressedRef.current && event.target === event.currentTarget) {
+							if (
+								pressedRef.current &&
+								event.target === event.currentTarget &&
+								isInTopLayer(event.currentTarget)
+							) {
 								onClose?.(event, "backdropClick");
 							}
 

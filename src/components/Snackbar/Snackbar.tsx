@@ -5,11 +5,13 @@ ClickAwayListener and Slide. Base UI's Toast doesn't fit the documented API: it 
 through a manager and closes them on its own timer, where a Snackbar is one controlled `open`
 whose onClose only asks, with a reason (timeout, clickaway, escapeKeyDown, closeButton).
 
-The root is the live region, role="status" (aria-live="polite") or "alert", with the ref. It
-stays mounted while closed, so it exists before a message lands in it, and it provides
-FeedbackLiveContext, so a hosted Alert drops its own role and is announced once. While a modal
-hides the rest of the page from assistive tech it leaves aria-live regions exposed, so a status
-snackbar stays usable over a Dialog.
+The root is the live region, role="status" (aria-live="polite") or "alert" (aria-live="assertive",
+which the role implies), with the ref. It stays mounted while closed, so it exists before a
+message lands in it, and it provides FeedbackLiveContext, so a hosted Alert drops its own role
+and is announced once. While a modal hides the rest of the page from assistive tech, Base UI and
+the modal adapter leave elements with an aria-live attribute exposed, so the explicit attribute
+keeps either role usable over a Dialog, as data-gl-live did in the reference, whose Modal made
+the page inert.
 
 Open content renders visible in the server HTML: Slide is the transition adapter's, which starts
 entered on the server and while hydrating (docs/deviations.md, entry 9). In place, an open
@@ -287,7 +289,7 @@ export function Snackbar({
 			<div
 				ref={handleRef}
 				role={role}
-				aria-live={role === "alert" ? undefined : "polite"}
+				aria-live={role === "alert" ? "assertive" : "polite"}
 				data-gl-live=""
 				className={cx(
 					"gl-snackbar",

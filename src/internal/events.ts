@@ -14,7 +14,9 @@ Events. Where a documented callback takes a React event:
   details.event is a placeholder Event that was never dispatched, so that element is its only
   target, and without one both targets would be null.
 - Escape is wrapped too, even where the documented union also accepts a native KeyboardEvent:
-  every Base UI-driven callback gets a SyntheticEvent, with the native one as nativeEvent.
+  every Base UI-driven callback gets a SyntheticEvent, with the native one as nativeEvent. The
+  modal adapter (modal.tsx) is the exception: Modal, Dialog and Drawer hear the Escape key
+  themselves and pass its native KeyboardEvent, which their specs require.
 - A remembered React event follows React's rules: its currentTarget is null once React's
   dispatch is over, as for any React event read after its handler returns.
 

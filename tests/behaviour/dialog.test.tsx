@@ -8,7 +8,7 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 import { referenceDefectTest } from "./reference-defect.js";
 import "#ui/styles.css";
 import {
@@ -18,6 +18,7 @@ import {
 	DialogContentText,
 	DialogTitle,
 	type DialogProps,
+	Modal,
 	type ModalCloseReason,
 } from "#ui";
 
@@ -597,6 +598,8 @@ describe("DialogContent and scroll", () => {
 
 		await userEvent.tab();
 		const content = document.activeElement as HTMLElement;
+		// In the tab order by its own tabindex: some browsers make any scroller focusable, not all.
+		expect(content.getAttribute("tabindex")).toBe("0");
 		// The content itself: it holds the notes, but not the title or the actions.
 		expect(content.contains(screen.getByText(notes[0]))).toBe(true);
 		expect(content.contains(within(dialog).getByRole("heading"))).toBe(false);
@@ -852,6 +855,52 @@ describe("size: maxWidth, fullWidth and fullScreen", () => {
 			style.borderBottomLeftRadius,
 		]).toEqual(["0px", "0px", "0px", "0px"]);
 	});
+
+	test('fullScreen="phone" fills a phone\'s viewport with square corners', async () => {
+		render(
+			<Dialog open fullScreen="phone">
+				<DraftConfirm />
+			</Dialog>,
+		);
+		const dialog = await screen.findByRole("dialog", { name: title });
+		await expect
+			.poll(() => {
+				const rect = dialog.getBoundingClientRect();
+				return [rect.left, rect.top, rect.width, rect.height].map((value) =>
+					Math.round(value),
+				);
+			})
+			.toEqual([
+				0,
+				0,
+				document.documentElement.clientWidth,
+				document.documentElement.clientHeight,
+			]);
+		expect(getComputedStyle(dialog).borderTopLeftRadius).toBe("0px");
+	});
+});
+
+describe('fullScreen="phone" above 700px', () => {
+	beforeEach(async () => {
+		await page.viewport(1280, 900);
+	});
+
+	afterEach(async () => {
+		await page.viewport(414, 896);
+	});
+
+	test("the dialog keeps its rounded corners and its width cap", async () => {
+		render(
+			<Dialog open fullScreen="phone">
+				<DraftConfirm />
+			</Dialog>,
+		);
+		const dialog = await screen.findByRole("dialog", { name: title });
+		expect(getComputedStyle(dialog).borderTopLeftRadius).not.toBe("0px");
+		await expect
+			.poll(() => Math.round(dialog.getBoundingClientRect().width))
+			.toBeLessThanOrEqual(600);
+	});
 });
 
 describe("Modal's flags, passed on", () => {
@@ -1045,5 +1094,61 @@ describe("Modal's flags, passed on", () => {
 		// ...and it's gone once the exit has run.
 		await expect.poll(() => dialog.isConnected, { timeout: 3000 }).toBe(false);
 		expect(performance.now() - closedAt).toBeGreaterThanOrEqual(500);
+	});
+});
+
+describe("a Modal opened over the dialog", () => {
+	test("with no backdrop of its own, a press outside both surfaces doesn't close the dialog: only the top layer reports presses", async () => {
+		const reasons: string[] = [];
+		function Over() {
+			const [isOpen, setIsOpen] = React.useState(false);
+			return (
+				<Dialog
+					open
+					onClose={(_event, reason) => {
+						reasons.push(reason);
+					}}
+				>
+					<DialogTitle>{title}</DialogTitle>
+					<DialogActions>
+						<button
+							type="button"
+							onClick={() => {
+								setIsOpen(true);
+							}}
+						>
+							Rename
+						</button>
+					</DialogActions>
+					<Modal hideBackdrop open={isOpen}>
+						<div
+							role="dialog"
+							aria-label="Rename the draft"
+							style={{
+								position: "fixed",
+								left: 150,
+								top: 300,
+								width: 120,
+								height: 60,
+							}}
+						>
+							A new name
+						</div>
+					</Modal>
+				</Dialog>
+			);
+		}
+
+		render(<Over />);
+		await userEvent.click(
+			await screen.findByRole("button", { name: "Rename" }),
+		);
+		await screen.findByRole("dialog", { name: "Rename the draft" });
+		// Near the corner, outside both surfaces.
+		await userEvent.click(document.documentElement, {
+			force: true,
+			position: { x: 5, y: 5 },
+		});
+		expect(reasons).toEqual([]);
 	});
 });

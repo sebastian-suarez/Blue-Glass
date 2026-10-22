@@ -600,6 +600,8 @@ describe.each([
 			const modal = setup({ flags: { ...flags, disableEnforceFocus: true } });
 			const dialog = await modal.open();
 			await expect.element(dialog).toHaveFocus();
+			// Still so a few frames on, after any late marking.
+			await frames();
 			expect(
 				modal.page.map((element) => isHiddenFromAssistiveTech(element)),
 			).toEqual([false, false, false]);

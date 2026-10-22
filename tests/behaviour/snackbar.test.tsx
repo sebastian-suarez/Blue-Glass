@@ -437,15 +437,15 @@ describe("Snackbar: closing", () => {
 
 	test("by default the time left after a pause is half of autoHideDuration", async () => {
 		const onClose = vi.fn<OnClose>();
-		render(<Published autoHideDuration={1600} onClose={onClose} />);
+		render(<Published autoHideDuration={3000} onClose={onClose} />);
 		await userEvent.hover(screen.getByText(message));
 		const left = performance.now();
 		await userEvent.hover(screen.getByText("Elsewhere"));
-		await calls(onClose, 1, 3000);
+		await calls(onClose, 1, 4000);
 		const elapsed = performance.now() - left;
-		expect(elapsed).toBeGreaterThanOrEqual(700);
-		// Well short of the full 1600.
-		expect(elapsed).toBeLessThan(1500);
+		expect(elapsed).toBeGreaterThanOrEqual(1400);
+		// Well short of the full 3000, with room for a slow, busy machine.
+		expect(elapsed).toBeLessThan(2700);
 	});
 
 	test("the action and the close button are in the tab order, and focus inside pauses the timer", async () => {
@@ -615,6 +615,29 @@ describe("Snackbar: with a dialog open", () => {
 		await userEvent.keyboard("{Escape}");
 		await calls(onSnackbarClose, 1);
 		expect(onSnackbarClose.mock.calls[0]?.[1]).toBe("escapeKeyDown");
+	});
+
+	test('a role="alert" snackbar stays exposed while a dialog is open too', async () => {
+		render(
+			<>
+				<Dialog open>
+					<DialogTitle>Delete the draft?</DialogTitle>
+					<DialogActions>
+						<Button>Keep draft</Button>
+					</DialogActions>
+				</Dialog>
+				<Snackbar open role="alert" message="The draft didn't save." />
+			</>,
+		);
+		const dialog = await screen.findByRole("dialog", {
+			name: "Delete the draft?",
+		});
+		await expect.poll(() => dialog.contains(document.activeElement)).toBe(true);
+		const region = screen.getByRole("alert");
+		expect(isHiddenFromAssistiveTech(region)).toBe(false);
+		expect(region).toContainElement(
+			within(region).getByText("The draft didn't save."),
+		);
 	});
 
 	test("while a dialog is open, the snackbar stays exposed and its action still works", async () => {

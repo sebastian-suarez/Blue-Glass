@@ -632,7 +632,6 @@ export function Tooltip({
 			{hasTitle ? (
 				<BaseTooltip.Root
 					open={isOpen && anchor !== null}
-					disableHoverablePopup={disableInteractive}
 					onOpenChange={cancelBaseUiChange}
 				>
 					<BaseTooltip.Portal
