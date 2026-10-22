@@ -7,8 +7,8 @@ How to run one phase of `docs/package-plan.md` in a fresh session. One phase per
 | Phase                                                  | State                               | Tip on `feat/blue-glass` | Review log                |
 | ------------------------------------------------------ | ----------------------------------- | ------------------------ | ------------------------- |
 | 0. Foundation                                          | Done 21 Oct 2026, two review rounds | `f07c0d9`                | `docs/reviews/phase-0.md` |
-| 1. Site set (26)                                       | Next, waiting for your go           |                          |                           |
-| 2. Overlays and feedback (17)                          |                                     |                          |                           |
+| 1. Site set (26)                                       | Done 22 Oct 2026, two review rounds | `432ca83`                | `docs/reviews/phase-1.md` |
+| 2. Overlays and feedback (17)                          | Next, waiting for your go           |                          |                           |
 | 3. Inputs (11)                                         |                                     |                          |                           |
 | 4. Navigation and layout (7)                           |                                     |                          |                           |
 | 5. Charts (5), then README, CHANGELOG, release dry run |                                     |                          |                           |
@@ -63,6 +63,13 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 - **Codex's review inlines untracked files** and stops at 1 MB of input. Commit or ignore large files first. Argon stops at 700 KB, so leave the lockfiles out.
 - **Reports are overwritten by the last run:** `parity:self` and `parity` both write `reports/parity`.
 - **Base UI supports Baseline Widely Available browsers,** so regexes in `src/` use the `u` flag, not `v`.
+
+## Traps found in phase 1
+
+- **Base UI's composite items act on keydown** and check only their own flag. A keydown your handler prevents has to call `preventBaseUIHandler()`, or Space and Enter still press. Base UI's Toggle also swaps an empty `value` for a generated id, and its arrow keys follow its DirectionProvider, not the page's direction.
+- **The React Compiler lint skips a component** whose memo depends on a helper's return value. Build memo keys with built-ins such as `.join()`.
+- **Don't plant a defect in a worktree while a gate run uses it.** A run that overlaps it can't be trusted, so run it again.
+- **A headless session on an API key stops when the credits run out.** Phase 1's stopped mid-review. A lead reviewer that delegates can also end before writing up its own part, so brief reviewers to do the review themselves, and copy their reports out of `/private/tmp`.
 
 ## Notes for each phase
 
