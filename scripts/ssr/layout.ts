@@ -92,6 +92,9 @@ const rawText: Plugin = {
 	},
 };
 
+const nodeRequire =
+	'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);';
+
 const slug = (file: string) => file.replaceAll(/\W+/gv, "-");
 
 /**
@@ -153,6 +156,9 @@ async function bundle(
 		format: "esm",
 		external: ["react", "react-dom"],
 		plugins: [rawText],
+		// Base UI's CommonJS dependencies (use-sync-external-store) require React, which stays
+		// external; ESM output has no require of its own, so the bundle gets Node's.
+		banner: { js: nodeRequire },
 	});
 	await build({
 		...shared,
