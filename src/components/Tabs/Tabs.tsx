@@ -265,7 +265,7 @@ export function Tabs({
 	}
 
 	const enabled = items.filter((item) => !item.isDisabled);
-	const first = enabled[0]?.value ?? false;
+	const first = enabled.at(0)?.value ?? false;
 	const [value, setValue] = useControlled<TabValue | false>(
 		valueProp,
 		defaultValue ?? first,
@@ -406,7 +406,7 @@ export function Tabs({
 		const count = items.length;
 		for (let step = 1; step <= count; step++) {
 			const item = items[(((from + direction * step) % count) + count) % count];
-			if (item && !item.isDisabled) {
+			if (!item.isDisabled) {
 				return item.value;
 			}
 		}
@@ -445,7 +445,7 @@ export function Tabs({
 		} else if (previousKeys.includes(event.key)) {
 			target = enabledFrom(current, -1);
 		} else if (event.key === "Home") {
-			target = enabled[0]?.value;
+			target = enabled.at(0)?.value;
 		} else if (event.key === "End") {
 			target = enabled.at(-1)?.value;
 		}

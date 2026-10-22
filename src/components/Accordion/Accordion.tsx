@@ -318,7 +318,7 @@ function moveBetweenRows(event: React.KeyboardEvent<HTMLButtonElement>): void {
 	}
 
 	event.preventDefault();
-	triggers[next]?.focus();
+	triggers[next].focus();
 }
 
 const isShown = (node: React.ReactNode) =>
@@ -515,7 +515,11 @@ export function PaneAccordion({
 	...rest
 }: PaneAccordionProps & { ref?: React.Ref<HTMLDivElement> }) {
 	const baseId = useId(id);
-	const ids = items.map((item, index) => item.id ?? slugOf(item.title, index));
+	const panes = items.map((item, index) => ({
+		item,
+		key: item.id ?? slugOf(item.title, index),
+	}));
+	const ids = panes.map((pane) => pane.key);
 	const [isControlled] = React.useState(open !== undefined);
 	// Behaviour only: CSS lays the panes out for the viewport before hydration.
 	const isCompact = useMediaQuery(compactQueries[orientation]);
@@ -594,7 +598,7 @@ export function PaneAccordion({
 		}
 
 		event.preventDefault();
-		buttons[next]?.focus();
+		buttons[next].focus();
 	};
 
 	return (
@@ -611,8 +615,7 @@ export function PaneAccordion({
 			onKeyDown={handleKeyDown}
 			{...rest}
 		>
-			{items.map((item, index) => {
-				const key = ids[index] ?? `pane-${index}`;
+			{panes.map(({ item, key }) => {
 				const bodyId = `${baseId}-${key}-body`;
 				const hasChips = Array.isArray(item.chips) && item.chips.length > 0;
 				const hasMore = item.more !== undefined && item.more !== null;
