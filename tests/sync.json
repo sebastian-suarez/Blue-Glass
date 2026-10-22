@@ -11,5 +11,24 @@
 			"shared/hooks.ts": "de15e3bfad0916fb"
 		}
 	},
-	"components": {}
+	"components": {
+		"Transitions": {
+			"files": {
+				"components/Transitions/README.md": "ba859d6f73ff9349",
+				"components/Transitions/api.d.ts": "985ca8e8eb6585c5",
+				"components/Transitions/styles.css": "299bff7cfe390f23",
+				"components/Transitions/preview.html": "2d95f869dc99525c",
+				"components/Transitions/reference.tsx": "7d276ad8f9390621"
+			}
+		},
+		"useMediaQuery": {
+			"files": {
+				"components/useMediaQuery/README.md": "e6ab8c2d51629a1b",
+				"components/useMediaQuery/api.d.ts": "c5ddacdbbc0e61ef",
+				"components/useMediaQuery/styles.css": "6d456f1d13fa5f20",
+				"components/useMediaQuery/preview.html": "c0a7384489ce7367",
+				"components/useMediaQuery/reference.tsx": "427b993b0ba261e3"
+			}
+		}
+	}
 }
