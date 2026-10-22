@@ -1,0 +1,284 @@
+/* Blue Glass — AppBar, ported from design-system/components/AppBar/styles.css. The glass
+   material (.gl-glass) is in foundation.css. */
+
+@layer gl-components {
+	/* AppBar — the site's header: .identity-strip, .personal-name, .signature, the nav pill and .resume-action (global.css) */
+	.gl-app-bar {
+		display: block;
+		width: 100%;
+		color: var(--color-ink);
+	}
+	.gl-app-bar-static {
+		position: relative;
+		background: transparent;
+	}
+	/* sticky / fixed (additions): the bar on glass with blur-control, a light lower edge */
+	.gl-app-bar-sticky,
+	.gl-app-bar-fixed {
+		--gl-fill: var(--glass);
+		--gl-blur: var(--blur-control);
+		top: 0;
+		z-index: var(--z-app-bar);
+		border-bottom: 1px solid var(--glass-edge);
+		box-shadow: var(--shadow-control);
+		transition: box-shadow var(--duration-surface) ease;
+	}
+	.gl-app-bar-sticky {
+		position: sticky;
+	}
+	.gl-app-bar-fixed {
+		position: fixed;
+		left: 0;
+		right: 0;
+	}
+	.gl-app-bar-resting {
+		box-shadow: none;
+	}
+	.gl-app-bar-elevated {
+		box-shadow: var(--shadow-pane);
+	}
+	.gl-app-bar-sentinel {
+		display: block;
+		height: 1px;
+		margin-bottom: -1px;
+		pointer-events: none;
+	}
+
+	/* Toolbar: .identity-strip */
+	.gl-toolbar {
+		max-width: var(--size-header);
+		margin: auto;
+		padding: 38px 5%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 25px;
+		min-width: 0;
+	}
+	.gl-toolbar.gl-toolbar-dense {
+		padding-top: var(--space-sm);
+		padding-bottom: var(--space-sm);
+	}
+	.gl-toolbar.gl-toolbar-flush {
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	/* Parts you compose inside a Toolbar to get the site's identity strip. */
+	/* .personal-name */
+	.gl-app-bar-brand {
+		display: flex;
+		align-items: center;
+		gap: 13px;
+		min-width: 0;
+		color: inherit;
+		text-decoration: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+	/* .signature: the "ss" monogram tile */
+	.gl-app-bar-monogram {
+		flex: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding-right: 6px;
+		font-size: 26px;
+		font-weight: 500;
+		letter-spacing: -5px;
+		border-radius: var(--radius-tile);
+		background: linear-gradient(135deg, #fff9, #fff3);
+		border: 1px solid #fff9;
+		box-shadow: var(--shadow-tile);
+	}
+	.gl-app-bar-text {
+		display: block;
+		min-width: 0;
+	}
+	/* .personal-name strong */
+	.gl-app-bar-title {
+		display: block;
+		font-size: 17px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+	/* .personal-name > span > span */
+	.gl-app-bar-subtitle {
+		display: block;
+		margin-top: 2px;
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+	/* .identity-strip nav: the glass pill track */
+	.gl-app-bar-nav {
+		display: flex;
+		gap: 3px;
+		padding: 5px;
+		background: var(--glass-faint);
+		border: 1px solid #ffffffc9;
+		border-radius: 30px;
+		box-shadow:
+			0 6px 20px #64779709,
+			inset 0 1px 0 #fff;
+		-webkit-backdrop-filter: blur(var(--blur-control));
+		backdrop-filter: blur(var(--blur-control));
+	}
+	/* .identity-strip nav a */
+	.gl-app-bar-link {
+		padding: 7px 17px;
+		font-size: 13px;
+		border-radius: 23px;
+		color: inherit;
+		text-decoration: none;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background var(--duration-hover) ease,
+			box-shadow var(--duration-hover) ease;
+	}
+	.gl-app-bar-link:focus-visible {
+		outline-offset: 2px;
+	}
+	/* The current page (an addition): the raised item of a glass group (.project-tab[aria-pressed=true]). */
+	.gl-app-bar-link[aria-current="page"] {
+		background: var(--glass-raised);
+		box-shadow: var(--shadow-raised);
+	}
+	/* .resume-action */
+	.gl-app-bar-action {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 40px;
+		font-size: 13px;
+		color: inherit;
+		text-decoration: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-app-bar-action .gl-icon {
+		width: 16px;
+		height: 16px;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-app-bar-link:hover {
+			background: #fff7;
+		}
+		.gl-app-bar-link[aria-current="page"]:hover {
+			background: #fff;
+		}
+		.gl-app-bar-action:hover {
+			text-decoration: underline;
+			text-underline-offset: 5px;
+		}
+	}
+
+	@media (max-width: 1000px) {
+		.gl-toolbar {
+			padding-top: 28px;
+			gap: 15px;
+		}
+		.gl-toolbar.gl-toolbar-dense {
+			padding-top: var(--space-sm);
+		}
+		.gl-app-bar-link {
+			padding: 7px 12px;
+		}
+	}
+	@media (max-width: 700px) {
+		.gl-toolbar {
+			padding: 24px 6% 18px;
+			flex-wrap: wrap;
+			gap: 18px;
+		}
+		.gl-toolbar.gl-toolbar-dense {
+			padding-top: var(--space-sm);
+			padding-bottom: var(--space-sm);
+			gap: var(--space-sm);
+		}
+		.gl-toolbar.gl-toolbar-flush {
+			padding-left: 0;
+			padding-right: 0;
+		}
+		.gl-app-bar-title {
+			font-size: 16px;
+		}
+		.gl-app-bar-subtitle {
+			font-size: 11px;
+		}
+		.gl-app-bar-monogram {
+			width: 34px;
+			height: 36px;
+			font-size: 24px;
+			border-radius: var(--radius-control);
+		}
+		.gl-app-bar-action {
+			margin-left: auto;
+			font-size: 12px;
+		}
+		.gl-app-bar-action .gl-icon {
+			width: 14px;
+			height: 14px;
+		}
+		.gl-app-bar-nav {
+			order: 3;
+			width: 100%;
+			justify-content: space-between;
+			margin-top: 5px;
+		}
+		.gl-app-bar-link {
+			flex: 1;
+			padding: 7px 8px;
+			font-size: 12px;
+			text-align: center;
+		}
+	}
+	@media (max-width: 360px) {
+		.gl-toolbar {
+			gap: 15px;
+		}
+		.gl-app-bar-brand {
+			gap: 9px;
+		}
+		.gl-app-bar-monogram {
+			display: none;
+		}
+	}
+
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-app-bar-nav {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-app-bar-nav {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-app-bar-sticky,
+		.gl-app-bar-fixed,
+		.gl-app-bar-link {
+			transition: none;
+		}
+	}
+	@media print {
+		.gl-app-bar-nav,
+		.gl-app-bar-action {
+			display: none;
+		}
+		.gl-app-bar-sticky,
+		.gl-app-bar-fixed {
+			position: static;
+			background: none;
+			box-shadow: none;
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+}
