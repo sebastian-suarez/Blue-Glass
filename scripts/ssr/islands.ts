@@ -158,7 +158,67 @@ less than half its size (a collapsed row is often a zero-height box that clips i
 */
 async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 	return page.evaluate((wanted) => {
+		// A colour's alpha, 1 when it has none: "rgba(0, 0, 0, 0)" and "color(srgb 0 0 0 / 0)" are 0, and
+		// "rgb(0, 0, 0)" is 1.
+		const alphaOf = (color: string): number => {
+			const alpha =
+				/^rgba\((?:[^,]*,){3}\s*(?<alpha>[\d.]+)\)$/v.exec(color)?.groups
+					?.alpha ?? /\/\s*(?<alpha>[\d.]+)%?\)$/v.exec(color)?.groups?.alpha;
+			return alpha === undefined ? 1 : Number(alpha);
+		};
+
+		// Where an element shows its content: its box when overflow clips, cut by a clip-path's
+		// inset(). Other clip-path shapes aren't measured.
+		const clipOf = (
+			element: Element,
+			style: CSSStyleDeclaration,
+		):
+			| { left: number; top: number; right: number; bottom: number }
+			| undefined => {
+			const isClipped =
+				style.overflowX !== "visible" || style.overflowY !== "visible";
+			const inset = /^inset\((?<values>[^\)]*?)(?: round [^\)]*)?\)$/v.exec(
+				style.clipPath,
+			)?.groups?.values;
+			if (!isClipped && inset === undefined) {
+				return undefined;
+			}
+
+			const box = element.getBoundingClientRect();
+			if (inset === undefined) {
+				return box;
+			}
+
+			const [top = "0px", right = top, bottom = top, left = right] = inset
+				.trim()
+				.split(/\s+/v, 4);
+			// Computed insets are in px or %.
+			const length = (value: string, size: number) =>
+				value.endsWith("%")
+					? (Number(value.slice(0, -1)) / 100) * size
+					: Number(value.replace(/px$/v, ""));
+			return {
+				left: box.left + length(left, box.width),
+				top: box.top + length(top, box.height),
+				right: box.right - length(right, box.width),
+				bottom: box.bottom - length(bottom, box.height),
+			};
+		};
+
 		const isShown = (node: Text): boolean => {
+			// Text in a transparent colour is invisible, unless a background shows through it.
+			const ink =
+				node.parentElement === null
+					? undefined
+					: getComputedStyle(node.parentElement);
+			if (
+				ink !== undefined &&
+				ink.backgroundClip !== "text" &&
+				(alphaOf(ink.color) === 0 || alphaOf(ink.webkitTextFillColor) === 0)
+			) {
+				return false;
+			}
+
 			const range = document.createRange();
 			range.selectNodeContents(node);
 			const box = range.getBoundingClientRect();
@@ -188,12 +248,12 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 					return false;
 				}
 
-				if (style.overflowX === "visible" && style.overflowY === "visible") {
+				const clip = clipOf(element, style);
+				if (clip === undefined) {
 					continue;
 				}
 
 				// Text cut to a sliver is unreadable: at least half of it must stay inside the clip.
-				const clip = element.getBoundingClientRect();
 				left = Math.max(left, clip.left);
 				top = Math.max(top, clip.top);
 				right = Math.min(right, clip.right);
@@ -757,6 +817,18 @@ const mutations: Mutation[] = [
 		name: "panel off screen",
 		island: "ClientWork",
 		css: '[role="tabpanel"] { position: absolute; left: -9999px }',
+		expect: '"CMS content, ready for mobile." isn\'t visible',
+	},
+	{
+		name: "panel cut by clip-path",
+		island: "ClientWork",
+		css: '[role="tabpanel"] { clip-path: inset(100%) }',
+		expect: '"CMS content, ready for mobile." isn\'t visible',
+	},
+	{
+		name: "panel text transparent",
+		island: "ClientWork",
+		css: '[role="tabpanel"], [role="tabpanel"] * { color: transparent }',
 		expect: '"CMS content, ready for mobile." isn\'t visible',
 	},
 	{

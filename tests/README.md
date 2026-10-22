@@ -25,7 +25,7 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 
 - `scripts/lib/server-render.ts` runs each preview's script in Node with stand-ins for `window` and `document`, and renders its tree with `renderToString`.
 - The rules are in `scripts/lib/ssr-rules.ts` and have tests of their own.
-- Text shown only after JavaScript is hidden (in the server HTML, invisible) or absent (not there at all). Hidden always fails. Absent fails unless the reference's server HTML lacked it too: what the reference held, even hidden, the package must show. Texts count by occurrence, so a visible caption doesn't stand in for a hidden copy of the same words.
+- Text shown only after JavaScript is hidden (in the server HTML, but invisible: hidden, transparent or cut away by a `clip-path`) or absent (not there at all). Hidden always fails. Absent fails unless the reference's server HTML lacked it too: what the reference held, even hidden, the package must show. Texts count by occurrence, so a visible caption doesn't stand in for a hidden copy of the same words.
 - `tests/ssr/reference-baseline.json` records the reference's hidden and absent texts. Re-record it only after `design-system/` is regenerated: `node scripts/ssr/run.ts --reference --record`.
 - `tests/ssr/exceptions.json` excuses named texts, or a whole preview, with a reason.
 
@@ -38,7 +38,7 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 
 - The portfolio hydrates its interactive sections late, as islands. `tests/ssr/fixtures/islands.tsx` holds them: the client-work Tabs, a project's Tabs, the career Accordion and the capabilities PaneAccordion.
 - `scripts/ssr/islands.ts` renders each in Node, loads the HTML with JavaScript on but not hydrated, and checks what the READMEs promise: the chosen tab or open rows show and the rest don't, tabs and panels name each other, and Tab reaches the selected tab and then its panel, or the first summary. Only then does the island hydrate, and it must do so with no error, no text moving more than 2px and focus kept, then answer End, Enter, the arrows and clicks as documented. At 390px and 1280px.
-- `--target reference` runs the same checks on the reference, and `--self` plants 13 defects there that each must add its problem: at least one of every kind above but the ARIA wiring, which the reference's own defect shows failing (`docs/reference-defects.md`).
+- `--target reference` runs the same checks on the reference, and `--self` plants 15 defects there that each must add its problem: at least one of every kind above but the ARIA wiring, which the reference's own defect shows failing (`docs/reference-defects.md`).
 
 ## After porting a module
 

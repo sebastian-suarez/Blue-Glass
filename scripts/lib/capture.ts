@@ -304,14 +304,58 @@ export async function visibleTexts(
 			return [];
 		}
 
+		// A colour's alpha, 1 when it has none: "rgba(0, 0, 0, 0)" and "color(srgb 0 0 0 / 0)" are 0, and
+		// "rgb(0, 0, 0)" is 1.
+		const alphaOf = (color: string): number => {
+			const alpha =
+				/^rgba\((?:[^,]*,){3}\s*(?<alpha>[\d.]+)\)$/v.exec(color)?.groups
+					?.alpha ?? /\/\s*(?<alpha>[\d.]+)%?\)$/v.exec(color)?.groups?.alpha;
+			return alpha === undefined ? 1 : Number(alpha);
+		};
+
+		// Whether a clip-path's inset() cuts an element's whole width or height away. Computed
+		// insets are in px or %.
+		const isCutAway = (node: Element, clipPath: string): boolean => {
+			const inset = /^inset\((?<values>[^\)]*?)(?: round [^\)]*)?\)$/v.exec(
+				clipPath,
+			)?.groups?.values;
+			if (inset === undefined) {
+				return false;
+			}
+
+			const box = node.getBoundingClientRect();
+			const [top = "0px", right = top, bottom = top, left = right] = inset
+				.trim()
+				.split(/\s+/v, 4);
+			const length = (value: string, size: number) =>
+				value.endsWith("%")
+					? (Number(value.slice(0, -1)) / 100) * size
+					: Number(value.replace(/px$/v, ""));
+			return (
+				length(left, box.width) + length(right, box.width) >= box.width ||
+				length(top, box.height) + length(bottom, box.height) >= box.height
+			);
+		};
+
 		const isShown = (element: Element | null): boolean => {
+			// Text in a transparent colour is invisible, unless a background shows through it.
+			const ink = element === null ? undefined : getComputedStyle(element);
+			if (
+				ink !== undefined &&
+				ink.backgroundClip !== "text" &&
+				(alphaOf(ink.color) === 0 || alphaOf(ink.webkitTextFillColor) === 0)
+			) {
+				return false;
+			}
+
 			for (let node = element; node !== null; node = node.parentElement) {
 				const style = getComputedStyle(node);
 				if (
 					style.display === "none" ||
 					style.visibility === "hidden" ||
 					style.visibility === "collapse" ||
-					Number(style.opacity) === 0
+					Number(style.opacity) === 0 ||
+					isCutAway(node, style.clipPath)
 				) {
 					return false;
 				}

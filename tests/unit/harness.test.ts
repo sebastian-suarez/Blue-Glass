@@ -1,8 +1,9 @@
 import { execFileSync, spawnSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { expect, test } from "vitest";
-import { currentPhase, readManifest } from "../../scripts/lib/phases.ts";
+import { readManifest } from "../../scripts/lib/phases.ts";
 import { root } from "../../scripts/lib/reference.ts";
 import { doesQueryMatch } from "../../scripts/lib/server-render.ts";
 
@@ -18,18 +19,29 @@ test("the ported modules and shared files still match their reference", () => {
 	expect(output).toContain("in sync");
 });
 
-const nextPhase = String(currentPhase() + 1);
-test.skipIf(!Object.hasOwn(readManifest().phases, nextPhase))(
+// The first phase with a module tests/sync.json doesn't record, whatever phase is current.
+const recorded = (
+	JSON.parse(fs.readFileSync(path.join(root, "tests/sync.json"), "utf8")) as {
+		components: Record<string, unknown>;
+	}
+).components;
+const unrecordedPhase = Object.entries(readManifest().phases)
+	.filter(([, modules]) =>
+		modules.some((name) => !Object.hasOwn(recorded, name)),
+	)
+	.map(([phase]) => phase)
+	.toSorted((first, second) => Number(first) - Number(second))
+	.at(0);
+test.skipIf(unrecordedPhase === undefined)(
 	"the sync check fails on a module in scope that was never recorded",
 	() => {
-		// The next phase's modules aren't ported, so none of them is recorded yet.
 		const result = spawnSync(
 			process.execPath,
 			[path.join(root, "scripts/check-sync.ts")],
 			{
 				encoding: "utf8",
 				// eslint-disable-next-line @typescript-eslint/naming-convention -- an environment variable
-				env: { ...process.env, BLUE_GLASS_PHASE: nextPhase },
+				env: { ...process.env, BLUE_GLASS_PHASE: unrecordedPhase },
 			},
 		);
 		expect(result.status).toBe(1);
