@@ -212,6 +212,14 @@ export const Variants: Story = {
 					"divided is the career list (.career-row). Interactive rows are buttons or links on .gl-option; selected is the raised tab.",
 			},
 		},
+		// The preview names its "Repo" link "VSebCode repository", which leaves out the visible label
+		// (axe's label-content-name-mismatch, WCAG 2.5.3). The reference's preview fails the same
+		// rule; this story stays faithful to it.
+		a11y: {
+			config: {
+				rules: [{ id: "label-content-name-mismatch", enabled: false }],
+			},
+		},
 	},
 	render: () => (
 		<div
@@ -316,14 +324,11 @@ export const Variants: Story = {
 					<List aria-label="Own projects">
 						<ListItem
 							secondaryAction={
-								// The preview's name, "VSebCode repository", leaves out the visible
-								// label, "Repo" (axe's label-content-name-mismatch, WCAG 2.5.3 Label
-								// in Name), so voice control can't reach the link by what it shows.
 								<Button
 									size="sm"
 									variant="text"
 									href="#vsebcode-repo"
-									aria-label="VSebCode repo"
+									aria-label="VSebCode repository"
 									endIcon={<Icon name="arrow-ne" />}
 								>
 									Repo
