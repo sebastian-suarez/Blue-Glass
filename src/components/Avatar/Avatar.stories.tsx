@@ -1,11 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import readme from "../../../design-system/components/Avatar/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
-import { Caption, Labelled, Row } from "../../../stories/blocks/preview-kit.js";
+import {
+	Caption,
+	Labelled,
+	Row,
+	Stack,
+} from "../../../stories/blocks/preview-kit.js";
+import { Divider } from "../Divider/index.js";
+import { Paper } from "../Paper/index.js";
+import { Tooltip } from "../Tooltip/index.js";
+import { Typography } from "../Typography/index.js";
 import { Avatar, AvatarGroup } from "./Avatar.js";
-
-// The preview's Example section waits for Tooltip in phase 2: it wraps each employer's avatar
-// in a Tooltip with its name.
 
 const meta = {
 	title: "Data display/Avatar",
@@ -39,6 +45,46 @@ const employers = [
 	"SunDevs",
 	"Limber Health",
 ];
+
+/**
+The Example's card: the header identity, and the employers, each avatar named by its tooltip.
+*/
+function Identity() {
+	return (
+		<Paper style={{ padding: 24, display: "grid", gap: 20, maxWidth: 560 }}>
+			<Row gap={13} wrap={false}>
+				<Avatar variant="tile" aria-hidden="true">
+					ss
+				</Avatar>
+				<span style={{ display: "grid" }}>
+					<Typography
+						variant="name"
+						component="strong"
+						style={{ lineHeight: 1.3 }}
+					>
+						Sebastian Suarez
+					</Typography>
+					<Typography variant="micro" color="muted">
+						Backend lead and architect
+					</Typography>
+				</span>
+			</Row>
+			<Divider />
+			<Row gap={16} style={{ justifyContent: "space-between" }}>
+				<Typography variant="caption" color="muted">
+					Shipped for
+				</Typography>
+				<AvatarGroup max={5} aria-label="Employers">
+					{employers.map((name) => (
+						<Tooltip key={name} title={name} describeChild={false}>
+							<Avatar alt={name} />
+						</Tooltip>
+					))}
+				</AvatarGroup>
+			</Row>
+		</Paper>
+	);
+}
 
 export const Default: Story = {
 	name: "Default",
@@ -159,5 +205,22 @@ export const Variants: Story = {
 				</Labelled>
 			</Row>
 		</>
+	),
+};
+
+export const Example: Story = {
+	name: "Example",
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"The header identity and an employer strip; hover an avatar for its name.",
+			},
+		},
+	},
+	render: () => (
+		<Stack gap={12}>
+			<Identity />
+		</Stack>
 	),
 };

@@ -53,6 +53,7 @@ export {
 } from "./components/Icon/index.js";
 export * from "./components/List/index.js";
 export * from "./components/Table/index.js";
+export { type TooltipProps, Tooltip } from "./components/Tooltip/index.js";
 export {
 	Typography,
 	type TypographyColor,
@@ -87,6 +88,12 @@ export {
 	CircularProgress,
 } from "./components/Progress/index.js";
 export { type SkeletonProps, Skeleton } from "./components/Skeleton/index.js";
+export {
+	type SnackbarCloseReason,
+	type SnackbarOrigin,
+	type SnackbarProps,
+	Snackbar,
+} from "./components/Snackbar/index.js";
 export {
 	type AccordionProps,
 	Accordion,

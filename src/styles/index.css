@@ -16,10 +16,12 @@
 @import "../components/Divider/Divider.css";
 @import "../components/List/List.css";
 @import "../components/Table/Table.css";
+@import "../components/Tooltip/Tooltip.css";
 @import "../components/Alert/Alert.css";
 @import "../components/Dialog/Dialog.css";
 @import "../components/Progress/Progress.css";
 @import "../components/Skeleton/Skeleton.css";
+@import "../components/Snackbar/Snackbar.css";
 @import "../components/Accordion/Accordion.css";
 @import "../components/AppBar/AppBar.css";
 @import "../components/Card/Card.css";

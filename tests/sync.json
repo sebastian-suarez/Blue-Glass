@@ -366,6 +366,25 @@
 				"components/Drawer/preview.html": "408db39347971326",
 				"components/Drawer/reference.tsx": "11a77371f290bfd8"
 			}
+		},
+		"Tooltip": {
+			"files": {
+				"components/Tooltip/README.md": "eea8ac0d78d09895",
+				"components/Tooltip/api.d.ts": "3082170536d58a98",
+				"components/Tooltip/styles.css": "f9b90572781835e3",
+				"components/Tooltip/preview.html": "db80f7f47f4e6020",
+				"components/Tooltip/reference.tsx": "f7fb5d5d691295e4"
+			}
+		},
+		"Snackbar": {
+			"files": {
+				"components/Snackbar/README.md": "40c0461a9185bc43",
+				"components/Snackbar/api.d.ts": "1c587921d822d20d",
+				"components/Snackbar/styles.css": "7a555aaded8550a4",
+				"components/Snackbar/preview.html": "2dc675b6b16f3bc3",
+				"components/Snackbar/reference.tsx": "1f3e2b984fe845d9",
+				"shared/_feedback-live.ts": "fc6737562912f11f"
+			}
 		}
 	}
 }

@@ -1,0 +1,85 @@
+/* Blue Glass — Tooltip, ported from design-system/components/Tooltip/styles.css. The surface is
+   Base UI's Tooltip.Popup, which carries the side it landed on as data-side; the layer is its
+   Positioner. */
+
+@layer gl-components {
+	/* Tooltip — a short ink label (the fill and lift of .btn-primary) floating at z-tooltip. */
+	.gl-tooltip {
+		--gl-tooltip-gap: 8px;
+		position: relative;
+		max-width: min(280px, calc(100vw - 32px));
+		padding: 6px 10px;
+		border-radius: var(--radius-control);
+		background: var(--color-ink);
+		color: var(--on-ink);
+		box-shadow: var(--shadow-primary);
+		font-family: var(--font-sans);
+		font-size: 12px;
+		font-weight: 500;
+		line-height: 1.45;
+		text-align: left;
+		overflow-wrap: break-word;
+	}
+	.gl-tooltip-arrowed {
+		--gl-tooltip-gap: 12px;
+	}
+
+	/* A bridge over the gap to the anchor, so the pointer can move onto the tooltip without it closing. */
+	.gl-tooltip::before {
+		content: "";
+		position: absolute;
+	}
+	.gl-tooltip[data-side="top"]::before {
+		inset-inline: 0;
+		top: 100%;
+		height: calc(var(--gl-tooltip-gap) + 2px);
+	}
+	.gl-tooltip[data-side="bottom"]::before {
+		inset-inline: 0;
+		bottom: 100%;
+		height: calc(var(--gl-tooltip-gap) + 2px);
+	}
+	.gl-tooltip[data-side="left"]::before {
+		inset-block: 0;
+		left: 100%;
+		width: calc(var(--gl-tooltip-gap) + 2px);
+	}
+	.gl-tooltip[data-side="right"]::before {
+		inset-block: 0;
+		right: 100%;
+		width: calc(var(--gl-tooltip-gap) + 2px);
+	}
+	.gl-tooltip-popper-static,
+	.gl-tooltip-popper-static .gl-tooltip {
+		pointer-events: none;
+	}
+	.gl-tooltip-popper-static .gl-tooltip::before {
+		display: none;
+	}
+
+	/* Arrow: an 8px square turned 45deg, half under the surface, centred on the anchor. */
+	.gl-tooltip-arrow {
+		position: absolute;
+		width: 8px;
+		height: 8px;
+		border-radius: 1px;
+		background: inherit;
+		transform: translate(-50%, -50%) rotate(45deg);
+	}
+	.gl-tooltip[data-side="top"] .gl-tooltip-arrow {
+		top: 100%;
+		left: 50%;
+	}
+	.gl-tooltip[data-side="bottom"] .gl-tooltip-arrow {
+		top: 0;
+		left: 50%;
+	}
+	.gl-tooltip[data-side="left"] .gl-tooltip-arrow {
+		top: 50%;
+		left: 100%;
+	}
+	.gl-tooltip[data-side="right"] .gl-tooltip-arrow {
+		top: 50%;
+		left: 0;
+	}
+}
