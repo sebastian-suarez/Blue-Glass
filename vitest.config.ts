@@ -84,6 +84,9 @@ function behaviour(target: keyof typeof targets) {
 
 export default defineConfig({
 	test: {
+		// The stories guard imports every stories file through import.meta.glob, and the file cache
+		// kept an old list, so a new stories file went unchecked.
+		fsModuleCache: false,
 		projects: [
 			{
 				test: {

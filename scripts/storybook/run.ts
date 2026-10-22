@@ -360,13 +360,23 @@ async function candidates(
 	/* eslint-disable no-await-in-loop -- one element at a time, in order */
 	for (let index = 0; index < count; index++) {
 		const match = all.nth(index);
-		const where = await match.evaluate((element, areas) => {
-			if (element.closest(areas.area) !== null) {
-				return "inside";
-			}
+		// An overlay can unmount between the count and this call, at the end of its exit
+		// transition, which is what a step that hides it waits for: count it as gone.
+		const where = await match
+			.evaluate(
+				(element, areas) => {
+					if (element.closest(areas.area) !== null) {
+						return "inside";
+					}
 
-			return element.closest(areas.app) === null ? "portalled" : "elsewhere";
-		}, scope);
+					return element.closest(areas.app) === null
+						? "portalled"
+						: "elsewhere";
+				},
+				scope,
+				{ timeout: 1000 },
+			)
+			.catch(() => "gone");
 		if (where === "inside") {
 			inside.push(match);
 		} else if (where === "portalled") {
