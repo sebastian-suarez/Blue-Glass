@@ -85,3 +85,23 @@ Adapter: `src/internal/transition.ts`. Tests: `src/internal/transition.test.ts` 
 - **Actual:** a child that is `in` when React renders it on the server, or hydrates it, starts entered whatever `appear` says: its server HTML is visible, and hydrating it reports `onEntered` and animates nothing, as `appear={false}` would. `appear` still runs the enter transition on client-side mounts: `createRoot`, a portal, a Suspense boundary that renders on the client, and anything mounted after hydration.
 - **Reason:** server HTML must be usable before hydration (`docs/package-plan.md`). The reference starts an appearing child at exited, so its server HTML holds `<Fade in>` and the other transitions at opacity 0 and visibility hidden until the script runs, a reference defect (`docs/reference-defects.md`).
 - **Tests:** "content that is in renders entered and visible, even with appear" (the adapter's and the components'); "hydrating the server HTML raises no error and animates nothing" (the adapter's) and "… changes nothing and animates nothing" (the components'); the behaviour specs' client mounts with `appear`.
+
+## Popover and Menu
+
+Adapter: `src/internal/popup-layer.tsx`, placing through `src/internal/anchor.ts`. Tests: `src/internal/popup-layer.test.tsx` and `src/internal/anchor.browser.test.tsx`.
+
+### 10. An open popup in place arrives with hydration
+
+- **Components:** Popover and Menu.
+- **Documented:** `disablePortal` renders "in place (inside a showcase stage) instead of in document.body".
+- **Actual:** in place, the popup goes through Base UI's portal into a `display: contents` span rendered where the component is. The portal renders nothing on the server, so an open Popover or Menu in place is in the page once its script runs, and the server HTML holds only the span.
+- **Reason:** Base UI's Popover and Menu render their popup through their portal part only. The reference's server HTML holds the open popup, but at `left: -9999px` and behind its transition's starting opacity until a layout effect measures the anchor, so it isn't usable before hydration there either. No preview opens a popup on the server.
+- **Tests:** none pins it: the server-HTML gate's previews open their popups after mount, the reference's too.
+
+### 11. A new `offset` on an open popup applies at its next placement
+
+- **Components:** Popover and Menu.
+- **Documented:** `offset` is the "gap to the anchor in px".
+- **Actual:** a popup that opens takes its `offset` at once. An open one takes a new `offset` when Base UI next places it: a scroll, a resize, or a change in the anchor's or the popup's size.
+- **Reason:** to land on the reference's pixels, the offsets reach Base UI as functions (`toWholePixelOffsets` in `src/internal/anchor.ts`), and Base UI keys its offset middleware to a constant when the offset is a function (`useAnchorPositioning`), so a new function doesn't place the popup again. The reference places its popup after every render. Forcing a placement would mean a synthetic window resize.
+- **Tests:** none.
