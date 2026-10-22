@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import readme from "../../../design-system/components/Divider/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
-import { Row } from "../../../stories/blocks/preview-kit.js";
+import { Caption, Row, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Icon } from "../Icon/index.js";
+import {
+	List,
+	ListItem,
+	ListItemIcon,
+	ListItemText,
+} from "../List/index.js";
 import { Paper } from "../Paper/index.js";
 import { Typography } from "../Typography/index.js";
 import { Divider } from "./Divider.js";
-
-// The preview's Variants section is left out until List is ported: its first specimen is an
-// inset divider between ListItems.
 
 const meta = {
 	title: "Data display/Divider",
@@ -117,6 +120,115 @@ export const Default: Story = {
 				Some dates overlap because I also held a side job.
 			</Typography>
 		</Paper>
+	),
+};
+
+// Two specimens a row, each at least 220px wide.
+const specimens = {
+	display: "grid",
+	gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+	gap: 20,
+} as const;
+
+export const Variants: Story = {
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"inset lines up with list text after an icon; middle stops 16px short of both ends.",
+			},
+		},
+	},
+	render: () => (
+		<>
+			<div style={specimens}>
+				<Stack gap={8}>
+					<Paper variant="inset" style={{ padding: 7 }}>
+						<List>
+							<ListItem>
+								<ListItemIcon>
+									<Icon name="mail" />
+								</ListItemIcon>
+								<ListItemText primary="Email" />
+							</ListItem>
+							<Divider component="li" variant="inset" />
+							<ListItem>
+								<ListItemIcon>
+									<Icon name="code" />
+								</ListItemIcon>
+								<ListItemText primary="GitHub" />
+							</ListItem>
+							<Divider component="li" variant="inset" />
+							<ListItem>
+								<ListItemIcon>
+									<Icon name="globe" />
+								</ListItemIcon>
+								<ListItemText primary="Medellín, Colombia" />
+							</ListItem>
+						</List>
+					</Paper>
+					<Caption>inset, in a list (component=&quot;li&quot;)</Caption>
+				</Stack>
+				<Stack gap={8}>
+					<Paper
+						variant="inset"
+						style={{ padding: "12px 0 18px", display: "grid", gap: 12 }}
+					>
+						{(["full", "middle", "inset"] as const).map((variant) => (
+							<div key={variant} style={{ display: "grid", gap: 8 }}>
+								<Typography
+									variant="micro"
+									color="muted"
+									style={{ paddingInline: 16 }}
+								>
+									{variant}
+								</Typography>
+								<Divider variant={variant} />
+							</div>
+						))}
+					</Paper>
+					<Caption>each variant against the well&apos;s edges</Caption>
+				</Stack>
+			</div>
+			<Row gap={28} align="flex-start">
+				<Stack gap={8}>
+					<Row gap={12}>
+						<Typography variant="caption">Node.js</Typography>
+						<Divider orientation="vertical" />
+						<Typography variant="caption">TypeScript</Typography>
+						<Divider orientation="vertical" />
+						<Typography variant="caption">AWS</Typography>
+					</Row>
+					<Caption>vertical: one text line tall</Caption>
+				</Stack>
+				<Stack gap={8}>
+					<Row gap={12} align="stretch" wrap={false}>
+						<Button size="sm">Download</Button>
+						<Divider flexItem orientation="vertical" />
+						<Button size="sm">Share</Button>
+					</Row>
+					<Caption>vertical · flexItem: full row height</Caption>
+				</Stack>
+				<Stack gap={8}>
+					<Row gap={12} align="stretch" wrap={false}>
+						<Button size="sm">Download</Button>
+						<Divider flexItem orientation="vertical" variant="middle" />
+						<Button size="sm">Share</Button>
+					</Row>
+					<Caption>flexItem · middle</Caption>
+				</Stack>
+			</Row>
+			<div style={specimens}>
+				<Stack gap={8}>
+					<Divider>Earlier roles</Divider>
+					<Caption>label, centred</Caption>
+				</Stack>
+				<Stack gap={8}>
+					<Divider textAlign="left">Earlier roles</Divider>
+					<Caption>label, at the start</Caption>
+				</Stack>
+			</div>
+		</>
 	),
 };
 
