@@ -55,6 +55,12 @@ export {
 	type AlertTitleProps,
 	AlertTitle,
 } from "./components/Alert/index.js";
+export {
+	type LinearProgressProps,
+	LinearProgress,
+	type CircularProgressProps,
+	CircularProgress,
+} from "./components/Progress/index.js";
 export { type SkeletonProps, Skeleton } from "./components/Skeleton/index.js";
 export {
 	type AccordionProps,
