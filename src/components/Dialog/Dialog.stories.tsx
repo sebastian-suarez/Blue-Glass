@@ -222,7 +222,7 @@ function useOpen(): {
 }
 
 /**
-scroll="paper": the release notes scroll between the title and Done.
+`scroll="paper"`: the release notes scroll between the title and Done.
 */
 function ReleaseNotes() {
 	const { isOpen, open, close } = useOpen();
@@ -259,7 +259,7 @@ function ReleaseNotes() {
 }
 
 /**
-fullScreen: the calibration fills its stage with square corners.
+`fullScreen`: the calibration fills its stage with square corners.
 */
 function Calibrate() {
 	const { isOpen, open, close } = useOpen();

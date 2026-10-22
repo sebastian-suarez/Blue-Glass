@@ -59,7 +59,7 @@ export type DialogProps = Omit<
 	*/
 	fullScreen?: boolean | "phone";
 	/**
-	paper: the content scrolls between a fixed title and actions, fading at its edges (default). body: the whole dialog scrolls in its layer.
+	`paper`: the content scrolls between a fixed title and actions, fading at its edges (default). `body`: the whole dialog scrolls in its layer.
 	*/
 	scroll?: DialogScroll;
 	/**
@@ -278,14 +278,14 @@ export function Dialog({
 						className={cx(
 							"gl-dialog-container",
 							`gl-dialog-scroll-${scroll}`,
-							screen && `gl-dialog-container-${screen}`,
+							screen !== undefined && `gl-dialog-container-${screen}`,
 						)}
 						data-transition={status}
 						onMouseDown={(event) => {
 							const layer = event.currentTarget;
 							pressedRef.current =
 								event.target === layer && !isOnScrollbar(layer, event);
-							if (pressedRef.current && disableEnforceFocus !== true) {
+							if (disableEnforceFocus !== true && pressedRef.current) {
 								event.preventDefault();
 							}
 						}}
@@ -323,7 +323,7 @@ export function Dialog({
 									"gl-dialog-paper",
 									maxWidth !== false && `gl-dialog-paper-${maxWidth}`,
 									fullWidth && "gl-dialog-paper-full-width",
-									screen && `gl-dialog-paper-${screen}`,
+									screen !== undefined && `gl-dialog-paper-${screen}`,
 									paperProps?.className,
 								)}
 							>
@@ -348,7 +348,7 @@ export function DialogTitle({
 	...rest
 }: DialogTitleProps & { ref?: React.Ref<HTMLHeadingElement> }) {
 	const id = useId(idProp);
-	const context = React.useContext(DialogContext);
+	const context = React.use(DialogContext);
 	useIsoLayoutEffect(() => context?.registerTitle(id), [context, id]);
 	return (
 		<h2
@@ -376,7 +376,7 @@ export function DialogContent({
 	ref,
 	...rest
 }: DialogContentProps & { ref?: React.Ref<HTMLDivElement> }) {
-	const context = React.useContext(DialogContext);
+	const context = React.use(DialogContext);
 	const isScrolling = (context?.scroll ?? "paper") === "paper";
 	const nodeRef = React.useRef<HTMLDivElement | null>(null);
 	const handleRef = useForkRef(nodeRef, ref);
@@ -387,15 +387,16 @@ export function DialogContent({
 
 	const measure = useEventCallback(() => {
 		const element = nodeRef.current;
-		const top = element !== null && isScrolling && element.scrollTop > 1;
-		const bottom =
+		const hasMoreAbove =
+			element !== null && isScrolling && element.scrollTop > 1;
+		const hasMoreBelow =
 			element !== null &&
 			isScrolling &&
 			element.scrollTop + element.clientHeight < element.scrollHeight - 1;
 		setEdges((previous) =>
-			previous.top === top && previous.bottom === bottom
+			previous.top === hasMoreAbove && previous.bottom === hasMoreBelow
 				? previous
-				: { top, bottom },
+				: { top: hasMoreAbove, bottom: hasMoreBelow },
 		);
 	});
 
@@ -434,7 +435,7 @@ export function DialogContent({
 			)}
 			data-fade-top={edges.top ? "" : undefined}
 			data-fade-bottom={edges.bottom ? "" : undefined}
-			// A scrolling region with nothing focusable in it still has to be reachable by keyboard.
+			// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex -- A scrolling region with nothing focusable in it still has to be reachable by keyboard.
 			tabIndex={isOverflowing ? 0 : undefined}
 			onScroll={(event) => {
 				measure();
@@ -458,7 +459,7 @@ export function DialogContentText({
 	...rest
 }: DialogContentTextProps & { ref?: React.Ref<HTMLParagraphElement> }) {
 	const id = useId(idProp);
-	const context = React.useContext(DialogContext);
+	const context = React.use(DialogContext);
 	useIsoLayoutEffect(() => context?.registerDescription(id), [context, id]);
 	return (
 		<p

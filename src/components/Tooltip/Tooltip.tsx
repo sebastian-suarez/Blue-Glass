@@ -80,8 +80,8 @@ export type TooltipProps = Omit<
 	*/
 	leaveTouchDelay?: number;
 	/**
-	true (default): the title describes the child (aria-describedby while open).
-	false: the title names the child (aria-label), for icon-only buttons.
+	`true` (default): the title describes the child (aria-describedby while open).
+	`false`: the title names the child (aria-label), for icon-only buttons.
 	*/
 	describeChild?: boolean;
 	/**
@@ -120,7 +120,7 @@ export type TooltipProps = Omit<
 Shared by every tooltip on the page: while one is open, or for 300ms after it closes, the next
 one opens at once and without animation (moving along a toolbar).
 */
-const handOff = { open: 0, lastClose: Number.NEGATIVE_INFINITY };
+const handOff = { open: 0, lastClose: -Infinity };
 const handOffMs = 300;
 
 function isHandOff(): boolean {
@@ -217,9 +217,10 @@ function ArrowAtAnchor({
 		// The layer is never scaled (the Grow is on the surface), so its box is the true position.
 		const b = layer.getBoundingClientRect();
 		const length = isVertical ? surface.offsetWidth : surface.offsetHeight;
+		const halfAnchor = (isVertical ? a.width : a.height) / 2;
 		const raw = isVertical
-			? a.left + a.width / 2 - b.left
-			: a.top + a.height / 2 - b.top;
+			? a.left + halfAnchor - b.left
+			: a.top + halfAnchor - b.top;
 		const next = Math.round(
 			Math.min(
 				Math.max(raw, arrowInset),
@@ -273,11 +274,9 @@ function usePortalContainer(
 			setResolved((container() as HTMLElement | null) ?? bodyRef);
 		}
 	}, [container]);
-	if (typeof container === "function") {
-		return resolved;
-	}
-
-	return (container as HTMLElement | null | undefined) ?? bodyRef;
+	return typeof container === "function"
+		? resolved
+		: ((container as HTMLElement | null | undefined) ?? bodyRef);
 }
 
 /**
@@ -285,7 +284,7 @@ Every open and close comes from this component's own handlers, so what Base UI a
 outside press, its own Escape, the pointer leaving the popup) is cancelled, and its event goes on.
 */
 function cancelBaseUiChange(
-	_open: boolean,
+	_isOpen: boolean,
 	details: BaseTooltip.Root.ChangeEventDetails,
 ): void {
 	details.cancel();
@@ -424,15 +423,17 @@ export function Tooltip({
 			hide(event);
 		}
 
-		document_.addEventListener("keydown", handleKeyDown, true);
+		document_.addEventListener("keydown", handleKeyDown, { capture: true });
 		return () => {
-			document_.removeEventListener("keydown", handleKeyDown, true);
+			document_.removeEventListener("keydown", handleKeyDown, {
+				capture: true,
+			});
 		};
 	}, [isOpen, isEscapeHeard, anchor, hide]);
 
 	const handlePointerEnter = (event: React.PointerEvent<HTMLElement>) => {
 		base.onPointerEnter?.(event);
-		if (event.pointerType === "touch" || disableHoverListener || !hasTitle) {
+		if (disableHoverListener || !hasTitle || event.pointerType === "touch") {
 			return;
 		}
 
@@ -456,6 +457,7 @@ export function Tooltip({
 			}, enterDelay);
 		}
 	};
+
 	const handlePointerLeave = (event: React.PointerEvent<HTMLElement>) => {
 		base.onPointerLeave?.(event);
 		if (event.pointerType === "touch") {
@@ -469,6 +471,7 @@ export function Tooltip({
 			hideLater(event, disableInteractive ? 0 : leaveDelay);
 		}
 	};
+
 	const handlePointerDown = (event: React.PointerEvent<HTMLElement>) => {
 		base.onPointerDown?.(event);
 		if (event.pointerType === "touch") {
@@ -487,6 +490,7 @@ export function Tooltip({
 		reasonsRef.current.focus = false;
 		hide(event);
 	};
+
 	// The finger lifted, or the browser took the touch over: it stays leaveTouchDelay more.
 	const handleTouchEnd = (event: React.PointerEvent<HTMLElement>) => {
 		if (event.pointerType !== "touch") {
@@ -498,14 +502,17 @@ export function Tooltip({
 			hide(event);
 		}, leaveTouchDelay);
 	};
+
 	const handlePointerUp = (event: React.PointerEvent<HTMLElement>) => {
 		base.onPointerUp?.(event);
 		handleTouchEnd(event);
 	};
+
 	const handlePointerCancel = (event: React.PointerEvent<HTMLElement>) => {
 		base.onPointerCancel?.(event);
 		handleTouchEnd(event);
 	};
+
 	const handleFocus = (event: React.FocusEvent<HTMLElement>) => {
 		base.onFocus?.(event);
 		// Keyboard focus only: the focus a press gives isn't :focus-visible.
@@ -520,6 +527,7 @@ export function Tooltip({
 		reasonsRef.current.focus = true;
 		show(event, isHandOff());
 	};
+
 	const handleBlur = (event: React.FocusEvent<HTMLElement>) => {
 		base.onBlur?.(event);
 		reasonsRef.current.focus = false;
@@ -530,9 +538,10 @@ export function Tooltip({
 
 	const handleRef = useForkRef<HTMLElement>(setAnchor, child.props.ref, ref);
 	const isLabel = !describeChild && typeof title === "string";
+	const childClassName = cx(other.className, child.props.className);
 	const merged: ChildProps & Record<string, unknown> = {
 		...base,
-		className: cx(other.className, child.props.className) || undefined,
+		className: childClassName === "" ? undefined : childClassName,
 		style:
 			other.style === undefined && child.props.style === undefined
 				? undefined
@@ -562,7 +571,7 @@ export function Tooltip({
 	const {
 		// The tooltip decides these, as in the reference.
 		open: _open,
-		anchorEl: _anchorEl,
+		anchorEl: _anchorElement,
 		children: _children,
 		transition: _transition,
 		placement: popperPlacement = placement,
@@ -614,7 +623,7 @@ export function Tooltip({
 
 	return (
 		<>
-			{/* eslint-disable-next-line @eslint-react/no-clone-element -- The reference's contract: the child gets the handlers. */}
+			{/* eslint-disable-next-line @eslint-react/no-clone-element, react-hooks/refs -- The reference's contract: the child gets the handlers and the forked ref, which nothing reads while rendering. */}
 			{React.cloneElement(child, merged)}
 			{hasTitle && isInPlace ? (
 				// In place, Base UI portals into this: it lays out nothing itself.
@@ -651,7 +660,7 @@ export function Tooltip({
 							style={{
 								zIndex,
 								...positionerVariables,
-								...(matchWidth ? anchorWidthStyle : undefined),
+								...(matchWidth && anchorWidthStyle),
 								...popperStyle,
 							}}
 						>

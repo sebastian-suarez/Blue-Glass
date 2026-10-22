@@ -9,7 +9,7 @@ export type LinearProgressProps = Omit<
 	"color"
 > & {
 	/**
-	determinate: a bar for value. buffer: value plus valueBuffer. indeterminate (default): a bar slides while the length is unknown.
+	`determinate`: a bar for value. `buffer`: value plus valueBuffer. `indeterminate` (default): a bar slides while the length is unknown.
 	*/
 	variant?: "determinate" | "indeterminate" | "buffer";
 	/**
@@ -33,7 +33,7 @@ export type LinearProgressProps = Omit<
 	*/
 	showValue?: boolean;
 	/**
-	default: color-blue on a color-line track. inherit: currentColor, for dark grounds.
+	`default`: color-blue on a color-line track. `inherit`: currentColor, for dark grounds.
 	*/
 	color?: "default" | "inherit";
 };
@@ -43,7 +43,7 @@ export type CircularProgressProps = Omit<
 	"color"
 > & {
 	/**
-	determinate: an arc for value. indeterminate (default): a turning arc that grows and shrinks.
+	`determinate`: an arc for value. `indeterminate` (default): a turning arc that grows and shrinks.
 	*/
 	variant?: "determinate" | "indeterminate";
 	/**
@@ -51,7 +51,7 @@ export type CircularProgressProps = Omit<
 	*/
 	value?: number;
 	/**
-	xs 20px, sm 28px, md 40px (default), lg 56px, or a number of px.
+	`xs` 20px, `sm` 28px, `md` 40px (default), `lg` 56px, or a number of px.
 	*/
 	size?: "xs" | "sm" | "md" | "lg" | number;
 	/**
@@ -63,7 +63,7 @@ export type CircularProgressProps = Omit<
 	*/
 	showValue?: boolean;
 	/**
-	default: color-blue on a color-line ring. inherit: currentColor, for dark grounds.
+	`default`: color-blue on a color-line ring. `inherit`: currentColor, for dark grounds.
 	*/
 	color?: "default" | "inherit";
 };
@@ -115,7 +115,7 @@ export function LinearProgress({
 		<Progress.Root
 			ref={ref}
 			id={id}
-			// null keeps Base UI indeterminate: no aria-valuenow, no indicator width.
+			// `null` keeps Base UI indeterminate: no aria-valuenow, no indicator width.
 			value={isDeterminate ? clamped : null}
 			// The documented attributes, set while rendering so the server HTML has them: the rounded
 			// value, the label's id (Base UI wires it only once the label mounts), and valueText alone
@@ -202,9 +202,9 @@ export function CircularProgress({
 	const clamped = clamp(value);
 	return (
 		<Progress.Root
+			ref={ref as React.Ref<HTMLDivElement> | undefined}
 			// The documented root is a span, so the ring sits in a line of text.
 			render={<span />}
-			ref={ref as React.Ref<HTMLDivElement> | undefined}
 			value={isDeterminate ? clamped : null}
 			aria-valuenow={isDeterminate ? Math.round(clamped) : undefined}
 			aria-valuetext={undefined}

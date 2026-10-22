@@ -12,7 +12,7 @@ export type AlertProps = React.HTMLAttributes<HTMLDivElement> & {
 	*/
 	severity?: AlertSeverity;
 	/**
-	standard: the soft status tint (default). outlined: glass-control with a 1px status border. filled: the status fill under on-ink.
+	`standard`: the soft status tint (default). `outlined`: glass-control with a 1px status border. `filled`: the status fill under on-ink.
 	*/
 	variant?: "standard" | "outlined" | "filled";
 	/**

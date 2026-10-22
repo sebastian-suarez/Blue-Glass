@@ -62,7 +62,7 @@ export function ClickAwayListener({
 	const handleEvent = useEventCallback(
 		(event: MouseEvent | TouchEvent | PointerEvent) => {
 			const node = nodeRef.current;
-			if (!isActiveRef.current || node === null) {
+			if (node === null || !isActiveRef.current) {
 				return;
 			}
 

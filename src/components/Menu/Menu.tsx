@@ -250,13 +250,15 @@ export function Menu({
 									onKeyDown?.(event);
 									// A menu is one tab stop: Tab closes it, and focus returns to the button.
 									if (
-										event.key === "Tab" &&
-										!event.defaultPrevented &&
-										layer.isReporting()
+										event.key !== "Tab" ||
+										event.defaultPrevented ||
+										!layer.isReporting()
 									) {
-										event.preventDefault();
-										onClose?.(event, "tabKeyDown");
+										return;
 									}
+
+									event.preventDefault();
+									onClose?.(event, "tabKeyDown");
 								}}
 								{...popupFocusProps}
 								{...rest}

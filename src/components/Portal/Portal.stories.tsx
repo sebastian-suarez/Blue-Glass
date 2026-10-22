@@ -36,7 +36,7 @@ function Places({
 	onDisablePortalChange,
 	...props
 }: PortalProps & {
-	readonly onDisablePortalChange: (disablePortal: boolean) => void;
+	readonly onDisablePortalChange: (isPortalDisabled: boolean) => void;
 }) {
 	// The container is a ref's element, so it arrives after the first render.
 	const [target, setTarget] = React.useState<HTMLDivElement | null>(null);

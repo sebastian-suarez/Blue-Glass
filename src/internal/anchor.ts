@@ -231,7 +231,7 @@ function toWholePixels(size: number): number {
 }
 
 /**
-toPositionerProps' sideOffset and alignOffset, corrected to land where the reference's
+The sideOffset and alignOffset of toPositionerProps, corrected to land where the reference's
 computePosition does, to the pixel. The reference places a popup from its offsetWidth and
 offsetHeight, whole pixels, and Base UI from its exact size, so where the size moves the popup
 (the top and left sides, end and center alignments) a fractional size lands a pixel apart, and

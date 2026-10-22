@@ -904,9 +904,12 @@ export function ModalLayer(props: ModalLayerProps) {
 			return;
 		}
 
-		const content = contentRef.current;
+		const contentElement = contentRef.current;
 		onClose?.(
-			toSyntheticEvent(event, findSurface(content) ?? content ?? undefined),
+			toSyntheticEvent(
+				event,
+				findSurface(contentElement) ?? contentElement ?? undefined,
+			),
 			"escapeKeyDown",
 		);
 	});

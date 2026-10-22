@@ -48,10 +48,8 @@ export function Portal({
 		return <>{children}</>;
 	}
 
-	// Neither the server render nor hydration gets past here, so neither touches the DOM.
-	if (isHydrating) {
-		return null;
-	}
-
-	return createPortal(children, resolveContainer(container));
+	// The server render and hydration render nothing here, so neither touches the DOM.
+	return isHydrating
+		? null
+		: createPortal(children, resolveContainer(container));
 }

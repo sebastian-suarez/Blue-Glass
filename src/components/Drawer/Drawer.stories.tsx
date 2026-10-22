@@ -180,7 +180,7 @@ function SiteMenuWithArgs(
 const repository = "https://github.com/sebastian-suarez/VSebCode";
 
 /**
-right · flush: the project's details, flush to the right edge.
+Right · flush: the project's details, flush to the right edge.
 */
 function ProjectDetails() {
 	const [isOpen, setIsOpen] = React.useState(true);
@@ -245,7 +245,7 @@ function ProjectDetails() {
 }
 
 /**
-bottom · sheet with grab handle: sharing a project, dragged down to close.
+Bottom · sheet with grab handle: sharing a project, dragged down to close.
 */
 function ShareSheet() {
 	const [isOpen, setIsOpen] = React.useState(true);
@@ -319,7 +319,7 @@ const chapters = [
 ];
 
 /**
-persistent: the contents beside the article, pushing it aside. As in the preview it starts closed
+`persistent`: the contents beside the article, pushing it aside. As in the preview it starts closed
 on phones, and narrower there; the README swaps drawers on phones with useMediaQuery too.
 */
 function Contents() {
@@ -402,7 +402,7 @@ function Contents() {
 const resume = ["Summary", "Experience", "Education", "Skills"];
 
 /**
-permanent: the résumé's sections, beside the page on wide screens and above it on phones.
+`permanent`: the résumé's sections, beside the page on wide screens and above it on phones.
 */
 function ResumeSections() {
 	const isPhone = useMediaQuery(media.phone);

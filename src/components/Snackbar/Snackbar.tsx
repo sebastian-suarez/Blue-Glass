@@ -187,13 +187,13 @@ export function Snackbar({
 		clear();
 	});
 	const release = useEventCallback((why: Hold) => {
-		if (!holdsRef.current.delete(why) || holdsRef.current.size > 0) {
+		const wasHeld = holdsRef.current.delete(why);
+		if (!wasHeld || !open || !hasTimeout || holdsRef.current.size > 0) {
 			return;
 		}
 
-		if (open && hasTimeout) {
-			arm(resumeHideDuration ?? autoHideDuration / 2);
-		}
+		const halfDuration = autoHideDuration / 2;
+		arm(resumeHideDuration ?? halfDuration);
 	});
 
 	React.useEffect(() => {

@@ -85,16 +85,14 @@ export type PopperProps = Omit<
 	disablePortal?: boolean;
 	container?: PortalProps["container"];
 	/**
-	z-index; default the z-modal token.
+	`z-index`; default the z-modal token.
 	*/
 	zIndex?: string | number;
 	children?: React.ReactNode | ((props: PopperChildProps) => React.ReactNode);
 };
 
-function resolveAnchor(
-	anchorEl: AnchorEl,
-): HTMLElement | VirtualElement | null {
-	return typeof anchorEl === "function" ? anchorEl() : anchorEl;
+function resolveAnchor(anchor: AnchorEl): HTMLElement | VirtualElement | null {
+	return typeof anchor === "function" ? anchor() : anchor;
 }
 
 function isSamePosition(a: PositionResult, b: PositionResult): boolean {
@@ -177,7 +175,7 @@ export function Popper({
 		};
 
 		// Capture, so a scrolling ancestor's scroll reaches it too.
-		window.addEventListener("scroll", onChange, true);
+		window.addEventListener("scroll", onChange, { capture: true });
 		window.addEventListener("resize", onChange);
 		const observer =
 			typeof ResizeObserver === "undefined"
@@ -192,7 +190,7 @@ export function Popper({
 		}
 
 		return () => {
-			window.removeEventListener("scroll", onChange, true);
+			window.removeEventListener("scroll", onChange, { capture: true });
 			window.removeEventListener("resize", onChange);
 			observer?.disconnect();
 		};

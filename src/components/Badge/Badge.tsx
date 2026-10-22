@@ -13,7 +13,7 @@ export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
 	*/
 	badgeContent?: React.ReactNode;
 	/**
-	standard: the count pill (18px, 11px text). dot: an 8px dot, no text.
+	`standard`: the count pill (18px, 11px text). `dot`: an 8px dot, no text.
 	*/
 	variant?: "standard" | "dot";
 	/**
@@ -37,7 +37,7 @@ export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
 	*/
 	anchor?: BadgeAnchor;
 	/**
-	circular pulls the pill in onto a round child such as an Avatar. Default rectangular.
+	`circular` pulls the pill in onto a round child such as an Avatar. Default `rectangular`.
 	*/
 	overlap?: "rectangular" | "circular";
 	/**

@@ -50,11 +50,11 @@ export type DrawerProps = Omit<
 	*/
 	anchor?: DrawerAnchor;
 	/**
-	temporary: a modal panel over a scrim (default). persistent: slides in and pushes the content beside it. permanent: a static panel.
+	`temporary`: a modal panel over a scrim (default). `persistent`: slides in and pushes the content beside it. `permanent`: a static panel.
 	*/
 	variant?: "temporary" | "persistent" | "permanent";
 	/**
-	true: floats 12px in from the edges on radius-panel (default). false: flush to the edge, only the inner corners rounded.
+	`true`: floats 12px in from the edges on radius-panel (default). `false`: flush to the edge, only the inner corners rounded.
 	*/
 	inset?: boolean;
 	/**
@@ -70,43 +70,43 @@ export type DrawerProps = Omit<
 	*/
 	closeLabel?: string;
 	/**
-	temporary: no scrim; the page behind stays visible.
+	`temporary`: no scrim; the page behind stays visible.
 	*/
 	hideBackdrop?: boolean;
 	/**
-	temporary: keep the panel mounted while closed.
+	`temporary`: keep the panel mounted while closed.
 	*/
 	keepMounted?: boolean;
 	/**
-	temporary: render in place instead of in document.body.
+	`temporary`: render in place instead of in document.body.
 	*/
 	disablePortal?: boolean;
 	/**
-	temporary: don't lock the page's scroll.
+	`temporary`: don't lock the page's scroll.
 	*/
 	disableScrollLock?: boolean;
 	/**
-	temporary: don't move focus into the panel on open.
+	`temporary`: don't move focus into the panel on open.
 	*/
 	disableAutoFocus?: boolean;
 	/**
-	temporary: let focus leave the panel while open.
+	`temporary`: let focus leave the panel while open.
 	*/
 	disableEnforceFocus?: boolean;
 	/**
-	temporary: don't return focus to the opener on close.
+	`temporary`: don't return focus to the opener on close.
 	*/
 	disableRestoreFocus?: boolean;
 	/**
-	temporary: Escape doesn't close it.
+	`temporary`: Escape doesn't close it.
 	*/
 	disableEscapeKeyDown?: boolean;
 	/**
-	temporary: where to portal, default document.body.
+	`temporary`: where to portal, default document.body.
 	*/
 	container?: Element | (() => Element | null) | null;
 	/**
-	temporary: slide timing in ms (default 280 in, 220 out).
+	`temporary`: slide timing in ms (default 280 in, 220 out).
 	*/
 	transitionDuration?: number | { enter?: number; exit?: number };
 	/**
@@ -183,13 +183,13 @@ function useSheetDrag(
 
 	const end = (event: React.PointerEvent<HTMLDivElement>) => {
 		const drag = dragRef.current;
-		if (!drag || drag.id !== event.pointerId) {
+		if (drag?.id !== event.pointerId) {
 			return;
 		}
 
 		dragRef.current = null;
 		const height = paperRef.current?.offsetHeight ?? 1;
-		// px per ms at release
+		// Speed at release, in px per ms.
 		const velocity =
 			(drag.dy - drag.previousDy) / Math.max(1, drag.time - drag.previousTime);
 		if (
@@ -198,7 +198,7 @@ function useSheetDrag(
 			(drag.dy > Math.min(120, height * 0.3) || velocity > 0.5)
 		) {
 			onSwipe(event);
-			// onClose only asks: a parent that keeps the sheet open gets it back in place.
+			// `onClose` only asks: a parent that keeps the sheet open gets it back in place.
 			requestAnimationFrame(() => {
 				if (isOpenNow()) {
 					offset(0, true);
@@ -227,7 +227,7 @@ function useSheetDrag(
 		},
 		onPointerMove(event) {
 			const drag = dragRef.current;
-			if (!drag || drag.id !== event.pointerId) {
+			if (drag?.id !== event.pointerId) {
 				return;
 			}
 
@@ -292,7 +292,9 @@ export function Drawer({
 	const hasTitle = Boolean(title);
 	const labelledBy = props["aria-labelledby"];
 	const named =
-		hasTitle && !labelledBy && !props["aria-label"] ? titleId : labelledBy;
+		hasTitle && (labelledBy ?? "") === "" && (props["aria-label"] ?? "") === ""
+			? titleId
+			: labelledBy;
 	const header =
 		hasTitle || canClose ? (
 			<div className="gl-drawer-header">
@@ -340,10 +342,12 @@ export function Drawer({
 		inset ? "gl-drawer-inset" : "gl-drawer-flush",
 		className,
 	);
-	const rootStyle = {
+	const rootStyle: React.CSSProperties & {
+		"--gl-drawer-width": string | undefined;
+	} = {
 		"--gl-drawer-width": typeof width === "number" ? `${width}px` : width,
 		...style,
-	} as React.CSSProperties;
+	};
 
 	if (variant === "temporary") {
 		return (
@@ -383,7 +387,7 @@ export function Drawer({
 		<div
 			ref={ref}
 			role={role}
-			aria-labelledby={role ? named : labelledBy}
+			aria-labelledby={role === undefined || role === "" ? labelledBy : named}
 			className={rootClass}
 			style={rootStyle}
 			data-open={isShown ? "" : undefined}

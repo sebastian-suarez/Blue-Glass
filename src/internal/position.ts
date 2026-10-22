@@ -42,7 +42,7 @@ export type PositionResult = {
 	y: number;
 	placement: Placement;
 	/**
-	transform-origin for origin-aware scale-in, relative to the floating box.
+	`transform-origin` for origin-aware scale-in, relative to the floating box.
 	*/
 	origin: string;
 	maxHeight: number;
@@ -65,10 +65,13 @@ function isVertical(side: Side): boolean {
 /**
 Whether a computed style makes its element the containing block of fixed descendants.
 */
-function containsFixed(style: CSSStyleDeclaration): boolean {
+function isFixedContainingBlock(style: CSSStyleDeclaration): boolean {
 	// Safari before 18 has only the prefixed property.
+	const standardBackdropFilter = style.getPropertyValue("backdrop-filter");
 	const backdropFilter =
-		style.backdropFilter || style.getPropertyValue("-webkit-backdrop-filter");
+		standardBackdropFilter === ""
+			? style.getPropertyValue("-webkit-backdrop-filter")
+			: standardBackdropFilter;
 	return (
 		style.transform !== "none" ||
 		style.perspective !== "none" ||
@@ -80,7 +83,7 @@ function containsFixed(style: CSSStyleDeclaration): boolean {
 }
 
 /**
-position: fixed is relative to the viewport unless an ancestor creates a containing block
+`position: fixed` is relative to the viewport unless an ancestor creates a containing block
 (transform, filter, backdrop-filter, contain, will-change). Returns that block's box in viewport
 coordinates, or null for the viewport.
 */
@@ -90,7 +93,7 @@ export function containingBlock(
 	const root = element?.ownerDocument.documentElement;
 	let node = element?.parentElement ?? null;
 	while (node !== null && node !== root) {
-		if (containsFixed(ownerWindow(node).getComputedStyle(node))) {
+		if (isFixedContainingBlock(ownerWindow(node).getComputedStyle(node))) {
 			// The padding box, which fixed descendants are placed in.
 			const rect = node.getBoundingClientRect();
 			return {
@@ -108,7 +111,7 @@ export function containingBlock(
 }
 
 /**
-computePosition for an element that is (or will be) position: fixed, in its own containing
+`computePosition` for an element that is (or will be) position: fixed, in its own containing
 block's coordinates.
 */
 export function positionFixed(
@@ -161,7 +164,9 @@ function alignAlong(
 		return start;
 	}
 
-	return align === "end" ? end - size : start + length / 2 - size / 2;
+	const halfLength = length / 2;
+	const halfSize = size / 2;
+	return align === "end" ? end - size : start + halfLength - halfSize;
 }
 
 function place(
@@ -259,25 +264,28 @@ export function computePosition(
 		y = clamp(y, padding, viewportHeight - box.height - padding);
 	}
 
+	const bothPaddings = 2 * padding;
 	const maxHeight = Math.max(
 		80,
-		isVertical(side) ? space[side] : viewportHeight - 2 * padding,
+		isVertical(side) ? space[side] : viewportHeight - bothPaddings,
 	);
 
 	// Origin: the edge facing the anchor, at the anchor's centre on the cross axis.
 	let origin: string;
 	if (isVertical(side)) {
-		const originX = clamp(anchor.left + anchor.width / 2 - x, 0, box.width);
+		const halfWidth = anchor.width / 2;
+		const originX = clamp(anchor.left + halfWidth - x, 0, box.width);
 		origin = `${Math.round(originX)}px ${side === "top" ? "100%" : "0"}`;
 	} else {
-		const originY = clamp(anchor.top + anchor.height / 2 - y, 0, box.height);
+		const halfHeight = anchor.height / 2;
+		const originY = clamp(anchor.top + halfHeight - y, 0, box.height);
 		origin = `${side === "left" ? "100%" : "0"} ${Math.round(originY)}px`;
 	}
 
 	return {
 		x: Math.round(x),
 		y: Math.round(y),
-		placement: (align === "center" ? side : `${side}-${align}`) as Placement,
+		placement: align === "center" ? side : `${side}-${align}`,
 		origin,
 		maxHeight,
 		minWidth: matchWidth ? anchor.width : undefined,

@@ -70,7 +70,7 @@ export type ModalProps = {
 	className?: string;
 	style?: React.CSSProperties;
 	/**
-	z-index; default the z-modal token.
+	`z-index`; default the z-modal token.
 	*/
 	zIndex?: string | number;
 };

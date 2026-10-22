@@ -9,6 +9,11 @@ import * as React from "react";
 import { cx } from "../../internal/cx.js";
 import { useForkRef, useIsoLayoutEffect } from "../../internal/hooks.js";
 
+function toPixels(value: string): number {
+	// eslint-disable-next-line unicorn/prefer-number-coercion -- Number() turns a value with a unit into NaN.
+	return Number.parseFloat(value);
+}
+
 export type TextareaAutosizeProps =
 	React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
 		/**
@@ -43,26 +48,26 @@ export function TextareaAutosize({
 		}
 
 		const computed = getComputedStyle(textarea);
+		const lineHeight = toPixels(computed.lineHeight);
 		const line =
-			Number.parseFloat(computed.lineHeight) ||
-			Number.parseFloat(computed.fontSize) * 1.6;
+			lineHeight > 0 ? lineHeight : toPixels(computed.fontSize) * 1.6;
 		const padding =
-			Number.parseFloat(computed.paddingTop) +
-			Number.parseFloat(computed.paddingBottom);
+			toPixels(computed.paddingTop) + toPixels(computed.paddingBottom);
 		const border =
-			Number.parseFloat(computed.borderTopWidth) +
-			Number.parseFloat(computed.borderBottomWidth);
+			toPixels(computed.borderTopWidth) + toPixels(computed.borderBottomWidth);
 		// Collapsed first, so scrollHeight is the content's own height.
 		textarea.style.height = "0px";
 		const content = textarea.scrollHeight - padding;
 		let height = Math.max(content, minRows * line);
-		if (maxRows) {
+		if (maxRows !== undefined && maxRows > 0) {
 			height = Math.min(height, maxRows * line);
 		}
 
 		textarea.style.height = `${Math.ceil(height + padding + border)}px`;
 		textarea.style.overflowY =
-			maxRows && content > maxRows * line ? "auto" : "hidden";
+			maxRows !== undefined && maxRows > 0 && content > maxRows * line
+				? "auto"
+				: "hidden";
 	}, [minRows, maxRows]);
 
 	useIsoLayoutEffect(() => {
@@ -78,10 +83,12 @@ export function TextareaAutosize({
 		// Only a new width rewraps the text; the height is the one resize sets.
 		let lastWidth = textarea.clientWidth;
 		const observer = new ResizeObserver(() => {
-			if (textarea.clientWidth !== lastWidth) {
-				lastWidth = textarea.clientWidth;
-				resize();
+			if (textarea.clientWidth === lastWidth) {
+				return;
 			}
+
+			lastWidth = textarea.clientWidth;
+			resize();
 		});
 		observer.observe(textarea);
 		return () => {

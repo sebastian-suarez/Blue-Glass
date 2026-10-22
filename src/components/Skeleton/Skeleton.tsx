@@ -3,7 +3,7 @@ import { cx } from "../../internal/cx.js";
 
 export type SkeletonProps = React.HTMLAttributes<HTMLSpanElement> & {
 	/**
-	text: one line at the current font size (default). rectangular: square corners. rounded: radius-well. circular: a circle.
+	`text`: one line at the current font size (default). `rectangular`: square corners. `rounded`: radius-well. `circular`: a circle.
 	*/
 	variant?: "text" | "rectangular" | "rounded" | "circular";
 	/**
@@ -15,7 +15,7 @@ export type SkeletonProps = React.HTMLAttributes<HTMLSpanElement> & {
 	*/
 	height?: number | string;
 	/**
-	pulse: a slow opacity breath (default). wave: a light sheen moving across. false: still.
+	`pulse`: a slow opacity breath (default). `wave`: a light sheen moving across. `false`: still.
 	*/
 	animation?: "pulse" | "wave" | false;
 	/**
