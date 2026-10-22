@@ -4,6 +4,7 @@
 @import "./tokens.css";
 @import "./foundation.css";
 @import "../components/Icon/Icon.css";
+@import "../components/Transitions/Transitions.css";
 @import "../components/Paper/Paper.css";
 @import "../components/Button/Button.css";
 @import "../components/Typography/Typography.css";
