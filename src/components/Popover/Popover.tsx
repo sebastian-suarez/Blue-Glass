@@ -78,12 +78,15 @@ export type PopoverProps = Omit<
 /**
 Where focus goes as it opens: the marked element, else the surface.
 */
-function initialFocusTarget(surface: HTMLElement | null): HTMLElement | true {
+function initialFocusTarget(surface: HTMLDivElement): HTMLElement {
 	return (
-		surface?.querySelector<HTMLElement>("[data-autofocus], [autofocus]") ??
-		surface ??
-		true
+		surface.querySelector<HTMLElement>("[data-autofocus], [autofocus]") ??
+		surface
 	);
+}
+
+function stayPut(): undefined {
+	return undefined;
 }
 
 /**
@@ -139,6 +142,8 @@ export function Popover({
 		onBackdropClick(event) {
 			onClose?.(event, "backdropClick");
 		},
+		getInitialFocusTarget:
+			disableAutoFocus === true ? stayPut : initialFocusTarget,
 		getReturnTarget: returnTarget,
 	});
 	const handleRef = useForkRef(layer.surfaceRef, ref);
@@ -180,11 +185,8 @@ export function Popover({
 									className,
 								)}
 								style={{ ...layer.surfaceStyle, ...style }}
-								initialFocus={
-									layer.behaviour.shouldAutoFocus
-										? () => initialFocusTarget(layer.surfaceRef.current)
-										: false
-								}
+								// The layer moves focus in and back itself.
+								initialFocus={false}
 								finalFocus={false}
 								onFocus={(event) => {
 									onFocus?.(event);

@@ -21,7 +21,8 @@ layer adds the rest, with the documented flags mapped by `resolveModalBehaviour`
 | `disableEnforceFocus` | None of that: focus may leave and the page stays exposed.                  |
 | (default)             | modal.tsx's `useScrollLock`.                                               |
 | `disableScrollLock`   | No lock.                                                                   |
-| `disableAutoFocus`    | The component's `initialFocus` is false (it picks its own target).         |
+| (default)             | Focus moves in as the surface starts to enter, to the component's target.  |
+| `disableAutoFocus`    | Focus stays put (the component gives no target).                           |
 | `disableRestoreFocus` | Focus stays put. Otherwise it returns to the element that had it when the  |
 |                       | layer opened (modal.tsx's `useRestoreFocus`); Base UI's finalFocus is off. |
 | `keepMounted`         | The portal stays, Base UI hides the positioner, the root gets              |
@@ -46,6 +47,7 @@ import {
 	type Placement,
 	positionerVariables,
 	toPositionerProps,
+	toWholePixelOffsets,
 	useBaseAnchor,
 } from "./anchor.js";
 import { cx } from "./cx.js";
@@ -81,6 +83,10 @@ export type PopupLayerOptions = {
 	Reports a press on the backdrop: the documented backdropClick.
 	*/
 	onBackdropClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+	/**
+	Where focus goes as the surface opens; undefined leaves it where it is.
+	*/
+	getInitialFocusTarget: (surface: HTMLDivElement) => HTMLElement | undefined;
 	/**
 	Where the focus guard sends focus that left the layer: the surface's first item, say.
 	*/
@@ -125,14 +131,23 @@ export type PopupLayer = {
 	/**
 	For the Base UI Positioner part.
 	*/
-	positionerProps: ReturnType<typeof toPositionerProps> & {
-		anchor: ReturnType<typeof useBaseAnchor>;
-		style: React.CSSProperties;
-	};
+	positionerProps: Omit<
+		ReturnType<typeof toPositionerProps>,
+		"sideOffset" | "alignOffset"
+	> &
+		ReturnType<typeof toWholePixelOffsets> & {
+			anchor: ReturnType<typeof useBaseAnchor>;
+			style: React.CSSProperties;
+		};
 	/**
 	For the Grow around the surface.
 	*/
-	transitionProps: { in: boolean; appear: boolean; onExited: () => void };
+	transitionProps: {
+		in: boolean;
+		appear: boolean;
+		onEnter: () => void;
+		onExited: () => void;
+	};
 	surfaceRef: React.RefObject<HTMLDivElement | null>;
 	/**
 	The surface's own style, before the caller's: the pointer, matchWidth and the reference's
@@ -265,6 +280,7 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 		disablePortal,
 		container,
 		onBackdropClick,
+		getInitialFocusTarget,
 		getReturnTarget,
 	} = options;
 	const behaviour = resolveModalBehaviour(options);
@@ -292,6 +308,22 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 		surfaceRef,
 		getReturnTarget,
 	);
+
+	// Focus moves in as the surface starts to enter, once Grow has made it visible: in the same
+	// task as the press that opened it, as the reference's effect does, so a key pressed right
+	// after lands inside. Base UI's initialFocus waits a frame, so the components turn it off.
+	const [enterCount, setEnterCount] = React.useState(0);
+	const focusIn = useEventCallback(() => {
+		const surface = surfaceRef.current;
+		if (open && surface && !isInside(surface, document.activeElement)) {
+			getInitialFocusTarget(surface)?.focus({ preventScroll: true });
+		}
+	});
+	React.useEffect(() => {
+		if (enterCount > 0) {
+			focusIn();
+		}
+	}, [enterCount, focusIn]);
 
 	const isReporting = useEventCallback(() => open && isTopLayer(layer));
 	const trapTab = useEventCallback((event: React.KeyboardEvent<HTMLElement>) => {
@@ -344,11 +376,15 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 		positionerProps: {
 			anchor,
 			...toPositionerProps({ placement, offset }),
+			...toWholePixelOffsets(offset),
 			style: positionerVariables,
 		},
 		transitionProps: {
 			in: open,
 			appear: true,
+			onEnter() {
+				setEnterCount((count) => count + 1);
+			},
 			onExited() {
 				setHasExited(true);
 			},

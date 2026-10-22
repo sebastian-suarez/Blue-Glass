@@ -18,9 +18,10 @@ would let leave an anchored menu, closes it from the surface's keydown with that
 opened: the button.
 
 Focus moves in to the selected item, else the first enabled one (`autoFocus`, or MenuListProps'
-`autoFocusItem`), through Menu.Popup's `initialFocus`, which Base UI's source reads though its
-types and docs leave it out. With `autoFocus={false}` it goes to the list, and with
-`disableAutoFocus` it stays put.
+`autoFocusItem`), as the surface starts to enter, so a key pressed right after the opening press
+lands on it. With `autoFocus={false}` it goes to the list, and with `disableAutoFocus` it stays
+put. Base UI would focus the list a frame later, so Menu.Popup's `initialFocus` is off: Base UI's
+source reads it, though its types and docs leave it out.
 
 MenuItem and MenuList are the adapter's: a MenuItem inside a Menu renders Base UI's item, and
 inside the standalone MenuList the reference's roving-focus item.
@@ -90,13 +91,9 @@ Where focus goes as it opens: the selected item, else the first enabled one, els
 without an item to focus, a marked element, else the list.
 */
 function initialFocusTarget(
-	list: HTMLElement | null,
+	list: HTMLElement,
 	shouldFocusItem: boolean,
-): HTMLElement | true {
-	if (list === null) {
-		return true;
-	}
-
+): HTMLElement {
 	if (!shouldFocusItem) {
 		return (
 			list.querySelector<HTMLElement>("[data-autofocus], [autofocus]") ?? list
@@ -112,8 +109,9 @@ function initialFocusTarget(
 	);
 }
 
-// Menu.Popup reads initialFocus, though its props type leaves it out.
-type PopupFocusProps = { initialFocus: false | (() => HTMLElement | true) };
+// The layer moves focus in, a frame sooner than Menu.Popup's initialFocus would, so that's off.
+// Menu.Popup reads it, though its props type leaves it out.
+const popupFocusProps: { initialFocus: false } = { initialFocus: false };
 
 /**
 A list of actions on a glass popover anchored to the button that opens it, closing on a choice,
@@ -155,6 +153,7 @@ export function Menu({
 		...listProps
 	} = listOptions ?? {};
 	const isDense = listDense ?? dense;
+	const shouldFocusItem = autoFocusItem ?? (autoFocus && !disableAutoFocus);
 	const listRef = React.useRef<HTMLUListElement | null>(null);
 	const handleListRef = useForkRef(listRef, listRefProp);
 	// The list's default name: the id of the element the menu is anchored to, as in the reference.
@@ -181,6 +180,14 @@ export function Menu({
 		disableScrollLock,
 		onBackdropClick(event) {
 			onClose?.(event, "backdropClick");
+		},
+		getInitialFocusTarget(surface) {
+			if (!shouldFocusItem && disableAutoFocus) {
+				return undefined;
+			}
+
+			const list = listRef.current;
+			return list ? initialFocusTarget(list, shouldFocusItem) : surface;
 		},
 		getReturnTarget: (surface) =>
 			getFocusable(surface)[0] ?? listRef.current ?? surface,
@@ -211,14 +218,6 @@ export function Menu({
 			details.allowPropagation();
 		},
 	);
-
-	const shouldFocusItem = autoFocusItem ?? (autoFocus && !disableAutoFocus);
-	const focusProps: PopupFocusProps = {
-		initialFocus:
-			shouldFocusItem || !disableAutoFocus
-				? () => initialFocusTarget(listRef.current, shouldFocusItem)
-				: false,
-	};
 
 	return (
 		<>
@@ -259,7 +258,7 @@ export function Menu({
 										onClose?.(event, "tabKeyDown");
 									}
 								}}
-								{...focusProps}
+								{...popupFocusProps}
 								{...rest}
 							>
 								<BaseMenu.List

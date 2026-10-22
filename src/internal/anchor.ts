@@ -42,6 +42,10 @@ Where Base UI differs from the reference math, all at the edges:
   edge for start and end; the reference's sits on the popup's own edge at the anchor's centre.
   A 0.96 grow starts 4% of the distance between the two away: a few pixels.
 - --available-height has no floor; the reference's never drops below 80px.
+- It places the popup from its exact size, the reference from whole pixels (offsetWidth and
+  offsetHeight), so a popup of fractional size above, left of, end-aligned or centred on its
+  anchor lands a pixel apart. toWholePixelOffsets corrects that, for the ports that compare
+  pixel for pixel.
 anchor.browser.test.tsx proves the position matches the reference math within 1px for every
 placement at offsets 0, 8 and 12, for flips and shifts, for virtual and function anchors
 (including a function whose answer changes while the popup is open) and for matchWidth, and
@@ -207,6 +211,54 @@ export function toPositionerProps({ placement, offset = 8 }: PositionOptions) {
 		},
 		positionMethod: "fixed",
 	} as const satisfies Partial<PositionerProps>;
+}
+
+/**
+What a Base UI offset function gets: the side and alignment the popup is placed on, and its
+size.
+*/
+type OffsetData = {
+	side: string;
+	align: string;
+	positioner: { width: number; height: number };
+};
+
+/**
+How far a size is from the whole pixels the reference measured it in.
+*/
+function toWholePixels(size: number): number {
+	return Math.round(size) - size;
+}
+
+/**
+toPositionerProps' sideOffset and alignOffset, corrected to land where the reference's
+computePosition does, to the pixel. The reference places a popup from its offsetWidth and
+offsetHeight, whole pixels, and Base UI from its exact size, so where the size moves the popup
+(the top and left sides, end and center alignments) a fractional size lands a pixel apart, and
+every glyph inside redraws. Each offset adds the rounding back. Shifts still clamp the exact
+size.
+*/
+export function toWholePixelOffsets(offset = 8) {
+	return {
+		sideOffset({ side, positioner }: OffsetData): number {
+			if (side === "top") {
+				return offset + toWholePixels(positioner.height);
+			}
+
+			return side === "left" ? offset + toWholePixels(positioner.width) : offset;
+		},
+		alignOffset({ side, align, positioner }: OffsetData): number {
+			const size =
+				side === "top" || side === "bottom"
+					? positioner.width
+					: positioner.height;
+			if (align === "end") {
+				return toWholePixels(size);
+			}
+
+			return align === "center" ? -toWholePixels(size) / 2 : 0;
+		},
+	};
 }
 
 /**
