@@ -469,6 +469,22 @@ describe("Tabs", () => {
 		expect(onChange).not.toHaveBeenCalled();
 	});
 
+	test("a disabled tab is dimmed, inside Tabs or alone", () => {
+		render(
+			<>
+				<Sections defaultValue="work" disabledTabs={["projects"]} />
+				<Tab disabled label="Alone" />
+			</>,
+		);
+		for (const name of ["Projects", "Alone"]) {
+			const style = getComputedStyle(tab(name));
+			expect(style.opacity).toBe("0.5");
+			expect(style.cursor).toBe("not-allowed");
+		}
+
+		expect(getComputedStyle(tab("Work")).opacity).toBe("1");
+	});
+
 	test("TabPanel keeps hidden panels' content mounted by default, and keepMounted={false} renders it only while selected", async () => {
 		render(
 			<Tabs aria-label="Sections" defaultValue="work">

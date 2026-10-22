@@ -704,6 +704,8 @@ export function Tab({
 				role="tab"
 				aria-selected={false}
 				disabled={disabled}
+				// The stylesheet reads Base UI's data-disabled, which a lone tab sets itself.
+				data-disabled={disabled ? "" : undefined}
 				className={cx("gl-tab", className)}
 				onClick={onClick}
 				onKeyDown={onKeyDown}
