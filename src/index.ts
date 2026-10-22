@@ -1,5 +1,16 @@
 // Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
 // and tests/api checks the exports against design-system/source/index.d.ts.
+export {
+	type Side,
+	type Align,
+	type Placement,
+	type PositionOptions,
+	type PositionResult,
+	containingBlock,
+	positionFixed,
+	splitPlacement,
+	computePosition,
+} from "./components/Popper/index.js";
 export { Button, type ButtonProps } from "./components/Button/index.js";
 export {
 	ButtonGroup,
@@ -74,7 +85,23 @@ export * from "./components/Box/index.js";
 export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";
 export * from "./components/Stack/index.js";
+export {
+	type ClickAwayListenerProps,
+	ClickAwayListener,
+} from "./components/ClickAwayListener/index.js";
 export * from "./components/CssBaseline/index.js";
+export {
+	type VirtualElement,
+	type AnchorEl,
+	type PopperChildProps,
+	type PopperProps,
+	Popper,
+} from "./components/Popper/index.js";
+export { type PortalProps, Portal } from "./components/Portal/index.js";
+export {
+	type TextareaAutosizeProps,
+	TextareaAutosize,
+} from "./components/TextareaAutosize/index.js";
 export {
 	type TransitionStatus,
 	type Timeout,
