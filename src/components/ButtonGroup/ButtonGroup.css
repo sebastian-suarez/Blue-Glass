@@ -1,0 +1,218 @@
+/* Blue Glass — ButtonGroup, ported from design-system/components/ButtonGroup/styles.css. */
+
+@layer gl-components {
+	/* ButtonGroup — the site's pill nav (.identity-strip nav) holding Buttons, an ink pill split into
+   segments, or hairline-split text actions. Button is only overridden through .gl-button-group compounds. */
+	.gl-button-group {
+		--gl-button-group-h: 34px; /* nav item: 7px + 20px line + 7px (.identity-strip nav a) */
+		--gl-button-group-px: 17px; /* .identity-strip nav a: padding 7px 17px */
+		--gl-button-group-font: 13px;
+		--gl-button-group-pad: 5px; /* .identity-strip nav: padding 5px */
+		--gl-button-group-gap: 3px; /* .identity-strip nav: gap 3px */
+		--gl-button-group-text-h: var(--size-control-sm);
+		--gl-button-group-text-px: var(--space-sm);
+		position: relative;
+		display: inline-flex;
+		align-items: stretch;
+		/* The track hugs its buttons even where a grid or flex parent would stretch it; fullWidth opts in. */
+		width: fit-content;
+		max-width: 100%;
+		vertical-align: middle;
+		isolation: isolate;
+	}
+	.gl-button-group-sm {
+		--gl-button-group-h: 26px;
+		--gl-button-group-px: var(--space-sm);
+		--gl-button-group-font: 12px;
+		--gl-button-group-pad: 4px;
+		--gl-button-group-gap: 2px;
+		--gl-button-group-text-h: 28px;
+		--gl-button-group-text-px: 10px;
+	}
+	.gl-button-group-lg {
+		--gl-button-group-h: 42px;
+		--gl-button-group-px: 22px;
+		--gl-button-group-font: 14px;
+		--gl-button-group-text-h: 40px;
+		--gl-button-group-text-px: 14px;
+	}
+	.gl-button-group .gl-button {
+		position: relative;
+	}
+	.gl-button-group .gl-button:focus-visible {
+		z-index: 1;
+		outline-offset: 2px;
+	}
+
+	/* glass: the nav track (glass-faint, #ffffffc9 edge, 5px padding, 3px gap) with nav-weight items. */
+	.gl-button-group-glass {
+		gap: var(--gl-button-group-gap);
+		padding: var(--gl-button-group-pad);
+		border: 1px solid #ffffffc9; /* .identity-strip nav */
+		border-radius: var(--radius-pill);
+		background: var(--glass-faint);
+		box-shadow: var(--shadow-control);
+		-webkit-backdrop-filter: blur(var(--blur-control));
+		backdrop-filter: blur(var(--blur-control));
+	}
+	.gl-button-group-glass .gl-button {
+		min-height: var(--gl-button-group-h);
+		padding: 0 var(--gl-button-group-px);
+		border-color: transparent;
+		border-radius: 23px; /* .identity-strip nav a */
+		background: transparent;
+		box-shadow: none;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+		font-size: var(--gl-button-group-font);
+		font-weight: 400;
+	}
+
+	/* primary: one ink pill (.btn-primary) split by 1px on-ink hairlines at 20%. */
+	.gl-button-group-primary {
+		border-radius: var(--radius-pill);
+		background: var(--color-ink);
+		box-shadow: var(--shadow-primary);
+	}
+	.gl-button-group-primary .gl-button {
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+	.gl-button-group-primary .gl-button:first-child {
+		border-start-start-radius: var(--radius-pill);
+		border-end-start-radius: var(--radius-pill);
+	}
+	.gl-button-group-primary .gl-button:last-child {
+		border-start-end-radius: var(--radius-pill);
+		border-end-end-radius: var(--radius-pill);
+	}
+	.gl-button-group-primary .gl-button + .gl-button::before {
+		content: "";
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: -1px;
+		width: 1px;
+		background: color-mix(in srgb, var(--on-ink) 20%, transparent);
+		pointer-events: none;
+	}
+
+	/* text: link-weight actions (.replink) split by short hairlines. */
+	.gl-button-group-text {
+		gap: 0;
+	}
+	.gl-button-group-text .gl-button {
+		min-height: var(--gl-button-group-text-h);
+		padding: 0 var(--gl-button-group-text-px);
+		font-size: var(--gl-button-group-font);
+	}
+	.gl-button-group-text .gl-button:first-child {
+		padding-inline-start: 2px;
+	}
+	.gl-button-group-text .gl-button:last-child {
+		padding-inline-end: 2px;
+	}
+	.gl-button-group-text .gl-button + .gl-button::before {
+		content: "";
+		position: absolute;
+		top: 50%;
+		inset-inline-start: -1px;
+		width: 1px;
+		height: 14px;
+		margin-top: -7px;
+		background: var(--color-line-strong);
+		pointer-events: none;
+	}
+
+	/* vertical: the track turns into the side selector's shape (radius-well = item pill + 5px padding). */
+	.gl-button-group-vertical {
+		flex-direction: column;
+	}
+	.gl-button-group-vertical.gl-button-group-glass,
+	.gl-button-group-vertical.gl-button-group-primary {
+		border-radius: var(--radius-well);
+	}
+	.gl-button-group-vertical.gl-button-group-primary .gl-button {
+		border-radius: 0;
+	}
+	.gl-button-group-vertical.gl-button-group-primary .gl-button:first-child {
+		border-top-left-radius: var(--radius-well);
+		border-top-right-radius: var(--radius-well);
+	}
+	.gl-button-group-vertical.gl-button-group-primary .gl-button:last-child {
+		border-bottom-left-radius: var(--radius-well);
+		border-bottom-right-radius: var(--radius-well);
+	}
+	.gl-button-group-vertical.gl-button-group-primary
+		.gl-button
+		+ .gl-button::before {
+		inset: -1px 0 auto;
+		width: auto;
+		height: 1px;
+	}
+	.gl-button-group-vertical.gl-button-group-text .gl-button {
+		justify-content: flex-start;
+		padding-inline: 2px;
+	}
+	.gl-button-group-vertical.gl-button-group-text .gl-button + .gl-button::before {
+		display: none;
+	}
+
+	.gl-button-group-full {
+		display: flex;
+		width: 100%;
+	}
+	.gl-button-group-full:not(.gl-button-group-vertical) > .gl-button {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	/* disabled: the whole track dims once, instead of every button on top of it. */
+	.gl-button-group-disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.gl-button-group-disabled .gl-button:disabled {
+		opacity: 1;
+	}
+	.gl-button-group-primary.gl-button-group-disabled {
+		box-shadow: none;
+	}
+
+	/* Phones: the site's nav tightens under 700px (.identity-strip nav a: 12px, less side padding). */
+	@media (max-width: 700px) {
+		.gl-button-group-md {
+			--gl-button-group-px: var(--space-sm);
+			--gl-button-group-font: 12px;
+		}
+		.gl-button-group-lg {
+			--gl-button-group-px: var(--space-md);
+			--gl-button-group-font: 13px;
+		}
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-button-group-glass
+			.gl-button:hover:not(:disabled):not([aria-disabled="true"]) {
+			background: #fff7;
+		} /* .identity-strip nav a:hover */
+		.gl-button-group-primary
+			.gl-button:hover:not(:disabled):not([aria-disabled="true"]) {
+			background: var(--ink-hover);
+		}
+	}
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-button-group-glass {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-button-group-glass {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+}

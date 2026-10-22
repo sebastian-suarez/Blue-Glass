@@ -128,6 +128,15 @@
 				"components/CssBaseline/preview.html": "30f3c40f99ac2fe7",
 				"components/CssBaseline/reference.tsx": "6bde58ffca34063d"
 			}
+		},
+		"ButtonGroup": {
+			"files": {
+				"components/ButtonGroup/README.md": "9013af2a752fe7af",
+				"components/ButtonGroup/api.d.ts": "e9881d3309631d14",
+				"components/ButtonGroup/styles.css": "933d854439cf7d68",
+				"components/ButtonGroup/preview.html": "8541145583762922",
+				"components/ButtonGroup/reference.tsx": "d5f0def5cc33432d"
+			}
 		}
 	}
 }
