@@ -41,6 +41,27 @@ const componentFiles = [
 	"reference.tsx",
 ];
 
+/**
+The shared helpers a component's reference imports by their underscored names, such as Box's
+`./_surfaces-layout-system`: a change to one is a change to every component built on it.
+*/
+function sharedHelpersOf(name: string): string[] {
+	const source = fs.readFileSync(
+		path.join(designSystem, `components/${name}/reference.tsx`),
+		"utf8",
+	);
+	const helpers = new Set(
+		source
+			.matchAll(/from\s+["'][^"']*\/(?<helper>_[\w\-]+)["']/gv)
+			.map((match) => match.groups?.helper ?? ""),
+	);
+	return [...helpers].flatMap((helper) =>
+		["ts", "tsx"]
+			.map((extension) => `shared/${helper}.${extension}`)
+			.filter((relative) => fs.existsSync(path.join(designSystem, relative))),
+	);
+}
+
 const hash = (relative: string) =>
 	createHash("sha256")
 		.update(fs.readFileSync(path.join(designSystem, relative)))
@@ -82,7 +103,10 @@ if (recordAt !== -1) {
 	}
 
 	manifest.components[name] = {
-		files: filesOf(componentFiles.map((file) => `components/${name}/${file}`)),
+		files: filesOf([
+			...componentFiles.map((file) => `components/${name}/${file}`),
+			...sharedHelpersOf(name),
+		]),
 	};
 	write(manifest);
 	console.log(`recorded ${name}`);
