@@ -248,6 +248,15 @@
 				"components/Accordion/preview.html": "5cf629db02aa8e4f",
 				"components/Accordion/reference.tsx": "ecf35c4dcbe0f2ec"
 			}
+		},
+		"Skeleton": {
+			"files": {
+				"components/Skeleton/README.md": "01dce518ac208033",
+				"components/Skeleton/api.d.ts": "78c4c92708f47553",
+				"components/Skeleton/styles.css": "3783e65164a793df",
+				"components/Skeleton/preview.html": "5089fe28366d4d5d",
+				"components/Skeleton/reference.tsx": "c76f83c092476135"
+			}
 		}
 	}
 }
