@@ -17,6 +17,7 @@
 @import "../components/List/List.css";
 @import "../components/Table/Table.css";
 @import "../components/Alert/Alert.css";
+@import "../components/Dialog/Dialog.css";
 @import "../components/Progress/Progress.css";
 @import "../components/Skeleton/Skeleton.css";
 @import "../components/Accordion/Accordion.css";
