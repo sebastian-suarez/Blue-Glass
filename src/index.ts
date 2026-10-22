@@ -68,6 +68,19 @@ export {
 	AlertTitle,
 } from "./components/Alert/index.js";
 export {
+	type DialogScroll,
+	type DialogProps,
+	Dialog,
+	type DialogTitleProps,
+	DialogTitle,
+	type DialogContentProps,
+	DialogContent,
+	type DialogContentTextProps,
+	DialogContentText,
+	type DialogActionsProps,
+	DialogActions,
+} from "./components/Dialog/index.js";
+export {
 	type LinearProgressProps,
 	LinearProgress,
 	type CircularProgressProps,
@@ -92,6 +105,12 @@ export {
 	LightField,
 	type LightFieldProps,
 } from "./components/LightField/index.js";
+export {
+	type DrawerCloseReason,
+	type DrawerAnchor,
+	type DrawerProps,
+	Drawer,
+} from "./components/Drawer/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export {
 	type TabValue,

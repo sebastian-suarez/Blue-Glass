@@ -348,6 +348,24 @@
 				"components/NoSsr/preview.html": "470311655f821d68",
 				"components/NoSsr/reference.tsx": "19403662242f1f3c"
 			}
+		},
+		"Dialog": {
+			"files": {
+				"components/Dialog/README.md": "0bb7a8568cdeb07f",
+				"components/Dialog/api.d.ts": "acdb230f8bccfeef",
+				"components/Dialog/styles.css": "f6136b08a8fd6d1f",
+				"components/Dialog/preview.html": "ab8aefd663e566cd",
+				"components/Dialog/reference.tsx": "1c25456118851665"
+			}
+		},
+		"Drawer": {
+			"files": {
+				"components/Drawer/README.md": "3f1389bc66065a91",
+				"components/Drawer/api.d.ts": "e140ea6c7163edb3",
+				"components/Drawer/styles.css": "18a824b9c5b9ae3c",
+				"components/Drawer/preview.html": "408db39347971326",
+				"components/Drawer/reference.tsx": "11a77371f290bfd8"
+			}
 		}
 	}
 }

@@ -1,0 +1,173 @@
+/* Blue Glass — Dialog, ported from design-system/components/Dialog/styles.css. */
+
+@layer gl-components {
+	/* Dialog — an addition (the site has no modal), in the site's language: the surface is a
+	   .glass-panel (Paper glass: radius-panel, shadow-panel, blur-panel) on Modal's scrim, the title
+	   is .pane-title (text-title-sm) and the body copy is .card-head p (text-body-sm in color-muted). */
+
+	/* The centring layer. A flex item with margin: auto centres, and its margins fall to 0 when it is
+	   taller than the layer, so nothing is ever pushed out of reach above the fold. The modal layer
+	   wraps it in an unpositioned .gl-modal-content, so it fills .gl-modal as in the reference. */
+	.gl-dialog-container {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		padding: var(--space-xl);
+		overflow: hidden;
+	}
+	.gl-dialog-container[data-transition="exiting"] {
+		pointer-events: none;
+	}
+	.gl-dialog-scroll-body {
+		overflow-x: hidden;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.gl-dialog-paper {
+		--gl-dialog-pad-x: 32px;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		margin: auto;
+		max-height: 100%;
+		padding: var(--space-xl) var(--gl-dialog-pad-x);
+	}
+	/* The surface takes focus on open so its name is read; the ring belongs to the controls in it. */
+	.gl-dialog-paper:focus-visible {
+		outline: none;
+	}
+	.gl-dialog-scroll-body .gl-dialog-paper {
+		max-height: none;
+	}
+	.gl-dialog-paper-xs {
+		max-width: 444px;
+	}
+	.gl-dialog-paper-sm {
+		max-width: 600px;
+	}
+	.gl-dialog-paper-md {
+		max-width: 900px;
+	}
+	.gl-dialog-paper-full-width {
+		width: 100%;
+	}
+	.gl-dialog-container.gl-dialog-container-fullscreen {
+		padding: 0;
+	}
+	.gl-dialog-paper.gl-dialog-paper-fullscreen {
+		width: 100%;
+		max-width: none;
+		height: 100%;
+		max-height: none;
+		margin: 0;
+		border-radius: 0;
+	}
+
+	/* Title: .pane-title */
+	.gl-dialog-title {
+		flex: none;
+		margin: 0;
+		color: var(--color-ink);
+		font-size: 22px;
+		font-weight: 500;
+		line-height: 1.1;
+		letter-spacing: -0.03em;
+		text-wrap: balance;
+	}
+
+	/* Content spans the surface edge to edge so its scrollbar sits on the edge; the 8px of block
+	   padding (cancelled by the margin) keeps focus rings inside the scroll box. */
+	.gl-dialog-content {
+		flex: 1 1 auto;
+		min-height: 0;
+		margin: -8px calc(-1 * var(--gl-dialog-pad-x));
+		padding: 8px var(--gl-dialog-pad-x);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+	.gl-dialog-scroll-body .gl-dialog-content {
+		overflow: visible;
+	}
+	.gl-dialog-content:focus-visible {
+		outline-offset: -3px;
+	}
+	.gl-dialog-content-dividers {
+		margin-block: 0;
+		padding-block: var(--space-md);
+		border-block: 1px solid var(--color-line);
+	}
+	/* Edge fades: only the edge that has more content behind it fades. */
+	.gl-dialog-content[data-fade-top] {
+		--gl-fade-top: var(--space-xl);
+	}
+	.gl-dialog-content[data-fade-bottom] {
+		--gl-fade-bottom: var(--space-xl);
+	}
+	.gl-dialog-content[data-fade-top],
+	.gl-dialog-content[data-fade-bottom] {
+		-webkit-mask-image: linear-gradient(
+			to bottom,
+			transparent 0,
+			#000 var(--gl-fade-top, 0px),
+			#000 calc(100% - var(--gl-fade-bottom, 0px)),
+			transparent 100%
+		);
+		mask-image: linear-gradient(
+			to bottom,
+			transparent 0,
+			#000 var(--gl-fade-top, 0px),
+			#000 calc(100% - var(--gl-fade-bottom, 0px)),
+			transparent 100%
+		);
+	}
+
+	/* Description: .card-head p */
+	.gl-dialog-content-text {
+		margin: 0;
+		color: var(--color-muted);
+		font-size: 15px;
+		line-height: 1.6;
+		text-wrap: pretty;
+	}
+	.gl-dialog-content-text + .gl-dialog-content-text {
+		margin-top: var(--space-sm);
+	}
+
+	/* Actions: .actions, right-aligned, the primary last */
+	.gl-dialog-actions {
+		display: flex;
+		flex: none;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: var(--space-sm);
+		margin-top: var(--space-sm);
+	}
+
+	/* Phones: the 16px gutter, and the card's phone padding (.card: 26px 22px under 700px).
+	   Actions share the row, and stack full width in DOM order when they don't fit. */
+	@media (max-width: 700px) {
+		.gl-dialog-container {
+			padding: var(--space-md);
+		}
+		.gl-dialog-paper {
+			--gl-dialog-pad-x: 22px;
+			padding-block: 26px;
+		}
+		.gl-dialog-actions > * {
+			flex: 1 1 auto;
+		}
+		.gl-dialog-container.gl-dialog-container-fullscreen-phone {
+			padding: 0;
+		}
+		.gl-dialog-paper.gl-dialog-paper-fullscreen-phone {
+			width: 100%;
+			max-width: none;
+			height: 100%;
+			max-height: none;
+			margin: 0;
+			border-radius: 0;
+		}
+	}
+}

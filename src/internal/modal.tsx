@@ -1,7 +1,8 @@
 "use client";
 /**
 The modal-flags adapter: Blue Glass's documented Modal flags (design-system/components/Modal)
-on Base UI's Dialog. Modal and Dialog build on `ModalLayer`; Drawer, Popover and Menu can reuse
+on Base UI's Dialog. Modal and Dialog build on `ModalLayer`, and so does Drawer's temporary
+variant, on Base UI's Drawer (`root="drawer"`, below); Popover and Menu can reuse
 `resolveModalBehaviour` and `useScrollLock` with their own Base UI roots.
 
 Why an adapter: the documented flags are independent, but Base UI's `modal` couples them. `true`
@@ -66,13 +67,21 @@ exposed, wherever they render.
 The backdrop is the Blue Glass Backdrop, as in the reference: through the portal it's what
 `Dialog.Backdrop` renders, in place it stands where the reference's did. It fades in as the layer
 opens and out as it closes, alongside a transition child's exit, and goes with the layer.
+
+Drawer. With `root="drawer"` the portal path runs on Base UI's Drawer parts instead of its
+Dialog's, everything else as above. Base UI's swipe to dismiss is off (`data-base-ui-swipe-ignore`
+on the popup): it starts on any press in the popup and drags it, while the documented drawer
+drags only its bottom sheet's grab handle, which the Drawer does itself with the reference's
+thresholds. Android's back gesture (Base UI's `close-watcher`) reports `escapeKeyDown` as Escape
+does (src/internal/events.ts), wrapped, since it isn't a KeyboardEvent.
 */
 import { Dialog } from "@base-ui/react/dialog";
+import { Drawer } from "@base-ui/react/drawer";
 import * as React from "react";
 import { Backdrop, type BackdropProps } from "../components/Backdrop/Backdrop.js";
 import { cx } from "./cx.js";
 import { getFocusable, getScrollbarSize, isInside } from "./dom.js";
-import type { ModalCloseReason } from "./events.js";
+import { type ModalCloseReason, toSyntheticEvent } from "./events.js";
 import { useEventCallback, useForkRef, useIsoLayoutEffect } from "./hooks.js";
 import type { TransitionOptions } from "./transition.js";
 
@@ -403,7 +412,15 @@ export type ModalLayerProps = ModalFlags & {
 	The layer's root element.
 	*/
 	ref?: React.Ref<HTMLDivElement>;
+	/**
+	The Base UI root the layer runs on through the portal: Dialog's (default), or Drawer's for
+	Drawer's temporary variant. In place it runs on neither.
+	*/
+	root?: "dialog" | "drawer";
 };
+
+type ChangeEventDetails =
+	Dialog.Root.ChangeEventDetails | Drawer.Root.ChangeEventDetails;
 
 /**
 A transition child runs its exit before the layer goes: it gets `in` and `appear`, and its
@@ -819,6 +836,7 @@ export function ModalLayer(props: ModalLayerProps) {
 		container,
 		BackdropProps: backdropProps,
 		ref,
+		root = "dialog",
 	} = props;
 	const behaviour = resolveModalBehaviour(props);
 	const rootRef = React.useRef<HTMLDivElement | null>(null);
@@ -872,13 +890,34 @@ export function ModalLayer(props: ModalLayerProps) {
 	});
 	useEscapeListener(isOpenInPlace, closeOnEscape);
 
+	// Android's back gesture, which only Base UI's Drawer reports: Escape's reason, wrapped.
+	const reportCloseRequest = useEventCallback((event: Event) => {
+		if (!open || !behaviour.shouldCloseOnEscape || !isTopLayer(layer)) {
+			return;
+		}
+
+		const content = contentRef.current;
+		onClose?.(
+			toSyntheticEvent(event, findSurface(content) ?? content ?? undefined),
+			"escapeKeyDown",
+		);
+	});
+
 	const handleOpenChange = useEventCallback(
-		(isOpen: boolean, details: Dialog.Root.ChangeEventDetails) => {
+		(isOpen: boolean, details: ChangeEventDetails) => {
 			if (
 				!isOpen &&
 				details.reason === "escape-key" &&
 				closeOnEscape(details.event)
 			) {
+				return;
+			}
+
+			if (!isOpen && details.reason === "close-watcher") {
+				reportCloseRequest(details.event);
+				// The parent decides. Cancelling keeps Base UI's watcher for the next back gesture
+				// while the layer stays open.
+				details.cancel();
 				return;
 			}
 
@@ -905,6 +944,57 @@ export function ModalLayer(props: ModalLayerProps) {
 					press,
 				);
 	const rootProps = getRootProps(props, hasExited);
+
+	if (!disablePortal && root === "drawer") {
+		return (
+			<Drawer.Root
+				disablePointerDismissal
+				open={isPresent}
+				modal={open ? behaviour.modal : false}
+				onOpenChange={handleOpenChange}
+				onOpenChangeComplete={(isOpen) => {
+					if (!isOpen) {
+						markExited();
+					}
+				}}
+			>
+				<Drawer.Portal
+					ref={handleRootRef}
+					keepMounted={keepMounted}
+					container={portalContainer}
+					{...rootProps}
+				>
+					{backdrop ? (
+						<Drawer.Backdrop
+							forceRender
+							{...backdrop.attributes}
+							render={(baseUiProps) => (
+								<Backdrop {...baseUiProps} {...backdrop.options} open={open} />
+							)}
+						/>
+					) : null}
+					<Drawer.Viewport>
+						<Drawer.Popup
+							ref={contentRef}
+							data-base-ui-swipe-ignore=""
+							role="presentation"
+							className="gl-modal-content"
+							style={{ pointerEvents: "auto" }}
+							initialFocus={
+								behaviour.shouldAutoFocus
+									? () => initialFocusTarget(contentRef.current) ?? true
+									: false
+							}
+							finalFocus={false}
+							onFocus={markInside}
+						>
+							{content}
+						</Drawer.Popup>
+					</Drawer.Viewport>
+				</Drawer.Portal>
+			</Drawer.Root>
+		);
+	}
 
 	if (!disablePortal) {
 		return (
