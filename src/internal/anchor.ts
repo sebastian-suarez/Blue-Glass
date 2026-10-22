@@ -246,7 +246,9 @@ export function toWholePixelOffsets(offset = 8) {
 				return offset + toWholePixels(positioner.height);
 			}
 
-			return side === "left" ? offset + toWholePixels(positioner.width) : offset;
+			return side === "left"
+				? offset + toWholePixels(positioner.width)
+				: offset;
 		},
 		alignOffset({ side, align, positioner }: OffsetData): number {
 			const size =

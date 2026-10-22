@@ -122,9 +122,12 @@ export function Badge({
 	const child =
 		isPassedThrough && !isInvisible
 			? // eslint-disable-next-line @eslint-react/no-clone-element -- The documented aria-label goes to the child, so focus on it reads the count.
-				React.cloneElement(children as React.ReactElement<{ "aria-label"?: string }>, {
-					"aria-label": ariaLabel,
-				})
+				React.cloneElement(
+					children as React.ReactElement<{ "aria-label"?: string }>,
+					{
+						"aria-label": ariaLabel,
+					},
+				)
 			: children;
 
 	return (

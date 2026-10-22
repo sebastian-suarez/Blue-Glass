@@ -64,9 +64,7 @@ function Places({
 					disablePortal
 				</Button>
 			</Row>
-			<div
-				style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
-			>
+			<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
 				<Paper variant="inset" style={place}>
 					<Caption>Where it&apos;s written</Caption>
 					<Portal {...props} container={target} disablePortal={disablePortal}>

@@ -30,7 +30,10 @@ export type { DrawerCloseReason } from "../../internal/events.js";
 
 export type DrawerAnchor = "left" | "right" | "top" | "bottom";
 
-export type DrawerProps = Omit<React.HTMLAttributes<HTMLDivElement>, "title"> & {
+export type DrawerProps = Omit<
+	React.HTMLAttributes<HTMLDivElement>,
+	"title"
+> & {
 	/**
 	Shown (temporary, persistent). A permanent drawer is always shown.
 	*/

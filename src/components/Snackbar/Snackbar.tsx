@@ -144,7 +144,10 @@ export function Snackbar({
 	const rootRef = React.useRef<HTMLDivElement | null>(null);
 	const handleRef = useForkRef(rootRef, ref);
 	const close = useEventCallback(
-		(event: React.SyntheticEvent | Event | null, reason: SnackbarCloseReason) => {
+		(
+			event: React.SyntheticEvent | Event | null,
+			reason: SnackbarCloseReason,
+		) => {
 			onClose?.(event, reason);
 		},
 	);
@@ -162,7 +165,8 @@ export function Snackbar({
 		undefined,
 	);
 	const holdsRef = React.useRef(new Set<Hold>());
-	const hasTimeout = autoHideDuration !== null && autoHideDuration !== undefined;
+	const hasTimeout =
+		autoHideDuration !== null && autoHideDuration !== undefined;
 	const clear = useEventCallback(() => {
 		clearTimeout(timerRef.current);
 		timerRef.current = undefined;

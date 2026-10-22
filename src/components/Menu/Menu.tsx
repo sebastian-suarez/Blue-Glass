@@ -36,10 +36,7 @@ import {
 	menuCloseReason,
 } from "../../internal/events.js";
 import { useEventCallback, useForkRef } from "../../internal/hooks.js";
-import {
-	BaseMenuItems,
-	type MenuListProps,
-} from "../../internal/menu-item.js";
+import { BaseMenuItems, type MenuListProps } from "../../internal/menu-item.js";
 import { usePopupLayer } from "../../internal/popup-layer.js";
 import type { PopoverProps } from "../Popover/Popover.js";
 import { Grow } from "../Transitions/Transitions.js";
@@ -52,7 +49,10 @@ export {
 	MenuItem,
 } from "../../internal/menu-item.js";
 
-export type MenuProps = Omit<PopoverProps, "onClose" | "padding" | "children"> & {
+export type MenuProps = Omit<
+	PopoverProps,
+	"onClose" | "padding" | "children"
+> & {
 	/**
 	Called with the reason (backdropClick, escapeKeyDown, itemClick, tabKeyDown). Set open to false
 	to close.

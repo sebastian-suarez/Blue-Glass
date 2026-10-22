@@ -246,7 +246,9 @@ export function CircularProgress({
 					strokeDasharray={isDeterminate ? "100 100" : undefined}
 					strokeDashoffset={isDeterminate ? 100 - clamped : undefined}
 					// At 0 the round caps would still draw a dot.
-					style={isDeterminate && clamped <= 0 ? { visibility: "hidden" } : undefined}
+					style={
+						isDeterminate && clamped <= 0 ? { visibility: "hidden" } : undefined
+					}
 				/>
 			</svg>
 			{showValue && isDeterminate && pixels >= 40 ? (

@@ -85,7 +85,11 @@ function SiteLinks({ onPick }: { readonly onPick?: () => void }) {
 					justifyItems: "start",
 				}}
 			>
-				<Button variant="text" href="#resume" endIcon={<Icon name="arrow-ne" />}>
+				<Button
+					variant="text"
+					href="#resume"
+					endIcon={<Icon name="arrow-ne" />}
+				>
 					Read résumé
 				</Button>
 				<span className="text-micro" style={{ color: "var(--color-muted)" }}>
@@ -219,7 +223,9 @@ function ProjectDetails() {
 						<dt style={{ color: "var(--color-muted)" }}>Stack</dt>
 						<dd style={{ margin: 0 }}>TypeScript, Electron</dd>
 						<dt style={{ color: "var(--color-muted)" }}>Review</dt>
-						<dd style={{ margin: 0 }}>Codex reviews every Claude Code change</dd>
+						<dd style={{ margin: 0 }}>
+							Codex reviews every Claude Code change
+						</dd>
 					</dl>
 					<div>
 						<Button

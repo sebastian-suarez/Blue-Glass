@@ -156,7 +156,8 @@
 	.gl-drawer-persistent.gl-drawer-right {
 		justify-content: flex-start;
 	}
-	.gl-drawer-persistent:is(.gl-drawer-left, .gl-drawer-right) > .gl-drawer-paper {
+	.gl-drawer-persistent:is(.gl-drawer-left, .gl-drawer-right)
+		> .gl-drawer-paper {
 		flex: none;
 	}
 	.gl-drawer-persistent:is(.gl-drawer-top, .gl-drawer-bottom) {

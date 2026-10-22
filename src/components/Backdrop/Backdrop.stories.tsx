@@ -129,9 +129,7 @@ function Region({
 /**
 A region that keeps its own open state, as each of the preview's does.
 */
-function OwnRegion(
-	props: Omit<RegionProps, "open" | "onShow" | "onClick">,
-) {
+function OwnRegion(props: Omit<RegionProps, "open" | "onShow" | "onClick">) {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
 		<Region

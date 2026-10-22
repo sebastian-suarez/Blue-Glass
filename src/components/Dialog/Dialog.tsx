@@ -186,7 +186,9 @@ function isOnScrollbar(element: HTMLElement, event: React.MouseEvent): boolean {
 	const box = element.getBoundingClientRect();
 	const x = event.clientX - box.left - element.clientLeft;
 	const y = event.clientY - box.top - element.clientTop;
-	return x < 0 || y < 0 || x >= element.clientWidth || y >= element.clientHeight;
+	return (
+		x < 0 || y < 0 || x >= element.clientWidth || y >= element.clientHeight
+	);
 }
 
 /**
@@ -249,8 +251,7 @@ export function Dialog({
 			: fullScreen === "phone"
 				? screens.phone
 				: undefined;
-	const isNamed =
-		labelledBy !== undefined || rest["aria-label"] !== undefined;
+	const isNamed = labelledBy !== undefined || rest["aria-label"] !== undefined;
 
 	return (
 		<ModalLayer
@@ -301,7 +302,9 @@ export function Dialog({
 								ref={surfaceRef}
 								role={role}
 								aria-modal="true"
-								aria-labelledby={labelledBy ?? (isNamed ? undefined : titleIds[0])}
+								aria-labelledby={
+									labelledBy ?? (isNamed ? undefined : titleIds[0])
+								}
 								aria-describedby={
 									describedBy ??
 									(descriptionIds.length > 0
@@ -312,7 +315,9 @@ export function Dialog({
 								{...paperProps}
 								{...rest}
 								radius={
-									screen === screens.full ? "none" : (paperProps?.radius ?? "panel")
+									screen === screens.full
+										? "none"
+										: (paperProps?.radius ?? "panel")
 								}
 								className={cx(
 									"gl-dialog-paper",

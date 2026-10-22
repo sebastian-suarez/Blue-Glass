@@ -81,8 +81,7 @@ export function Alert({
 			severity === "error" || severity === "warning" ? "alert" : "status";
 	}
 
-	const hasAction =
-		action !== undefined && action !== null && action !== false;
+	const hasAction = action !== undefined && action !== null && action !== false;
 	return (
 		<div
 			ref={ref}

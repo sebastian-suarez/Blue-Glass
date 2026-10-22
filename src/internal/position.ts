@@ -234,9 +234,7 @@ export function computePosition(
 		viewport?.height ?? (hasWindow ? window.innerHeight : 768);
 	const [preferred, align] = splitPlacement(placement);
 	const box = {
-		width: matchWidth
-			? Math.max(floating.width, anchor.width)
-			: floating.width,
+		width: matchWidth ? Math.max(floating.width, anchor.width) : floating.width,
 		height: floating.height,
 	};
 

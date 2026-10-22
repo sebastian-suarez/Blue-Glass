@@ -81,7 +81,10 @@ does (src/internal/events.ts), wrapped, since it isn't a KeyboardEvent.
 import { Dialog } from "@base-ui/react/dialog";
 import { Drawer } from "@base-ui/react/drawer";
 import * as React from "react";
-import { Backdrop, type BackdropProps } from "../components/Backdrop/Backdrop.js";
+import {
+	Backdrop,
+	type BackdropProps,
+} from "../components/Backdrop/Backdrop.js";
 import { cx } from "./cx.js";
 import { getFocusable, getScrollbarSize, isInside } from "./dom.js";
 import { type ModalCloseReason, toSyntheticEvent } from "./events.js";

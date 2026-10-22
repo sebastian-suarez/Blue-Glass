@@ -309,8 +309,8 @@ function Publish({ open = false, onClose, ...dialog }: PublishProps) {
 					}}
 				>
 					<DialogContentText>
-						The build goes to the private S3 bucket; CloudFront serves it through
-						Cloudflare.
+						The build goes to the private S3 bucket; CloudFront serves it
+						through Cloudflare.
 					</DialogContentText>
 					<div style={{ display: "grid", gap: 6 }}>
 						<label htmlFor={`${id}-name`} style={label}>

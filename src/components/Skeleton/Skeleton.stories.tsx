@@ -204,7 +204,12 @@ export const Variants: Story = {
 					<Skeleton variant="rounded" width={150} height={46} />
 				</Labelled>
 				<Labelled label="wave">
-					<Skeleton variant="rounded" width={150} height={46} animation="wave" />
+					<Skeleton
+						variant="rounded"
+						width={150}
+						height={46}
+						animation="wave"
+					/>
 				</Labelled>
 				<Labelled label="still">
 					<Skeleton

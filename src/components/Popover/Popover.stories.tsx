@@ -101,9 +101,7 @@ function AnchoredStage({
 /**
 A stage that keeps its own open state, as each of the preview's does: open at first.
 */
-function OwnStage(
-	props: Omit<StageProps, "open" | "onToggle" | "onClose">,
-) {
+function OwnStage(props: Omit<StageProps, "open" | "onToggle" | "onClose">) {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
 		<AnchoredStage

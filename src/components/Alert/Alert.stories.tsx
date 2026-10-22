@@ -5,7 +5,12 @@ import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Stack, Tiles } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Paper } from "../Paper/index.js";
-import { Alert, type AlertProps, type AlertSeverity, AlertTitle } from "./Alert.js";
+import {
+	Alert,
+	type AlertProps,
+	type AlertSeverity,
+	AlertTitle,
+} from "./Alert.js";
 
 const meta = {
 	title: "Feedback/Alert",

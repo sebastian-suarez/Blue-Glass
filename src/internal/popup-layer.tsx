@@ -326,17 +326,19 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 	}, [enterCount, focusIn]);
 
 	const isReporting = useEventCallback(() => open && isTopLayer(layer));
-	const trapTab = useEventCallback((event: React.KeyboardEvent<HTMLElement>) => {
-		const surface = surfaceRef.current;
-		if (
-			surface &&
-			behaviour.shouldEnforceFocus &&
-			isReporting() &&
-			isInside(surface, event.target)
-		) {
-			keepTabInside(event, surface);
-		}
-	});
+	const trapTab = useEventCallback(
+		(event: React.KeyboardEvent<HTMLElement>) => {
+			const surface = surfaceRef.current;
+			if (
+				surface &&
+				behaviour.shouldEnforceFocus &&
+				isReporting() &&
+				isInside(surface, event.target)
+			) {
+				keepTabInside(event, surface);
+			}
+		},
+	);
 
 	const press = useBackdropPress(behaviour.shouldEnforceFocus, (event) => {
 		if (isReporting()) {

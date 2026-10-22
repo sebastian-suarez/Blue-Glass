@@ -198,7 +198,10 @@ function ArrowAtAnchor({
 	style: _baseUiOffset,
 	ref,
 	...props
-}: ArrowProps & { readonly anchor: HTMLElement | null; readonly side: string }) {
+}: ArrowProps & {
+	readonly anchor: HTMLElement | null;
+	readonly side: string;
+}) {
 	const arrowRef = React.useRef<HTMLElement | null>(null);
 	const handleRef = useForkRef(arrowRef, ref);
 	const [centre, setCentre] = React.useState<number | undefined>(undefined);
@@ -218,7 +221,10 @@ function ArrowAtAnchor({
 			? a.left + a.width / 2 - b.left
 			: a.top + a.height / 2 - b.top;
 		const next = Math.round(
-			Math.min(Math.max(raw, arrowInset), Math.max(arrowInset, length - arrowInset)),
+			Math.min(
+				Math.max(raw, arrowInset),
+				Math.max(arrowInset, length - arrowInset),
+			),
 		);
 		setCentre((previous) => (previous === next ? previous : next));
 	});
@@ -692,7 +698,11 @@ export function Tooltip({
 									<BaseTooltip.Arrow
 										className="gl-tooltip-arrow"
 										render={(props, state) => (
-											<ArrowAtAnchor {...props} anchor={anchor} side={state.side} />
+											<ArrowAtAnchor
+												{...props}
+												anchor={anchor}
+												side={state.side}
+											/>
 										)}
 									/>
 								) : null}

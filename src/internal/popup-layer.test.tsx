@@ -261,9 +261,8 @@ describe("whole-pixel offsets", () => {
 			try {
 				render(<Anchored anchor={anchor} placement={placement} size={size} />);
 				const positioner = await vi.waitFor(() => {
-					const element = document.querySelector<HTMLElement>(
-						"[data-positioner]",
-					);
+					const element =
+						document.querySelector<HTMLElement>("[data-positioner]");
 					expect(element).not.toBeNull();
 					return element!;
 				});
