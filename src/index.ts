@@ -22,6 +22,15 @@ export {
 	LightField,
 	type LightFieldProps,
 } from "./components/LightField/index.js";
+export {
+	type TabValue,
+	type TabsProps,
+	Tabs,
+	type TabProps,
+	Tab,
+	type TabPanelProps,
+	TabPanel,
+} from "./components/Tabs/index.js";
 export * from "./components/Box/index.js";
 export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";

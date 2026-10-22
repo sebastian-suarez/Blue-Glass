@@ -1,0 +1,388 @@
+/* Blue Glass — Tabs, ported from design-system/components/Tabs/styles.css. Base UI marks the
+   selected tab data-active and a disabled one data-disabled (it stays focusable, aria-disabled),
+   where the reference used data-selected and :disabled. */
+
+@layer gl-components {
+	/* Tabs — three looks from global.css: underline (the mobile tab mark, .project-tab[aria-pressed=true]::after),
+   pill (the nav pill, .identity-strip nav) and side (the client-work folio: .folio-layout,
+   .project-selector, .project-tab, .tab-orb, .tab-mark). Panels crossfade like project-tabs.ts. */
+	.gl-tabs {
+		display: grid;
+		gap: var(--space-md);
+		min-width: 0;
+		color: var(--color-ink);
+	}
+	.gl-tabs-bar {
+		position: relative;
+		min-width: 0;
+	}
+	.gl-tabs-list {
+		position: relative;
+		display: flex;
+		min-width: 0;
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+	}
+	.gl-tabs-list::-webkit-scrollbar {
+		display: none;
+	}
+
+	.gl-tab {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-xs);
+		flex: none;
+		margin: 0;
+		border: 1px solid transparent;
+		background: transparent;
+		color: var(--color-ink);
+		font: inherit;
+		font-size: 14px;
+		line-height: 1.3;
+		white-space: nowrap;
+		text-align: center;
+		cursor: pointer;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background-color var(--duration-state) ease,
+			border-color var(--duration-state) ease,
+			box-shadow var(--duration-state) ease,
+			color var(--duration-state) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-tab:active:not([data-disabled]) {
+		transform: scale(0.98);
+	}
+	.gl-tab:focus-visible {
+		outline-offset: 2px;
+	}
+	.gl-tab[data-disabled] {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.gl-tab-icon {
+		display: inline-flex;
+		flex: none;
+	}
+	.gl-tab-icon .gl-icon {
+		width: 16px;
+		height: 16px;
+	}
+	.gl-tab-label {
+		min-width: 0;
+	}
+	.gl-tabs-full .gl-tab {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	/* underline. The list keeps 5px of room so the focus ring isn't clipped by the scroller, and gives it back. */
+	.gl-tabs-underline .gl-tabs-list {
+		gap: 2px;
+		padding: 5px;
+		margin: -5px;
+	}
+	.gl-tabs-underline .gl-tab {
+		min-height: var(--size-control);
+		padding: 0 var(--space-md);
+		border-radius: var(--radius-control);
+		color: var(--color-muted);
+	}
+	.gl-tabs-underline .gl-tab[data-active] {
+		color: var(--color-ink);
+	}
+	/* The site's mobile tab mark (16 × 2px, color-ink, 4px off the tab's foot), as one element that slides. */
+	.gl-tabs-indicator {
+		position: absolute;
+		left: 0;
+		bottom: 9px;
+		width: 16px;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--color-ink);
+		pointer-events: none;
+		transition: transform var(--duration-tab) var(--ease-folio);
+	}
+
+	/* pill: the nav pill (.identity-strip nav and its links) */
+	.gl-tabs-pill .gl-tabs-bar {
+		justify-self: start;
+		max-width: 100%;
+	}
+	.gl-tabs-pill.gl-tabs-full .gl-tabs-bar {
+		justify-self: stretch;
+	}
+	.gl-tabs-pill .gl-tabs-list {
+		gap: 3px;
+		padding: 5px;
+		background: var(--glass-faint);
+		border: 1px solid #ffffffc9;
+		border-radius: var(--radius-pill);
+		box-shadow:
+			0 6px 20px #64779709,
+			inset 0 1px 0 #fff;
+		-webkit-backdrop-filter: blur(var(--blur-control));
+		backdrop-filter: blur(var(--blur-control));
+	}
+	/* .identity-strip nav a is padding 7px 17px; 1px goes to the border the raised state shows. */
+	.gl-tabs-pill .gl-tab {
+		padding: 6px 16px;
+		border-radius: 23px;
+		font-size: 13px;
+		line-height: 1.6;
+	}
+	.gl-tabs-pill .gl-tab[data-active],
+	.gl-tabs-side .gl-tab[data-active] {
+		background: var(--glass-raised);
+		border-color: #fff;
+		box-shadow: var(--shadow-raised);
+	}
+
+	/* side: .folio-layout's 176px column beside the panels, .project-selector, .project-tab */
+	.gl-tabs-side {
+		grid-template-columns: 176px minmax(0, 1fr);
+		gap: var(--space-lg);
+		align-items: start;
+	}
+	.gl-tabs-side .gl-tabs-list {
+		flex-direction: column;
+		gap: 5px;
+		padding: 7px;
+		overflow: visible;
+		background: rgba(255, 255, 255, 0.4);
+		border: 1px solid #fff9;
+		border-radius: var(--radius-well);
+		box-shadow: var(--shadow-selector);
+		-webkit-backdrop-filter: blur(var(--blur-selector));
+		backdrop-filter: blur(var(--blur-selector));
+	}
+	.gl-tabs-side.gl-tabs-with-panels .gl-tabs-list {
+		margin-top: 20px;
+	}
+	.gl-tabs-side .gl-tab {
+		display: flex;
+		justify-content: flex-start;
+		gap: 11px;
+		width: 100%;
+		min-height: var(--size-control);
+		padding: 14px 12px;
+		border-radius: var(--radius-tab);
+		text-align: left;
+		white-space: normal;
+	}
+	/* .tab-orb, .orb-1, .orb-2 */
+	.gl-tab-orb {
+		display: block;
+		width: 12px;
+		height: 12px;
+		flex: none;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #f6fbff, #93afcf);
+		box-shadow:
+			inset 0 0 1px #ffffff,
+			0 1px 4px #546b8e25;
+	}
+	.gl-tab-orb-1 {
+		background: linear-gradient(135deg, #f1f8ff, #77a5d8);
+	}
+	.gl-tab-orb-2 {
+		background: linear-gradient(135deg, #edfaff, #82b9d5);
+	}
+	/* .tab-mark: shown on the selected tab only, its space always kept so labels never reflow */
+	.gl-tab-mark {
+		display: inline-flex;
+		flex: none;
+		margin-left: auto;
+		opacity: 0;
+		transition: opacity var(--duration-state) ease;
+	}
+	.gl-tab[data-active] .gl-tab-mark {
+		opacity: 1;
+	}
+
+	.gl-tabs-panels {
+		min-width: 0;
+	}
+	.gl-tab-panel {
+		min-width: 0;
+	}
+	.gl-tab-panel[hidden] {
+		display: none;
+	}
+	/* The site's crossfade: the incoming panel fades in over duration-tab on ease-folio. */
+	.gl-tab-panel-animate:not([hidden]) {
+		animation: gl-tab-panel-in var(--duration-tab) var(--ease-folio);
+	}
+	@keyframes gl-tab-panel-in {
+		from {
+			opacity: 0;
+		}
+	}
+
+	/* Scrolling row: faded edges, and chevrons for pointers that can't scroll sideways. */
+	.gl-tabs-bar[data-overflow-start] .gl-tabs-list {
+		-webkit-mask-image: linear-gradient(to right, transparent, #000 40px);
+		mask-image: linear-gradient(to right, transparent, #000 40px);
+	}
+	.gl-tabs-bar[data-overflow-end] .gl-tabs-list {
+		-webkit-mask-image: linear-gradient(to left, transparent, #000 40px);
+		mask-image: linear-gradient(to left, transparent, #000 40px);
+	}
+	.gl-tabs-bar[data-overflow-start][data-overflow-end] .gl-tabs-list {
+		-webkit-mask-image: linear-gradient(
+			to right,
+			transparent,
+			#000 40px,
+			#000 calc(100% - 40px),
+			transparent
+		);
+		mask-image: linear-gradient(
+			to right,
+			transparent,
+			#000 40px,
+			#000 calc(100% - 40px),
+			transparent
+		);
+	}
+	.gl-tabs-scroll {
+		display: none;
+		position: absolute;
+		top: 50%;
+		translate: 0 -50%;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		margin: 0;
+		padding: 0;
+		border: 1px solid var(--glass-edge);
+		border-radius: var(--radius-pill);
+		background: var(--glass-solid);
+		color: var(--ink-soft);
+		box-shadow: var(--shadow-raised);
+		cursor: pointer;
+		transition:
+			background-color var(--duration-hover) ease,
+			color var(--duration-hover) ease;
+	}
+	.gl-tabs-scroll-start {
+		inset-inline-start: 2px;
+	}
+	.gl-tabs-scroll-end {
+		inset-inline-end: 2px;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-tabs-bar[data-overflow-start] .gl-tabs-scroll-start,
+		.gl-tabs-bar[data-overflow-end] .gl-tabs-scroll-end {
+			display: inline-flex;
+		}
+		.gl-tabs-scroll:hover {
+			background: #fff;
+			color: var(--color-ink);
+		}
+		/* .project-tab:hover, .identity-strip nav a:hover */
+		.gl-tabs-underline .gl-tab:hover:not([data-disabled]),
+		.gl-tabs-side .gl-tab:hover:not([data-disabled]):not([data-active]) {
+			background: #ffffff66;
+			color: var(--color-ink);
+		}
+		.gl-tabs-pill .gl-tab:hover:not([data-disabled]):not([data-active]) {
+			background: #fff7;
+		}
+		.gl-tabs-pill .gl-tab[data-active]:hover,
+		.gl-tabs-side .gl-tab[data-active]:hover {
+			background: #fff;
+		}
+	}
+
+	/* Phones: the side selector becomes a row of tabs with the mark under the selected one (global.css ≤700px). */
+	@media (max-width: 700px) {
+		.gl-tabs-side {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 15px;
+		}
+		.gl-tabs-side .gl-tabs-list,
+		.gl-tabs-side.gl-tabs-with-panels .gl-tabs-list {
+			flex-direction: row;
+			margin: 0;
+			padding: 4px;
+			gap: 2px;
+			border-radius: 16px;
+		}
+		.gl-tabs-side .gl-tab {
+			flex: 1;
+			min-width: 0;
+			width: auto;
+			padding: 11px 7px;
+			justify-content: center;
+			gap: 6px;
+			font-size: 12px;
+			text-align: center;
+			border-radius: 12px;
+		}
+		.gl-tabs-side .gl-tab-mark {
+			display: none;
+		}
+		.gl-tabs-side .gl-tab[data-active]::after {
+			content: "";
+			position: absolute;
+			left: calc(50% - 8px);
+			bottom: 4px;
+			width: 16px;
+			height: 2px;
+			border-radius: 2px;
+			background: var(--color-ink);
+		}
+		.gl-tabs-side .gl-tab-orb {
+			width: 7px;
+			height: 7px;
+		}
+	}
+	@media (max-width: 360px) {
+		.gl-tabs-side .gl-tab {
+			padding: 11px 5px;
+			font-size: 11px;
+		}
+		.gl-tabs-side .gl-tab-orb {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.gl-tab,
+		.gl-tab-mark,
+		.gl-tabs-indicator,
+		.gl-tabs-scroll {
+			transition: none;
+		}
+		.gl-tab-panel-animate:not([hidden]) {
+			animation: none;
+		}
+		.gl-tab:active:not([data-disabled]) {
+			transform: none;
+		}
+	}
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-tabs-pill .gl-tabs-list,
+		.gl-tabs-side .gl-tabs-list {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-tabs-pill .gl-tabs-list,
+		.gl-tabs-side .gl-tabs-list {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+}
