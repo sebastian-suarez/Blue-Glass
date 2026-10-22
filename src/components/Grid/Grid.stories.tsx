@@ -219,7 +219,7 @@ export const Variants: Story = {
 						<Cell>9</Cell>
 					</Grid>
 				</Grid>
-				<Caption>{'sizes · spacing="xs"'}</Caption>
+				<Caption>sizes · spacing="xs"</Caption>
 			</Stack>
 			<Stack gap={8}>
 				<Grid container spacing="xs">
@@ -255,9 +255,7 @@ export const Variants: Story = {
 						</Grid>
 					))}
 				</Grid>
-				<Caption>
-					{'spacing="xl" · rowSpacing="2xs" columnSpacing="lg"'}
-				</Caption>
+				<Caption>spacing="xl" · rowSpacing="2xs" columnSpacing="lg"</Caption>
 			</Stack>
 			<Stack gap={8}>
 				<Grid container columns={5} spacing="xs">

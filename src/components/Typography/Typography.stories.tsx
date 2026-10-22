@@ -189,7 +189,11 @@ function TypeScale() {
 									<Typography
 										variant={variant}
 										component="p"
-										style={fontSize ? { fontSize } : undefined}
+										style={
+											fontSize === undefined || fontSize === ""
+												? undefined
+												: { fontSize }
+										}
 									>
 										{sample}
 									</Typography>
@@ -299,7 +303,7 @@ function ClientWorkPanel() {
 				<Typography variant="body-lg">
 					{/* A word joiner after the dash keeps the range on one line. */}
 					{
-						"Cut PDF generation time from about 6 seconds to 10–\u206020 milliseconds."
+						"Cut PDF generation time from about 6 seconds to 10–\u{2060}20 milliseconds."
 					}
 				</Typography>
 				<Typography

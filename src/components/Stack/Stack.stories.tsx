@@ -143,9 +143,8 @@ export const Variants: Story = {
 					</span>
 				</Stack>
 				<Caption>
-					{
-						'direction="row" justifyContent="space-between" alignItems="baseline" wrap'
-					}
+					direction="row" justifyContent="space-between" alignItems="baseline"
+					wrap
 				</Caption>
 			</Column>
 			<Labelled label={'direction="row" wrap spacing="2xs"'} minHeight={40}>
@@ -213,9 +212,8 @@ export const Example: Story = {
 			</Stack>
 			<Column gap={6}>
 				<Caption>
-					{
-						'Stack component="ul" keeps the list semantics; spacing tokens keep the rhythm.'
-					}
+					Stack component="ul" keeps the list semantics; spacing tokens keep the
+					rhythm.
 				</Caption>
 			</Column>
 		</>

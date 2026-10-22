@@ -2,6 +2,7 @@
 The transitions rendered on the server, in Node with no DOM globals. Transitions.test.tsx renders
 the same tree in Chromium to the same file snapshot, and hydrates it.
 */
+/* eslint-disable @eslint-react/jsx-no-children-prop -- A Node test is a .ts file, so it builds trees with createElement, which types a required children only as a prop. */
 import { createElement, Fragment } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
@@ -65,22 +66,21 @@ describe("the transitions on the server", () => {
 	});
 
 	test("content that is out renders hidden, or not at all with mountOnEnter", () => {
-		const html = renderToString(
-			createElement(
-				Fragment,
-				null,
-				createElement(Grow, {
-					in: false,
-					children: createElement("div", { id: "out" }, "Out"),
-				}),
-				createElement(Fade, {
-					in: false,
-					mountOnEnter: true,
-					children: createElement("div", { id: "lazy" }, "Lazy"),
-				}),
-				createElement(Collapse, { in: false, children: "Closed" }),
-			),
+		const tree = createElement(
+			Fragment,
+			null,
+			createElement(Grow, {
+				in: false,
+				children: createElement("div", { id: "out" }, "Out"),
+			}),
+			createElement(Fade, {
+				in: false,
+				mountOnEnter: true,
+				children: createElement("div", { id: "lazy" }, "Lazy"),
+			}),
+			createElement(Collapse, { in: false, children: "Closed" }),
 		);
+		const html = renderToString(tree);
 		expect(html).toMatch(
 			/id="out" data-transition="exited" style="opacity:0;transform:scale\(0\.96\)[^"]*visibility:hidden/u,
 		);

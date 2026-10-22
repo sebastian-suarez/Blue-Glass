@@ -81,7 +81,7 @@ export const Default: Story = {
 	},
 	render: () => (
 		<Box p="xl" style={{ ...well, maxWidth: 420 }}>
-			<span style={plate}>{'p="xl" · 28px on every side'}</span>
+			<span style={plate}>p="xl" · 28px on every side</span>
 		</Box>
 	),
 };
@@ -136,7 +136,7 @@ export const Variants: Story = {
 						p="sm"
 						style={{ ...plate, width: 220, textAlign: "center" }}
 					>
-						{'mx="auto" centres a sized box'}
+						mx="auto" centres a sized box
 					</Box>
 				</div>
 			</Stack>
@@ -243,9 +243,8 @@ export const Example: Story = {
 				</Box>
 			</Paper>
 			<Caption>
-				{
-					'Paper gives the surface; Box p="2xl" gives the card padding, gap="md" the rhythm.'
-				}
+				Paper gives the surface; Box p="2xl" gives the card padding, gap="md"
+				the rhythm.
 			</Caption>
 		</>
 	),

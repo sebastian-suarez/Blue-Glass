@@ -114,18 +114,17 @@ function ReadMore() {
 				className="text-body-sm"
 				style={{ margin: 0, color: "var(--color-muted)" }}
 			>
-				{
-					"A Rust daemon that carries force feedback from a Windows sim under Wine to the wheel on macOS."
-				}
+				A Rust daemon that carries force feedback from a Windows sim under Wine
+				to the wheel on macOS.
 			</p>
 			<Collapse in={isOpen}>
 				<p
 					className="text-body-sm"
 					style={{ margin: 0, paddingBottom: 4, color: "var(--color-muted)" }}
 				>
-					{
-						"It replaces a closed driver with an open one: the sim's FFB packets are read in the Wine prefix, normalised, and written to the wheel at the device's rate."
-					}
+					It replaces a closed driver with an open one: the sim's FFB packets
+					are read in the Wine prefix, normalised, and written to the wheel at
+					the device's rate.
 				</p>
 			</Collapse>
 			<Row>
