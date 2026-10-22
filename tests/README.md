@@ -10,7 +10,7 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 | Story layout      | `npm run check:layout`                       | A listed story's server HTML lays out differently from its hydrated page at 390px or 1280px (the self-test proves a layout chosen in JavaScript fails)                                                                                                                                                                  |
 | Delayed hydration | `npm run check:islands`                      | An island, not yet hydrated, shows the wrong tab or rows, lacks its ARIA wiring or tab stop; or it hydrates with an error, a moved text or lost focus; or it then ignores its documented keys and clicks (the self-test plants each kind of defect on the reference, but the wiring, which the reference already lacks) |
 | Reference sync    | `npm run check:sync`                         | A reference file changed since the module built from it was ported                                                                                                                                                                                                                                                      |
-| Unit              | `npx vitest run --project unit`              | Node tests, including the gates' own rules                                                                                                                                                                                                                                                                              |
+| Unit              | `npx vitest run --project unit`              | Node tests, including the gates' own rules and the stories guard (below)                                                                                                                                                                                                                                                |
 | Browser           | `npx vitest run --project browser`           | Package-only tests in Chromium: internals and adapters                                                                                                                                                                                                                                                                  |
 | Behaviour         | `npx vitest run --project behaviour:package` | Each phase's specs, written against `#ui`; `behaviour:reference` runs the same specs on the reference                                                                                                                                                                                                                   |
 
@@ -33,6 +33,14 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 
 - `tests/ssr/layout.json` lists the stories files checked from each phase: the sections and the components whose layout changes with the viewport.
 - `scripts/ssr/layout.ts` composes each story with the preview's decorators, renders it in Node, then compares where every text sits with JavaScript off and after hydration, at 390px and 1280px.
+
+## Stories
+
+- `tests/unit/stories.test.ts` composes every stories file with `.storybook/preview.tsx` and renders it in Node. A component's Default must list its args in `controls.include`, and changing any one of them must change its server HTML. Every other story, and every docs or section story, must keep Controls off.
+- An arg's next value comes from its argTypes' options, or else from its prop's union type, read with TypeScript as docgen reads it. A listed arg that isn't a prop of the component needs argTypes.
+- Each file `tests/ssr/layout.json` lists by the current phase needs a story pinned to the phone viewport, and the toolbar's phone and desktop sizes must be the capture sizes.
+- `tests/unit/fixtures/stories.tsx` proves the guard: an ignored, overridden, dropped or group-owned arg fails, and so does a story with Controls on elsewhere. Default parameters, inherited renders, wrappers and `useArgs` pass.
+- `tests/unit/stories.json` exempts, with a reason, a component file with nothing to control, or an arg that acts only after hydration.
 
 ## Delayed hydration
 

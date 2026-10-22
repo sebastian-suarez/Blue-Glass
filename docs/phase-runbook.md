@@ -82,6 +82,7 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
   - iOS 26 Safari backdrops: see "iOS 26+ Safari" in Base UI's quick start (`node_modules/@base-ui/react/docs/react/overview/quick-start.md`).
   - `ModalLayer` listens on the page's `document`, so a layer inside an iframe isn't supported. Escape's `onClose` gets the native KeyboardEvent.
   - A non-modal popup already open in body when an in-place modal opens gets hidden with the rest of the page.
+  - Stories follow the Controls rules in `stories/README.md`, which the guard in the unit project (`tests/unit/stories.test.ts`) checks. An overlay's Default lists `open`, bridged through `useArgs`: its own dismissal (Escape, the backdrop, a close button) calls `onClose`, which logs and sets the arg back to false. Check once in `npm run storybook` that a control change, a click and a dismissal each update the panel.
 - **Phase 3:** Checkbox, Radio and Switch follow deviations 1 to 6. Deviation 6 (a Radio outside a RadioGroup) is the gap to watch.
 - **Phase 5 and release:**
   - The packed `package.json` still carries `"prepare": "husky"`. Strip it before publishing.
