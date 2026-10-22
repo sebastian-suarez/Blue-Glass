@@ -266,6 +266,16 @@
 				"components/Badge/preview.html": "2b22e2980a294f42",
 				"components/Badge/reference.tsx": "16fd689f2948c3cf"
 			}
+		},
+		"Alert": {
+			"files": {
+				"components/Alert/README.md": "a01509476d9110aa",
+				"components/Alert/api.d.ts": "8070f068c106084e",
+				"components/Alert/styles.css": "3c3283eca2f22afd",
+				"components/Alert/preview.html": "d43caacc60360c34",
+				"components/Alert/reference.tsx": "e7d01b1039e7a3c1",
+				"shared/_feedback-live.ts": "fc6737562912f11f"
+			}
 		}
 	}
 }
