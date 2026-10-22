@@ -771,8 +771,8 @@
 		}
 	}
 	/* Placement: span size + offset tracks, then a start margin past the offset tracks (% of the item's own area).
-	   It starts at the first breakpoint with a size or an offset (gl-grid-placed-*). Below that the item fills its
-	   row: the size it would fall back to is its columns, which a nested container sets to its own count. */
+	   It starts at the item's first size (gl-grid-placed-*). Below that the item fills its row and an offset waits:
+	   the size it would fall back to is its columns, which a nested container sets to its own count. */
 	.gl-grid-sized {
 		--gl-grid-span: auto / span
 			calc(var(--gl-grid-size) + var(--gl-grid-offset));

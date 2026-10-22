@@ -286,6 +286,36 @@ describe("Tabs", () => {
 		},
 	);
 
+	referenceDefectTest(
+		'the values 1 and "1" get tabs and panels of their own, which the arrow keys tell apart',
+		async () => {
+			render(
+				<Tabs defaultValue={1} aria-label="Releases">
+					<Tab value={1} label="Number" />
+					<Tab value="1" label="Text" />
+					<Tab value={2} label="Two" />
+					<TabPanel value={1}>Number panel</TabPanel>
+					<TabPanel value="1">Text panel</TabPanel>
+					<TabPanel value={2}>Two panel</TabPanel>
+				</Tabs>,
+			);
+			const ids = ["Number", "Text", "Two"].flatMap((name) => [
+				tab(name).id,
+				tab(name).getAttribute("aria-controls") ?? "",
+			]);
+			expect(new Set(ids).size).toBe(ids.length);
+			expect(byId(tab("Text").getAttribute("aria-controls"))).toHaveTextContent(
+				"Text panel",
+			);
+			tab("Number").focus();
+			await userEvent.keyboard("{ArrowRight}");
+			await expect.element(tab("Text")).toHaveFocus();
+			await userEvent.keyboard("{ArrowRight}");
+			await expect.element(tab("Two")).toHaveFocus();
+			expect(tab("Two").getAttribute("aria-selected")).toBe("true");
+		},
+	);
+
 	test("generated ids don't collide between two Tabs with the same values", () => {
 		const first = React.createRef<HTMLDivElement>();
 		const second = React.createRef<HTMLDivElement>();

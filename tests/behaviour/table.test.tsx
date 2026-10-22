@@ -19,12 +19,19 @@ afterEach(() => {
 });
 
 /**
-Whether a cell has the header look: 12px, weight 600 (the README's "12px muted header cells").
-No preview sets variant, so parity can't see the look: this reads it.
+A cell's look: the header's 12px at weight 600 (the README's "12px muted header cells"), or the
+body's larger type at the table's weight 400. No preview sets variant, so parity can't see the
+look: this reads it.
 */
-function hasHeadLook(element: HTMLElement): boolean {
+function lookOf(element: HTMLElement): "head" | "body" | "neither" {
 	const style = getComputedStyle(element);
-	return style.fontSize === "12px" && style.fontWeight === "600";
+	if (style.fontSize === "12px" && style.fontWeight === "600") {
+		return "head";
+	}
+
+	return style.fontSize !== "12px" && style.fontWeight === "400"
+		? "body"
+		: "neither";
 }
 
 function must<T>(value: T | null | undefined): T {
@@ -483,8 +490,21 @@ describe("TableRow", () => {
 		const cell = (name: string) => screen.getByRole("cell", { name });
 		const background = (name: string) =>
 			getComputedStyle(cell(name)).backgroundColor;
+		// The pointer may start over a row, from the test before: the rest is read once its fade ends.
+		const settled = async (name: string) => {
+			await Promise.allSettled(
+				cell(name)
+					.getAnimations()
+					.map(async (animation) => animation.finished),
+			);
+			return background(name);
+		};
+
 		await userEvent.hover(screen.getByText("Away from the table"));
-		const resting = { epam: background("EPAM"), intive: background("Intive") };
+		const resting = {
+			epam: await settled("EPAM"),
+			intive: await settled("Intive"),
+		};
 		await userEvent.hover(cell("EPAM"));
 		await expect.poll(() => background("EPAM")).not.toBe(resting.epam);
 		await userEvent.hover(cell("Intive"));
@@ -592,10 +612,10 @@ describe("TableCell", () => {
 			const header = screen.getByRole("columnheader", { name: "Employer" });
 			expect(header).toHaveAttribute("scope", "col");
 			expect(header).toHaveAttribute("aria-sort", "ascending");
-			expect(hasHeadLook(header)).toBe(false);
+			expect(lookOf(header)).toBe("body");
 			const cell = screen.getByRole("cell", { name: "EPAM" });
 			expect(cell.tagName).toBe("TD");
-			expect(hasHeadLook(cell)).toBe(true);
+			expect(lookOf(cell)).toBe("head");
 		},
 	);
 
@@ -635,10 +655,10 @@ describe("TableCell", () => {
 				</TableBody>
 			</Table>,
 		);
-		expect(hasHeadLook(screen.getByText("Head"))).toBe(true);
-		expect(hasHeadLook(screen.getByText("Body look in the head"))).toBe(false);
-		expect(hasHeadLook(screen.getByText("Body"))).toBe(false);
-		expect(hasHeadLook(screen.getByText("Head look in the body"))).toBe(true);
+		expect(lookOf(screen.getByText("Head"))).toBe("head");
+		expect(lookOf(screen.getByText("Body look in the head"))).toBe("body");
+		expect(lookOf(screen.getByText("Body"))).toBe("body");
+		expect(lookOf(screen.getByText("Head look in the body"))).toBe("head");
 	});
 });
 

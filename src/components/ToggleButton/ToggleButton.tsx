@@ -1,5 +1,4 @@
 "use client";
-import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import * as React from "react";
@@ -251,13 +250,9 @@ export function ToggleButtonGroup({
 	className,
 	children,
 	onKeyDown,
-	onFocus,
 	ref,
 	...rest
 }: ToggleButtonGroupProps & { ref?: React.Ref<HTMLDivElement> }) {
-	// Base UI's arrow keys follow its DirectionProvider, not the page. The reference reads the
-	// group's computed direction, so the group reads it whenever focus comes in, before any key.
-	const [direction, setDirection] = React.useState<"ltr" | "rtl">("ltr");
 	// The group keeps the value, so it knows what's pressed while it renders its tab stop, and
 	// Base UI's ToggleGroup always runs controlled.
 	const [value, setValue] = useControlled<Selection>(
@@ -298,57 +293,76 @@ export function ToggleButtonGroup({
 	);
 
 	return (
-		<DirectionProvider direction={direction}>
-			<ToggleGroup
-				ref={ref}
-				value={pressed.map((item) => toBaseValue(item))}
-				multiple={!exclusive}
-				orientation={orientation}
-				disabled={disabled}
-				className={cx(
-					"gl-toggle-group",
-					`gl-toggle-group-${size}`,
-					orientation === "vertical" && "gl-toggle-group-vertical",
-					fullWidth && "gl-toggle-group-full",
-					disabled && "gl-toggle-group-disabled",
-					className,
-				)}
-				onValueChange={(next, details) => {
-					const values = next.map((item) => fromBaseValue(item));
-					const selection: Selection = exclusive
-						? (values.at(0) ?? null)
-						: values;
-					setValue(selection);
-					onChange?.(
-						documentedEvent(
-							details.event,
-							buttonOf(details.event),
-						) as React.MouseEvent<HTMLButtonElement>,
-						selection,
-					);
-				}}
-				onKeyDown={(event) => {
-					onKeyDown?.(event);
-					// The documented way to take over the keys. Base UI's arrow keys run after this
-					// handler and don't check defaultPrevented.
-					if (event.defaultPrevented) {
-						event.preventBaseUIHandler();
-					}
-				}}
-				onFocus={(event) => {
-					onFocus?.(event);
-					setDirection(
-						getComputedStyle(event.currentTarget).direction === "rtl"
-							? "rtl"
-							: "ltr",
-					);
-				}}
-				{...rest}
-			>
-				<ToggleButtonGroupContext value={context}>
-					{children}
-				</ToggleButtonGroupContext>
-			</ToggleGroup>
-		</DirectionProvider>
+		<ToggleGroup
+			ref={ref}
+			value={pressed.map((item) => toBaseValue(item))}
+			multiple={!exclusive}
+			orientation={orientation}
+			disabled={disabled}
+			className={cx(
+				"gl-toggle-group",
+				`gl-toggle-group-${size}`,
+				orientation === "vertical" && "gl-toggle-group-vertical",
+				fullWidth && "gl-toggle-group-full",
+				disabled && "gl-toggle-group-disabled",
+				className,
+			)}
+			onValueChange={(next, details) => {
+				const values = next.map((item) => fromBaseValue(item));
+				const selection: Selection = exclusive
+					? (values.at(0) ?? null)
+					: values;
+				setValue(selection);
+				onChange?.(
+					documentedEvent(
+						details.event,
+						buttonOf(details.event),
+					) as React.MouseEvent<HTMLButtonElement>,
+					selection,
+				);
+			}}
+			onKeyDown={(event) => {
+				onKeyDown?.(event);
+				// The documented way to take over the keys. Base UI's arrow keys run after this
+				// handler and don't check defaultPrevented.
+				if (event.defaultPrevented) {
+					event.preventBaseUIHandler();
+					return;
+				}
+
+				// Base UI's arrows follow its DirectionProvider, not the page. Right to left, the
+				// group moves them itself, reading the direction at each key as the reference does.
+				const root = event.currentTarget;
+				const isSideways =
+					orientation === "horizontal" &&
+					(event.key === "ArrowLeft" || event.key === "ArrowRight");
+				if (!isSideways || getComputedStyle(root).direction !== "rtl") {
+					return;
+				}
+
+				event.preventBaseUIHandler();
+				const buttons = [
+					...root.querySelectorAll<HTMLButtonElement>(".gl-toggle-button"),
+				].filter(
+					(button) =>
+						!button.disabled && button.closest(".gl-toggle-group") === root,
+				);
+				const current = buttons.indexOf(
+					root.ownerDocument.activeElement as HTMLButtonElement,
+				);
+				if (current === -1) {
+					return;
+				}
+
+				event.preventDefault();
+				const step = event.key === "ArrowLeft" ? 1 : -1;
+				buttons.at((current + step) % buttons.length)?.focus();
+			}}
+			{...rest}
+		>
+			<ToggleButtonGroupContext value={context}>
+				{children}
+			</ToggleButtonGroupContext>
+		</ToggleGroup>
 	);
 }

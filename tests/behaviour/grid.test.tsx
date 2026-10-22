@@ -290,6 +290,38 @@ referenceDefectTest(
 	},
 );
 
+referenceDefectTest(
+	"an offset waits for the item's first size: below it the item fills its row",
+	async () => {
+		// A phone width, below md.
+		await page.viewport(414, 896);
+		render(
+			<Grid container data-testid="grid" style={{ width: 400 }}>
+				<Grid
+					container
+					data-testid="inner"
+					columns={4}
+					size={{ md: 6 }}
+					offset={0}
+				>
+					<Grid data-testid="x" size={2} style={{ height: 10 }} />
+				</Grid>
+				<Grid
+					data-testid="pushed"
+					size={{ md: 6 }}
+					offset={{ xs: 2, md: 3 }}
+					style={{ height: 10 }}
+				/>
+			</Grid>,
+		);
+		expect(measure(["inner", "x", "pushed"])).toEqual({
+			inner: { left: 0, top: 0, width: 400 },
+			x: { left: 0, top: 0, width: 200 },
+			pushed: { left: 0, top: 10, width: 400 },
+		});
+	},
+);
+
 test("it renders a div by default, and component picks the element", () => {
 	const ref = React.createRef<HTMLElement>();
 	render(

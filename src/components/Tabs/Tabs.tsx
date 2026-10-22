@@ -140,7 +140,10 @@ const TabsContext = React.createContext<TabsContextValue | undefined>(
 );
 
 // Values become id fragments: keep [A-Za-z0-9-] and encode the rest, so "a b" and "a-b" stay apart.
+// A number gets _n, which no string's fragment starts with (an encoded character is _ and hex),
+// so 1 and "1" get ids of their own.
 const slug = (value: TabValue) =>
+	(typeof value === "number" ? "_n" : "") +
 	String(value).replaceAll(
 		/[^\d\-A-Za-z]/gu,
 		(character) => `_${(character.codePointAt(0) ?? 0).toString(16)}`,

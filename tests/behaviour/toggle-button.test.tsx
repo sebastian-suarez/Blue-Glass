@@ -826,6 +826,25 @@ describe("ToggleButtonGroup keyboard", () => {
 		await expectFocus("Code");
 	});
 
+	test("the arrows follow the page's direction at each key, also one set while the group has focus", async () => {
+		render(
+			<div data-testid="page">
+				<Around>
+					<Views exclusive />
+				</Around>
+			</div>,
+		);
+		focusBefore();
+		await userEvent.tab();
+		await userEvent.keyboard("{ArrowRight}");
+		await expectFocus("Code");
+		screen.getByTestId("page").dir = "rtl";
+		await userEvent.keyboard("{ArrowLeft}");
+		await expectFocus("Notes");
+		await userEvent.keyboard("{ArrowLeft}");
+		await expectFocus("Diagram");
+	});
+
 	test("a button whose onKeyDown prevents Space or Enter isn't pressed by them, as a native button isn't", async () => {
 		const onChange = vi.fn<() => void>();
 		render(

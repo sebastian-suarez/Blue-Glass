@@ -94,6 +94,10 @@
 		padding-block: 8px 6px;
 		font-size: 12px;
 	}
+	/* The body look keeps the table's weight on a th too, such as a body-look cell in the head. */
+	.gl-table-cell-body {
+		font-weight: inherit;
+	}
 	.gl-table-cell-rowheader {
 		font-weight: 500;
 	}
