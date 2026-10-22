@@ -1,3 +1,20 @@
 // Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
 // and tests/api checks the exports against design-system/source/index.d.ts.
-export {};
+export {
+	type TransitionStatus,
+	type Timeout,
+	type TransitionProps,
+	useTransition,
+	Transition,
+	type FadeProps,
+	Fade,
+	type GrowProps,
+	Grow,
+	type ZoomProps,
+	Zoom,
+	type SlideDirection,
+	type SlideProps,
+	Slide,
+	type CollapseProps,
+	Collapse,
+} from "./components/Transitions/index.js";
