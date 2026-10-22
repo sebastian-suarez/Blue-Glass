@@ -42,6 +42,7 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export { type BackdropProps, Backdrop } from "./components/Backdrop/index.js";
 export {
 	type AccordionProps,
 	Accordion,
@@ -75,6 +76,12 @@ export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";
 export * from "./components/Stack/index.js";
 export * from "./components/CssBaseline/index.js";
+export {
+	type ModalCloseReason,
+	type ModalProps,
+	Modal,
+} from "./components/Modal/index.js";
+export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
 export {
 	type TransitionStatus,
 	type Timeout,

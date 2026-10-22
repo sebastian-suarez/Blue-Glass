@@ -18,7 +18,8 @@ Each flag maps on its own instead:
 | (default)             | `useScrollLock`, the reference's lock: `overflow: hidden` on body, with    |
 |                       | `padding-right` grown by the scrollbar's width so the page doesn't shift.  |
 | `disableScrollLock`   | No lock.                                                                   |
-| (default)             | A backdrop covers the page and catches outside presses.                    |
+| (default)             | The Backdrop component covers the page and catches outside presses. It     |
+|                       | fades with the layer's `open`, and takes `BackdropProps` but `open`.       |
 | `invisibleBackdrop`   | The same backdrop, transparent (`gl-backdrop-invisible`).                  |
 | `hideBackdrop`        | No backdrop. The root ignores the pointer, so outside presses reach the    |
 |                       | page (focus still comes back in unless `disableEnforceFocus`).             |
@@ -62,11 +63,13 @@ backdrop clicks and pulls focus back. Scroll stays locked while any open modal l
 place, the page is hidden for the top layer that hides it, and layers opened above that one stay
 exposed, wherever they render.
 
-Left to the Modal port: the Blue Glass Backdrop component (`BackdropProps` takes its props, but
-the backdrop here is a plain element with the `gl-backdrop` classes).
+The backdrop is the Blue Glass Backdrop, as in the reference: through the portal it's what
+`Dialog.Backdrop` renders, in place it stands where the reference's did. It fades in as the layer
+opens and out as it closes, alongside a transition child's exit, and goes with the layer.
 */
 import { Dialog } from "@base-ui/react/dialog";
 import * as React from "react";
+import { Backdrop, type BackdropProps } from "../components/Backdrop/Backdrop.js";
 import { cx } from "./cx.js";
 import { getFocusable, getScrollbarSize, isInside } from "./dom.js";
 import type { ModalCloseReason } from "./events.js";
@@ -368,15 +371,10 @@ function isTransitionElement(
 }
 
 /**
-The Blue Glass Backdrop's props, as Modal's `BackdropProps` takes them. Only `invisible` and the
-HTML attributes apply here; the rest belong to the Backdrop component.
+The Backdrop's props, as Modal's `BackdropProps` takes them. All of them apply but `open`, which
+the layer drives.
 */
-export type ModalBackdropProps = React.HTMLAttributes<HTMLDivElement> & {
-	open?: boolean;
-	invisible?: boolean;
-	transitionDuration?: number | { enter?: number; exit?: number };
-	keepMounted?: boolean;
-};
+export type ModalBackdropProps = Partial<BackdropProps>;
 
 export type ModalLayerProps = ModalFlags & {
 	open: boolean;
@@ -732,20 +730,30 @@ function useBackdropPress(
 	};
 }
 
+type BackdropOptions = Pick<
+	BackdropProps,
+	"invisible" | "transitionDuration" | "keepMounted" | "children"
+>;
+
 /**
-The backdrop's props: the `gl-backdrop` classes, BackdropProps' HTML attributes and the press.
+What the layer gives the Backdrop: its options, with `invisible` from the flag unless
+BackdropProps sets it, and its HTML attributes with the press. Through the portal the attributes
+go to `Dialog.Backdrop`, which merges its own in before the Backdrop renders them all.
 */
 function getBackdropProps(
-	backdropProps: Partial<ModalBackdropProps> | undefined,
+	backdropProps: ModalBackdropProps | undefined,
 	isInvisibleByDefault: boolean,
 	press: BackdropPress,
-) {
+): {
+	options: BackdropOptions;
+	attributes: React.HTMLAttributes<HTMLDivElement>;
+} {
 	const {
 		open: _open,
-		invisible: isInvisible = isInvisibleByDefault,
-		transitionDuration: _transitionDuration,
-		keepMounted: _keepMounted,
-		className,
+		invisible = isInvisibleByDefault,
+		transitionDuration,
+		keepMounted,
+		children,
 		style,
 		onMouseDown,
 		onClick,
@@ -756,21 +764,18 @@ function getBackdropProps(
 		...style,
 	};
 	return {
-		"aria-hidden": true,
-		className: cx(
-			"gl-backdrop",
-			isInvisible && "gl-backdrop-invisible",
-			className,
-		),
-		style: backdropStyle,
-		...rest,
-		onMouseDown(event: React.MouseEvent<HTMLDivElement>) {
-			press.onMouseDown(event);
-			onMouseDown?.(event);
-		},
-		onClick(event: React.MouseEvent<HTMLDivElement>) {
-			onClick?.(event);
-			press.onClick(event);
+		options: { invisible, transitionDuration, keepMounted, children },
+		attributes: {
+			...rest,
+			style: backdropStyle,
+			onMouseDown(event) {
+				press.onMouseDown(event);
+				onMouseDown?.(event);
+			},
+			onClick(event) {
+				onClick?.(event);
+				press.onClick(event);
+			},
 		},
 	};
 }
@@ -920,7 +925,15 @@ export function ModalLayer(props: ModalLayerProps) {
 					container={portalContainer}
 					{...rootProps}
 				>
-					{backdrop ? <Dialog.Backdrop forceRender {...backdrop} /> : null}
+					{backdrop ? (
+						<Dialog.Backdrop
+							forceRender
+							{...backdrop.attributes}
+							render={(baseUiProps) => (
+								<Backdrop {...baseUiProps} {...backdrop.options} open={open} />
+							)}
+						/>
+					) : null}
 					<Dialog.Popup
 						ref={contentRef}
 						role="presentation"
@@ -950,7 +963,12 @@ export function ModalLayer(props: ModalLayerProps) {
 	return (
 		<div ref={handleRootRef} {...rootProps}>
 			{backdrop ? (
-				<div role="presentation" hidden={!isPresent} {...backdrop} />
+				<Backdrop
+					role="presentation"
+					{...backdrop.attributes}
+					{...backdrop.options}
+					open={open}
+				/>
 			) : null}
 			{isTrapping ? (
 				<TabSentinel
