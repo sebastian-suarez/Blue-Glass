@@ -18,3 +18,8 @@ export {
 	type CollapseProps,
 	Collapse,
 } from "./components/Transitions/index.js";
+export {
+	media,
+	type UseMediaQueryOptions,
+	useMediaQuery,
+} from "./components/useMediaQuery/index.js";
