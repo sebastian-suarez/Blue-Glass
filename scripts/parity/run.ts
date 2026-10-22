@@ -10,7 +10,8 @@ The report, with the three images per preview, goes to reports/parity/.
 
 Usage:
   node scripts/parity/run.ts             the gate, for the phase in scope
-  node scripts/parity/run.ts --self      the reference against itself, every preview
+  node scripts/parity/run.ts --self      the reference against itself, every preview, at rest
+                                         and in the opened states
   node scripts/parity/run.ts --mutate    proves planted defects fail the gate
   --only components/Button,sections/Hero  limits the previews
   --phase N                               overrides the phase (as BLUE_GLASS_PHASE does)
@@ -356,12 +357,28 @@ async function main(): Promise<number> {
 				only === undefined
 					? available
 					: available.filter((preview) => only.includes(preview.id));
-			const stateTable = mode === "self" ? selfTestStates : states;
+			// The self-test runs the gate's opened states too, so their budgets come from the
+			// reference against itself, plus its own states that prove the mechanism.
+			const statesOf = (id: string): State[] => {
+				const gate = states[id] ?? [];
+				if (mode !== "self") {
+					return gate;
+				}
+
+				const names = new Set(gate.map((state) => state.name));
+				return [
+					...gate,
+					...(selfTestStates[id] ?? []).filter(
+						(state) => !names.has(state.name),
+					),
+				];
+			};
+
 			const candidate: Runtime = mode === "self" ? "reference" : "package";
 			jobs = chosen.flatMap((preview) => [
 				async () =>
 					compareSafely(browser, server, thresholds, { preview, candidate }),
-				...(stateTable[preview.id] ?? []).map(
+				...statesOf(preview.id).map(
 					(state) => async () =>
 						compareSafely(browser, server, thresholds, {
 							preview,

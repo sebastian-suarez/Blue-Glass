@@ -2,16 +2,17 @@
 
 Every gate reads its scope from `tests/phases.json`: the modules ported up to the current phase, their exports, and the previews whose components all exist by then. `BLUE_GLASS_PHASE=N` or `--phase N` overrides it. Reports go to `reports/`, which git ignores.
 
-| Gate             | Command                                      | Fails when                                                                                                                                                            |
-| ---------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Parity           | `npm run parity`                             | A preview's package page logs an error, has a different size, or has a section with more differing pixels than its budget, at rest or in an opened state              |
-| Parity self-test | `npm run parity:self`                        | The reference doesn't match itself, or a planted defect (radius, colour, 2px shift, tracking) passes                                                                  |
-| Server HTML      | `npm run check:ssr`                          | A preview can't render on the server, logs an error, hydrates with an error, hides text in its server HTML, or leaves out text the reference showed before JavaScript |
-| Story layout     | `npm run check:layout`                       | A listed story's server HTML lays out differently from its hydrated page at 390px or 1280px (the self-test proves a layout chosen in JavaScript fails)                |
-| Reference sync   | `npm run check:sync`                         | A reference file changed since the module built from it was ported                                                                                                    |
-| Unit             | `npx vitest run --project unit`              | Node tests, including the gates' own rules                                                                                                                            |
-| Browser          | `npx vitest run --project browser`           | Package-only tests in Chromium: internals and adapters                                                                                                                |
-| Behaviour        | `npx vitest run --project behaviour:package` | Each phase's specs, written against `#ui`; `behaviour:reference` runs the same specs on the reference                                                                 |
+| Gate              | Command                                      | Fails when                                                                                                                                                                                                                                                           |
+| ----------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parity            | `npm run parity`                             | A preview's package page logs an error, has a different size, or has a section with more differing pixels than its budget, at rest or in an opened state                                                                                                             |
+| Parity self-test  | `npm run parity:self`                        | The reference doesn't match itself, or a planted defect (radius, colour, 2px shift, tracking) passes                                                                                                                                                                 |
+| Server HTML       | `npm run check:ssr`                          | A preview can't render on the server, logs an error, hydrates with an error, hides text in its server HTML, or leaves out text the reference showed before JavaScript                                                                                                |
+| Story layout      | `npm run check:layout`                       | A listed story's server HTML lays out differently from its hydrated page at 390px or 1280px (the self-test proves a layout chosen in JavaScript fails)                                                                                                               |
+| Delayed hydration | `npm run check:islands`                      | An island, not yet hydrated, shows the wrong tab or rows, lacks its ARIA wiring or tab stop; or it hydrates with an error, a moved text or lost focus; or it then ignores its documented keys and clicks (the self-test plants each kind of defect on the reference) |
+| Reference sync    | `npm run check:sync`                         | A reference file changed since the module built from it was ported                                                                                                                                                                                                   |
+| Unit              | `npx vitest run --project unit`              | Node tests, including the gates' own rules                                                                                                                                                                                                                           |
+| Browser           | `npx vitest run --project browser`           | Package-only tests in Chromium: internals and adapters                                                                                                                                                                                                               |
+| Behaviour         | `npx vitest run --project behaviour:package` | Each phase's specs, written against `#ui`; `behaviour:reference` runs the same specs on the reference                                                                                                                                                                |
 
 ## Parity
 
@@ -32,6 +33,12 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 
 - `tests/ssr/layout.json` lists the stories files checked from each phase: the sections and the components whose layout changes with the viewport.
 - `scripts/ssr/layout.ts` composes each story with the preview's decorators, renders it in Node, then compares where every text sits with JavaScript off and after hydration, at 390px and 1280px.
+
+## Delayed hydration
+
+- The portfolio hydrates its interactive sections late, as islands. `tests/ssr/fixtures/islands.tsx` holds them: the client-work Tabs, a project's Tabs, the career Accordion and the capabilities PaneAccordion.
+- `scripts/ssr/islands.ts` renders each in Node, loads the HTML with JavaScript on but not hydrated, and checks what the READMEs promise: the chosen tab or open rows show and the rest don't, tabs and panels name each other, and Tab reaches the selected tab and then its panel, or the first summary. Only then does the island hydrate, and it must do so with no error, no text moving more than 2px and focus kept, then answer End, Enter, the arrows and clicks as documented. At 390px and 1280px.
+- `--target reference` runs the same checks on the reference, and `--self` plants five defects there that each must add its problem.
 
 ## After porting a module
 

@@ -58,6 +58,9 @@ jobs:
       - name: Story layout
         run: npm run check:layout
 
+      - name: Delayed hydration
+        run: npm run check:islands
+
       - name: API
         run: npm run check:api
 

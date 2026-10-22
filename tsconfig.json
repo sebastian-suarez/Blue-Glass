@@ -21,8 +21,10 @@
 		// Scripts and tests run as TypeScript straight from Node 24, which strips types.
 		"allowImportingTsExtensions": true,
 		"erasableSyntaxOnly": true,
-		// Behaviour tests import the components as "#ui" (vitest.config.ts swaps the target).
-		"paths": { "#ui": ["./src/index.ts"] }
+		// Behaviour specs import the components as "#ui", and vitest.config.ts runs them on the
+		// package or the reference. They compile against the documented API, which they were
+		// written from; the API gate (tests/api) checks the package's types against the same file.
+		"paths": { "#ui": ["./design-system/source/index.d.ts"] }
 	},
 	// A bare ".storybook" matches nothing: the implied **/* skips dot folders.
 	"include": ["src", "tests", "scripts", ".storybook/**/*", "stories", "*.ts"],

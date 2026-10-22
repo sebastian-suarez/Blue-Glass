@@ -15,14 +15,15 @@ The reference in `design-system/` is the spec, but it isn't flawless. Phase 0 qu
   - **The package must render hidden text visibly.** It may leave out only what the reference's server HTML lacked too, copy for copy (`scripts/lib/ssr-rules.ts`). Hidden open content is the reference's defect, and leaving it out is no fix.
 - **`<Fade in>` renders invisible on the server.** The same goes for the other transitions while `appear` is on, which is the default: they render at opacity 0 and visibility hidden until hydration. That's what hides the overlays above. `src/internal/transition.ts` fixes it, and its tests pin the fix.
 - **Modal makes the rest of the page `inert` whatever its flags say.** `syncStack` in `Modal/reference.tsx` marks every other body child `inert`. So `hideBackdrop` ("the page behind stays visible and clickable") and `disableEnforceFocus` ("let focus leave the content") can't do what their docs promise. The package uses `aria-hidden` instead, while focus is enforced (`docs/deviations.md`, entry 7).
+- **Tabs name their panels only after hydration** (phase 1). A Tab sets `aria-controls` once its panel has registered in an effect (`Tabs/reference.tsx`, line 264), so in the server HTML no tab names its panel, though the README says "each tab gets `aria-controls` pointing at its panel". `node scripts/ssr/islands.ts --target reference` reports it for both Tabs islands. The package must wire them in the server HTML.
 - **Known from the reference's README:**
   - Tooltip and the transitions read a child's ref from `props.ref`, which React 18 drops in development.
   - Select spreads a `key` into Option, which React 19 warns about in development.
 
 ## Tests allowed to fail on the reference
 
-Each phase's behaviour tests run on the reference first. A test may fail there only if it's listed below with the defect it hits, and every test still has to pass on the package.
+Each phase's behaviour tests run on the reference first. A test may fail there only if it's listed below with the defect it hits, and every test still has to pass on the package. A listed test is declared with `referenceDefectTest` from `tests/behaviour/reference-defect.ts`: it must fail on the reference, so a fixed reference shows up, and pass on the package.
 
-| Test                                 | Defect |
-| ------------------------------------ | ------ |
-| _None yet; each phase adds its own._ |        |
+| Test                                                                                                          | Defect                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chip: "clickable gives the clickable styling without making the chip a button, so it can sit inside your own" | `api.d.ts` documents `clickable` as "hover and press styling without onClick, e.g. inside your own button", and the README makes a chip interactive only through `onClick` or `href`. The reference renders `clickable` alone as a `<button>` (`Chip/reference.tsx`, line 49), so inside your own button it nests a button in a button, which React reports as a hydration error. |
