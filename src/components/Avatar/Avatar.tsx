@@ -90,7 +90,8 @@ type GroupContextValue = {
 const AvatarGroupContext = React.createContext<GroupContextValue | null>(null);
 
 /**
-Base UI's loading status of the photo, with the source it was reported for.
+Base UI's loading status of the photo, with the source it was reported for: only a failure
+matters here.
 */
 type ImageReport = {
 	source: string;
@@ -173,6 +174,10 @@ export function Avatar({
 				// Rendered in place, so the photo is in the server HTML and loads before hydration,
 				// and loading="lazy" works; a failed one goes, for the fallbacks below.
 				keepMounted
+				// Base UI hides a loading image from assistive tech so a fallback beside it can take
+				// the name. None renders beside it here, so its alt names the avatar throughout, as
+				// in the reference.
+				aria-hidden={imgProps?.["aria-hidden"]}
 				onLoadingStatusChange={(next) => {
 					setReport({ source, status: next });
 				}}
@@ -196,9 +201,8 @@ export function Avatar({
 		variant === "tile" &&
 		typeof content === "string" &&
 		monogramPattern.test(content);
-	// A lettered avatar with a name reads as one image named after the person, not as "S S". So
-	// does a photo until it loads, since Base UI hides the img from assistive tech until then.
-	const isNamed = Boolean(alt) && !(showImage && status === "loaded");
+	// A lettered avatar with a name reads as one image named after the person, not as "S S".
+	const isNamed = Boolean(alt) && !showImage;
 	return (
 		<BaseAvatar.Root
 			ref={ref}
