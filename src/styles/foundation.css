@@ -128,7 +128,12 @@
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 	}
-	.gl-modal > :not(.gl-backdrop):not([data-gl-sentinel]) {
+	/* No ring on what the layer focuses when nothing in it asks to (the ring belongs to the
+	   controls inside). The package wraps the child in .gl-modal-content and focuses the
+	   surface, its [role="dialog"], so the reference's selector reaches neither. */
+	.gl-modal > :not(.gl-backdrop):not([data-gl-sentinel]),
+	.gl-modal-content > *,
+	.gl-modal-content :is([role="dialog"], [role="alertdialog"]) {
 		outline: none;
 	}
 	@media (prefers-reduced-transparency: reduce) {
