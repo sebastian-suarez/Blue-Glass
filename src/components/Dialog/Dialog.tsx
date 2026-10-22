@@ -179,6 +179,17 @@ const screens = {
 } as const;
 
 /**
+Whether a press lands on the element's own scrollbar (with scroll="body", the layer scrolls),
+which belongs to the browser.
+*/
+function isOnScrollbar(element: HTMLElement, event: React.MouseEvent): boolean {
+	const box = element.getBoundingClientRect();
+	const x = event.clientX - box.left - element.clientLeft;
+	const y = event.clientY - box.top - element.clientTop;
+	return x < 0 || y < 0 || x >= element.clientWidth || y >= element.clientHeight;
+}
+
+/**
 A modal task on a glass panel: Modal underneath (scrim, focus kept in, Escape, scroll lock, the
 rest of the page hidden from assistive tech), Grow from the centre, title and description wired
 to the surface's aria-labelledby and aria-describedby.
@@ -270,7 +281,9 @@ export function Dialog({
 						)}
 						data-transition={status}
 						onMouseDown={(event) => {
-							pressedRef.current = event.target === event.currentTarget;
+							const layer = event.currentTarget;
+							pressedRef.current =
+								event.target === layer && !isOnScrollbar(layer, event);
 							if (pressedRef.current && disableEnforceFocus !== true) {
 								event.preventDefault();
 							}
