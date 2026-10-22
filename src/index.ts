@@ -9,3 +9,7 @@ export {
 	type IconProps,
 	type SvgIconProps,
 } from "./components/Icon/index.js";
+export {
+	LightField,
+	type LightFieldProps,
+} from "./components/LightField/index.js";
