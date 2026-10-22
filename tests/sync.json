@@ -348,6 +348,24 @@
 				"components/NoSsr/preview.html": "470311655f821d68",
 				"components/NoSsr/reference.tsx": "19403662242f1f3c"
 			}
+		},
+		"Popover": {
+			"files": {
+				"components/Popover/README.md": "4a47843c8bfcf453",
+				"components/Popover/api.d.ts": "12bcbc39d025d30f",
+				"components/Popover/styles.css": "c2aaa1cf1dce764d",
+				"components/Popover/preview.html": "6f700bddd5555275",
+				"components/Popover/reference.tsx": "a695189b9826c0ca"
+			}
+		},
+		"Menu": {
+			"files": {
+				"components/Menu/README.md": "0fc6380b253874da",
+				"components/Menu/api.d.ts": "2f3cf68c7d5b016a",
+				"components/Menu/styles.css": "da01918f31918dae",
+				"components/Menu/preview.html": "62e396689d1a9bd1",
+				"components/Menu/reference.tsx": "54461a2732b66b8b"
+			}
 		}
 	}
 }
