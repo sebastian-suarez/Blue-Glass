@@ -37,7 +37,11 @@ type Story = StoryObj<Partial<DialogProps>>;
 
 // The preview's stages grow on phones, where the surface takes the card's phone padding and its
 // actions stack: it picks their heights with useMediaQuery(media.phone). Here CSS picks them under
-// the same query, so the server HTML lays out as the hydrated page does.
+// the same query, so the server HTML lays out as the hydrated page does. On phones the notes'
+// default text also wraps to three rows, while TextareaAutosize's server HTML is minRows rows tall
+// and the browser measures the rest, so CSS holds the field at three rows there (past the field
+// style's inline min-height): otherwise the centred surface grows, and every text moves, as the
+// page hydrates.
 const styles = `
 .dialog-stage-confirm {
 	height: 320px;
@@ -51,6 +55,9 @@ const styles = `
 	}
 	.dialog-stage-form {
 		height: 600px;
+	}
+	.dialog-notes {
+		min-height: calc(3lh + 22px) !important;
 	}
 }
 `;
@@ -324,6 +331,7 @@ function Publish({ open = false, onClose, ...dialog }: PublishProps) {
 						</label>
 						<TextareaAutosize
 							id={`${id}-notes`}
+							className="dialog-notes"
 							minRows={2}
 							maxRows={5}
 							defaultValue="Tabs crossfade instead of jumping. Diagrams draw in on scroll."
