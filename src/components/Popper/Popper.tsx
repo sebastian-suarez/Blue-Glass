@@ -8,9 +8,13 @@ content. It's non-modal: no backdrop, no focus move, nothing hidden from assisti
 
 As in the reference, the position is measured in a layout effect after every render, so a
 function anchorEl is asked again each time, and the layer stays hidden until it has a position.
-One change: the layer's element is also kept in state, so a layer that mounts after the Popper's
-own render (the Portal adds its children only once hydration is over) is measured when it
-arrives, not at the next scroll.
+Two changes:
+- The layer's element is also kept in state, so a layer that mounts after the Popper's own
+  render (the Portal adds its children only once hydration is over) is measured when it
+  arrives, not at the next scroll.
+- A new minWidth alone counts as a new position. The reference kept the old one, so turning
+  matchWidth on at a start placement, which moves nothing else, left the layer narrow until
+  something else moved.
 */
 import * as React from "react";
 import type { AnchorEl, VirtualElement } from "../../internal/anchor.js";
