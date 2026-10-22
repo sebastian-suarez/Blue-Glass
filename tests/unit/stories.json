@@ -1,6 +1,7 @@
 {
 	"$comment": "Exemptions from the stories guard (tests/unit/stories.test.ts), each with its reason. noControls: a component's stories file whose Default has nothing to control, so Controls stay off there too. afterHydration: a Default arg whose effect shows only once the story has hydrated, so its server HTML can't change. A row must name a stories file that exists, and an arg its Default lists.",
 	"noControls": {
+		"src/components/ClickAwayListener/ClickAwayListener.stories.tsx": "Its props say which presses count (mouseEvent, touchEvent) and what one does (onClickAway), and none changes what it renders; the Actions panel logs each press outside instead.",
 		"src/components/CssBaseline/CssBaseline.stories.tsx": "Its only prop is children: the resets apply to whatever it wraps.",
 		"src/components/useMediaQuery/useMediaQuery.stories.tsx": "A hook, not a component: its Default shows what it returns at the current viewport."
 	},
