@@ -153,8 +153,8 @@ async function bundle(target: Target): Promise<{ node: string }> {
 
 /**
 Whether a reader can see each text: some text node in #root with exactly these words, whose
-box isn't hidden by display, visibility or opacity, nor clipped away by an ancestor's overflow
-(a collapsed row is often a zero-height box that clips its content).
+box isn't hidden by display, visibility or opacity, nor clipped by an ancestor's overflow to
+less than half its size (a collapsed row is often a zero-height box that clips its content).
 */
 async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 	return page.evaluate((wanted) => {
@@ -186,12 +186,13 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 					continue;
 				}
 
+				// Text cut to a sliver is unreadable: at least half of it must stay inside the clip.
 				const clip = element.getBoundingClientRect();
 				left = Math.max(left, clip.left);
 				top = Math.max(top, clip.top);
 				right = Math.min(right, clip.right);
 				bottom = Math.min(bottom, clip.bottom);
-				if (right - left < 1 || bottom - top < 1) {
+				if (right - left < box.width / 2 || bottom - top < box.height / 2) {
 					return false;
 				}
 			}
@@ -534,7 +535,14 @@ function panesIsland(panes: Pane[]): Island {
 				/* eslint-enable no-await-in-loop */
 			}
 
+			// "Tab reaches each summary or pane button."
 			await tabIn(page);
+			if (!(await isFocused(button(page, panes[0].title)))) {
+				problems.push(
+					`server HTML: Tab doesn't reach the first pane, ${panes[0].title}`,
+				);
+			}
+
 			return problems;
 		},
 		focus: (page) => button(page, panes[0].title),
@@ -642,6 +650,12 @@ const mutations: Mutation[] = [
 		expect: '"CMS content, ready for mobile." isn\'t visible',
 	},
 	{
+		name: "panel partly clipped",
+		island: "ClientWork",
+		css: '[role="tabpanel"] { max-height: 6px; overflow: hidden }',
+		expect: '"CMS content, ready for mobile." isn\'t visible',
+	},
+	{
 		name: "no tab stop",
 		island: "ProjectTabs",
 		html: (html) => html.replaceAll('tabindex="0"', 'tabindex="-1"'),
@@ -659,6 +673,12 @@ const mutations: Mutation[] = [
 		island: "Career",
 		isInert: true,
 		expect: "after Enter: EPAM isn't closed",
+	},
+	{
+		name: "no pane tab stop",
+		island: "Capabilities",
+		html: (html) => html.replaceAll("<button", '<button tabindex="-1"'),
+		expect: "Tab doesn't reach the first pane",
 	},
 	{
 		name: "moves on hydration",
