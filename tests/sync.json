@@ -348,6 +348,15 @@
 				"components/NoSsr/preview.html": "470311655f821d68",
 				"components/NoSsr/reference.tsx": "19403662242f1f3c"
 			}
+		},
+		"Dialog": {
+			"files": {
+				"components/Dialog/README.md": "0bb7a8568cdeb07f",
+				"components/Dialog/api.d.ts": "acdb230f8bccfeef",
+				"components/Dialog/styles.css": "f6136b08a8fd6d1f",
+				"components/Dialog/preview.html": "ab8aefd663e566cd",
+				"components/Dialog/reference.tsx": "1c25456118851665"
+			}
 		}
 	}
 }
