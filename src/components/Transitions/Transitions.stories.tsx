@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
+import { useArgs } from "storybook/preview-api";
 import readme from "../../../design-system/components/Transitions/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Row, Stack } from "../../../stories/blocks/preview-kit.js";
@@ -46,20 +47,19 @@ function Specimen({
 }
 
 /**
-Fade, Grow, Zoom and Slide on one switch.
+Fade, Grow, Zoom and Slide on one switch, which the story's `in` arg holds.
 */
-function Transitions() {
-	const [isShown, setIsShown] = React.useState(true);
+function Transitions({
+	isShown,
+	onToggle,
+}: {
+	readonly isShown: boolean;
+	readonly onToggle: () => void;
+}) {
 	return (
 		<div style={{ display: "grid", gap: 16 }}>
 			<Row>
-				<Button
-					size="sm"
-					variant="primary"
-					onClick={() => {
-						setIsShown((shown) => !shown);
-					}}
-				>
+				<Button size="sm" variant="primary" onClick={onToggle}>
 					{isShown ? "Hide all" : "Show all"}
 				</Button>
 				<Caption>Enter 200-280ms ease-out-quint; exit faster.</Caption>
@@ -143,9 +143,27 @@ function ReadMore() {
 	);
 }
 
+/**
+Default's demo: the in arg shows or hides all four, and the button flips it.
+*/
+function TransitionsWithArgs(args: { readonly in?: boolean }) {
+	const [, updateArgs] = useArgs<{ readonly in?: boolean }>();
+	const isShown = args.in !== false;
+	return (
+		<Transitions
+			isShown={isShown}
+			onToggle={() => {
+				updateArgs({ in: !isShown });
+			}}
+		/>
+	);
+}
+
 export const Default: Story = {
 	name: "Default",
+	args: { in: true },
 	parameters: {
+		controls: { disable: false, include: ["in"] },
 		docs: {
 			description: {
 				story:
@@ -153,7 +171,7 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => <Transitions />,
+	render: TransitionsWithArgs,
 };
 
 export const Example: Story = {

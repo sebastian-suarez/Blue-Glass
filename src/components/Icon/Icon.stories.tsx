@@ -19,7 +19,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
 	name: "Default",
+	args: { name: "arrow-ne", size: 32, filled: false, strokeWidth: 1.5 },
+	argTypes: { name: { control: "select", options: iconNames } },
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["name", "size", "filled", "strokeWidth"],
+		},
 		docs: {
 			description: {
 				story:
@@ -27,9 +33,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Row gap={16}>
-			<Icon name="arrow-ne" size={32} />
+			<Icon {...args} />
 			<Button variant="text" href="#repo" endIcon={<Icon name="arrow-ne" />}>
 				Repository
 			</Button>

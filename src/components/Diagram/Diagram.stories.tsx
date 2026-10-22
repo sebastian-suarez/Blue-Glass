@@ -882,6 +882,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
 	parameters: {
+		controls: { disable: false, include: ["minScale"] },
 		docs: {
 			description: {
 				story:

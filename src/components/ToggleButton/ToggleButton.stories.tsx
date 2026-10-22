@@ -1,11 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Fragment, useState } from "react";
+import { useArgs } from "storybook/preview-api";
+import { fn } from "storybook/test";
 import readme from "../../../design-system/components/ToggleButton/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Labelled, Row } from "../../../stories/blocks/preview-kit.js";
 import { Icon, SvgIcon } from "../Icon/index.js";
 import { Paper } from "../Paper/index.js";
-import { ToggleButton, ToggleButtonGroup } from "./ToggleButton.js";
+import {
+	ToggleButton,
+	ToggleButtonGroup,
+	type ToggleButtonGroupProps,
+} from "./ToggleButton.js";
 
 const meta = {
 	title: "Inputs/ToggleButton",
@@ -188,9 +194,51 @@ function ProjectViews() {
 	);
 }
 
-export const Default: Story = {
+/**
+Default's group: the args drive it, and a press sets the value arg.
+*/
+function ViewPickerWithArgs(args: ToggleButtonGroupProps) {
+	const [, updateArgs] = useArgs<ToggleButtonGroupProps>();
+	return (
+		<ToggleButtonGroup
+			{...args}
+			onChange={(event, value: unknown) => {
+				args.onChange?.(event, value);
+				updateArgs({ value: value as typeof args.value });
+			}}
+		>
+			<ToggleButton value="diagram">Diagram</ToggleButton>
+			<ToggleButton value="code">Code</ToggleButton>
+			<ToggleButton value="notes">Notes</ToggleButton>
+		</ToggleButtonGroup>
+	);
+}
+
+// The args go to the group, which owns which button is pressed.
+export const Default: StoryObj<typeof ToggleButtonGroup> = {
 	name: "Default",
+	args: {
+		exclusive: true,
+		value: "diagram",
+		"aria-label": "View",
+		size: "md",
+		orientation: "horizontal",
+		disabled: false,
+		fullWidth: false,
+		onChange: fn<() => void>(),
+	},
+	argTypes: {
+		value: { control: "inline-radio", options: ["diagram", "code", "notes"] },
+		orientation: {
+			control: "inline-radio",
+			options: ["horizontal", "vertical"],
+		},
+	},
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["value", "size", "orientation", "disabled", "fullWidth"],
+		},
 		docs: {
 			description: {
 				story:
@@ -198,13 +246,7 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<ToggleButtonGroup exclusive defaultValue="diagram" aria-label="View">
-			<ToggleButton value="diagram">Diagram</ToggleButton>
-			<ToggleButton value="code">Code</ToggleButton>
-			<ToggleButton value="notes">Notes</ToggleButton>
-		</ToggleButtonGroup>
-	),
+	render: ViewPickerWithArgs,
 };
 
 export const Variants: Story = {

@@ -179,7 +179,20 @@ const ignore = () => undefined;
 
 export const Default: Story = {
 	name: "Default",
+	args: {
+		label: "TypeScript",
+		variant: "chip",
+		size: "md",
+		tone: "default",
+		selected: false,
+		disabled: false,
+	},
+	argTypes: { label: { control: "text" } },
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["label", "variant", "size", "tone", "selected", "disabled"],
+		},
 		docs: {
 			description: {
 				story:
@@ -187,9 +200,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Row gap={6}>
-			<Chip label="TypeScript" />
+			<Chip {...args} />
 			<Chip label="Node.js" />
 			<Chip label="AWS" />
 		</Row>

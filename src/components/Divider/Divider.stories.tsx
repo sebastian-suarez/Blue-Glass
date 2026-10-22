@@ -95,7 +95,9 @@ function Background() {
 }
 
 export const Default: Story = {
+	args: { variant: "full" },
 	parameters: {
+		controls: { disable: false, include: ["variant"] },
 		docs: {
 			description: {
 				story:
@@ -103,14 +105,14 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Paper
 			style={{ padding: "20px 28px", maxWidth: 560, display: "grid", gap: 16 }}
 		>
 			<Typography variant="small">
 				I&apos;ve led small teams and still spend my time writing code.
 			</Typography>
-			<Divider />
+			<Divider {...args} />
 			<Typography variant="small" color="muted">
 				Some dates overlap because I also held a side job.
 			</Typography>

@@ -66,13 +66,21 @@ const employers = [
 ];
 
 export const Default: Story = {
+	args: { spacing: "sm", direction: "column", wrap: false },
+	argTypes: {
+		direction: {
+			control: "inline-radio",
+			options: ["column", "row", "column-reverse", "row-reverse"],
+		},
+	},
 	parameters: {
+		controls: { disable: false, include: ["spacing", "direction", "wrap"] },
 		docs: {
 			description: { story: "A column with a token gap between children." },
 		},
 	},
-	render: () => (
-		<Stack spacing="sm" style={{ maxWidth: 360 }}>
+	render: (args) => (
+		<Stack {...args} style={{ maxWidth: 360 }}>
 			<div style={layer}>Domain</div>
 			<div style={layer}>Application</div>
 			<div style={layer}>Infrastructure, interfaces</div>

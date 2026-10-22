@@ -10,7 +10,7 @@ import {
 } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Paper } from "../Paper/index.js";
-import { type SpaceToken, Box } from "./Box.js";
+import { type SpaceToken, type SpaceValue, Box } from "./Box.js";
 
 const meta = {
 	title: "Layout/Box",
@@ -60,6 +60,8 @@ const paddings: Array<[SpaceToken, string]> = [
 	["2xl", "40px"],
 ];
 
+const pixels = new Map<SpaceValue | undefined, string>(paddings);
+
 const employers = [
 	"PayPal",
 	"Nike, via Globant",
@@ -71,7 +73,12 @@ const employers = [
 ];
 
 export const Default: Story = {
+	args: { p: "xl" },
+	argTypes: {
+		p: { control: "select", options: paddings.map(([token]) => token) },
+	},
 	parameters: {
+		controls: { disable: false, include: ["p"] },
 		docs: {
 			description: {
 				story:
@@ -79,9 +86,11 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<Box p="xl" style={{ ...well, maxWidth: 420 }}>
-			<span style={plate}>p="xl" · 28px on every side</span>
+	render: (args) => (
+		<Box {...args} style={{ ...well, maxWidth: 420 }}>
+			<span style={plate}>
+				{`p="${String(args.p)}" · ${pixels.get(args.p) ?? "a token"} on every side`}
+			</span>
 		</Box>
 	),
 };

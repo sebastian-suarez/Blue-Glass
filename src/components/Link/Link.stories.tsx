@@ -75,7 +75,18 @@ function SitePanel() {
 
 export const Default: Story = {
 	name: "Default",
+	args: {
+		href: repository,
+		children: "GitHub",
+		underline: "always",
+		external: false,
+	},
+	argTypes: { children: { control: "text" } },
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["children", "underline", "external"],
+		},
 		docs: {
 			description: {
 				story:
@@ -83,10 +94,10 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<p className="text-caption" style={prose}>
 			Checked against the live setup on 20 October 2026. The code is public on{" "}
-			<Link href={repository}>GitHub</Link>.
+			<Link {...args} />.
 		</p>
 	),
 };

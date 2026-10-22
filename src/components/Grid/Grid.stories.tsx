@@ -160,7 +160,9 @@ const count = (length: number) =>
 	Array.from({ length }, (_, index) => index + 1);
 
 export const Default: Story = {
+	args: { spacing: "md" },
 	parameters: {
+		controls: { disable: false, include: ["spacing"] },
 		docs: {
 			description: {
 				story:
@@ -168,8 +170,8 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<Grid container spacing="md">
+	render: (args) => (
+		<Grid container {...args}>
 			{count(3).map((item) => (
 				<Grid key={item} size={{ xs: 12, md: 6, lg: 4 }}>
 					<Cell>{"size={{ xs: 12, md: 6, lg: 4 }}"}</Cell>

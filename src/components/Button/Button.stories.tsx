@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
+import { fn } from "storybook/test";
 import readme from "../../../design-system/components/Button/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Labelled, Row } from "../../../stories/blocks/preview-kit.js";
@@ -74,14 +75,37 @@ function ContactBlock() {
 
 export const Default: Story = {
 	name: "Default",
+	args: {
+		children: "See the work",
+		variant: "glass",
+		tone: "default",
+		size: "md",
+		loading: false,
+		disabled: false,
+		fullWidth: false,
+		onClick: fn<() => void>(),
+	},
+	argTypes: { children: { control: "text" } },
 	parameters: {
+		controls: {
+			disable: false,
+			include: [
+				"children",
+				"variant",
+				"tone",
+				"size",
+				"loading",
+				"disabled",
+				"fullWidth",
+			],
+		},
 		docs: {
 			description: { story: "The glass pill. Verb first, sentence case." },
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Row>
-			<Button>See the work</Button>
+			<Button {...args} />
 		</Row>
 	),
 };

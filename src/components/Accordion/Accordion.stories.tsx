@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { useArgs } from "storybook/preview-api";
+import { fn } from "storybook/test";
 import readme from "../../../design-system/components/Accordion/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Stack } from "../../../stories/blocks/preview-kit.js";
@@ -9,6 +11,7 @@ import {
 	AccordionDetails,
 	AccordionSummary,
 	PaneAccordion,
+	type AccordionProps,
 	type PaneAccordionItem,
 } from "./Accordion.js";
 
@@ -151,12 +154,13 @@ One row of the career list: employer, title and dates, the paragraphs, then the 
 function CareerRow({
 	role,
 	isOpen = false,
-}: {
+	...props
+}: Omit<AccordionProps, "role"> & {
 	readonly role: Role;
 	readonly isOpen?: boolean;
 }) {
 	return (
-		<Accordion defaultExpanded={isOpen}>
+		<Accordion defaultExpanded={isOpen} {...props}>
 			<AccordionSummary secondary={role.title} meta={role.dates}>
 				{role.employer}
 			</AccordionSummary>
@@ -234,9 +238,46 @@ function SectionHead({
 	);
 }
 
+/**
+Default's rows: the args drive the first, and its own toggle sets the expanded arg.
+*/
+function CareerRowsWithArgs(args: AccordionProps) {
+	const [, updateArgs] = useArgs<AccordionProps>();
+	// The args drive the first row; the others stay closed, as in the preview.
+	return (
+		<div className="gl-accordion-surface">
+			{roles.slice(0, 3).map((role, index) =>
+				index === 0 ? (
+					<CareerRow
+						key={role.dates}
+						{...args}
+						role={role}
+						onChange={(event, expanded) => {
+							args.onChange?.(event, expanded);
+							updateArgs({ expanded });
+						}}
+					/>
+				) : (
+					<CareerRow key={role.dates} role={role} />
+				),
+			)}
+		</div>
+	);
+}
+
 export const Default: Story = {
 	name: "Default",
+	args: {
+		expanded: true,
+		disabled: false,
+		headingLevel: 3,
+		onChange: fn<() => void>(),
+	},
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["expanded", "disabled", "headingLevel"],
+		},
 		docs: {
 			description: {
 				story:
@@ -244,13 +285,7 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<div className="gl-accordion-surface">
-			{roles.slice(0, 3).map((role, index) => (
-				<CareerRow key={role.dates} role={role} isOpen={index === 0} />
-			))}
-		</div>
-	),
+	render: CareerRowsWithArgs,
 };
 
 export const Variants: Story = {
@@ -370,4 +405,13 @@ export const Example: Story = {
 			</div>
 		</Stack>
 	),
+};
+
+// Variants at the phone size the layout gate checks: its axe test runs at 390px too, and the
+// tag keeps the copy off the docs page.
+export const VariantsOnPhone: Story = {
+	...Variants,
+	name: "Variants on a phone",
+	tags: ["!autodocs"],
+	globals: { viewport: { value: "phone", isRotated: false } },
 };

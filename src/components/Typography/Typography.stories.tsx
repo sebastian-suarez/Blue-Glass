@@ -321,7 +321,27 @@ function ClientWorkPanel() {
 
 export const Default: Story = {
 	name: "Default",
+	args: {
+		children: "What I bring to a team",
+		variant: "heading",
+		color: "inherit",
+		align: "inherit",
+		noWrap: false,
+		gutterBottom: true,
+	},
+	argTypes: { children: { control: "text" } },
 	parameters: {
+		controls: {
+			disable: false,
+			include: [
+				"children",
+				"variant",
+				"color",
+				"align",
+				"noWrap",
+				"gutterBottom",
+			],
+		},
 		docs: {
 			description: {
 				story:
@@ -329,11 +349,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<div>
-			<Typography gutterBottom variant="heading">
-				What I bring to a team
-			</Typography>
+			<Typography {...args} />
 			<Typography variant="body-sm" color="muted" style={{ maxWidth: "62ch" }}>
 				Node.js and TypeScript services with Clean Architecture boundaries and
 				DDD vocabulary. Java and Spring before that.

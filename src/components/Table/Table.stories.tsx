@@ -13,6 +13,7 @@ import {
 	TableHead,
 	TableRow,
 	TableSortLabel,
+	type TableProps,
 } from "./Table.js";
 
 const meta = {
@@ -139,10 +140,10 @@ const muted = { color: "var(--color-muted)" };
 /**
 The outcomes table: employers as row headers, figures right-aligned.
 */
-function Outcomes() {
+function Outcomes(props: TableProps) {
 	return (
 		<TableContainer aria-label="Outcomes">
-			<Table>
+			<Table {...props}>
 				<TableHead>
 					<TableRow>
 						<TableCell>Employer</TableCell>
@@ -256,7 +257,9 @@ function Experience() {
 
 export const Default: Story = {
 	name: "Default",
+	args: { size: "md", stickyHeader: false },
 	parameters: {
+		controls: { disable: false, include: ["size", "stickyHeader"] },
 		docs: {
 			description: {
 				story:
@@ -264,7 +267,7 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => <Outcomes />,
+	render: (args) => <Outcomes {...args} />,
 };
 
 export const Variants: Story = {

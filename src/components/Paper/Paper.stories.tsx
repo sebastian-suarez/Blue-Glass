@@ -27,7 +27,9 @@ const tile: CSSProperties = {
 
 export const Default: Story = {
 	name: "Default",
+	args: { variant: "glass" },
 	parameters: {
+		controls: { disable: false, include: ["variant"] },
 		docs: {
 			description: {
 				story:
@@ -35,8 +37,8 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<Paper style={{ padding: 28, maxWidth: 520 }}>
+	render: (args) => (
+		<Paper {...args} style={{ padding: 28, maxWidth: 520 }}>
 			<p className="text-body" style={{ margin: 0 }}>
 				Every panel on the site is cut from this.
 			</p>

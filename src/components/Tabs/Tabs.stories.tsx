@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
+import { useArgs } from "storybook/preview-api";
+import { fn } from "storybook/test";
 import readme from "../../../design-system/components/Tabs/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Icon } from "../Icon/index.js";
 import { Paper } from "../Paper/index.js";
-import { Tab, TabPanel, Tabs } from "./Tabs.js";
+import { type TabsProps, Tab, TabPanel, Tabs } from "./Tabs.js";
 
 const meta = {
 	title: "Navigation/Tabs",
@@ -70,9 +72,9 @@ const projects = [
 /**
 The preview's site sections: underline tabs over four panels.
 */
-function SiteSections() {
+function SiteSections(props: TabsProps) {
 	return (
-		<Tabs aria-label="Sections" defaultValue="work">
+		<Tabs aria-label="Sections" {...props}>
 			<Tab value="work" label="Work" />
 			<Tab value="projects" label="Projects" />
 			<Tab value="experience" label="Experience" />
@@ -174,9 +176,38 @@ function ClientWork() {
 	);
 }
 
+/**
+Default's tabs: the args drive them, and a click sets the value arg.
+*/
+function SiteSectionsWithArgs(args: TabsProps) {
+	const [, updateArgs] = useArgs<TabsProps>();
+	return (
+		<SiteSections
+			{...args}
+			onChange={(event, value) => {
+				args.onChange?.(event, value);
+				updateArgs({ value });
+			}}
+		/>
+	);
+}
+
 export const Default: Story = {
 	name: "Default",
+	args: {
+		value: "work",
+		variant: "underline",
+		fullWidth: false,
+		onChange: fn<() => void>(),
+	},
+	argTypes: {
+		value: {
+			control: "inline-radio",
+			options: ["work", "projects", "experience", "contact"],
+		},
+	},
 	parameters: {
+		controls: { disable: false, include: ["value", "variant", "fullWidth"] },
 		docs: {
 			description: {
 				story:
@@ -184,7 +215,7 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => <SiteSections />,
+	render: SiteSectionsWithArgs,
 };
 
 export const Variants: Story = {
@@ -251,4 +282,13 @@ export const Example: Story = {
 		},
 	},
 	render: () => <ClientWork />,
+};
+
+// Example at the phone size the layout gate checks: its axe test runs at 390px too, and the
+// tag keeps the copy off the docs page.
+export const ExampleOnPhone: Story = {
+	...Example,
+	name: "Example on a phone",
+	tags: ["!autodocs"],
+	globals: { viewport: { value: "phone", isRotated: false } },
 };

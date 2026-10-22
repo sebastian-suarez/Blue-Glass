@@ -42,7 +42,9 @@ const employers = [
 
 export const Default: Story = {
 	name: "Default",
+	args: { alt: "Sebastian Suarez", variant: "circle", size: "md" },
 	parameters: {
+		controls: { disable: false, include: ["alt", "variant", "size"] },
 		docs: {
 			description: {
 				story:
@@ -50,10 +52,10 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Row gap={16}>
-			<Avatar alt="Sebastian Suarez" />
-			<Caption>alt=&quot;Sebastian Suarez&quot;</Caption>
+			<Avatar {...args} />
+			<Caption>{`alt="${args.alt}"`}</Caption>
 		</Row>
 	),
 };

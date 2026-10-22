@@ -166,3 +166,12 @@ export const Default: Story = {
 		</SectionPage>
 	),
 };
+
+// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
+// tag keeps the copy off the docs page.
+export const DefaultOnPhone: Story = {
+	...Default,
+	name: "Default on a phone",
+	tags: ["!autodocs"],
+	globals: { viewport: { value: "phone", isRotated: false } },
+};

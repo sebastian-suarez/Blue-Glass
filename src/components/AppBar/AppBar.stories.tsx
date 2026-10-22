@@ -178,7 +178,9 @@ function ScrollingPage({
 
 export const Default: Story = {
 	name: "Default",
+	args: { position: "static" },
 	parameters: {
+		controls: { disable: false, include: ["position"] },
 		docs: {
 			description: {
 				story:
@@ -186,9 +188,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<div style={{ margin: "0 -28px" }}>
-			<AppBar>
+			<AppBar {...args}>
 				<Toolbar>
 					<IdentityStrip />
 				</Toolbar>

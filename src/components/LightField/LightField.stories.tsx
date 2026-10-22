@@ -66,14 +66,16 @@ function Placement({
 
 export const Default: Story = {
 	name: "Default",
+	args: { variant: "compact" },
 	parameters: {
+		controls: { disable: false, include: ["variant"] },
 		docs: {
 			description: {
 				story: "compact: the rings and fold scaled to whatever box holds them.",
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<div
 			style={{
 				position: "relative",
@@ -84,7 +86,7 @@ export const Default: Story = {
 				background: "var(--color-canvas)",
 			}}
 		>
-			<LightField variant="compact" />
+			<LightField {...args} />
 			<Paper
 				style={{
 					position: "absolute",

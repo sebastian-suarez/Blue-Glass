@@ -169,7 +169,9 @@ function ClientWorkNav() {
 
 export const Default: Story = {
 	name: "Default",
+	args: { dense: false, divided: false },
 	parameters: {
+		controls: { disable: false, include: ["dense", "divided"] },
 		docs: {
 			description: {
 				story:
@@ -177,9 +179,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Paper style={{ padding: 7, maxWidth: 520 }}>
-			<List>
+			<List {...args}>
 				<ListItem>
 					<ListItemText
 						primary="Backend"

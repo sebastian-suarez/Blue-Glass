@@ -217,7 +217,9 @@ const tile: CSSProperties = { padding: 26, gap: 14 };
 
 export const Default: Story = {
 	name: "Default",
+	args: { variant: "glass" },
 	parameters: {
+		controls: { disable: false, include: ["variant"] },
 		docs: {
 			description: {
 				story:
@@ -225,8 +227,8 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
-		<Card component="article" style={{ maxWidth: 640 }}>
+	render: (args) => (
+		<Card {...args} component="article" style={{ maxWidth: 640 }}>
 			<CardHeader
 				title="RS50 force-feedback bridge"
 				subheader="Force feedback for a Logitech RS50 under Wine on Apple Silicon. A DirectInput proxy inside the bottle, a Rust daemon on the host, GPL-2.0."

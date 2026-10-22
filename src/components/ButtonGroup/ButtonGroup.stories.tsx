@@ -160,7 +160,19 @@ function DiagramHeader() {
 
 export const Default: Story = {
 	name: "Default",
+	args: {
+		"aria-label": "Résumé",
+		variant: "glass",
+		size: "md",
+		orientation: "horizontal",
+		fullWidth: false,
+		disabled: false,
+	},
 	parameters: {
+		controls: {
+			disable: false,
+			include: ["variant", "size", "orientation", "fullWidth", "disabled"],
+		},
 		docs: {
 			description: {
 				story:
@@ -168,9 +180,9 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => (
+	render: (args) => (
 		<Row>
-			<ButtonGroup aria-label="Résumé">
+			<ButtonGroup {...args}>
 				<Button>Read résumé</Button>
 				<Button>Download PDF</Button>
 				<Button>Copy link</Button>

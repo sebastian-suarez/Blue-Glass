@@ -34,6 +34,13 @@ const content: CSSProperties = {
 	color: "var(--ink-soft)",
 };
 
+// What each cap's width resolves to, as the content names it.
+const caps = {
+	wrap: "size-wrap",
+	header: "size-header",
+	prose: "62ch",
+} as const;
+
 /**
 A Container in the stand-in page, its content naming the cap.
 */
@@ -58,7 +65,9 @@ function Column({
 }
 
 export const Default: Story = {
+	args: { maxWidth: "wrap", disableGutters: false },
 	parameters: {
+		controls: { disable: false, include: ["maxWidth", "disableGutters"] },
 		docs: {
 			description: {
 				story:
@@ -66,7 +75,15 @@ export const Default: Story = {
 			},
 		},
 	},
-	render: () => <Column label="wrap" note="min(size-wrap, 90%)" />,
+	render: ({ maxWidth = "wrap", disableGutters = false, ...args }) => (
+		<Column
+			{...args}
+			maxWidth={maxWidth}
+			disableGutters={disableGutters}
+			label={maxWidth === false ? "uncapped" : maxWidth}
+			note={`min(${maxWidth === false ? "100%" : caps[maxWidth]}, ${disableGutters ? "100%" : "90%"})`}
+		/>
+	),
 };
 
 export const Variants: Story = {
