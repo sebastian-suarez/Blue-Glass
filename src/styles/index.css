@@ -3,3 +3,4 @@
    which the build checks. */
 @import "./tokens.css";
 @import "./foundation.css";
+@import "../components/Icon/Icon.css";
