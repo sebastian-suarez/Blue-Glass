@@ -6,6 +6,12 @@ export {
 	type ButtonGroupProps,
 } from "./components/ButtonGroup/index.js";
 export {
+	type ToggleButtonProps,
+	ToggleButton,
+	type ToggleButtonGroupProps,
+	ToggleButtonGroup,
+} from "./components/ToggleButton/index.js";
+export {
 	type AvatarSize,
 	type AvatarVariant,
 	type AvatarProps,

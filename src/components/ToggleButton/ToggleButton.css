@@ -1,0 +1,235 @@
+/* Blue Glass — ToggleButton, ported from design-system/components/ToggleButton/styles.css. Base
+   UI's Toggle keeps aria-pressed and the native disabled attribute, which the selectors read. */
+
+@layer gl-components {
+	/* ToggleButton — the site's segmented pill: the nav track (.identity-strip nav) holding nav-sized items
+   (.identity-strip nav a) that rise when pressed (.project-tab[aria-pressed=true]). */
+	.gl-toggle-group {
+		--gl-toggle-group-pad: 5px; /* .identity-strip nav: padding 5px */
+		--gl-toggle-group-gap: 3px; /* .identity-strip nav: gap 3px */
+		position: relative;
+		display: inline-flex;
+		align-items: stretch;
+		gap: var(--gl-toggle-group-gap);
+		/* The track hugs its buttons even where a grid or flex parent would stretch it; fullWidth opts in. */
+		width: fit-content;
+		max-width: 100%;
+		padding: var(--gl-toggle-group-pad);
+		border: 1px solid #ffffffc9; /* .identity-strip nav */
+		border-radius: var(--radius-pill);
+		background: var(--glass-faint);
+		box-shadow: var(--shadow-control);
+		-webkit-backdrop-filter: blur(var(--blur-control));
+		backdrop-filter: blur(var(--blur-control));
+		vertical-align: middle;
+		isolation: isolate;
+	}
+	.gl-toggle-group-sm {
+		--gl-toggle-group-pad: 4px;
+		--gl-toggle-group-gap: 2px;
+	}
+	/* vertical: the side selector's shape; radius-well = the item pill plus the 5px padding. */
+	.gl-toggle-group-vertical {
+		flex-direction: column;
+		border-radius: var(--radius-well);
+	}
+	.gl-toggle-group-full {
+		display: flex;
+		width: 100%;
+	}
+	.gl-toggle-group-full:not(.gl-toggle-group-vertical) > .gl-toggle-button {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+	/* A disabled group dims once, not once per button on top of it. */
+	.gl-toggle-group-disabled {
+		opacity: 0.5;
+	}
+	.gl-toggle-group-disabled .gl-toggle-button:disabled {
+		opacity: 1;
+	}
+
+	.gl-toggle-button {
+		--gl-toggle-h: 34px; /* 7px + 20px line + 7px: .identity-strip nav a */
+		--gl-toggle-px: 17px; /* .identity-strip nav a: padding 7px 17px */
+		--gl-toggle-font: 13px;
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: var(--gl-toggle-h);
+		padding: 0 var(--gl-toggle-px);
+		border: 1px solid transparent;
+		border-radius: 23px; /* .identity-strip nav a */
+		background: transparent;
+		color: var(--color-ink);
+		font: inherit;
+		font-size: var(--gl-toggle-font);
+		line-height: 20px;
+		white-space: nowrap;
+		cursor: pointer;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background-color var(--duration-state) ease,
+			border-color var(--duration-state) ease,
+			box-shadow var(--duration-state) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-toggle-button-sm {
+		--gl-toggle-h: 26px;
+		--gl-toggle-px: var(--space-sm);
+		--gl-toggle-font: 12px;
+		line-height: 16px;
+	}
+	.gl-toggle-button-lg {
+		--gl-toggle-h: 42px;
+		--gl-toggle-px: 22px;
+		--gl-toggle-font: 14px;
+	}
+	.gl-toggle-button-label {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-xs);
+		min-width: 0;
+	}
+	.gl-toggle-button-label .gl-icon {
+		width: 16px;
+		height: 16px;
+	}
+	.gl-toggle-button-lg .gl-toggle-button-label .gl-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* Pressed: the raised tab (.project-tab[aria-pressed=true]) plus its short ink bar
+   (.project-tab[aria-pressed=true]::after), so the state never rests on the fill alone. */
+	.gl-toggle-button[aria-pressed="true"] {
+		border-color: #fff;
+		background: var(--glass-raised);
+		box-shadow: var(--shadow-raised);
+	}
+	.gl-toggle-button::after {
+		content: "";
+		position: absolute;
+		left: calc(50% - 8px);
+		bottom: 4px;
+		width: 16px;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--color-ink);
+		opacity: 0;
+		transition: opacity var(--duration-state) ease;
+		pointer-events: none;
+	}
+	.gl-toggle-button-sm::after {
+		bottom: 2px;
+	}
+	.gl-toggle-button[aria-pressed="true"]::after {
+		opacity: 1;
+	}
+
+	.gl-toggle-button:focus-visible {
+		z-index: 1;
+		outline-offset: 2px;
+	}
+	.gl-toggle-button:active:not(:disabled) {
+		transform: scale(0.98);
+	}
+	.gl-toggle-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	/* Standalone: the glass pill (.btn-glass) at control height, raised the same way when pressed. */
+	.gl-toggle-button-standalone {
+		--gl-toggle-h: var(--size-control);
+		--gl-toggle-px: var(--space-lg);
+		--gl-toggle-font: 14px;
+		border-color: #fffc; /* .btn-glass */
+		border-radius: var(--radius-pill);
+		background: rgba(255, 255, 255, 0.5); /* .btn-glass */
+		box-shadow: var(--shadow-control);
+		-webkit-backdrop-filter: blur(var(--blur-control));
+		backdrop-filter: blur(var(--blur-control));
+		font-weight: 500;
+	}
+	.gl-toggle-button-standalone.gl-toggle-button-sm {
+		--gl-toggle-h: 36px;
+		--gl-toggle-px: var(--space-md);
+		--gl-toggle-font: 13px;
+	}
+	.gl-toggle-button-standalone.gl-toggle-button-lg {
+		--gl-toggle-h: 54px;
+		--gl-toggle-px: 30px;
+		--gl-toggle-font: 15px;
+	}
+	.gl-toggle-button-standalone.gl-toggle-button-sm::after {
+		bottom: 4px;
+	}
+	.gl-toggle-button-standalone:disabled {
+		box-shadow: none;
+	}
+	.gl-toggle-button-full {
+		display: flex;
+		width: 100%;
+	}
+
+	/* Phones: the site's nav tightens under 700px (.identity-strip nav a: 12px, less side padding). */
+	@media (max-width: 700px) {
+		.gl-toggle-group .gl-toggle-button-md {
+			--gl-toggle-px: var(--space-sm);
+			--gl-toggle-font: 12px;
+		}
+		.gl-toggle-group .gl-toggle-button-lg {
+			--gl-toggle-px: var(--space-md);
+			--gl-toggle-font: 13px;
+		}
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-toggle-button:hover:not(:disabled) {
+			background: #fff7;
+		} /* .identity-strip nav a:hover */
+		.gl-toggle-button-standalone:hover:not(:disabled) {
+			background: rgba(255, 255, 255, 0.75);
+		} /* .btn-glass:hover */
+		.gl-toggle-button[aria-pressed="true"]:hover:not(:disabled) {
+			background: #fff;
+		} /* .project-tab[aria-pressed=true]:hover */
+	}
+	/* Forced colours flatten the raised fill and erase the bar: mark pressed with system colours instead. */
+	@media (forced-colors: active) {
+		.gl-toggle-button[aria-pressed="true"] {
+			border-color: Highlight;
+		}
+		.gl-toggle-button::after {
+			background: Highlight;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-toggle-button,
+		.gl-toggle-button::after {
+			transition: none;
+		}
+		.gl-toggle-button:active:not(:disabled) {
+			transform: none;
+		}
+	}
+	@supports not (
+		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+	) {
+		.gl-toggle-group,
+		.gl-toggle-button-standalone:not([aria-pressed="true"]) {
+			background: var(--glass-solid);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-toggle-group,
+		.gl-toggle-button-standalone:not([aria-pressed="true"]) {
+			background: var(--glass-solid);
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
+		}
+	}
+}

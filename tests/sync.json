@@ -164,6 +164,15 @@
 				"components/Chip/preview.html": "0a93b101039d643e",
 				"components/Chip/reference.tsx": "4a99169729bd05b8"
 			}
+		},
+		"ToggleButton": {
+			"files": {
+				"components/ToggleButton/README.md": "be1dbf02f69d5a13",
+				"components/ToggleButton/api.d.ts": "89c777fd21466735",
+				"components/ToggleButton/styles.css": "9d5da34382f7d9df",
+				"components/ToggleButton/preview.html": "a6f368c0fb6d6ee1",
+				"components/ToggleButton/reference.tsx": "a4316f95e4ad9839"
+			}
 		}
 	}
 }
