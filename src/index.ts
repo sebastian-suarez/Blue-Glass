@@ -105,6 +105,12 @@ export {
 	LightField,
 	type LightFieldProps,
 } from "./components/LightField/index.js";
+export {
+	type DrawerCloseReason,
+	type DrawerAnchor,
+	type DrawerProps,
+	Drawer,
+} from "./components/Drawer/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export {
 	type TabValue,
