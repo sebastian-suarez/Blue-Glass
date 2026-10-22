@@ -39,3 +39,29 @@ Found while fixing:
 ### Rejected
 
 - **#11, the server render's clock.** A component that renders the current time can't hydrate cleanly in production either, because the server and the browser read different clocks. The harness's mismatch exposes that hazard, so it stays. No preview renders a date or time today.
+
+## Round 2, 21 Oct 2026
+
+The round reviewed the round-1 fixes, `92384f0..ebfce2e`.
+
+- **Verification first.** The full suite passed before the reviews: lint, types, build, 268 tests, the API gate, parity calibration (72 of 72) and its mutation test, the parity, server-HTML and layout gates, the sync check, the package check and the Storybook build.
+- **Code-only review: Fable** (xhigh), which had credits again. It saw only the diff.
+- **Task-aware review: Codex** (GPT-6 Astra), `/codex:adversarial-review`, with round 1's log.
+- Both returned "needs attention".
+
+| #   | From                           | Finding                                                                            | Check                                                                                                                                                                            | Disposition                                                                                                                          |
+| --- | ------------------------------ | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Codex (high), Fable (low)      | Text the reference held but hid still excuses the package for leaving it out       | The rule's own test passed it. Modal, Dialog, Drawer and Snackbar's open examples render in place, so leaving their content out is no portal                                     | Fixed: only text the reference's server HTML lacked may be missing. The test flipped to fail                                         |
+| 2   | Codex (medium)                 | Rest parameters (`...args: any[]`) slip past the API gate's `any` walk             | A planted fixture (ToggleButton's and Tabs' onChange, useMediaQuery): no check failed                                                                                            | Fixed: each documented position reads the package's rest element. The fixture fails the five checks that cover it                    |
+| 3   | Codex (medium), Fable (low)    | Texts compared as sets: a visible caption masks a hidden copy of the same words    | Re-recorded with counts: the Transitions demos' four labels are hidden before JavaScript, which the sets had missed                                                              | Fixed: texts count by occurrence. The baseline now lists 21 previews; the reference qualifies 53 of 71 (`docs/reference-defects.md`) |
+| 4   | Codex (medium)                 | Two stacked in-place layers leave both hidden from assistive tech                  | Chromium test: the second layer stayed `aria-hidden`. So did a portal kept mounted before an in-place layer opened                                                               | Fixed: the stack decides what's hidden. The top in-place layer hides the page, and layers opened above it stay exposed               |
+| 5   | Codex (medium), Fable (medium) | An open layer that unmounts doesn't return focus                                   | Chromium test, both paths: focus fell to body                                                                                                                                    | Fixed: an unmount returns focus too, after StrictMode's replay. See below                                                            |
+| 6   | Codex (medium)                 | MenuList items inside a fragment or a component get no tab stop in the server HTML | Node and Chromium tests: no item had `tabindex="0"`                                                                                                                              | Fixed: items the list can't see while rendering are each tabbable until it mounts, then one is. Hydration matches                    |
+| 7   | Fable (low)                    | Through the portal, re-opening before an exit transition ends leaves focus outside | Chromium test: focus stayed on the opener through the portal; in place it went in                                                                                                | Fixed: a re-open during the exit moves focus in, as Base UI's initialFocus doesn't run again                                         |
+| 8   | Fable (low, not reproduced)    | With the React root on `document`, Escape could report `onClose` twice             | React attaches its listeners to the root container, and `stopPropagation` doesn't stop other listeners on the same node. No test: the test page can't hydrate the whole document | Fixed by the DOM's rules alone: a layer handles each Escape event once                                                               |
+
+Found while fixing:
+
+- **StrictMode overwrote the opener in place.** It replays the stack's layout effect after focus has moved in, so the opener became an element inside the layer, and a close or unmount sent focus nowhere. The opener now stays when focus is already inside.
+
+Round 2 was the last round. Its fixes have tests but no third review.
