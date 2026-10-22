@@ -172,6 +172,46 @@ describe("standalone MenuList", () => {
 		}
 	});
 
+	test("items inside a fragment: every one is tabbable in the server HTML, then one after hydrating", async () => {
+		const tree = (
+			<MenuList aria-label="Actions">
+				<>
+					<MenuItem>Copy link</MenuItem>
+					<MenuItem>Delete</MenuItem>
+				</>
+			</MenuList>
+		);
+		const host = document.createElement("div");
+		document.body.append(host);
+		const errors: unknown[] = [];
+		let root: ReturnType<typeof hydrateRoot> | undefined;
+		const tabbableLabels = () =>
+			[...host.querySelectorAll<HTMLElement>('[role^="menuitem"]')]
+				.filter((element) => element.tabIndex === 0)
+				.map(
+					(element) =>
+						element.querySelector(".gl-menu-item-label")?.textContent,
+				);
+		try {
+			host.innerHTML = renderToString(tree);
+			expect(tabbableLabels()).toEqual(["Copy link", "Delete"]);
+			await act(async () => {
+				root = hydrateRoot(host, tree, {
+					onRecoverableError(error) {
+						errors.push(error);
+					},
+				});
+			});
+			expect(errors).toEqual([]);
+			expect(tabbableLabels()).toEqual(["Copy link"]);
+		} finally {
+			act(() => {
+				root?.unmount();
+			});
+			host.remove();
+		}
+	});
+
 	test("renders without a Base UI menu around it", () => {
 		const errors = vi.spyOn(console, "error").mockImplementation(() => {
 			// Silenced to assert on it.

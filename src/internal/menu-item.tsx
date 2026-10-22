@@ -28,8 +28,9 @@ its `onClick` doesn't run.
 `disableListWrap`, Up and Down, Home and End, typeahead (a word typed within 500ms, or one
 letter repeated to cycle), and Tab leaves it. Its roving tab stop is set during render (the
 selected item, else the first enabled one, among the MenuItems it holds directly), so the server
-HTML already has one tabbable item and hydration matches it; once mounted, the list keeps the
-stop where focus last was. Inside a Base UI menu the list is `Menu.Popup` itself
+HTML already has one tabbable item and hydration matches it. Items it can't see while rendering
+(inside a fragment, or rendered by another component) are each tabbable until it mounts, so the
+server HTML can still be tabbed into. Once mounted, the list keeps the stop where focus last was. Inside a Base UI menu the list is `Menu.Popup` itself
 (`MenuPopupList`), so `disableListWrap` becomes `Menu.Root`'s `loopFocus={false}`.
 
 `BaseUiMenu` is the smallest controlled Base UI menu around `MenuPopupList`, enough for tests;
@@ -568,6 +569,18 @@ function isTabStop(
 }
 
 /**
+Before the list has mounted, when it couldn't pick an item while rendering (its items sit inside
+fragments or other components): every item is tabbable, until the mounted list picks one.
+*/
+function isUnpicked(list: ListContextValue | undefined): boolean {
+	return (
+		list !== undefined &&
+		list.tabStop === undefined &&
+		list.initialStop === undefined
+	);
+}
+
+/**
 The reference's item: a roving tab stop in a standalone MenuList, a plain focusable row alone.
 */
 function ListMenuItem({
@@ -631,7 +644,7 @@ function ListMenuItem({
 	const attributes = {
 		id,
 		role,
-		tabIndex: list === undefined || isStop ? 0 : -1,
+		tabIndex: list === undefined || isStop || isUnpicked(list) ? 0 : -1,
 		className: itemClassName(isDense, tone, className),
 		"aria-disabled": disabled || undefined,
 		...checkedState(role, selected),

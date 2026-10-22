@@ -2,7 +2,7 @@
 The standalone MenuList rendered on the server, in Node with no DOM globals. menu-item.test.tsx
 hydrates the same HTML in Chromium.
 */
-import { createElement } from "react";
+import { createElement, Fragment } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { MenuItem, MenuList } from "./menu-item.js";
@@ -56,5 +56,35 @@ describe("MenuList on the server", () => {
 			{ label: "Delete", disabled: true },
 		]);
 		expect(tabbable(html)).toEqual(["Archive"]);
+	});
+
+	// Items the list can't see while rendering: inside a fragment, or rendered by a component.
+	// Each is tabbable until the list mounts and picks one.
+	test("items inside a fragment are tabbable", () => {
+		const items = [
+			createElement(MenuItem, { key: "copy" }, "Copy link"),
+			createElement(MenuItem, { key: "delete" }, "Delete"),
+		];
+		const html = renderToString(
+			createElement(
+				MenuList,
+				{ "aria-label": "Actions" },
+				createElement(Fragment, null, items),
+			),
+		);
+		expect(tabbable(html)).toEqual(["Copy link", "Delete"]);
+	});
+
+	test("items a component renders are tabbable", () => {
+		// A component in a .ts file: createElement takes it as a function.
+		const shareItem = () => createElement(MenuItem, null, "Share");
+		const html = renderToString(
+			createElement(
+				MenuList,
+				{ "aria-label": "Actions" },
+				createElement(shareItem),
+			),
+		);
+		expect(tabbable(html)).toEqual(["Share"]);
 	});
 });
