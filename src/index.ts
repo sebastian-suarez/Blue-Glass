@@ -117,6 +117,7 @@ export {
 	Modal,
 } from "./components/Modal/index.js";
 export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
+export { type PopoverProps, Popover } from "./components/Popover/index.js";
 export {
 	type VirtualElement,
 	type AnchorEl,

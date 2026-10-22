@@ -2,7 +2,10 @@
 /**
 The modal-flags adapter: Blue Glass's documented Modal flags (design-system/components/Modal)
 on Base UI's Dialog. Modal and Dialog build on `ModalLayer`; Drawer, Popover and Menu can reuse
-`resolveModalBehaviour` and `useScrollLock` with their own Base UI roots.
+`resolveModalBehaviour` and `useScrollLock` with their own Base UI roots. The stack's hooks are
+exported too (`useStackEntry`, `isTopLayer`, `useHidePage`, `useRestoreFocus`,
+`useBackdropPress`, `usePortalContainer`), so a layer on another Base UI root shares the stack
+with this one: popup-layer.tsx builds Popover's and Menu's on them.
 
 Why an adapter: the documented flags are independent, but Base UI's `modal` couples them. `true`
 traps focus, locks scroll and blocks outside clicks at once; `'trap-focus'` only traps focus;
@@ -193,7 +196,7 @@ export function useScrollLock(isActive: boolean): void {
 	}, [isActive]);
 }
 
-type Layer = {
+export type Layer = {
 	/**
 	The layer's root element, once mounted.
 	*/
@@ -207,7 +210,7 @@ const openLayers: Layer[] = [];
 // The open layers that hide the rest of the page themselves: in place, with focus enforced.
 const pageHiders = new WeakSet<Layer>();
 
-function isTopLayer(layer: Layer): boolean {
+export function isTopLayer(layer: Layer): boolean {
 	return openLayers.at(-1) === layer;
 }
 
@@ -451,7 +454,7 @@ Joins the stack while open, and keeps the element that had focus when the layer 
 read before focus moves in: Base UI moves it a frame after its own layout effects, and in place
 an effect after this one does.
 */
-function useStackEntry(
+export function useStackEntry(
 	isOpen: boolean,
 	layer: Layer,
 ): React.RefObject<Element | null> {
@@ -486,7 +489,7 @@ Sends focus back to the opener as the layer closes, before any exit transition, 
 reference, and as an open layer unmounts (`{isShown && <Modal open />}`). Base UI's finalFocus
 is off, so both paths do it here.
 */
-function useRestoreFocus(
+export function useRestoreFocus(
 	isOpen: boolean,
 	shouldRestore: boolean,
 	openerRef: React.RefObject<Element | null>,
@@ -628,9 +631,11 @@ function useFocusOnReopen(
 
 /**
 In place, the rest of the page is hidden from assistive tech while focus is enforced (Base UI
-does it on the portal path). The stack decides what that hides (syncHiddenPage).
+does it on the portal path). The stack decides what that hides (syncHiddenPage). Popover's and
+Menu's layers use it through the portal too, where their Base UI roots don't hide the page; their
+root mounts after they open, so they pass `isActive` again once it has.
 */
-function useHidePage(isActive: boolean, layer: Layer): void {
+export function useHidePage(isActive: boolean, layer: Layer): void {
 	useIsoLayoutEffect(() => {
 		if (!isActive) {
 			return undefined;
@@ -681,7 +686,7 @@ The portal's container: the given element, a function's result once mounted (bod
 undefined for Base UI's default (body, or the enclosing Base UI portal). Nothing here reads the
 DOM while rendering, so the layer renders on the server.
 */
-function usePortalContainer(
+export function usePortalContainer(
 	container: ModalLayerProps["container"],
 ): HTMLElement | null | undefined {
 	const [resolved, setResolved] = React.useState<HTMLElement | null>(null);
@@ -699,7 +704,7 @@ function usePortalContainer(
 		: ((container ?? undefined) as HTMLElement | undefined);
 }
 
-type BackdropPress = {
+export type BackdropPress = {
 	onMouseDown: (event: React.MouseEvent<HTMLDivElement>) => void;
 	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
@@ -708,7 +713,7 @@ type BackdropPress = {
 Reports a press on the backdrop that both starts and ends there, so a drag out of the content
 doesn't count. While focus is enforced the press doesn't take focus off the content.
 */
-function useBackdropPress(
+export function useBackdropPress(
 	shouldKeepFocus: boolean,
 	onPress: (event: React.MouseEvent<HTMLDivElement>) => void,
 ): BackdropPress {
