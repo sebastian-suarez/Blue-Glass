@@ -12,6 +12,7 @@ import type { Buffer } from "node:buffer";
 import type { Browser, BrowserContext, Page } from "playwright";
 import { mermaidUrl } from "./pages.ts";
 import { root } from "./reference.ts";
+import { viewports } from "./viewports.ts";
 
 export type Box = { x: number; y: number; width: number; height: number };
 
@@ -22,10 +23,7 @@ The moment every capture pretends it is, so dates rendered from "now" never drif
 */
 export const fixedNow = new Date("2026-10-21T12:00:00Z");
 
-export const viewports = {
-	desktop: { width: 1280, height: 900 },
-	phone: { width: 390, height: 844 },
-} as const;
+export { viewports } from "./viewports.ts";
 
 export async function newContext(
 	browser: Browser,
