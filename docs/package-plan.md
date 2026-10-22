@@ -140,7 +140,7 @@ A preview joins the parity gate in the phase where everything it uses exists. Fo
 
 ## How each phase runs
 
-This follows your routing rules.
+This follows your routing rules. Each phase runs in its own session, step by step in `docs/phase-runbook.md`.
 
 - **Two attempts.** Phases 1–5 port an existing implementation onto Base UI, which I count as a migration (and the whole run is well over 10 hours). So each phase gets two attempts from the same base commit:
   - Mine, in worktree `phase-N-opus`: Opus subagents at max, each in its own worktree, merged by me.
