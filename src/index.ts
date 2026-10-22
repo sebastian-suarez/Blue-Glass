@@ -11,6 +11,7 @@ export {
 	type IconProps,
 	type SvgIconProps,
 } from "./components/Icon/index.js";
+export * from "./components/List/index.js";
 export {
 	Typography,
 	type TypographyColor,
