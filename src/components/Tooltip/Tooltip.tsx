@@ -32,6 +32,7 @@ import {
 	useIsoLayoutEffect,
 	useShouldReduceMotion,
 } from "../../internal/hooks.js";
+import { containingBlock, positionFixed } from "../../internal/position.js";
 import {
 	durations,
 	growStyle,
@@ -139,7 +140,93 @@ const instant = { enter: 0, exit: 0 };
 const isUnset = (value: unknown) => value === undefined || value === null;
 
 // The arrow's centre stays 12px from the surface's ends, clear of its rounded corners.
-const arrowPadding = 8;
+const arrowInset = 12;
+
+type OffsetData = {
+	side: string;
+	align: string;
+	positioner: { width: number; height: number };
+};
+
+/**
+The gap to the anchor, as the reference places the layer: it takes the layer's whole-pixel size
+(offsetWidth, offsetHeight), where Base UI takes the fractional one, so above and to the left the
+layer would land up to a pixel off. Rounding a size gives the whole-pixel one (floating-ui reads
+it the same way).
+*/
+function sideOffsetOf(offset: number) {
+	return ({ side, positioner }: OffsetData): number => {
+		if (side === "top") {
+			return offset + Math.round(positioner.height) - positioner.height;
+		}
+
+		return side === "left"
+			? offset + Math.round(positioner.width) - positioner.width
+			: offset;
+	};
+}
+
+/**
+The same along the anchor: centred and end-aligned layers move by the size's fractional part as
+the reference's would. Base UI turns the offset round for end alignment.
+*/
+function alignOffsetOf({ side, align, positioner }: OffsetData): number {
+	const size =
+		side === "top" || side === "bottom" ? positioner.width : positioner.height;
+	const error = size - Math.round(size);
+	if (align === "center") {
+		return error / 2;
+	}
+
+	return align === "end" ? -error : 0;
+}
+
+type ArrowProps = React.HTMLAttributes<HTMLElement> & {
+	readonly ref?: React.Ref<HTMLElement>;
+};
+
+/**
+The arrow, centred on the anchor as the reference measures it: from the layer's box, rounded to
+a whole pixel, at least 12px from the surface's ends. Base UI's Tooltip.Arrow renders it, so it
+runs again whenever the tooltip moves, but its own offset is fractional and is left out.
+*/
+function ArrowAtAnchor({
+	anchor,
+	side,
+	style: _baseUiOffset,
+	ref,
+	...props
+}: ArrowProps & { readonly anchor: HTMLElement | null; readonly side: string }) {
+	const arrowRef = React.useRef<HTMLElement | null>(null);
+	const handleRef = useForkRef(arrowRef, ref);
+	const [centre, setCentre] = React.useState<number | undefined>(undefined);
+	const isVertical = side === "top" || side === "bottom";
+	useIsoLayoutEffect(() => {
+		const surface = arrowRef.current?.parentElement;
+		const layer = surface?.parentElement;
+		if (!surface || !layer || !anchor) {
+			return;
+		}
+
+		const a = anchor.getBoundingClientRect();
+		// The layer is never scaled (the Grow is on the surface), so its box is the true position.
+		const b = layer.getBoundingClientRect();
+		const length = isVertical ? surface.offsetWidth : surface.offsetHeight;
+		const raw = isVertical
+			? a.left + a.width / 2 - b.left
+			: a.top + a.height / 2 - b.top;
+		const next = Math.round(
+			Math.min(Math.max(raw, arrowInset), Math.max(arrowInset, length - arrowInset)),
+		);
+		setCentre((previous) => (previous === next ? previous : next));
+	});
+	let offset: React.CSSProperties | undefined;
+	if (centre !== undefined) {
+		offset = isVertical ? { left: centre } : { top: centre };
+	}
+
+	return <span ref={handleRef} {...props} style={offset} />;
+}
 
 /**
 The transition status of the surface, from Base UI's: its starting and ending styles are the
@@ -479,6 +566,29 @@ export function Tooltip({
 		...surfaceRest
 	} = slotProps?.tooltip ?? {};
 	const portalContainer = usePortalContainer(container);
+	const [layer, setLayer] = React.useState<HTMLElement | null>(null);
+	// Inside a containing block (a transformed showcase stage) the reference flips against that
+	// block alone, where Base UI keeps the layer in the viewport too, so a page scrolled past the
+	// stage would turn the tooltip over. There the reference's own math picks the side.
+	const [blockPlacement, setBlockPlacement] = React.useState<Placement>();
+	useIsoLayoutEffect(() => {
+		if (layer === null || anchor === null) {
+			return;
+		}
+
+		const next =
+			containingBlock(layer) === null
+				? undefined
+				: positionFixed(anchor.getBoundingClientRect(), layer, {
+						placement: popperPlacement,
+						offset,
+					}).placement;
+		setBlockPlacement((previous) => (previous === next ? previous : next));
+	});
+	const positionerProps = toPositionerProps({
+		placement: blockPlacement ?? popperPlacement,
+		offset,
+	});
 	const motion: MotionContext = {
 		...(isInstant ? instant : durations.grow),
 		reduced: shouldReduceMotion,
@@ -504,10 +614,17 @@ export function Tooltip({
 						style={{ display: "contents" }}
 					>
 						<BaseTooltip.Positioner
-							{...toPositionerProps({ placement: popperPlacement, offset })}
+							{...positionerProps}
+							collisionAvoidance={
+								blockPlacement === undefined
+									? positionerProps.collisionAvoidance
+									: { ...positionerProps.collisionAvoidance, side: "none" }
+							}
 							{...popperRest}
+							ref={setLayer}
 							anchor={anchor}
-							arrowPadding={arrowPadding}
+							sideOffset={sideOffsetOf(offset)}
+							alignOffset={alignOffsetOf}
 							className={cx(
 								"gl-tooltip-popper",
 								disableInteractive && "gl-tooltip-popper-static",
@@ -559,7 +676,14 @@ export function Tooltip({
 								}}
 							>
 								{title}
-								{arrow ? <BaseTooltip.Arrow className="gl-tooltip-arrow" /> : null}
+								{arrow ? (
+									<BaseTooltip.Arrow
+										className="gl-tooltip-arrow"
+										render={(props, state) => (
+											<ArrowAtAnchor {...props} anchor={anchor} side={state.side} />
+										)}
+									/>
+								) : null}
 							</BaseTooltip.Popup>
 						</BaseTooltip.Positioner>
 					</BaseTooltip.Portal>

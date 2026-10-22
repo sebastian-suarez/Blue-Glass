@@ -59,27 +59,29 @@
 		display: none;
 	}
 
-	/* Arrow: an 8px square turned 45deg, half under the surface, centred on the anchor. Base UI's
-	   Tooltip.Arrow sets its start along the edge (left or top), so these only set how far across
-	   the edge it sits: its centre on the edge. */
+	/* Arrow: an 8px square turned 45deg, half under the surface, centred on the anchor. */
 	.gl-tooltip-arrow {
 		position: absolute;
 		width: 8px;
 		height: 8px;
 		border-radius: 1px;
 		background: inherit;
-		transform: rotate(45deg);
+		transform: translate(-50%, -50%) rotate(45deg);
 	}
 	.gl-tooltip[data-side="top"] .gl-tooltip-arrow {
-		top: calc(100% - 4px);
+		top: 100%;
+		left: 50%;
 	}
 	.gl-tooltip[data-side="bottom"] .gl-tooltip-arrow {
-		top: -4px;
+		top: 0;
+		left: 50%;
 	}
 	.gl-tooltip[data-side="left"] .gl-tooltip-arrow {
-		left: calc(100% - 4px);
+		top: 50%;
+		left: 100%;
 	}
 	.gl-tooltip[data-side="right"] .gl-tooltip-arrow {
-		left: -4px;
+		top: 50%;
+		left: 0;
 	}
 }
