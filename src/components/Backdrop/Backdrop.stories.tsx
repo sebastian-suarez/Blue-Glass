@@ -18,7 +18,8 @@ const meta = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+// Only Default renders through its args, so the others need none, not even the required open.
+type Story = StoryObj<Partial<BackdropProps>>;
 
 // As in the preview: over its region, above the region's content, with its copy centred.
 const cover: React.CSSProperties = {
@@ -151,13 +152,13 @@ Default's region: the open arg shows the backdrop, a press on it sets it back to
 button shows it again.
 */
 function ScrimWithArgs(
-	args: BackdropProps,
+	args: Partial<BackdropProps>,
 	{ viewMode }: { readonly viewMode: string },
 ) {
-	const [, updateArgs] = useArgs<BackdropProps>();
+	const [, updateArgs] = useArgs<Partial<BackdropProps>>();
 	return (
 		<LiveArg
-			value={args.open}
+			value={args.open !== false}
 			fixed={viewMode === "docs"}
 			onChange={(open) => {
 				updateArgs({ open });
