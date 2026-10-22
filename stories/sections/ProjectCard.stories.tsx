@@ -9,6 +9,7 @@ import {
 import {
 	Diagram,
 	type DiagramData,
+	type DiagramNodeLine,
 } from "../../src/components/Diagram/index.ts";
 import { Icon } from "../../src/components/Icon/index.ts";
 import { media } from "../../src/components/useMediaQuery/index.ts";
@@ -23,6 +24,13 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+/**
+A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
+*/
+function boldLine(text: string): Exclude<DiagramNodeLine, string> {
+	return { text, bold: true };
+}
 
 // The preview picks these with useMediaQuery(media.tablet). Here CSS picks them under the same
 // query, so the server HTML lays out as the hydrated page does.
@@ -59,11 +67,7 @@ const milestones: DiagramData = {
 			y: 32,
 			w: 160,
 			h: 88,
-			lines: [
-				{ text: "Spike 0", bold: true },
-				"raw force packets",
-				"from user space",
-			],
+			lines: [boldLine("Spike 0"), "raw force packets", "from user space"],
 			tone: "accent",
 		},
 		{
@@ -71,21 +75,21 @@ const milestones: DiagramData = {
 			y: 32,
 			w: 160,
 			h: 88,
-			lines: [{ text: "M1", bold: true }, "rs50d daemon"],
+			lines: [boldLine("M1"), "rs50d daemon"],
 		},
 		{
 			x: 400,
 			y: 32,
 			w: 160,
 			h: 88,
-			lines: [{ text: "M2", bold: true }, "DirectInput", "proxy DLL"],
+			lines: [boldLine("M2"), "DirectInput", "proxy DLL"],
 		},
 		{
 			x: 600,
 			y: 32,
 			w: 160,
 			h: 88,
-			lines: [{ text: "M3", bold: true }, "Assetto Corsa,", "end to end"],
+			lines: [boldLine("M3"), "Assetto Corsa,", "end to end"],
 		},
 	],
 	edges: [
@@ -143,14 +147,14 @@ const reviewGate: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Claude Code", bold: true }, "implements"],
+			lines: [boldLine("Claude Code"), "implements"],
 		},
 		{
 			x: 290,
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Codex review gate", bold: true }, "GPT-6 Astra, xhigh"],
+			lines: [boldLine("Codex review gate"), "GPT-6 Astra, xhigh"],
 			tone: "accent",
 		},
 		{
@@ -158,21 +162,21 @@ const reviewGate: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "VSebCode", bold: true }, "merge"],
+			lines: [boldLine("VSebCode"), "merge"],
 		},
 		{
 			x: 280,
 			y: 180,
 			w: 200,
 			h: 64,
-			lines: [{ text: "AGENTS.md", bold: true }, "imported from CLAUDE.md"],
+			lines: [boldLine("AGENTS.md"), "imported from CLAUDE.md"],
 		},
 		{
 			x: 580,
 			y: 180,
 			w: 180,
 			h: 64,
-			lines: [{ text: "Antigravity", bold: true }, "reads the same file"],
+			lines: [boldLine("Antigravity"), "reads the same file"],
 		},
 	],
 	edges: [

@@ -4,6 +4,7 @@ import { Button } from "../../src/components/Button/index.ts";
 import {
 	Diagram,
 	type DiagramData,
+	type DiagramNodeLine,
 } from "../../src/components/Diagram/index.ts";
 import { Icon } from "../../src/components/Icon/index.ts";
 import { Paper } from "../../src/components/Paper/index.ts";
@@ -19,6 +20,13 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+/**
+A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
+*/
+function boldLine(text: string): Exclude<DiagramNodeLine, string> {
+	return { text, bold: true };
+}
 
 // The preview picks these with useMediaQuery(media.tablet) and useMediaQuery(media.phone). Here
 // CSS picks them under the same queries, so the server HTML lays out as the hydrated page does.
@@ -69,42 +77,42 @@ const siteFlow: DiagramData = {
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Pull request", bold: true }, "checks must pass"],
+			lines: [boldLine("Pull request"), "checks must pass"],
 		},
 		{
 			x: 225,
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "GitHub Actions", bold: true }, "OIDC, no keys"],
+			lines: [boldLine("GitHub Actions"), "OIDC, no keys"],
 		},
 		{
 			x: 430,
 			y: 96,
 			w: 150,
 			h: 72,
-			lines: [{ text: "S3 bucket", bold: true }, "private"],
+			lines: [boldLine("S3 bucket"), "private"],
 		},
 		{
 			x: 430,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "CloudFront", bold: true }, "cache, HTTPS"],
+			lines: [boldLine("CloudFront"), "cache, HTTPS"],
 		},
 		{
 			x: 225,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Cloudflare", bold: true }, "DNS, proxy, TLS"],
+			lines: [boldLine("Cloudflare"), "DNS, proxy, TLS"],
 		},
 		{
 			x: 20,
 			y: 328,
 			w: 150,
 			h: 72,
-			lines: [{ text: "Your browser", bold: true }, "this page"],
+			lines: [boldLine("Your browser"), "this page"],
 			tone: "accent",
 		},
 	],

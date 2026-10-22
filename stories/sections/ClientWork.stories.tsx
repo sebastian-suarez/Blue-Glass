@@ -5,6 +5,7 @@ import { Button } from "../../src/components/Button/index.ts";
 import {
 	Diagram,
 	type DiagramData,
+	type DiagramNodeLine,
 } from "../../src/components/Diagram/index.ts";
 import { Icon } from "../../src/components/Icon/index.ts";
 import { Paper } from "../../src/components/Paper/index.ts";
@@ -25,6 +26,13 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+/**
+A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
+*/
+function boldLine(text: string): Exclude<DiagramNodeLine, string> {
+	return { text, bold: true };
+}
+
 // The preview's datasets, from facts in the CV.
 const cmsPipeline: DiagramData = {
 	id: "cms-pipeline",
@@ -40,21 +48,21 @@ const cmsPipeline: DiagramData = {
 			y: 52,
 			w: 150,
 			h: 76,
-			lines: [{ text: "Client CMS", bold: true }, "modules, packages"],
+			lines: [boldLine("Client CMS"), "modules, packages"],
 		},
 		{
 			x: 196,
 			y: 52,
 			w: 160,
 			h: 76,
-			lines: [{ text: "Fetch service", bold: true }, "pulls CMS data"],
+			lines: [boldLine("Fetch service"), "pulls CMS data"],
 		},
 		{
 			x: 406,
 			y: 52,
 			w: 160,
 			h: 76,
-			lines: [{ text: "Transform service", bold: true }, "fits mobile schema"],
+			lines: [boldLine("Transform service"), "fits mobile schema"],
 			tone: "accent",
 		},
 		{
@@ -62,7 +70,7 @@ const cmsPipeline: DiagramData = {
 			y: 52,
 			w: 150,
 			h: 76,
-			lines: [{ text: "Mobile apps", bold: true }, "existing schema"],
+			lines: [boldLine("Mobile apps"), "existing schema"],
 		},
 	],
 	edges: [
@@ -121,24 +129,21 @@ const stripeAccess: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Gym app", bold: true }, "React, React Native"],
+			lines: [boldLine("Gym app"), "React, React Native"],
 		},
 		{
 			x: 290,
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Stripe checkout", bold: true }, "subscription payment"],
+			lines: [boldLine("Stripe checkout"), "subscription payment"],
 		},
 		{
 			x: 580,
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [
-				{ text: "Express.js backend", bold: true },
-				"subscription status",
-			],
+			lines: [boldLine("Express.js backend"), "subscription status"],
 			tone: "accent",
 		},
 		{
@@ -146,7 +151,7 @@ const stripeAccess: DiagramData = {
 			y: 188,
 			w: 180,
 			h: 64,
-			lines: [{ text: "PostgreSQL", bold: true }, "on AWS"],
+			lines: [boldLine("PostgreSQL"), "on AWS"],
 		},
 	],
 	edges: [

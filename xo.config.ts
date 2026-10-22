@@ -134,9 +134,10 @@ const xoConfig: FlatXoConfig = [
 		},
 	},
 	{
-		files: ["stories/*.stories.tsx"],
+		files: ["stories/**/*.stories.tsx"],
 		rules: {
-			// Like a component's stories, a docs entry's stories are named after what they show.
+			// Like a component's stories, a docs entry's or a section's stories are named after
+			// what they show (tests/ssr/layout.json names the sections' files).
 			"unicorn/filename-case": [
 				"error",
 				{ cases: { pascalCase: true, kebabCase: true } },
