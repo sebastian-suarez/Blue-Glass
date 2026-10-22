@@ -146,6 +146,15 @@
 				"components/Link/preview.html": "ca2c3adf6e2da28e",
 				"components/Link/reference.tsx": "b9339a0c7afa11ca"
 			}
+		},
+		"Avatar": {
+			"files": {
+				"components/Avatar/README.md": "907fbcafa66bfcc0",
+				"components/Avatar/api.d.ts": "2677a566b04442cd",
+				"components/Avatar/styles.css": "f192cd7a5cb37396",
+				"components/Avatar/preview.html": "3a6b45bf938791c0",
+				"components/Avatar/reference.tsx": "832e591f42da4876"
+			}
 		}
 	}
 }

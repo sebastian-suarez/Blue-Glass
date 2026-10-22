@@ -5,6 +5,14 @@ export {
 	ButtonGroup,
 	type ButtonGroupProps,
 } from "./components/ButtonGroup/index.js";
+export {
+	type AvatarSize,
+	type AvatarVariant,
+	type AvatarProps,
+	Avatar,
+	type AvatarGroupProps,
+	AvatarGroup,
+} from "./components/Avatar/index.js";
 export * from "./components/Divider/index.js";
 export {
 	GLYPHS,
