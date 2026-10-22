@@ -10,6 +10,12 @@ export {
 	type IconProps,
 	type SvgIconProps,
 } from "./components/Icon/index.js";
+export {
+	Typography,
+	type TypographyColor,
+	type TypographyProps,
+	type TypographyVariant,
+} from "./components/Typography/index.js";
 export { Paper, type PaperProps } from "./components/Paper/index.js";
 export {
 	LightField,
