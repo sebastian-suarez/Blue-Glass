@@ -1,0 +1,160 @@
+/* Blue Glass — Snackbar, ported from design-system/components/Snackbar/styles.css. */
+
+@layer gl-components {
+	/* Snackbar — an addition, matching MUI's Snackbar. The surface is the primary button's ground
+	   (.btn-primary: color-ink, on-ink text, shadow-primary) cut to the monogram tile's radius
+	   (radius-tile, .signature). It slides in from the edge it sits on and leaves the same way. */
+
+	/* The root is a fixed strip along one edge that never catches presses itself. */
+	.gl-snackbar {
+		position: fixed;
+		z-index: var(--z-snackbar);
+		left: var(--space-lg);
+		right: var(--space-lg);
+		display: flex;
+		justify-content: center;
+		pointer-events: none;
+	}
+	.gl-snackbar-top {
+		top: 0;
+	}
+	.gl-snackbar-bottom {
+		bottom: 0;
+	}
+	.gl-snackbar-left {
+		justify-content: flex-start;
+	}
+	.gl-snackbar-right {
+		justify-content: flex-end;
+	}
+
+	/* The slot slides. Its padding is the gap to the edge, so a slide of 100% clears the screen. */
+	.gl-snackbar-slot {
+		display: flex;
+		min-width: 0;
+		max-width: 100%;
+	}
+	.gl-snackbar-top .gl-snackbar-slot {
+		padding-top: var(--space-lg);
+	}
+	.gl-snackbar-bottom .gl-snackbar-slot {
+		padding-bottom: var(--space-lg);
+	}
+	.gl-snackbar-slot > * {
+		pointer-events: auto;
+	}
+
+	.gl-snackbar-surface {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		min-width: 288px;
+		max-width: 560px;
+		padding: 12px 16px;
+		border-radius: var(--radius-tile);
+		background: var(--color-ink);
+		color: var(--on-ink);
+		box-shadow: var(--shadow-primary);
+		font-size: 14px;
+		line-height: 1.5;
+	}
+	.gl-snackbar-message {
+		flex: 1 1 auto;
+		min-width: 0;
+		padding-block: 2px;
+		overflow-wrap: break-word;
+	}
+	.gl-snackbar-action {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: var(--space-2xs);
+		margin-block: -6px;
+		margin-left: auto;
+	}
+	/* A text button on the dark ground: on-ink, a little heavier so it reads as the action. */
+	.gl-snackbar-surface .gl-snackbar-action .gl-button {
+		color: var(--on-ink);
+		font-weight: 500;
+	}
+	/* The focus colour vanishes on ink; on this ground the ring is on-ink. */
+	.gl-snackbar-surface :focus-visible {
+		outline-color: var(--on-ink);
+		outline-offset: 2px;
+	}
+
+	.gl-snackbar-close {
+		display: inline-grid;
+		place-items: center;
+		flex: none;
+		width: var(--size-control-sm);
+		height: var(--size-control-sm);
+		margin-right: -8px;
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-pill);
+		background: transparent;
+		color: var(--on-ink);
+		font: inherit;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background var(--duration-hover) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-snackbar-close:active {
+		transform: scale(0.98);
+	}
+
+	/* A hosted Alert floats like the surface: same width limits, and a lift for its light plate. */
+	.gl-snackbar-slot > .gl-alert {
+		min-width: 288px;
+		max-width: 560px;
+		box-shadow: var(--shadow-panel);
+	}
+	.gl-snackbar-slot > .gl-alert-filled {
+		box-shadow: var(--shadow-primary);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-snackbar-close:hover {
+			background: rgba(255, 255, 255, 0.14);
+		}
+	}
+
+	/* Phones: full width inside the 16px gutter. */
+	@media (max-width: 700px) {
+		.gl-snackbar {
+			left: var(--space-md);
+			right: var(--space-md);
+		}
+		.gl-snackbar-top .gl-snackbar-slot {
+			padding-top: var(--space-md);
+		}
+		.gl-snackbar-bottom .gl-snackbar-slot {
+			padding-bottom: var(--space-md);
+		}
+		.gl-snackbar-slot {
+			flex: 1 1 auto;
+		}
+		.gl-snackbar-slot > *,
+		.gl-snackbar-slot > .gl-alert {
+			flex: 1 1 auto;
+			min-width: 0;
+			max-width: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-snackbar-close {
+			transition: none;
+		}
+		.gl-snackbar-close:active {
+			transform: none;
+		}
+	}
+	@media print {
+		.gl-snackbar {
+			display: none;
+		}
+	}
+}

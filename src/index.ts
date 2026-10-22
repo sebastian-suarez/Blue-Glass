@@ -76,6 +76,12 @@ export {
 } from "./components/Progress/index.js";
 export { type SkeletonProps, Skeleton } from "./components/Skeleton/index.js";
 export {
+	type SnackbarCloseReason,
+	type SnackbarOrigin,
+	type SnackbarProps,
+	Snackbar,
+} from "./components/Snackbar/index.js";
+export {
 	type AccordionProps,
 	Accordion,
 	type AccordionSummaryProps,
