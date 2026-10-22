@@ -91,7 +91,7 @@ export function Link({
 			{icon ? (
 				<span className="gl-link-icon" aria-hidden="true">
 					{/* A word joiner, so the arrow never wraps onto a line of its own. */}
-					{"⁠"}
+					{"\u2060"}
 					{icon}
 				</span>
 			) : null}
