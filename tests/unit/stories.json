@@ -3,6 +3,7 @@
 	"noControls": {
 		"src/components/ClickAwayListener/ClickAwayListener.stories.tsx": "Its props say which presses count (mouseEvent, touchEvent) and what one does (onClickAway), and none changes what it renders; the Actions panel logs each press outside instead.",
 		"src/components/CssBaseline/CssBaseline.stories.tsx": "Its only prop is children: the resets apply to whatever it wraps.",
+		"src/components/NoSsr/NoSsr.stories.tsx": "Nothing a reader can change shows: the server HTML always holds the fallback, and once mounted the children always replace it, a frame later with defer. Its other props are nodes.",
 		"src/components/useMediaQuery/useMediaQuery.stories.tsx": "A hook, not a component: its Default shows what it returns at the current viewport."
 	},
 	"afterHydration": {}

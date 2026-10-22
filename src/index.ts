@@ -59,6 +59,7 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export { type BackdropProps, Backdrop } from "./components/Backdrop/index.js";
 export {
 	type AlertSeverity,
 	type AlertProps,
@@ -110,6 +111,12 @@ export {
 	ClickAwayListener,
 } from "./components/ClickAwayListener/index.js";
 export * from "./components/CssBaseline/index.js";
+export {
+	type ModalCloseReason,
+	type ModalProps,
+	Modal,
+} from "./components/Modal/index.js";
+export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
 export {
 	type VirtualElement,
 	type AnchorEl,
