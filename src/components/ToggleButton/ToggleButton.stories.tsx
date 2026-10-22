@@ -198,11 +198,15 @@ function ProjectViews() {
 /**
 Default's group: the args drive it, and a press sets the value arg.
 */
-function ViewPickerWithArgs(args: ToggleButtonGroupProps) {
+function ViewPickerWithArgs(
+	args: ToggleButtonGroupProps,
+	{ viewMode }: { readonly viewMode: string },
+) {
 	const [, updateArgs] = useArgs<ToggleButtonGroupProps>();
 	return (
 		<LiveArg
 			value={args.value}
+			fixed={viewMode === "docs"}
 			onChange={(value) => {
 				updateArgs({ value });
 			}}

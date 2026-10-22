@@ -180,11 +180,15 @@ function ClientWork() {
 /**
 Default's tabs: the args drive them, and a click sets the value arg.
 */
-function SiteSectionsWithArgs(args: TabsProps) {
+function SiteSectionsWithArgs(
+	args: TabsProps,
+	{ viewMode }: { readonly viewMode: string },
+) {
 	const [, updateArgs] = useArgs<TabsProps>();
 	return (
 		<LiveArg
 			value={args.value}
+			fixed={viewMode === "docs"}
 			onChange={(value) => {
 				updateArgs({ value });
 			}}

@@ -147,11 +147,15 @@ function ReadMore() {
 /**
 Default's demo: the in arg shows or hides all four, and the button flips it.
 */
-function TransitionsWithArgs(args: { readonly in?: boolean }) {
+function TransitionsWithArgs(
+	args: { readonly in?: boolean },
+	{ viewMode }: { readonly viewMode: string },
+) {
 	const [, updateArgs] = useArgs<{ readonly in?: boolean }>();
 	return (
 		<LiveArg
 			value={args.in !== false}
+			fixed={viewMode === "docs"}
 			onChange={(isShown) => {
 				updateArgs({ in: isShown });
 			}}

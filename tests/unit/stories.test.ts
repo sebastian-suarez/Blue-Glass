@@ -19,6 +19,7 @@ import { describe, expect, test } from "vitest";
 import preview from "../../.storybook/preview.tsx";
 import { currentPhase } from "../../scripts/lib/phases.ts";
 import { viewports } from "../../scripts/lib/viewports.ts";
+import * as fixtureExports from "./fixtures/stories.tsx";
 import {
 	type CsfModule,
 	failing,
@@ -54,19 +55,8 @@ The annotations the guard reads straight from a stories module: the inferred arg
 composed story cover every arg, so only these say which ones the story declares.
 */
 type Annotations = {
-	readonly component?: ComponentLike;
+	readonly component?: unknown;
 	readonly argTypes?: Readonly<Record<string, unknown>>;
-};
-
-/**
-A component as a stories meta holds it: a function, or the object React's memo or forwardRef
-returns around one.
-*/
-type ComponentLike = {
-	readonly displayName?: string;
-	readonly name?: string;
-	readonly type?: ComponentLike;
-	readonly render?: ComponentLike;
 };
 
 /**
@@ -200,6 +190,25 @@ function readProps(): ReadonlyMap<string, Props> {
 
 const componentProps = readProps();
 
+// The component modules and the fixtures, so a meta's component is found by what it is, not by
+// its runtime name: a memo or an anonymous function has none.
+const componentModules = import.meta.glob<Record<string, unknown>>(
+	[
+		"../../src/components/*/*.tsx",
+		"!../../src/components/*/*.stories.tsx",
+		"!../../src/components/*/*.test.tsx",
+	],
+	{ eager: true },
+);
+const exportNames = new Map<unknown, string>();
+for (const module_ of [...Object.values(componentModules), fixtureExports]) {
+	for (const [name, value] of Object.entries(module_)) {
+		if (!exportNames.has(value)) {
+			exportNames.set(value, name);
+		}
+	}
+}
+
 const render = (story: ComposedStory, args: Record<string, unknown> = {}) =>
 	renderToString(createElement(story, args));
 
@@ -227,22 +236,6 @@ function alternatives(
 	}
 
 	return typeof value === "string" ? [`${value} changed`] : [];
-}
-
-/**
-The names a component goes by, so a memo or forwardRef wrapper finds its props too.
-*/
-function namesOf(component: ComponentLike | undefined): string[] {
-	if (component === undefined) {
-		return [];
-	}
-
-	return [
-		component.displayName,
-		component.name,
-		...namesOf(component.type),
-		...namesOf(component.render),
-	].filter((name): name is string => name !== undefined && name !== "");
 }
 
 // A default* prop is read only at mount, so its control would do nothing after the first render.
@@ -298,10 +291,7 @@ function controlProblems(
 
 	const keys = include.map(String);
 	const annotations = module as Record<string, Annotations | undefined>;
-	const name =
-		namesOf(annotations.default?.component).find((candidate) =>
-			componentProps.has(candidate),
-		) ?? "";
+	const name = exportNames.get(annotations.default?.component) ?? "";
 	const props = componentProps.get(name);
 	if (props === undefined) {
 		return [...problems, "no props found for the meta's component"];
@@ -360,14 +350,23 @@ function controlProblems(
 			return [];
 		}
 
-		const dead = others.filter(
-			(other) => render(listed, { [key]: other }) === base,
-		);
+		// Each value must render unlike the default and unlike every other value.
+		const seen = new Map<string, unknown>([[base, value]]);
+		const dead: string[] = [];
+		for (const other of others) {
+			const html = render(listed, { [key]: other });
+			if (seen.has(html)) {
+				dead.push(
+					`${JSON.stringify(other)} renders like ${JSON.stringify(seen.get(html))}`,
+				);
+			} else {
+				seen.set(html, other);
+			}
+		}
+
 		return dead.length === 0
 			? []
-			: [
-					`${key} doesn't change the render: ${dead.map((other) => JSON.stringify(other)).join(", ")}`,
-				];
+			: [`${key} doesn't change the render: ${dead.join(", ")}`];
 	}
 }
 

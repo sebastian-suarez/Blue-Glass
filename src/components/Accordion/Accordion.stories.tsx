@@ -242,12 +242,16 @@ function SectionHead({
 /**
 Default's rows: the args drive the first, and its own toggle sets the expanded arg.
 */
-function CareerRowsWithArgs(args: AccordionProps) {
+function CareerRowsWithArgs(
+	args: AccordionProps,
+	{ viewMode }: { readonly viewMode: string },
+) {
 	const [, updateArgs] = useArgs<AccordionProps>();
 	// The args drive the first row; the others stay closed, as in the preview.
 	return (
 		<LiveArg
 			value={args.expanded}
+			fixed={viewMode === "docs"}
 			onChange={(expanded) => {
 				updateArgs({ expanded });
 			}}

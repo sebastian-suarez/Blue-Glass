@@ -51,6 +51,11 @@ Probe behind React's memo, which has no function name of its own.
 */
 export const MemoProbe = memo(Probe);
 
+/**
+A component whose function has no name at all.
+*/
+export const AnonymousProbe = memo((props: ProbeProps) => <Probe {...props} />);
+
 const GroupValueContext = createContext<string | undefined>(undefined);
 
 /**
@@ -290,7 +295,29 @@ export const failing: Record<
 				),
 			},
 		},
-		problem: 'tone doesn\'t change the render: "quiet"',
+		problem: 'tone doesn\'t change the render: "quiet" renders like "plain"',
+	},
+	alikeOptions: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				argTypes: {
+					tone: {
+						control: "inline-radio",
+						options: ["plain", "loud", "quiet"],
+					},
+				},
+				// "quiet" draws as "loud": unlike the default, but no different from loud.
+				render: ({
+					tone,
+					...props
+				}: Omit<ProbeProps, "tone"> & { tone?: string }) => (
+					<Probe {...props} tone={tone === "plain" ? "plain" : "loud"} />
+				),
+			},
+		},
+		problem: 'tone doesn\'t change the render: "quiet" renders like "loud"',
 	},
 };
 
@@ -300,6 +327,10 @@ Each must pass the guard.
 export const passing: Record<string, CsfModule> = {
 	memoComponent: {
 		default: { ...meta, component: MemoProbe },
+		Default: { args, parameters: listed("label", "tone") },
+	},
+	anonymousComponent: {
+		default: { ...meta, component: AnonymousProbe },
 		Default: { args, parameters: listed("label", "tone") },
 	},
 	inheritedRender: {
