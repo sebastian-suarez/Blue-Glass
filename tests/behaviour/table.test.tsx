@@ -18,6 +18,15 @@ afterEach(() => {
 	cleanup();
 });
 
+/**
+Whether a cell has the header look: 12px, weight 600 (the README's "12px muted header cells").
+No preview sets variant, so parity can't see the look: this reads it.
+*/
+function hasHeadLook(element: HTMLElement): boolean {
+	const style = getComputedStyle(element);
+	return style.fontSize === "12px" && style.fontWeight === "600";
+}
+
 function must<T>(value: T | null | undefined): T {
 	if (value === null || value === undefined) {
 		throw new Error("expected a value");
@@ -583,10 +592,10 @@ describe("TableCell", () => {
 			const header = screen.getByRole("columnheader", { name: "Employer" });
 			expect(header).toHaveAttribute("scope", "col");
 			expect(header).toHaveAttribute("aria-sort", "ascending");
-			expect(header).not.toHaveClass("gl-table-cell-head");
+			expect(hasHeadLook(header)).toBe(false);
 			const cell = screen.getByRole("cell", { name: "EPAM" });
 			expect(cell.tagName).toBe("TD");
-			expect(cell).toHaveClass("gl-table-cell-head");
+			expect(hasHeadLook(cell)).toBe(true);
 		},
 	);
 
@@ -626,14 +635,10 @@ describe("TableCell", () => {
 				</TableBody>
 			</Table>,
 		);
-		expect(screen.getByText("Head")).toHaveClass("gl-table-cell-head");
-		expect(screen.getByText("Body look in the head")).not.toHaveClass(
-			"gl-table-cell-head",
-		);
-		expect(screen.getByText("Body")).not.toHaveClass("gl-table-cell-head");
-		expect(screen.getByText("Head look in the body")).toHaveClass(
-			"gl-table-cell-head",
-		);
+		expect(hasHeadLook(screen.getByText("Head"))).toBe(true);
+		expect(hasHeadLook(screen.getByText("Body look in the head"))).toBe(false);
+		expect(hasHeadLook(screen.getByText("Body"))).toBe(false);
+		expect(hasHeadLook(screen.getByText("Head look in the body"))).toBe(true);
 	});
 });
 
