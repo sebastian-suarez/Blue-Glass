@@ -20,6 +20,12 @@ export {
 	AvatarGroup,
 } from "./components/Avatar/index.js";
 export {
+	type BadgeTone,
+	type BadgeAnchor,
+	type BadgeProps,
+	Badge,
+} from "./components/Badge/index.js";
+export {
 	type ChipTone,
 	type ChipProps,
 	Chip,
