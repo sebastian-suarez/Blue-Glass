@@ -52,6 +52,9 @@ type Island = {
 
 type Outcome = { island: string; width: Width; problems: string[] };
 
+const nodeRequire =
+	'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);';
+
 const work = path.join(root, ".cache/islands");
 const fixture = path.join(root, "tests/ssr/fixtures/islands.tsx");
 const entries: Record<Target, string> = {
@@ -131,6 +134,9 @@ async function bundle(target: Target): Promise<{ node: string }> {
 		format: "esm",
 		external: ["react", "react-dom", "mermaid"],
 		plugins: [ui(target)],
+		// Base UI's CommonJS dependencies (use-sync-external-store) require React, which stays
+		// external; ESM output has no require of its own, so the bundle gets Node's.
+		banner: { js: nodeRequire },
 	});
 	await build({
 		...shared,
