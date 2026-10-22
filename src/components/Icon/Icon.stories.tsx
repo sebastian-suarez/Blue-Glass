@@ -20,7 +20,12 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	name: "Default",
 	args: { name: "arrow-ne", size: 32, filled: false, strokeWidth: 1.5 },
-	argTypes: { name: { control: "select", options: iconNames } },
+	argTypes: {
+		name: { control: "select", options: iconNames },
+		// Both take a number or a CSS length, so docgen alone gives them a JSON field.
+		size: { control: "number" },
+		strokeWidth: { control: "number" },
+	},
 	parameters: {
 		controls: {
 			disable: false,

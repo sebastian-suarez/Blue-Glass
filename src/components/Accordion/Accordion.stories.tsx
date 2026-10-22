@@ -4,6 +4,7 @@ import { useArgs } from "storybook/preview-api";
 import { fn } from "storybook/test";
 import readme from "../../../design-system/components/Accordion/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
+import { LiveArg } from "../../../stories/blocks/live-arg.js";
 import { Caption, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Icon } from "../Icon/index.js";
 import {
@@ -245,23 +246,33 @@ function CareerRowsWithArgs(args: AccordionProps) {
 	const [, updateArgs] = useArgs<AccordionProps>();
 	// The args drive the first row; the others stay closed, as in the preview.
 	return (
-		<div className="gl-accordion-surface">
-			{roles.slice(0, 3).map((role, index) =>
-				index === 0 ? (
-					<CareerRow
-						key={role.dates}
-						{...args}
-						role={role}
-						onChange={(event, expanded) => {
-							args.onChange?.(event, expanded);
-							updateArgs({ expanded });
-						}}
-					/>
-				) : (
-					<CareerRow key={role.dates} role={role} />
-				),
+		<LiveArg
+			value={args.expanded}
+			onChange={(expanded) => {
+				updateArgs({ expanded });
+			}}
+		>
+			{(expanded, setExpanded) => (
+				<div className="gl-accordion-surface">
+					{roles.slice(0, 3).map((role, index) =>
+						index === 0 ? (
+							<CareerRow
+								key={role.dates}
+								{...args}
+								role={role}
+								expanded={expanded}
+								onChange={(event, isExpanded) => {
+									args.onChange?.(event, isExpanded);
+									setExpanded(isExpanded);
+								}}
+							/>
+						) : (
+							<CareerRow key={role.dates} role={role} />
+						),
+					)}
+				</div>
 			)}
-		</div>
+		</LiveArg>
 	);
 }
 

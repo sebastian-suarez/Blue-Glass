@@ -3,7 +3,14 @@ CSF modules for the stories guard's self-test (tests/unit/stories.test.ts): a pr
 Default stories that wire its args, or fail to, in the ways a real stories file can.
 */
 import type { composeStories } from "@storybook/react-vite";
-import { createContext, use, type CSSProperties, type ReactNode } from "react";
+import {
+	createContext,
+	memo,
+	use,
+	useState,
+	type CSSProperties,
+	type ReactNode,
+} from "react";
 import { useArgs } from "storybook/preview-api";
 
 type StoriesModule = Parameters<typeof composeStories>[0];
@@ -17,19 +24,32 @@ export type CsfModule = Record<string, unknown> & {
 
 type ProbeProps = {
 	readonly label?: string;
+	readonly defaultLabel?: string;
 	readonly tone?: "plain" | "loud";
 	readonly value?: string;
 	readonly selected?: boolean;
 	readonly style?: CSSProperties;
 };
 
-export function Probe({ label = "probe", tone = "plain", style }: ProbeProps) {
+export function Probe({
+	label,
+	defaultLabel = "probe",
+	tone = "plain",
+	style,
+}: ProbeProps) {
+	// Read only at mount, as the components' default* props are.
+	const [initial] = useState(defaultLabel);
 	return (
 		<span data-tone={tone} style={style}>
-			{label}
+			{label ?? initial}
 		</span>
 	);
 }
+
+/**
+Probe behind React's memo, which has no function name of its own.
+*/
+export const MemoProbe = memo(Probe);
 
 const GroupValueContext = createContext<string | undefined>(undefined);
 
@@ -207,18 +227,80 @@ export const failing: Record<
 		},
 		problem: "no Default story",
 	},
+	// Storybook gives no Controls to a render whose arity is 0, as a defaulted parameter makes it.
+	defaultParameter: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				render: (props: ProbeProps = {}) => <Probe {...props} />,
+			},
+		},
+		problem: "Default's render takes no args",
+	},
+	mountOnlyArg: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				args: { defaultLabel: "first" },
+				parameters: listed("defaultLabel"),
+			},
+		},
+		problem: "defaultLabel is read only at mount",
+	},
+	unsetArg: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				args: { label: "probe" },
+				parameters: listed("tone"),
+			},
+		},
+		problem: "tone has no value in args",
+	},
+	singleOption: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				argTypes: { tone: { control: "inline-radio", options: ["plain"] } },
+			},
+		},
+		problem: "tone has no other option",
+	},
+	deadOption: {
+		module: {
+			default: meta,
+			Default: {
+				...good,
+				argTypes: {
+					tone: {
+						control: "inline-radio",
+						options: ["plain", "loud", "quiet"],
+					},
+				},
+				// "quiet" draws as "plain", so that option does nothing.
+				render: ({
+					tone,
+					...props
+				}: Omit<ProbeProps, "tone"> & { tone?: string }) => (
+					<Probe {...props} tone={tone === "loud" ? "loud" : "plain"} />
+				),
+			},
+		},
+		problem: 'tone doesn\'t change the render: "quiet"',
+	},
 };
 
 /**
 Each must pass the guard.
 */
 export const passing: Record<string, CsfModule> = {
-	defaultParameter: {
-		default: meta,
-		Default: {
-			...good,
-			render: (props: ProbeProps = {}) => <Probe {...props} />,
-		},
+	memoComponent: {
+		default: { ...meta, component: MemoProbe },
+		Default: { args, parameters: listed("label", "tone") },
 	},
 	inheritedRender: {
 		default: { ...meta, render: (props: ProbeProps) => <Probe {...props} /> },
@@ -264,6 +346,38 @@ export const passing: Record<string, CsfModule> = {
 		Default: good,
 		Variants: { parameters: off, render: () => <Probe /> },
 	},
+};
+
+const phone = { viewport: { value: "phone", isRotated: false } };
+
+/**
+Each must fail the phone check, which a stories file the layout gate lists must pass.
+*/
+export const phoneFailing: Record<
+	string,
+	{ readonly module: CsfModule; readonly problem: string }
+> = {
+	notPinned: {
+		module: { default: meta, Default: good },
+		problem: "no story pinned to phone",
+	},
+	twinOnDocs: {
+		module: {
+			default: meta,
+			Default: good,
+			DefaultOnPhone: { ...good, globals: phone },
+		},
+		problem: "DefaultOnPhone shows on the docs page",
+	},
+};
+
+/**
+A twin as stories/README.md describes it, which passes.
+*/
+export const phonePassing: CsfModule = {
+	default: meta,
+	Default: good,
+	DefaultOnPhone: { ...good, tags: ["!autodocs"], globals: phone },
 };
 
 /* eslint-enable @typescript-eslint/naming-convention */

@@ -17,7 +17,7 @@ Revision 2, after Codex's attack (end of file).
 ## Viewports
 
 - `scripts/lib/viewports.ts` holds phone 390×844 and desktop 1280×900. `scripts/lib/capture.ts` re-exports it, and `.storybook/preview.tsx` turns it into `parameters.viewport.options`, adding a tablet at 834×1112. The toolbar's default stays responsive.
-- **Phone twins.** Each file in `tests/ssr/layout.json` gets a twin of its viewport-dependent story: the 5 sections' Default, Tabs' Example and Accordion's Variants. The twin spreads the story, pins `globals.viewport` to `phone`, disables Controls, and is tagged `!autodocs`, which keeps it off the docs page because the Stories block shows only autodocs-tagged stories. addon-vitest resizes the browser to the twin, so axe also runs at 390px.
+- **Phone twins.** Each file in `tests/ssr/layout.json` gets a twin of its viewport-dependent story: the 5 sections' Default, Tabs' Example and Accordion's Variants. The twin spreads the story, pins `globals.viewport` to `phone`, keeps the preview's Controls off, and is tagged `!autodocs`, which keeps it off the docs page because the Stories block shows only autodocs-tagged stories. addon-vitest resizes the browser to the twin, so axe also runs at 390px.
 
 ## Guard
 
@@ -27,9 +27,9 @@ The guard is `tests/unit/stories.test.ts`, in the unit project, Node. It compose
 - **Other stories:** Controls are disabled on every story except Default, inherited annotations included.
 - **Viewports:** each `layout.json` file has a story pinned to `phone`, and the preview's viewport options equal the capture sizes.
 - **Allowlist:** a no-Controls file, or an arg whose effect shows only after hydration, needs a row with its reason. Rows must name files and args that exist.
-- **Fixtures** under `tests/unit/fixtures/stories/`:
+- **Fixtures** in `tests/unit/fixtures/stories.tsx`:
   - must fail: an ignored arg, an arg overridden after the spread, a destructured-and-dropped arg, a group-owned prop, a non-Default story with Controls on;
-  - must pass: `(args = {}) =>`, an inherited meta `render`, a wrapping helper.
+  - must pass: an inherited meta `render`, a wrapping helper. (`(args = {}) =>` moved to must-fail in round 1: Storybook gives it no Controls.)
 - It must fail on phase 1's stories before the retrofit.
 
 ## Brief

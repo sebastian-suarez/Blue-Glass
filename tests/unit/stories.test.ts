@@ -19,7 +19,13 @@ import { describe, expect, test } from "vitest";
 import preview from "../../.storybook/preview.tsx";
 import { currentPhase } from "../../scripts/lib/phases.ts";
 import { viewports } from "../../scripts/lib/viewports.ts";
-import { type CsfModule, failing, passing } from "./fixtures/stories.tsx";
+import {
+	type CsfModule,
+	failing,
+	passing,
+	phoneFailing,
+	phonePassing,
+} from "./fixtures/stories.tsx";
 
 setProjectAnnotations(preview);
 
@@ -48,8 +54,19 @@ The annotations the guard reads straight from a stories module: the inferred arg
 composed story cover every arg, so only these say which ones the story declares.
 */
 type Annotations = {
-	readonly component?: { readonly name?: string };
+	readonly component?: ComponentLike;
 	readonly argTypes?: Readonly<Record<string, unknown>>;
+};
+
+/**
+A component as a stories meta holds it: a function, or the object React's memo or forwardRef
+returns around one.
+*/
+type ComponentLike = {
+	readonly displayName?: string;
+	readonly name?: string;
+	readonly type?: ComponentLike;
+	readonly render?: ComponentLike;
 };
 
 /**
@@ -190,30 +207,52 @@ const controlsOf = (story: ComposedStory) =>
 	(story.parameters.controls ?? {}) as Controls;
 
 /**
-Another value of the arg's type: the next of its options, or a flipped boolean, a moved number, a
-longer string. Undefined when the arg has none of those.
+The other values a listed arg can take: every other option when it has options, or else a
+flipped boolean, a moved number or a longer string. Empty when there's none.
 */
-function changed(value: unknown, options?: readonly unknown[]): unknown {
-	const other = options?.find((option) => option !== value);
-	if (other !== undefined) {
-		return other;
+function alternatives(
+	value: unknown,
+	options: readonly unknown[] | undefined,
+): unknown[] {
+	if (options !== undefined) {
+		return options.filter((option) => option !== value);
 	}
 
 	if (typeof value === "boolean") {
-		return !value;
+		return [!value];
 	}
 
 	if (typeof value === "number") {
-		return value + 1;
+		return [value + 1];
 	}
 
-	return typeof value === "string" ? `${value} changed` : undefined;
+	return typeof value === "string" ? [`${value} changed`] : [];
 }
 
 /**
+The names a component goes by, so a memo or forwardRef wrapper finds its props too.
+*/
+function namesOf(component: ComponentLike | undefined): string[] {
+	if (component === undefined) {
+		return [];
+	}
+
+	return [
+		component.displayName,
+		component.name,
+		...namesOf(component.type),
+		...namesOf(component.render),
+	].filter((name): name is string => name !== undefined && name !== "");
+}
+
+// A default* prop is read only at mount, so its control would do nothing after the first render.
+const isMountOnly = (key: string) =>
+	key.startsWith("default") && key.charAt(7) !== key.charAt(7).toLowerCase();
+
+/**
 What's wrong with a stories module's Controls. In a component's file, Default lists the args it
-renders through, and each one changes its server HTML; every other story turns Controls off. In a
-docs or section file, every story does.
+renders through, and each value each one can take changes its server HTML; every other story
+turns Controls off. In a docs or section file, every story does.
 */
 function controlProblems(
 	module: CsfModule,
@@ -252,9 +291,17 @@ function controlProblems(
 		return [...problems, "Default lists no args in controls.include"];
 	}
 
+	// Storybook gives Controls only to a story whose render takes the args (its arity).
+	if (story.parameters.__isArgsStory !== true) {
+		return [...problems, "Default's render takes no args"];
+	}
+
 	const keys = include.map(String);
 	const annotations = module as Record<string, Annotations | undefined>;
-	const name = annotations.default?.component?.name ?? "";
+	const name =
+		namesOf(annotations.default?.component).find((candidate) =>
+			componentProps.has(candidate),
+		) ?? "";
 	const props = componentProps.get(name);
 	if (props === undefined) {
 		return [...problems, "no props found for the meta's component"];
@@ -266,27 +313,7 @@ function controlProblems(
 	}
 
 	for (const key of keys) {
-		// The story's own argTypes win, as in the panel; a prop's own options come next.
-		const declared =
-			annotations.default?.argTypes?.[key] ??
-			annotations.Default?.argTypes?.[key];
-		if (declared === undefined && !props.has(key)) {
-			problems.push(`${key} isn't a prop of ${name}, so it needs argTypes`);
-			continue;
-		}
-
-		const next = changed(
-			story.args[key],
-			story.argTypes[key]?.options ?? props.get(key),
-		);
-		if (next === undefined) {
-			problems.push(`${key} has no boolean, number or string value`);
-		} else if (
-			exemption.afterHydration?.[key] === undefined &&
-			render(story, { [key]: next }) === base
-		) {
-			problems.push(`${key} doesn't change the render`);
-		}
+		problems.push(...argProblems(key, story, props));
 	}
 
 	for (const key of Object.keys(exemption.afterHydration ?? {})) {
@@ -296,18 +323,97 @@ function controlProblems(
 	}
 
 	return problems;
+
+	function argProblems(
+		key: string,
+		listed: ComposedStory,
+		known: Props,
+	): string[] {
+		if (isMountOnly(key)) {
+			return [`${key} is read only at mount, so list the controlled prop`];
+		}
+
+		// The story's own argTypes win, as in the panel; a prop's own options come next.
+		const declared =
+			annotations.default?.argTypes?.[key] ??
+			annotations.Default?.argTypes?.[key];
+		if (declared === undefined && !known.has(key)) {
+			return [`${key} isn't a prop of ${name}, so it needs argTypes`];
+		}
+
+		const value: unknown = listed.args[key];
+		if (value === undefined) {
+			return [`${key} has no value in args`];
+		}
+
+		const options = listed.argTypes[key]?.options ?? known.get(key);
+		const others = alternatives(value, options);
+		if (others.length === 0) {
+			return [
+				options === undefined
+					? `${key} has no boolean, number or string value`
+					: `${key} has no other option`,
+			];
+		}
+
+		if (exemption.afterHydration?.[key] !== undefined) {
+			return [];
+		}
+
+		const dead = others.filter(
+			(other) => render(listed, { [key]: other }) === base,
+		);
+		return dead.length === 0
+			? []
+			: [
+					`${key} doesn't change the render: ${dead.map((other) => JSON.stringify(other)).join(", ")}`,
+				];
+	}
+}
+
+const viewportOf = (story: ComposedStory) =>
+	(story.globals.viewport as { value?: string } | undefined)?.value;
+
+/**
+What's wrong with the phone twins of a stories file the layout gate lists: it needs one, and
+none may show on the docs page.
+*/
+function phoneProblems(module: CsfModule): string[] {
+	const pinned = Object.entries(compose(module)).filter(
+		([, story]) => viewportOf(story) === "phone",
+	);
+	if (pinned.length === 0) {
+		return ["no story pinned to phone"];
+	}
+
+	return pinned
+		.filter(([, story]) => story.tags.includes("autodocs"))
+		.map(([name]) => `${name} shows on the docs page`);
 }
 
 describe("the guard's fixtures", () => {
 	test.each(Object.entries(failing))(
 		"%s fails",
 		(_name, { module, problem }) => {
-			expect(controlProblems(module)).toContain(problem);
+			expect(
+				controlProblems(module).filter((found) => found.startsWith(problem)),
+			).not.toEqual([]);
 		},
 	);
 
 	test.each(Object.entries(passing))("%s passes", (_name, module) => {
 		expect(controlProblems(module)).toEqual([]);
+	});
+
+	test.each(Object.entries(phoneFailing))(
+		"%s fails the phone check",
+		(_name, { module, problem }) => {
+			expect(phoneProblems(module)).toContain(problem);
+		},
+	);
+
+	test("a pinned twin off the docs page passes the phone check", () => {
+		expect(phoneProblems(phonePassing)).toEqual([]);
 	});
 });
 
@@ -352,13 +458,7 @@ describe("viewports", () => {
 		layout.stories
 			.filter((entry) => entry.phase <= phase)
 			.map((entry) => entry.file),
-	)("%s has a story pinned to phone", async (file) => {
-		const stories = Object.values(compose(await load(file)));
-		const pinned = stories.filter(
-			(story) =>
-				(story.globals.viewport as { value?: string } | undefined)?.value ===
-				"phone",
-		);
-		expect(pinned.length).toBeGreaterThan(0);
+	)("%s has a phone twin off the docs page", async (file) => {
+		expect(phoneProblems(await load(file))).toEqual([]);
 	});
 });

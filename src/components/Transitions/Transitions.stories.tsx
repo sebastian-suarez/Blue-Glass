@@ -3,6 +3,7 @@ import * as React from "react";
 import { useArgs } from "storybook/preview-api";
 import readme from "../../../design-system/components/Transitions/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
+import { LiveArg } from "../../../stories/blocks/live-arg.js";
 import { Caption, Row, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Icon } from "../Icon/index.js";
@@ -148,14 +149,22 @@ Default's demo: the in arg shows or hides all four, and the button flips it.
 */
 function TransitionsWithArgs(args: { readonly in?: boolean }) {
 	const [, updateArgs] = useArgs<{ readonly in?: boolean }>();
-	const isShown = args.in !== false;
 	return (
-		<Transitions
-			isShown={isShown}
-			onToggle={() => {
-				updateArgs({ in: !isShown });
+		<LiveArg
+			value={args.in !== false}
+			onChange={(isShown) => {
+				updateArgs({ in: isShown });
 			}}
-		/>
+		>
+			{(isShown, setIsShown) => (
+				<Transitions
+					isShown={isShown}
+					onToggle={() => {
+						setIsShown(!isShown);
+					}}
+				/>
+			)}
+		</LiveArg>
 	);
 }
 

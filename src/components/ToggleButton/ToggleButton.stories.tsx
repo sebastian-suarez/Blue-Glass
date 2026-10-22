@@ -4,6 +4,7 @@ import { useArgs } from "storybook/preview-api";
 import { fn } from "storybook/test";
 import readme from "../../../design-system/components/ToggleButton/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
+import { LiveArg } from "../../../stories/blocks/live-arg.js";
 import { Labelled, Row } from "../../../stories/blocks/preview-kit.js";
 import { Icon, SvgIcon } from "../Icon/index.js";
 import { Paper } from "../Paper/index.js";
@@ -200,17 +201,27 @@ Default's group: the args drive it, and a press sets the value arg.
 function ViewPickerWithArgs(args: ToggleButtonGroupProps) {
 	const [, updateArgs] = useArgs<ToggleButtonGroupProps>();
 	return (
-		<ToggleButtonGroup
-			{...args}
-			onChange={(event, value: unknown) => {
-				args.onChange?.(event, value);
-				updateArgs({ value: value as typeof args.value });
+		<LiveArg
+			value={args.value}
+			onChange={(value) => {
+				updateArgs({ value });
 			}}
 		>
-			<ToggleButton value="diagram">Diagram</ToggleButton>
-			<ToggleButton value="code">Code</ToggleButton>
-			<ToggleButton value="notes">Notes</ToggleButton>
-		</ToggleButtonGroup>
+			{(value, setValue) => (
+				<ToggleButtonGroup
+					{...args}
+					value={value}
+					onChange={(event, next: unknown) => {
+						args.onChange?.(event, next);
+						setValue(next as typeof value);
+					}}
+				>
+					<ToggleButton value="diagram">Diagram</ToggleButton>
+					<ToggleButton value="code">Code</ToggleButton>
+					<ToggleButton value="notes">Notes</ToggleButton>
+				</ToggleButtonGroup>
+			)}
+		</LiveArg>
 	);
 }
 
@@ -227,11 +238,26 @@ export const Default: StoryObj<typeof ToggleButtonGroup> = {
 		fullWidth: false,
 		onChange: fn<() => void>(),
 	},
+	// The panel reads ToggleButton's own docs; these args are the group's, so they say so.
 	argTypes: {
-		value: { control: "inline-radio", options: ["diagram", "code", "notes"] },
+		value: {
+			control: "inline-radio",
+			options: ["diagram", "code", "notes"],
+			description: "The group's pressed value.",
+		},
 		orientation: {
 			control: "inline-radio",
 			options: ["horizontal", "vertical"],
+			description: "A row (default) or a column. Arrow keys follow it.",
+		},
+		size: {
+			description:
+				"`sm` 36px, `md` 46px (the site's nav track, default), `lg` 54px. Sets every button's size.",
+		},
+		disabled: { description: "Disables every button." },
+		fullWidth: {
+			description:
+				"Stretch to the container width; the buttons share it equally.",
 		},
 	},
 	parameters: {

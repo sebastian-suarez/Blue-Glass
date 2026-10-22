@@ -4,6 +4,7 @@ import { useArgs } from "storybook/preview-api";
 import { fn } from "storybook/test";
 import readme from "../../../design-system/components/Tabs/README.md?raw";
 import { componentDocs } from "../../../stories/blocks/component-docs.js";
+import { LiveArg } from "../../../stories/blocks/live-arg.js";
 import { Caption, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Icon } from "../Icon/index.js";
 import { Paper } from "../Paper/index.js";
@@ -182,13 +183,23 @@ Default's tabs: the args drive them, and a click sets the value arg.
 function SiteSectionsWithArgs(args: TabsProps) {
 	const [, updateArgs] = useArgs<TabsProps>();
 	return (
-		<SiteSections
-			{...args}
-			onChange={(event, value) => {
-				args.onChange?.(event, value);
+		<LiveArg
+			value={args.value}
+			onChange={(value) => {
 				updateArgs({ value });
 			}}
-		/>
+		>
+			{(value, setValue) => (
+				<SiteSections
+					{...args}
+					value={value}
+					onChange={(event, next) => {
+						args.onChange?.(event, next);
+						setValue(next);
+					}}
+				/>
+			)}
+		</LiveArg>
 	);
 }
 
