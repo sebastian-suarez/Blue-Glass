@@ -1,0 +1,131 @@
+@layer gl-components {
+	/* Stack — a flex column or row on the site's breakpoints (xs, sm >=361px, md >=701px, lg >=900px, xl >=1001px).
+	   The built-in divider is the site's hairline (color-line, as between .career-row and .employer-strip rows);
+	   it turns with the direction at every breakpoint. */
+	.gl-stack {
+		--gl-stack-rule-w: auto;
+		--gl-stack-rule-h: 1px;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+	.gl-stack-wrap {
+		flex-wrap: wrap;
+	}
+	.gl-stack-rule {
+		display: block;
+		flex: none;
+		align-self: stretch;
+		width: var(--gl-stack-rule-w);
+		height: var(--gl-stack-rule-h);
+		background: var(--color-line);
+	}
+	.gl-stack-xs-row {
+		flex-direction: row;
+		--gl-stack-rule-w: 1px;
+		--gl-stack-rule-h: auto;
+	}
+	.gl-stack-xs-column {
+		flex-direction: column;
+		--gl-stack-rule-w: auto;
+		--gl-stack-rule-h: 1px;
+	}
+	.gl-stack-xs-row-reverse {
+		flex-direction: row-reverse;
+		--gl-stack-rule-w: 1px;
+		--gl-stack-rule-h: auto;
+	}
+	.gl-stack-xs-column-reverse {
+		flex-direction: column-reverse;
+		--gl-stack-rule-w: auto;
+		--gl-stack-rule-h: 1px;
+	}
+	@media (min-width: 361px) {
+		.gl-stack-sm-row {
+			flex-direction: row;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-sm-column {
+			flex-direction: column;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+		.gl-stack-sm-row-reverse {
+			flex-direction: row-reverse;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-sm-column-reverse {
+			flex-direction: column-reverse;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+	}
+	@media (min-width: 701px) {
+		.gl-stack-md-row {
+			flex-direction: row;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-md-column {
+			flex-direction: column;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+		.gl-stack-md-row-reverse {
+			flex-direction: row-reverse;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-md-column-reverse {
+			flex-direction: column-reverse;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+	}
+	@media (min-width: 900px) {
+		.gl-stack-lg-row {
+			flex-direction: row;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-lg-column {
+			flex-direction: column;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+		.gl-stack-lg-row-reverse {
+			flex-direction: row-reverse;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-lg-column-reverse {
+			flex-direction: column-reverse;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+	}
+	@media (min-width: 1001px) {
+		.gl-stack-xl-row {
+			flex-direction: row;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-xl-column {
+			flex-direction: column;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+		.gl-stack-xl-row-reverse {
+			flex-direction: row-reverse;
+			--gl-stack-rule-w: 1px;
+			--gl-stack-rule-h: auto;
+		}
+		.gl-stack-xl-column-reverse {
+			flex-direction: column-reverse;
+			--gl-stack-rule-w: auto;
+			--gl-stack-rule-h: 1px;
+		}
+	}
+}
