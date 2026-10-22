@@ -90,3 +90,5 @@ Found while fixing:
 - **#5, a TabPanel inside another component.** React writes a tab's HTML before it reaches the component that holds the panel, so no render can know of that panel in time. Panels among Tabs' children, and the elements in them, are wired in the server HTML. A panel inside another component is named after hydration, as in the reference, and `docs/reference-defects.md` now says so.
 
 Round 2 was the last round. Its fixes have tests but no third review.
+
+After its fixes the full suite passed, and the tests passed in three full runs: 1,626 tests, parity 42 of 42, server HTML 30 of 30, story layout 22 of 22, islands 8 of 8 with 30 of 30 planted defects caught, and the reference still in sync.
