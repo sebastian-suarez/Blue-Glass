@@ -455,25 +455,32 @@ describe("TableRow", () => {
 		expect(row("SunDevs")).not.toHaveAttribute("aria-selected", "true");
 	});
 
-	test("hover puts its class on the row", () => {
+	test("hover highlights the row under a fine pointer, and a row without it stays as it is", async () => {
 		render(
-			<Table aria-label="Experience">
-				<TableBody>
-					<TableRow hover>
-						<TableCell>EPAM</TableCell>
-					</TableRow>
-					<TableRow>
-						<TableCell>Intive</TableCell>
-					</TableRow>
-				</TableBody>
-			</Table>,
+			<>
+				<p>Away from the table</p>
+				<Table aria-label="Experience">
+					<TableBody>
+						<TableRow hover>
+							<TableCell>EPAM</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell>Intive</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>
+			</>,
 		);
-		expect(screen.getByRole("row", { name: "EPAM" })).toHaveClass(
-			"gl-table-row-hover",
-		);
-		expect(screen.getByRole("row", { name: "Intive" })).not.toHaveClass(
-			"gl-table-row-hover",
-		);
+		const cell = (name: string) => screen.getByRole("cell", { name });
+		const background = (name: string) =>
+			getComputedStyle(cell(name)).backgroundColor;
+		await userEvent.hover(screen.getByText("Away from the table"));
+		const resting = { epam: background("EPAM"), intive: background("Intive") };
+		await userEvent.hover(cell("EPAM"));
+		await expect.poll(() => background("EPAM")).not.toBe(resting.epam);
+		await userEvent.hover(cell("Intive"));
+		await expect.poll(() => background("EPAM")).toBe(resting.epam);
+		expect(background("Intive")).toBe(resting.intive);
 	});
 });
 
