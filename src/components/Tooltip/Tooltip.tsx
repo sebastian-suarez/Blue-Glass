@@ -2,7 +2,9 @@
 /**
 Tooltip, ported from design-system/components/Tooltip/reference.tsx onto Base UI's Tooltip. Its
 Root (held by `open`), Portal, Positioner, Popup and Arrow place the ink label by anchor.ts's
-rules, render it into body or in place, and keep it mounted while it leaves.
+rules, render it into body or in place, and keep it mounted while it leaves. Where Base UI's
+placement differs from the reference's by a pixel (whole-pixel sizes, the arrow's rounded
+offset, flips inside a showcase stage), the reference's arithmetic wins, so both land alike.
 
 What opens and closes it stays the reference's, on the child's own handlers, because Base UI's
 triggers differ from the README:
@@ -246,7 +248,7 @@ Body, the documented mount point. Base UI's own default is the Base UI popup the
 (a Dialog's portal), so it's passed explicitly, as a ref: Base UI reads it only once mounted, so
 body is never read while rendering.
 */
-const body: React.RefObject<HTMLElement> = {
+const bodyRef: React.RefObject<HTMLElement> = {
 	get current() {
 		return document.body;
 	},
@@ -262,14 +264,14 @@ function usePortalContainer(
 	const [resolved, setResolved] = React.useState<Container | null>(null);
 	useIsoLayoutEffect(() => {
 		if (typeof container === "function") {
-			setResolved((container() as HTMLElement | null) ?? body);
+			setResolved((container() as HTMLElement | null) ?? bodyRef);
 		}
 	}, [container]);
 	if (typeof container === "function") {
 		return resolved;
 	}
 
-	return (container as HTMLElement | null | undefined) ?? body;
+	return (container as HTMLElement | null | undefined) ?? bodyRef;
 }
 
 /**
