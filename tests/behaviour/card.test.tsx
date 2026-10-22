@@ -206,7 +206,7 @@ describe("CardMedia", () => {
 		expect(style.minHeight).toBe(`${10 * fontSize}px`);
 	});
 
-	test("disablePadding puts its class on the well", () => {
+	test("disablePadding takes the well's padding away, so an image can bleed", () => {
 		const padded = React.createRef<HTMLElement>();
 		const flush = React.createRef<HTMLElement>();
 		render(
@@ -219,8 +219,9 @@ describe("CardMedia", () => {
 				</CardMedia>
 			</Card>,
 		);
-		expect(flush.current).toHaveClass("gl-card-media-flush");
-		expect(padded.current).not.toHaveClass("gl-card-media-flush");
+		// The preview never sets disablePadding, so parity can't see it: read the padding.
+		expect(getComputedStyle(must(flush.current)).padding).toBe("0px");
+		expect(getComputedStyle(must(padded.current)).paddingTop).not.toBe("0px");
 	});
 
 	test("component renders the well as another element, around its children", () => {

@@ -571,7 +571,7 @@ describe("ListItemText and ListItemIcon", () => {
 		).toBe(true);
 	});
 
-	test("inset and noWrap put their classes on the text", () => {
+	test("inset puts its class on the text, and noWrap cuts the text to one line with an ellipsis", () => {
 		const insetRef = React.createRef<HTMLSpanElement>();
 		const noWrapRef = React.createRef<HTMLSpanElement>();
 		const plainRef = React.createRef<HTMLSpanElement>();
@@ -589,9 +589,15 @@ describe("ListItemText and ListItemIcon", () => {
 			</List>,
 		);
 		expect(insetRef.current).toHaveClass("gl-list-text-inset");
-		expect(noWrapRef.current).toHaveClass("gl-list-text-nowrap");
 		expect(plainRef.current).not.toHaveClass("gl-list-text-inset");
-		expect(plainRef.current).not.toHaveClass("gl-list-text-nowrap");
+		// The preview never sets noWrap, so parity can't see it: read the style itself.
+		const cut = getComputedStyle(screen.getByText("RS50 bridge"));
+		expect(cut.whiteSpace).toBe("nowrap");
+		expect(cut.textOverflow).toBe("ellipsis");
+		expect(cut.overflow).toBe("hidden");
+		expect(getComputedStyle(screen.getByText("VSebCode")).whiteSpace).not.toBe(
+			"nowrap",
+		);
 	});
 });
 

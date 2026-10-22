@@ -42,6 +42,18 @@ type Variant = NonNullable<PaperProps["variant"]>;
 type Elevation = NonNullable<PaperProps["elevation"]>;
 type Radius = NonNullable<PaperProps["radius"]>;
 
+/**
+The corner radius a token resolves to, read from a probe element styled with it.
+*/
+function resolvedRadius(token: string): string {
+	const probe = document.createElement("div");
+	probe.style.borderRadius = `var(${token})`;
+	document.body.append(probe);
+	const radius = getComputedStyle(probe).borderTopLeftRadius;
+	probe.remove();
+	return radius;
+}
+
 test("the variant is glass by default", () => {
 	expect(root({ children: "Panel" }).classList.contains("gl-paper-glass")).toBe(
 		true,
@@ -105,10 +117,18 @@ test.each([
 );
 
 test.each(["panel", "pane", "well", "control", "none"] as const)(
-	"radius %s sets that corner token on the root",
+	"radius %s rounds the root's corners with that token",
 	(radius) => {
 		const element = root({ variant: "inset", radius, children: radius });
-		expect(element.classList.contains(`gl-radius-${radius}`)).toBe(true);
+		// The class alone isn't the promise: preview.html never sets radius, so parity can't see it.
+		// "Under 700px, radius-panel drops to radius-panel-sm."
+		const token =
+			radius === "panel" && matchMedia("(max-width: 700px)").matches
+				? "--radius-panel-sm"
+				: `--radius-${radius}`;
+		expect(getComputedStyle(element).borderTopLeftRadius).toBe(
+			radius === "none" ? "0px" : resolvedRadius(token),
+		);
 		if (radius !== "well") {
 			expect(element.classList.contains("gl-radius-well")).toBe(false);
 		}
