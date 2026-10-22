@@ -19,6 +19,7 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export * from "./components/AppBar/index.js";
 export * from "./components/Card/index.js";
 export { Paper, type PaperProps } from "./components/Paper/index.js";
 export {
