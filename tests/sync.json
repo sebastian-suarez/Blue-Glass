@@ -155,6 +155,15 @@
 				"components/Avatar/preview.html": "3a6b45bf938791c0",
 				"components/Avatar/reference.tsx": "832e591f42da4876"
 			}
+		},
+		"Chip": {
+			"files": {
+				"components/Chip/README.md": "e84703bd519efcf5",
+				"components/Chip/api.d.ts": "def81b65a42dc7f8",
+				"components/Chip/styles.css": "fdbfd77fc487ec20",
+				"components/Chip/preview.html": "0a93b101039d643e",
+				"components/Chip/reference.tsx": "4a99169729bd05b8"
+			}
 		}
 	}
 }

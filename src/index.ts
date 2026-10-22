@@ -13,6 +13,7 @@ export {
 	type AvatarGroupProps,
 	AvatarGroup,
 } from "./components/Avatar/index.js";
+export { type ChipTone, type ChipProps, Chip } from "./components/Chip/index.js";
 export * from "./components/Divider/index.js";
 export {
 	GLYPHS,
