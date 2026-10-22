@@ -710,6 +710,19 @@ describe("Diagram: scale and scrolling", () => {
 		expect(group.scrollLeft).toBe(0);
 		await userEvent.keyboard("{ArrowRight}");
 		await expect.poll(() => group.scrollLeft).toBeGreaterThan(0);
+		// Chromium scrolls smoothly, and under load drops a key pressed mid-scroll: wait for the
+		// scroll to settle first.
+		let last = -1;
+		await expect
+			.poll(
+				() => {
+					const isSettled = group.scrollLeft === last;
+					last = group.scrollLeft;
+					return isSettled;
+				},
+				{ interval: 100 },
+			)
+			.toBe(true);
 		await userEvent.keyboard("{ArrowLeft}");
 		await expect.poll(() => group.scrollLeft).toBe(0);
 	});
