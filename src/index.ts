@@ -120,6 +120,15 @@ export {
 } from "./components/Drawer/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export {
+	type MenuCloseReason,
+	type MenuListProps,
+	MenuList,
+	type MenuItemProps,
+	MenuItem,
+	type MenuProps,
+	Menu,
+} from "./components/Menu/index.js";
+export {
 	type TabValue,
 	type TabsProps,
 	Tabs,
@@ -143,6 +152,7 @@ export {
 	Modal,
 } from "./components/Modal/index.js";
 export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
+export { type PopoverProps, Popover } from "./components/Popover/index.js";
 export {
 	type VirtualElement,
 	type AnchorEl,
