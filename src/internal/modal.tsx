@@ -946,71 +946,69 @@ export function ModalLayer(props: ModalLayerProps) {
 				);
 	const rootProps = getRootProps(props, hasExited);
 
-	if (!disablePortal) {
-		const handleOpenChangeComplete = (isOpen: boolean) => {
-			if (!isOpen) {
-				markExited();
-			}
-		};
-
-		const initialFocus = behaviour.shouldAutoFocus
-			? () => initialFocusTarget(contentRef.current) ?? true
-			: false;
-
-		if (root === "drawer") {
-			return (
-				<Drawer.Root
-					disablePointerDismissal
-					open={isPresent}
-					modal={open ? behaviour.modal : false}
-					onOpenChange={handleOpenChange}
-					onOpenChangeComplete={handleOpenChangeComplete}
+	if (!disablePortal && root === "drawer") {
+		return (
+			<Drawer.Root
+				disablePointerDismissal
+				open={isPresent}
+				modal={open ? behaviour.modal : false}
+				onOpenChange={handleOpenChange}
+				onOpenChangeComplete={(isOpen) => {
+					if (!isOpen) {
+						markExited();
+					}
+				}}
+			>
+				<Drawer.Portal
+					ref={handleRootRef}
+					keepMounted={keepMounted}
+					container={portalContainer}
+					{...rootProps}
 				>
-					<Drawer.Portal
-						ref={handleRootRef}
-						keepMounted={keepMounted}
-						container={portalContainer}
-						{...rootProps}
-					>
-						{backdrop ? (
-							<Drawer.Backdrop
-								forceRender
-								{...backdrop.attributes}
-								render={(baseUiProps) => (
-									<Backdrop
-										{...baseUiProps}
-										{...backdrop.options}
-										open={open}
-									/>
-								)}
-							/>
-						) : null}
-						<Drawer.Viewport>
-							<Drawer.Popup
-								ref={contentRef}
-								data-base-ui-swipe-ignore=""
-								role="presentation"
-								className="gl-modal-content"
-								style={{ pointerEvents: "auto" }}
-								initialFocus={initialFocus}
-								finalFocus={false}
-								onFocus={markInside}
-							>
-								{content}
-							</Drawer.Popup>
-						</Drawer.Viewport>
-					</Drawer.Portal>
-				</Drawer.Root>
-			);
-		}
+					{backdrop ? (
+						<Drawer.Backdrop
+							forceRender
+							{...backdrop.attributes}
+							render={(baseUiProps) => (
+								<Backdrop {...baseUiProps} {...backdrop.options} open={open} />
+							)}
+						/>
+					) : null}
+					<Drawer.Viewport>
+						<Drawer.Popup
+							ref={contentRef}
+							data-base-ui-swipe-ignore=""
+							role="presentation"
+							className="gl-modal-content"
+							style={{ pointerEvents: "auto" }}
+							initialFocus={
+								behaviour.shouldAutoFocus
+									? () => initialFocusTarget(contentRef.current) ?? true
+									: false
+							}
+							finalFocus={false}
+							onFocus={markInside}
+						>
+							{content}
+						</Drawer.Popup>
+					</Drawer.Viewport>
+				</Drawer.Portal>
+			</Drawer.Root>
+		);
+	}
 
+	if (!disablePortal) {
 		return (
 			<Dialog.Root
 				disablePointerDismissal
 				open={isPresent}
 				modal={open ? behaviour.modal : false}
 				onOpenChange={handleOpenChange}
-				onOpenChangeComplete={handleOpenChangeComplete}
+				onOpenChangeComplete={(isOpen) => {
+					if (!isOpen) {
+						markExited();
+					}
+				}}
 			>
 				<Dialog.Portal
 					ref={handleRootRef}
@@ -1032,7 +1030,11 @@ export function ModalLayer(props: ModalLayerProps) {
 						role="presentation"
 						className="gl-modal-content"
 						style={{ pointerEvents: "auto" }}
-						initialFocus={initialFocus}
+						initialFocus={
+							behaviour.shouldAutoFocus
+								? () => initialFocusTarget(contentRef.current) ?? true
+								: false
+						}
 						finalFocus={false}
 						onFocus={markInside}
 					>
