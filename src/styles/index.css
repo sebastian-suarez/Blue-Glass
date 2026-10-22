@@ -13,3 +13,5 @@
 @import "../components/Container/Container.css";
 @import "../components/Grid/Grid.css";
 @import "../components/Stack/Stack.css";
+@import "../components/Diagram/Diagram.css";
+@import "../components/TimingChart/TimingChart.css";

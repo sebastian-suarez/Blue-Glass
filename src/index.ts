@@ -50,3 +50,5 @@ export {
 	type UseMediaQueryOptions,
 	useMediaQuery,
 } from "./components/useMediaQuery/index.js";
+export * from "./components/Diagram/index.js";
+export * from "./components/TimingChart/index.js";

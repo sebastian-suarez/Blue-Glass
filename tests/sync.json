@@ -128,6 +128,24 @@
 				"components/CssBaseline/preview.html": "30f3c40f99ac2fe7",
 				"components/CssBaseline/reference.tsx": "6bde58ffca34063d"
 			}
+		},
+		"Diagram": {
+			"files": {
+				"components/Diagram/README.md": "9d85393a5deda199",
+				"components/Diagram/api.d.ts": "3d12671fbf9f69c9",
+				"components/Diagram/styles.css": "4f5fe9c05ce01ea8",
+				"components/Diagram/preview.html": "51b6c5fc79480753",
+				"components/Diagram/reference.tsx": "e26d2fd2f584c5c1"
+			}
+		},
+		"TimingChart": {
+			"files": {
+				"components/TimingChart/README.md": "c33a103eadc2b321",
+				"components/TimingChart/api.d.ts": "33a1365339fbc844",
+				"components/TimingChart/styles.css": "5b62c37ee623bfd1",
+				"components/TimingChart/preview.html": "bf792c2dec1aeb44",
+				"components/TimingChart/reference.tsx": "36e8f0f668ff9066"
+			}
 		}
 	}
 }
