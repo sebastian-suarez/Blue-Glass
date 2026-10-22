@@ -1,6 +1,25 @@
 // Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
 // and tests/api checks the exports against design-system/source/index.d.ts.
 export { Button, type ButtonProps } from "./components/Button/index.js";
+export {
+	ButtonGroup,
+	type ButtonGroupProps,
+} from "./components/ButtonGroup/index.js";
+export {
+	type ToggleButtonProps,
+	ToggleButton,
+	type ToggleButtonGroupProps,
+	ToggleButtonGroup,
+} from "./components/ToggleButton/index.js";
+export {
+	type AvatarSize,
+	type AvatarVariant,
+	type AvatarProps,
+	Avatar,
+	type AvatarGroupProps,
+	AvatarGroup,
+} from "./components/Avatar/index.js";
+export { type ChipTone, type ChipProps, Chip } from "./components/Chip/index.js";
 export * from "./components/Divider/index.js";
 export {
 	GLYPHS,
@@ -26,6 +45,7 @@ export {
 	LightField,
 	type LightFieldProps,
 } from "./components/LightField/index.js";
+export { Link, type LinkProps } from "./components/Link/index.js";
 export * from "./components/Box/index.js";
 export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";
