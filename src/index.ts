@@ -42,6 +42,7 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export { type SkeletonProps, Skeleton } from "./components/Skeleton/index.js";
 export {
 	type AccordionProps,
 	Accordion,

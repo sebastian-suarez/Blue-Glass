@@ -15,6 +15,7 @@
 @import "../components/Divider/Divider.css";
 @import "../components/List/List.css";
 @import "../components/Table/Table.css";
+@import "../components/Skeleton/Skeleton.css";
 @import "../components/Accordion/Accordion.css";
 @import "../components/AppBar/AppBar.css";
 @import "../components/Card/Card.css";
