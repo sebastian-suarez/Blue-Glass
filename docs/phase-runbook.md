@@ -9,8 +9,8 @@ How to run one phase of `docs/package-plan.md` in a fresh session. One phase per
 | 0. Foundation                                          | Done 21 Oct 2026, two review rounds | `f07c0d9`                | `docs/reviews/phase-0.md`   |
 | 1. Site set (26)                                       | Done 22 Oct 2026, two review rounds | `432ca83`                | `docs/reviews/phase-1.md`   |
 | Storybook controls and viewports (between 1 and 2)     | Done 22 Oct 2026, two review rounds | `b11d4fd`                | `docs/reviews/storybook.md` |
-| 2. Overlays and feedback (17)                          | Next, waiting for your go           |                          |                             |
-| 3. Inputs (11)                                         |                                     |                          |                             |
+| 2. Overlays and feedback (17)                          | Done 22 Oct 2026, one review round  | `1879bb1`                | `docs/reviews/phase-2.md`   |
+| 3. Inputs (11)                                         | Next, waiting for your go           |                          |                             |
 | 4. Navigation and layout (7)                           |                                     |                          |                             |
 | 5. Charts (5), then README, CHANGELOG, release dry run |                                     |                          |                             |
 
@@ -72,6 +72,17 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 - **Don't plant a defect in a worktree while a gate run uses it.** A run that overlaps it can't be trusted, so run it again.
 - **A headless session on an API key stops when the credits run out.** Phase 1's stopped mid-review. A lead reviewer that delegates can also end before writing up its own part, so brief reviewers to do the review themselves, and copy their reports out of `/private/tmp`.
 
+## Traps found in phase 2
+
+- **Vitest caches modules across runs** (`fsModuleCache`), which let new stories files skip the stories guard. It's off in `vitest.config.ts`: if a new file seems ignored, look there first.
+- **Every checkout needs `npm run fonts`,** agent worktrees included. Where Fontshare is unreachable, copy `fonts/` from the main checkout: the gates check the file's hash.
+- **Prettier drops the parentheses XO's `no-mixed-operators` asks for** (`a + b / 2`). Name the part instead (`const half = b / 2`).
+- **A gate step must survive its element unmounting.** An overlay that closed while the Storybook gate read it stalled the step for 30 seconds.
+- **`check:sync` doesn't track `design-system/shared/position.ts`:** `sharedFiles` lacks it, and `sharedHelpersOf` only follows underscored imports. A regenerated position helper (Popper's, Tooltip's) goes unnoticed. Fix it when phase 3 opens.
+- **Merging parallel agents:** a `tests/sync.json` conflict resolves by taking every component record from both sides and one `shared` block. `src/index.ts` and `src/styles/index.css` follow the reference's order (`index.d.ts`).
+- **Run the gates in a quiet window.** While agents also run gates, the parity self-test and the Storybook gate time out on harness steps, not on the port.
+- **Base UI's portals render nothing on the server.** A popup that must be in the server HTML needs its own in-place path, as `ModalLayer` has. Popover and Menu have none (deviation 10).
+
 ## Notes for each phase
 
 - **Phase 1:**
@@ -85,7 +96,10 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
   - The type switched to Satoshi on 22 Oct 2026, after the suite first opened and before any attempt finished. The tokens name it, so a port reads it like any other token. Every checkout needs `npm run fonts` (`tests/README.md`, "Fonts"), and the Codex worktree needs it before Codex starts, since its sandbox has no network.
   - A non-modal popup already open in body when an in-place modal opens gets hidden with the rest of the page.
   - Stories follow the Controls rules in `stories/README.md`, which the guard in the unit project (`tests/unit/stories.test.ts`) checks. An overlay's Default lists `open` through `LiveArg`: its own dismissal (Escape, the backdrop, a close button) calls `onClose`, which logs and sets it back to false. If a portalled overlay's `open` changes nothing in the server HTML, list it under `afterHydration` in `tests/unit/stories.json` with that reason. `npm run check:storybook` checks that a control change, each step in `tests/storybook/interactions.ts` (an opening click, a dismissal) and the docs page all keep the story and the panel in step.
-- **Phase 3:** Checkbox, Radio and Switch follow deviations 1 to 6. Deviation 6 (a Radio outside a RadioGroup) is the gap to watch.
+- **Phase 3:**
+  - Checkbox, Radio and Switch follow deviations 1 to 6. Deviation 6 (a Radio outside a RadioGroup) is the gap to watch.
+  - Select can build on Popover's and Menu's layer (`src/internal/popup-layer.tsx`) and place with `toWholePixelOffsets` (`src/internal/anchor.ts`) to land on the reference's pixels.
+  - Open from phase 2's review (`docs/reviews/phase-2.md`): the iOS 26 Safari backdrops (your call), an open Dialog's name in the server HTML, the Storybook gate's toolbar and scope checks, and `check:sync`'s `position.ts`.
 - **Phase 5 and release:**
   - The packed `package.json` still carries `"prepare": "husky"`. Strip it before publishing.
   - The `dist` source maps point to `src`, which isn't shipped. Ship it or drop the maps.
