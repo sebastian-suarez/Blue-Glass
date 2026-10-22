@@ -227,6 +227,24 @@
 				"components/Link/preview.html": "ca2c3adf6e2da28e",
 				"components/Link/reference.tsx": "b9339a0c7afa11ca"
 			}
+		},
+		"Tabs": {
+			"files": {
+				"components/Tabs/README.md": "a3f6836d69a07fb5",
+				"components/Tabs/api.d.ts": "63ce367a7994b46c",
+				"components/Tabs/styles.css": "a46ed97aab18d5fe",
+				"components/Tabs/preview.html": "cf0a093eb4b3ba72",
+				"components/Tabs/reference.tsx": "c0f7611fb6a40636"
+			}
+		},
+		"Accordion": {
+			"files": {
+				"components/Accordion/README.md": "169f6531c85c0d64",
+				"components/Accordion/api.d.ts": "d471b4b17af67d76",
+				"components/Accordion/styles.css": "cfb43f2ef4424484",
+				"components/Accordion/preview.html": "5cf629db02aa8e4f",
+				"components/Accordion/reference.tsx": "ecf35c4dcbe0f2ec"
+			}
 		}
 	}
 }

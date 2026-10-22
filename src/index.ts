@@ -19,7 +19,11 @@ export {
 	type AvatarGroupProps,
 	AvatarGroup,
 } from "./components/Avatar/index.js";
-export { type ChipTone, type ChipProps, Chip } from "./components/Chip/index.js";
+export {
+	type ChipTone,
+	type ChipProps,
+	Chip,
+} from "./components/Chip/index.js";
 export * from "./components/Divider/index.js";
 export {
 	GLYPHS,
@@ -38,6 +42,17 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export {
+	type AccordionProps,
+	Accordion,
+	type AccordionSummaryProps,
+	AccordionSummary,
+	type AccordionDetailsProps,
+	AccordionDetails,
+	type PaneAccordionItem,
+	type PaneAccordionProps,
+	PaneAccordion,
+} from "./components/Accordion/index.js";
 export * from "./components/AppBar/index.js";
 export * from "./components/Card/index.js";
 export { Paper, type PaperProps } from "./components/Paper/index.js";
@@ -46,6 +61,15 @@ export {
 	type LightFieldProps,
 } from "./components/LightField/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
+export {
+	type TabValue,
+	type TabsProps,
+	Tabs,
+	type TabProps,
+	Tab,
+	type TabPanelProps,
+	TabPanel,
+} from "./components/Tabs/index.js";
 export * from "./components/Box/index.js";
 export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";
