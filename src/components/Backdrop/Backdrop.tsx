@@ -6,7 +6,8 @@ under reduced transparency, or nothing at all with `invisible`. Modal renders it
 content (src/internal/modal.tsx).
 
 The Fade is the transition adapter's: a backdrop open when the page renders on the server shows
-in its server HTML, and hydrating it animates nothing (docs/deviations.md, entry 9).
+in its server HTML, and hydrating it animates nothing (docs/deviations.md, entry 9). It runs no
+hooks itself, so it needs no client directive.
 */
 import type * as React from "react";
 import { cx } from "../../internal/cx.js";
