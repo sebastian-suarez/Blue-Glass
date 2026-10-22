@@ -49,6 +49,7 @@ import { previews, root, type Preview } from "../lib/reference.ts";
 import { buildRuntimes } from "../runtimes.ts";
 import { mutations, recordEvents, type Mutation } from "./injected.ts";
 import {
+	argWritesSince,
 	errorsOf,
 	eventCount,
 	firedIn,
@@ -804,8 +805,9 @@ async function afterPanelChange(context: InteractionContext): Promise<void> {
 }
 
 /**
-On the docs page the Default responds, and a canvas opened from there through the sidebar,
-without reloading the preview, still shows the initial value: the docs page wrote no args.
+On the docs page the Default responds and writes no args, at any step: a sequence that ends on
+the initial value can't hide a write. Then a canvas opened from there through the sidebar,
+without reloading the preview, still shows the initial value.
 */
 async function onDocsPage(
 	context: InteractionContext,
@@ -817,6 +819,7 @@ async function onDocsPage(
 	try {
 		frame = await openDocs(worker, server, docsId);
 		const opened = frame;
+		const start = await eventCount(opened);
 		const { hasPassed } = await runSteps(log, {
 			story: id,
 			where: "docs",
@@ -826,7 +829,15 @@ async function onDocsPage(
 			scope: { area: `#anchor--${id}`, app: appOfStorybook },
 			errors: async () => errorsOf(worker, opened),
 		});
-		if (hasPassed) {
+		const writes = await argWritesSince(opened, id, start);
+		if (writes > 0) {
+			log.fail(
+				"interactions",
+				id,
+				"docs",
+				`the docs page wrote the story's args ${writes} time${writes === 1 ? "" : "s"} during its steps`,
+			);
+		} else if (hasPassed) {
 			const since = await eventCount(opened);
 			await worker.page.locator(`[data-item-id="${id}"]`).first().click();
 			await waitForEvent(opened, { type: "storyRendered", id, since });
@@ -1224,7 +1235,8 @@ function verdict(
 		(result) =>
 			result.check === mutation.check &&
 			result.story === mutation.story &&
-			result.where === mutation.where,
+			result.where === mutation.where &&
+			(mutation.detail === undefined || mutation.detail.test(result.detail)),
 	);
 	const stray = failures.filter(
 		(result) =>
@@ -1240,7 +1252,7 @@ function verdict(
 			...(run.fired > 0 ? [] : ["the planted script never acted"]),
 			...(caught === undefined
 				? [
-						`no ${mutation.check} failure on ${mutation.story} (${mutation.where})`,
+						`no ${mutation.check} failure on ${mutation.story} (${mutation.where})${mutation.detail === undefined ? "" : ` matching ${String(mutation.detail)}`}`,
 					]
 				: []),
 			...stray.map(

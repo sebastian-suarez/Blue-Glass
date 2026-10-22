@@ -52,6 +52,28 @@ export async function eventCount(frame: Frame): Promise<number> {
 }
 
 /**
+How many times the preview reported new args for this story after the first `since` events.
+*/
+export async function argWritesSince(
+	frame: Frame,
+	id: string,
+	since: number,
+): Promise<number> {
+	return frame.evaluate(
+		(target) =>
+			(globalThis as unknown as Recorded).__glEvents
+				.slice(target.since)
+				.filter(
+					(event) =>
+						event.type === "storyArgsUpdated" &&
+						(event.payload as { storyId?: string } | undefined)?.storyId ===
+							target.id,
+				).length,
+		{ id, since },
+	);
+}
+
+/**
 Waits for the preview to report `type` for this story or docs entry, after the first `since`
 events. A render error for it ends the wait as a failure.
 */

@@ -50,13 +50,15 @@ export const recordEvents = `(() => {
 
 /**
 A defect planted at runtime for the self-test. `script` runs in every frame after the recorder,
-with TARGET set to the story's id; it bumps window.__glFired each time it acts.
+with TARGET set to the story's id; it bumps window.__glFired each time it acts. With `detail`,
+the failure that catches it must match it, so the self-test proves that comparison bites.
 */
 export type Mutation = {
 	name: string;
 	story: string;
 	where: "canvas" | "docs";
 	check: Check;
+	detail?: RegExp;
 	script: string;
 };
 
@@ -80,6 +82,25 @@ export const mutations: Mutation[] = [
 				if (event && event.type === "updateStoryArgs" && event.args && event.args[0] && event.args[0].storyId === TARGET) {
 					window.__glFired++;
 					return;
+				}
+				return handler.call(this, event, ...rest);
+			};
+		});`,
+	},
+	{
+		name: "the preview takes the panel's arg update and changes nothing",
+		story: "inputs-button--default",
+		where: "canvas",
+		check: "controls",
+		detail: /changes nothing in the story/v,
+		script: `window.__glOnChannel((channel) => {
+			${inPreview}
+			const transport = channel.transports[0];
+			const handler = transport.handler;
+			transport.handler = function (event, ...rest) {
+				if (event && event.type === "updateStoryArgs" && event.args && event.args[0] && event.args[0].storyId === TARGET) {
+					window.__glFired++;
+					return handler.call(this, { ...event, args: [{ ...event.args[0], updatedArgs: {} }, ...event.args.slice(1)] }, ...rest);
 				}
 				return handler.call(this, event, ...rest);
 			};
@@ -145,6 +166,25 @@ export const mutations: Mutation[] = [
 			if (current.viewMode === "docs" && event.target.closest && event.target.closest("#anchor--" + TARGET)) {
 				setTimeout(() => {
 					window.__STORYBOOK_ADDONS_CHANNEL__.emit("updateStoryArgs", { storyId: TARGET, updatedArgs: { value: "projects" } });
+					window.__glFired++;
+				}, 0);
+			}
+		}, true);`,
+	},
+	{
+		name: "the docs page writes its change to the args, then resets them",
+		story: "navigation-tabs--default",
+		where: "docs",
+		check: "interactions",
+		detail: /wrote the story's args/v,
+		script: `window.addEventListener("click", (event) => {
+			${inPreview}
+			const current = ${selection};
+			if (current.viewMode === "docs" && event.target.closest && event.target.closest("#anchor--" + TARGET)) {
+				setTimeout(() => {
+					const channel = window.__STORYBOOK_ADDONS_CHANNEL__;
+					channel.emit("updateStoryArgs", { storyId: TARGET, updatedArgs: { value: "projects" } });
+					channel.emit("resetStoryArgs", { storyId: TARGET, argNames: ["value"] });
 					window.__glFired++;
 				}, 0);
 			}
