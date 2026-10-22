@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { scope } from "./lib/phases.ts";
 import { componentNames, designSystem, root } from "./lib/reference.ts";
 
 type Entry = { files: Record<string, string> };
@@ -121,14 +122,23 @@ if (recordAt !== -1) {
 			changes(entry).map((file) => `${name}: ${file}`),
 		),
 	];
+	// A module the phase has ported but never recorded would go unwatched.
+	const unrecorded = [...scope().modules].filter(
+		(name) => manifest.components[name] === undefined,
+	);
 	for (const line of changed) {
 		console.log(`changed since it was ported  ${line}`);
 	}
 
+	for (const name of unrecorded) {
+		console.log(`not recorded  ${name}: run --record ${name}`);
+	}
+
+	const problems = changed.length + unrecorded.length;
 	console.log(
-		changed.length === 0
+		problems === 0
 			? `in sync: ${Object.keys(manifest.components).length} ported modules and the shared files match their reference`
-			: `${changed.length} reference file(s) changed: re-port them, then record them again`,
+			: `${changed.length} reference file(s) changed and ${unrecorded.length} module(s) not recorded: re-port and record them`,
 	);
-	process.exitCode = changed.length === 0 ? 0 : 1;
+	process.exitCode = problems === 0 ? 0 : 1;
 }

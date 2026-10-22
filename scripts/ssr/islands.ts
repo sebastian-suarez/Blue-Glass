@@ -163,7 +163,13 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 			range.selectNodeContents(node);
 			const box = range.getBoundingClientRect();
 			let { left, top, right, bottom } = box;
-			if (box.width === 0 || box.height === 0) {
+			// Text wholly before the page's start, as left: -9999px puts it, can't be scrolled to.
+			if (
+				box.width === 0 ||
+				box.height === 0 ||
+				right + globalThis.scrollX <= 0 ||
+				bottom + globalThis.scrollY <= 0
+			) {
 				return false;
 			}
 
@@ -288,6 +294,10 @@ type TabsSpec = {
 	selected: string;
 	panels: Record<string, string>;
 	/**
+	The enabled tab after the selected one, which the next arrow selects.
+	*/
+	next: string;
+	/**
 	The last enabled tab, which End selects.
 	*/
 	last: string;
@@ -296,7 +306,7 @@ type TabsSpec = {
 /**
 A Tabs island (Tabs README: "What you provide" and "Keyboard").
 */
-function tabsIsland({ list, selected, panels, last }: TabsSpec): Island {
+function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 	const tablist = (page: Page) =>
 		page.getByRole("tablist", { name: list, exact: true });
 	const tab = (page: Page, name: string) =>
@@ -381,12 +391,31 @@ function tabsIsland({ list, selected, panels, last }: TabsSpec): Island {
 		},
 		focus: (page) => tab(page, selected),
 		async after(page) {
+			// "Left and Right (Up and Down in side) move to the previous or next tab and select
+			// it." Right and Left also move in side, which is a row on phones.
+			await page.keyboard.press("ArrowRight");
+			const problems = await eventually(page, async () => [
+				...(await selection(page, next, "after ArrowRight")),
+				...(await expectSeen(page, "after ArrowRight", showing(next))),
+			]);
+			if (!(await isFocused(tab(page, next)))) {
+				problems.push(`after ArrowRight: focus isn't on ${next}`);
+			}
+
+			await page.keyboard.press("ArrowLeft");
+			problems.push(
+				...(await eventually(page, async () =>
+					selection(page, selected, "after ArrowLeft"),
+				)),
+			);
 			// "Home and End select the first and last tab. Disabled tabs are skipped."
 			await page.keyboard.press("End");
-			const problems = await eventually(page, async () => [
-				...(await selection(page, last, "after End")),
-				...(await expectSeen(page, "after End", showing(last))),
-			]);
+			problems.push(
+				...(await eventually(page, async () => [
+					...(await selection(page, last, "after End")),
+					...(await expectSeen(page, "after End", showing(last))),
+				])),
+			);
 			if (!(await isFocused(tab(page, last)))) {
 				problems.push(`after End: focus isn't on ${last}`);
 			}
@@ -547,11 +576,28 @@ function panesIsland(panes: Pane[]): Island {
 		},
 		focus: (page) => button(page, panes[0].title),
 		async after(page) {
-			const closed = panes.find((pane) => pane.open !== true)!;
-			await button(page, closed.title).click();
-			return eventually(page, async () =>
-				openProblems(page, closed, `after a press on ${closed.title}`),
+			const [, second, third] = panes as [Pane, Pane, Pane];
+			// "Up and Down move between the summaries of one list (Left and Right too between
+			// panes)", then "Enter and Space open and close it."
+			await page.keyboard.press("ArrowRight");
+			const problems = (await isFocused(button(page, second.title)))
+				? []
+				: [`after ArrowRight: focus isn't on ${second.title}`];
+
+			await page.keyboard.press("Enter");
+			problems.push(
+				...(await eventually(page, async () =>
+					openProblems(page, second, "after Enter"),
+				)),
 			);
+			// "A press anywhere on a pane toggles it."
+			await button(page, third.title).click();
+			problems.push(
+				...(await eventually(page, async () =>
+					openProblems(page, third, `after a press on ${third.title}`),
+				)),
+			);
+			return problems;
 		},
 	};
 }
@@ -566,6 +612,7 @@ const islands: Record<string, Island> = {
 			Intive: "CMS content, ready for mobile.",
 			SunDevs: "A fitness app. Built together.",
 		},
+		next: "SunDevs",
 		last: "SunDevs",
 	}),
 	ProjectTabs: tabsIsland({
@@ -577,6 +624,7 @@ const islands: Record<string, Island> = {
 			Stack: "TypeScript, Electron and the VS Code extension API.",
 			Releases: "No public release yet.",
 		},
+		next: "Review gate",
 		last: "Stack",
 	}),
 	Career: accordionIsland([
@@ -642,6 +690,23 @@ type Mutation = {
 	afterHydration?: (page: Page) => Promise<void>;
 };
 
+/**
+Stops the arrow keys before React sees them, as an island whose keys never got wired would.
+*/
+async function dropArrowKeys(page: Page): Promise<void> {
+	await page.evaluate(() => {
+		document.addEventListener(
+			"keydown",
+			(event) => {
+				if (event.key.startsWith("Arrow")) {
+					event.stopPropagation();
+				}
+			},
+			{ capture: true },
+		);
+	});
+}
+
 const mutations: Mutation[] = [
 	{
 		name: "hidden panel",
@@ -687,6 +752,51 @@ const mutations: Mutation[] = [
 			await page.addStyleTag({ content: "#root { padding-top: 12px }" });
 		},
 		expect: "hydration moves",
+	},
+	{
+		name: "panel off screen",
+		island: "ClientWork",
+		css: '[role="tabpanel"] { position: absolute; left: -9999px }',
+		expect: '"CMS content, ready for mobile." isn\'t visible',
+	},
+	{
+		name: "no tab selected",
+		island: "ProjectTabs",
+		html: (html) =>
+			html.replaceAll('aria-selected="true"', 'aria-selected="false"'),
+		expect: "server HTML: the selected tab is none",
+	},
+	{
+		name: "hydration error",
+		island: "ClientWork",
+		html: (html) =>
+			html.replace("Training PDFs. A shorter wait.", "Training PDFs."),
+		expect: "hydration: ",
+	},
+	{
+		name: "loses focus",
+		island: "ProjectTabs",
+		async afterHydration(page) {
+			await page.evaluate(() => {
+				const active = document.activeElement as HTMLElement | null;
+				if (active !== null) {
+					active.blur();
+				}
+			});
+		},
+		expect: "hydration loses the focus",
+	},
+	{
+		name: "tab keys ignored",
+		island: "ClientWork",
+		afterHydration: dropArrowKeys,
+		expect: "after ArrowRight: the selected tab is",
+	},
+	{
+		name: "pane keys ignored",
+		island: "Capabilities",
+		afterHydration: dropArrowKeys,
+		expect: "after ArrowRight: focus isn't on",
 	},
 ];
 

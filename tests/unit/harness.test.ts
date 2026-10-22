@@ -1,7 +1,8 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { expect, test } from "vitest";
+import { currentPhase, readManifest } from "../../scripts/lib/phases.ts";
 import { root } from "../../scripts/lib/reference.ts";
 import { doesQueryMatch } from "../../scripts/lib/server-render.ts";
 
@@ -16,6 +17,25 @@ test("the ported modules and shared files still match their reference", () => {
 	);
 	expect(output).toContain("in sync");
 });
+
+const nextPhase = String(currentPhase() + 1);
+test.skipIf(!Object.hasOwn(readManifest().phases, nextPhase))(
+	"the sync check fails on a module in scope that was never recorded",
+	() => {
+		// The next phase's modules aren't ported, so none of them is recorded yet.
+		const result = spawnSync(
+			process.execPath,
+			[path.join(root, "scripts/check-sync.ts")],
+			{
+				encoding: "utf8",
+				// eslint-disable-next-line @typescript-eslint/naming-convention -- an environment variable
+				env: { ...process.env, BLUE_GLASS_PHASE: nextPhase },
+			},
+		);
+		expect(result.status).toBe(1);
+		expect(result.stdout).toContain("not recorded");
+	},
+);
 
 test("server rendering answers media queries for a 1280px desktop reader", () => {
 	const desktop = { width: 1280, height: 900 };
