@@ -9,6 +9,7 @@ export {
 	type IconProps,
 	type SvgIconProps,
 } from "./components/Icon/index.js";
+export { Paper, type PaperProps } from "./components/Paper/index.js";
 export {
 	LightField,
 	type LightFieldProps,
