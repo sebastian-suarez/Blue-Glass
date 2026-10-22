@@ -6,5 +6,11 @@
 		"src/components/NoSsr/NoSsr.stories.tsx": "Nothing a reader can change shows: the server HTML always holds the fallback, and once mounted the children always replace it, a frame later with defer. Its other props are nodes.",
 		"src/components/useMediaQuery/useMediaQuery.stories.tsx": "A hook, not a component: its Default shows what it returns at the current viewport."
 	},
-	"afterHydration": {}
+	"afterHydration": {
+		"src/components/Tooltip/Tooltip.stories.tsx": {
+			"title": "The tooltip renders through Base UI's portal, which renders nothing on the server (as the reference's left it out), so its title shows only after hydration; with describeChild true the child doesn't carry it either.",
+			"placement": "Base UI places the tooltip, which its portal renders only after hydration, so where it sits can't show in the server HTML.",
+			"arrow": "The arrow is part of the tooltip, which Base UI's portal renders only after hydration."
+		}
+	}
 }
