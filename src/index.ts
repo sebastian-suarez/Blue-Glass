@@ -48,6 +48,13 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export {
+	type AlertSeverity,
+	type AlertProps,
+	Alert,
+	type AlertTitleProps,
+	AlertTitle,
+} from "./components/Alert/index.js";
 export { type SkeletonProps, Skeleton } from "./components/Skeleton/index.js";
 export {
 	type AccordionProps,
