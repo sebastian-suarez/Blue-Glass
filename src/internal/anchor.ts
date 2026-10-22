@@ -236,7 +236,8 @@ computePosition does, to the pixel. The reference places a popup from its offset
 offsetHeight, whole pixels, and Base UI from its exact size, so where the size moves the popup
 (the top and left sides, end and center alignments) a fractional size lands a pixel apart, and
 every glyph inside redraws. Each offset adds the rounding back. Shifts still clamp the exact
-size.
+size. Base UI takes an offset function's result when it next places the popup (a scroll, a
+resize, a change of size), so a new `offset` on an open popup waits for that.
 */
 export function toWholePixelOffsets(offset = 8) {
 	return {
