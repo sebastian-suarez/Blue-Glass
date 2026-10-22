@@ -430,7 +430,6 @@ export function DialogContent({
 			data-fade-top={edges.top ? "" : undefined}
 			data-fade-bottom={edges.bottom ? "" : undefined}
 			// A scrolling region with nothing focusable in it still has to be reachable by keyboard.
-			// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
 			tabIndex={isOverflowing ? 0 : undefined}
 			onScroll={(event) => {
 				measure();
