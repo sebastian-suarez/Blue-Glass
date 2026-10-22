@@ -138,6 +138,10 @@ export const Variants: Story = {
 					"inset lines up with list text after an icon; middle stops 16px short of both ends.",
 			},
 		},
+		// The preview's <Divider component="li"> puts an li with role="separator" in a ul, as
+		// tests/behaviour/divider.test.tsx requires, and axe's list rule wants only list items
+		// there. The reference's preview fails the same rule; this story stays faithful to it.
+		a11y: { config: { rules: [{ id: "list", enabled: false }] } },
 	},
 	render: () => (
 		<>

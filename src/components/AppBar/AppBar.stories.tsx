@@ -204,6 +204,11 @@ export const Variants: Story = {
 					"Sticky and fixed bars sit on glass (blur-control) at z-app-bar. elevateOnScroll adds the shadow once the page moves.",
 			},
 		},
+		// The preview shows three bars, each with a "Main navigation" nav, and two scrolling
+		// pages, each a region named "Scrolling page", so axe's landmark-unique rule finds
+		// repeated landmarks. The reference's preview fails the same rule; this story stays
+		// faithful to it.
+		a11y: { config: { rules: [{ id: "landmark-unique", enabled: false }] } },
 	},
 	render: () => (
 		<>
