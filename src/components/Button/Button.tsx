@@ -184,17 +184,25 @@ export function Button({
 		);
 	}
 
-	// Loading disables the button but keeps it focusable: Base UI then marks it aria-disabled
-	// and blocks its clicks and keys, so a busy submit button doesn't submit.
+	// Loading only blocks clicks, as in the reference: the button stays focusable and gets its other
+	// handlers, and preventing the click keeps a busy submit button from submitting. Base UI's
+	// disabled would swallow every handler.
 	return (
 		<BaseButton
 			ref={ref}
 			type={type}
 			className={classes}
-			disabled={isInactive}
-			focusableWhenDisabled={loading && !disabled}
+			disabled={disabled}
+			aria-disabled={loading || undefined}
 			aria-busy={loading || undefined}
-			onClick={onClick}
+			onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+				if (loading) {
+					event.preventDefault();
+					return;
+				}
+
+				onClick?.(event);
+			}}
 			{...rest}
 		>
 			{inner}

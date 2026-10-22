@@ -2,6 +2,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
+import { referenceDefectTest } from "./reference-defect.js";
 import "#ui/styles.css";
 import {
 	Table,
@@ -552,6 +553,35 @@ describe("TableCell", () => {
 		expect(header("Role")).not.toHaveAttribute("aria-sort");
 		expect(header("Location")).not.toHaveAttribute("aria-sort");
 	});
+
+	referenceDefectTest(
+		"variant changes only the look: in the head a cell stays a sorted column header, and in the body a td",
+		() => {
+			render(
+				<Table aria-label="Roles">
+					<TableHead>
+						<TableRow>
+							<TableCell variant="body" sortDirection="asc">
+								Employer
+							</TableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						<TableRow>
+							<TableCell variant="head">EPAM</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>,
+			);
+			const header = screen.getByRole("columnheader", { name: "Employer" });
+			expect(header).toHaveAttribute("scope", "col");
+			expect(header).toHaveAttribute("aria-sort", "ascending");
+			expect(header).not.toHaveClass("gl-table-cell-head");
+			const cell = screen.getByRole("cell", { name: "EPAM" });
+			expect(cell.tagName).toBe("TD");
+			expect(cell).toHaveClass("gl-table-cell-head");
+		},
+	);
 
 	test('padding="checkbox" and padding="none" put their classes on the cell', () => {
 		render(

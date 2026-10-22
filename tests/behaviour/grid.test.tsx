@@ -1,6 +1,8 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, expect, test } from "vitest";
+import { page } from "vitest/browser";
+import { referenceDefectTest } from "./reference-defect.js";
 import "#ui/styles.css";
 import { type GridProps, Grid } from "#ui";
 
@@ -9,7 +11,8 @@ afterEach(() => {
 });
 
 // Layout here sticks to values that hold at every width: plain numbers and xs. The sm to xl
-// breakpoints are viewport media queries, which these specs don't resize.
+// breakpoints are viewport media queries, which these specs don't resize, except to pin a
+// phone width where a spec says so.
 
 type Placement = { left: number; top: number; width: number };
 
@@ -267,6 +270,25 @@ test("a Grid can be a container and an item at once", () => {
 		z: { left: 600, top: 0, width: 600 },
 	});
 });
+
+referenceDefectTest(
+	"a container that's also an item fills its row below its first size, whatever its own columns",
+	async () => {
+		// A phone width, below md.
+		await page.viewport(414, 896);
+		render(
+			<Grid container data-testid="grid" style={{ width: 400 }}>
+				<Grid container data-testid="inner" columns={4} size={{ md: 6 }}>
+					<Grid data-testid="x" size={2} style={{ height: 10 }} />
+				</Grid>
+			</Grid>,
+		);
+		expect(measure(["inner", "x"])).toEqual({
+			inner: { left: 0, top: 0, width: 400 },
+			x: { left: 0, top: 0, width: 200 },
+		});
+	},
+);
 
 test("it renders a div by default, and component picks the element", () => {
 	const ref = React.createRef<HTMLElement>();

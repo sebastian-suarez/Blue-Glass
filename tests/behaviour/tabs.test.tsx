@@ -5,6 +5,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
+import { referenceDefectTest } from "./reference-defect.js";
 import "#ui/styles.css";
 import { Tab, TabPanel, Tabs, type TabsProps, type TabValue } from "#ui";
 
@@ -258,6 +259,32 @@ describe("Tabs", () => {
 			expect(within(panel).getByText(section.text)).toBeInTheDocument();
 		}
 	});
+
+	referenceDefectTest(
+		"a Tab's or a TabPanel's own id is the one the wiring and the arrow keys use",
+		async () => {
+			render(
+				<Tabs defaultValue="work" aria-label="Sections">
+					<Tab value="work" label="Work" id="work-tab" />
+					<Tab value="projects" label="Projects" />
+					<TabPanel value="work" id="work-panel">
+						Work panel
+					</TabPanel>
+					<TabPanel value="projects">Projects panel</TabPanel>
+				</Tabs>,
+			);
+			const work = tab("Work");
+			expect(work.id).toBe("work-tab");
+			expect(work.getAttribute("aria-controls")).toBe("work-panel");
+			expect(byId("work-panel")?.getAttribute("aria-labelledby")).toBe(
+				"work-tab",
+			);
+			work.focus();
+			await userEvent.keyboard("{ArrowRight}");
+			await expect.element(tab("Projects")).toHaveFocus();
+			expect(tab("Projects").getAttribute("aria-selected")).toBe("true");
+		},
+	);
 
 	test("generated ids don't collide between two Tabs with the same values", () => {
 		const first = React.createRef<HTMLDivElement>();
@@ -802,6 +829,32 @@ describe("Tabs keyboard", () => {
 			await press("{ArrowUp}", "Contact");
 			await press("{ArrowUp}", "Projects");
 		});
+	});
+
+	test("a tab whose onKeyDown prevents Space or Enter isn't selected by them, as a native button isn't", async () => {
+		render(
+			<Tabs defaultValue="work" aria-label="Sections">
+				<Tab value="work" label="Work" />
+				<Tab
+					value="projects"
+					label="Projects"
+					onKeyDown={(event) => {
+						event.preventDefault();
+					}}
+				/>
+				<Tab value="contact" label="Contact" />
+			</Tabs>,
+		);
+		tab("Projects").focus();
+		await userEvent.keyboard(" ");
+		await userEvent.keyboard("{Enter}");
+		expect(tab("Projects").getAttribute("aria-selected")).toBe("false");
+		// Without the handler Space selects, as a click on the button does.
+		tab("Contact").focus();
+		await userEvent.keyboard(" ");
+		await expect
+			.poll(() => tab("Contact").getAttribute("aria-selected"))
+			.toBe("true");
 	});
 
 	test("with value and onChange kept in a parent's state, the keys select through the parent", async () => {

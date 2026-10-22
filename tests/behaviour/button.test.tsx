@@ -281,11 +281,28 @@ describe("loading", () => {
 		const element = button("Saving");
 		expect(element).toHaveAttribute("aria-busy", "true");
 		await userEvent.click(element, { force: true });
-		// Whether a busy button keeps focus is the port's choice; if it does, keys mustn't press it.
+		// A busy button keeps focus (see below), but keys mustn't press it.
 		element.focus();
 		await userEvent.keyboard("{Enter}");
 		await userEvent.keyboard(" ");
 		expect(onClick).not.toHaveBeenCalled();
+	});
+
+	test("loading blocks only clicks: the Button keeps focus and its other handlers", async () => {
+		const onKeyDown = vi.fn<() => void>();
+		const onPointerDown = vi.fn<() => void>();
+		render(
+			<Button loading onKeyDown={onKeyDown} onPointerDown={onPointerDown}>
+				Saving
+			</Button>,
+		);
+		const element = button("Saving");
+		await userEvent.click(element, { force: true });
+		expect(onPointerDown).toHaveBeenCalled();
+		element.focus();
+		expect(element).toHaveFocus();
+		await userEvent.keyboard("{Escape}");
+		expect(onKeyDown).toHaveBeenCalled();
 	});
 
 	test("a loading submit Button doesn't submit its form", async () => {

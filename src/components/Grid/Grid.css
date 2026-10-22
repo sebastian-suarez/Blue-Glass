@@ -770,12 +770,43 @@
 			--gl-grid-offset: 11;
 		}
 	}
-	/* Placement: span size + offset tracks, then a start margin past the offset tracks (% of the item's own area). */
+	/* Placement: span size + offset tracks, then a start margin past the offset tracks (% of the item's own area).
+	   It starts at the first breakpoint with a size or an offset (gl-grid-placed-*). Below that the item fills its
+	   row: the size it would fall back to is its columns, which a nested container sets to its own count. */
 	.gl-grid-sized {
-		grid-column: auto / span calc(var(--gl-grid-size) + var(--gl-grid-offset));
-		margin-inline-start: calc(
+		--gl-grid-span: auto / span
+			calc(var(--gl-grid-size) + var(--gl-grid-offset));
+		--gl-grid-push: calc(
 			(100% + var(--gl-grid-item-gap, 0px)) * var(--gl-grid-offset) /
 				(var(--gl-grid-size) + var(--gl-grid-offset))
 		);
+	}
+	.gl-grid-placed-xs {
+		grid-column: var(--gl-grid-span);
+		margin-inline-start: var(--gl-grid-push);
+	}
+	@media (min-width: 361px) {
+		.gl-grid-placed-sm {
+			grid-column: var(--gl-grid-span);
+			margin-inline-start: var(--gl-grid-push);
+		}
+	}
+	@media (min-width: 701px) {
+		.gl-grid-placed-md {
+			grid-column: var(--gl-grid-span);
+			margin-inline-start: var(--gl-grid-push);
+		}
+	}
+	@media (min-width: 900px) {
+		.gl-grid-placed-lg {
+			grid-column: var(--gl-grid-span);
+			margin-inline-start: var(--gl-grid-push);
+		}
+	}
+	@media (min-width: 1001px) {
+		.gl-grid-placed-xl {
+			grid-column: var(--gl-grid-span);
+			margin-inline-start: var(--gl-grid-push);
+		}
 	}
 }

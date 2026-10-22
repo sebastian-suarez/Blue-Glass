@@ -516,6 +516,26 @@ describe("ToggleButtonGroup", () => {
 		expect(pressed()).toEqual([]);
 	});
 
+	test("an empty string is a value like any other", async () => {
+		const { calls, onChange } = recorder();
+		render(
+			<ToggleButtonGroup
+				exclusive
+				defaultValue=""
+				aria-label="Filter"
+				onChange={onChange}
+			>
+				<ToggleButton value="">All</ToggleButton>
+				<ToggleButton value="open">Open</ToggleButton>
+			</ToggleButtonGroup>,
+		);
+		expect(pressed()).toEqual(["All"]);
+		await userEvent.click(button("Open"));
+		await userEvent.click(button("All"));
+		expect(pressed()).toEqual(["All"]);
+		expect(calls.map((call) => call.value)).toEqual(["open", ""]);
+	});
+
 	test("inside a group the group's value decides, not a ToggleButton's selected", () => {
 		render(
 			<ToggleButtonGroup exclusive value="code" aria-label="View">
@@ -785,6 +805,47 @@ describe("ToggleButtonGroup keyboard", () => {
 			["click", "code"],
 			["click", "diagram"],
 		]);
+	});
+
+	test("in a right-to-left page Left moves to the next button and Right to the previous one", async () => {
+		render(
+			<div dir="rtl">
+				<Around>
+					<Views exclusive />
+				</Around>
+			</div>,
+		);
+		focusBefore();
+		await userEvent.tab();
+		await expectFocus("Diagram");
+		await userEvent.keyboard("{ArrowLeft}");
+		await expectFocus("Code");
+		await userEvent.keyboard("{ArrowLeft}");
+		await expectFocus("Notes");
+		await userEvent.keyboard("{ArrowRight}");
+		await expectFocus("Code");
+	});
+
+	test("a button whose onKeyDown prevents Space or Enter isn't pressed by them, as a native button isn't", async () => {
+		const onChange = vi.fn<() => void>();
+		render(
+			<ToggleButtonGroup exclusive aria-label="View" onChange={onChange}>
+				<ToggleButton
+					value="diagram"
+					onKeyDown={(event) => {
+						event.preventDefault();
+					}}
+				>
+					Diagram
+				</ToggleButton>
+				<ToggleButton value="code">Code</ToggleButton>
+			</ToggleButtonGroup>,
+		);
+		button("Diagram").focus();
+		await userEvent.keyboard(" ");
+		await userEvent.keyboard("{Enter}");
+		expect(pressed()).toEqual([]);
+		expect(onChange).not.toHaveBeenCalled();
 	});
 
 	test("onKeyDown runs before the group's arrow keys, and preventDefault takes over", async () => {

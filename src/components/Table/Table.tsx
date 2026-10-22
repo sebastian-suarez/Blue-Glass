@@ -303,8 +303,10 @@ export function TableCell({
 	const table = React.use(TableContext);
 	const section = React.use(SectionContext);
 	const variant = variantProperty ?? (section === "head" ? "head" : "body");
+	// The section picks the element and variant only the look, as the API documents. The
+	// reference picks it from variant, so a body-look cell in the head lost its header role.
 	const Component: React.ElementType =
-		component ?? (variant === "head" ? "th" : "td");
+		component ?? (section === "head" ? "th" : "td");
 	const isHeader = Component === "th";
 	const size = sizeProperty ?? table.size;
 	const textAlign = numeric && align === "inherit" ? "right" : align;
@@ -321,7 +323,10 @@ export function TableCell({
 				"gl-table-cell",
 				`gl-table-cell-${size}`,
 				variant === "head" ? "gl-table-cell-head" : "gl-table-cell-body",
-				isHeader && variant === "body" && "gl-table-cell-rowheader",
+				isHeader &&
+					section !== "head" &&
+					variant === "body" &&
+					"gl-table-cell-rowheader",
 				textAlign !== "inherit" && `gl-table-cell-align-${textAlign}`,
 				numeric && "gl-table-cell-numeric",
 				padding !== "normal" && `gl-table-cell-pad-${padding}`,

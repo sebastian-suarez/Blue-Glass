@@ -1,6 +1,7 @@
 import type * as React from "react";
 import { cx } from "../../internal/cx.js";
 import {
+	breakpoints,
 	isIntegerIn,
 	isSpace,
 	responsiveClasses,
@@ -131,6 +132,21 @@ export function Grid({
 		classes.push("gl-grid-sized");
 		place("size", size);
 		place("offset", offset);
+		// It spans from the first breakpoint with a size or an offset, and fills its row below.
+		const isInline =
+			"--gl-grid-size" in variables || "--gl-grid-offset" in variables;
+		const from = isInline
+			? "xs"
+			: breakpoints.find((breakpoint) =>
+					classes.some(
+						(name) =>
+							name.startsWith(`gl-grid-size-${breakpoint}-`) ||
+							name.startsWith(`gl-grid-offset-${breakpoint}-`),
+					),
+				);
+		if (from !== undefined) {
+			classes.push(`gl-grid-placed-${from}`);
+		}
 	}
 
 	return (

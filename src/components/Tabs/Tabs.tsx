@@ -124,7 +124,15 @@ type TabsContextValue = {
 	*/
 	tabStop: TabValue | false;
 	hasPanel: (value: TabValue) => boolean;
-	registerPanel: (value: TabValue) => () => void;
+	/**
+	A tab's id: its own id prop, else one made from Tabs' id.
+	*/
+	tabId: (value: TabValue) => string;
+	/**
+	A panel's id, the same way.
+	*/
+	panelId: (value: TabValue) => string;
+	registerPanel: (value: TabValue, id: string | undefined) => () => void;
 };
 
 const TabsContext = React.createContext<TabsContextValue | undefined>(
@@ -143,6 +151,26 @@ const panelIdOf = (baseId: string, value: TabValue) =>
 	`${baseId}-panel-${slug(value)}`;
 // 1 and "1" are different values, as Base UI compares them.
 const keyOf = (value: TabValue) => `${typeof value}:${value}`;
+
+/**
+A value key and the id it maps to, as one line of a key that changes only when they do: JSON
+never holds a raw line break.
+*/
+const idLine = (key: string, id: string | undefined) =>
+	JSON.stringify([key, id ?? null]);
+/**
+The ids a key of idLine lines holds, by value key.
+*/
+const idsOf = (key: string) =>
+	new Map(
+		key
+			.split("\n")
+			.filter(Boolean)
+			.map((line) => {
+				const [valueKey, id] = JSON.parse(line) as [string, string | null];
+				return [valueKey, id ?? undefined] as const;
+			}),
+	);
 
 /**
 The indicator's width: the site's mobile tab mark is 16px.
@@ -193,10 +221,13 @@ function revealTab(list: HTMLElement, tab: HTMLElement, isSmooth: boolean) {
 }
 
 /**
-Adds the values of the TabPanels among `node`'s elements to `into`, without entering the panels,
-so the server HTML can point each tab at its panel.
+Adds the TabPanels among `node`'s elements to `into`, by value key with any id of their own,
+without entering the panels, so the server HTML can point each tab at its panel.
 */
-function collectPanels(node: React.ReactNode, into: Set<TabValue>): void {
+function collectPanels(
+	node: React.ReactNode,
+	into: Map<string, string | undefined>,
+): void {
 	if (Array.isArray(node)) {
 		for (const child of node as React.ReactNode[]) {
 			collectPanels(child, into);
@@ -206,9 +237,11 @@ function collectPanels(node: React.ReactNode, into: Set<TabValue>): void {
 	}
 
 	if (
-		!React.isValidElement<{ children?: React.ReactNode; value?: TabValue }>(
-			node,
-		) ||
+		!React.isValidElement<{
+			children?: React.ReactNode;
+			value?: TabValue;
+			id?: string;
+		}>(node) ||
 		// A nested Tabs names its own panels.
 		node.type === Tabs
 	) {
@@ -217,7 +250,7 @@ function collectPanels(node: React.ReactNode, into: Set<TabValue>): void {
 
 	if (node.type === TabPanel) {
 		if (node.props.value !== undefined) {
-			into.add(node.props.value);
+			into.set(keyOf(node.props.value), node.props.id);
 		}
 
 		return;
@@ -253,7 +286,7 @@ export function Tabs({
 
 	// Tab children go to the list, their value defaulting to their position; the rest is the
 	// panel area.
-	const items: Array<{ value: TabValue; isDisabled: boolean }> = [];
+	const items: Array<{ value: TabValue; isDisabled: boolean; id: string }> = [];
 	const tabs: React.ReactNode[] = [];
 	const panels: React.ReactNode[] = [];
 	// eslint-disable-next-line @eslint-react/no-children-to-array -- The documented contract: Tab children form the list.
@@ -270,6 +303,7 @@ export function Tabs({
 			items.push({
 				value: tabValue,
 				isDisabled: Boolean(child.props.disabled),
+				id: child.props.id ?? tabIdOf(baseId, tabValue),
 			});
 		} else {
 			panels.push(child);
@@ -298,36 +332,78 @@ export function Tabs({
 		},
 	);
 
+	// Ids come from a Tab's or TabPanel's own id prop when it has one, so the keys, the indicator
+	// and the ARIA wiring find the elements that are there. Keyed by content, so tabId stays the
+	// same function while the tabs do.
+	const tabIdKey = items
+		.map((item) => idLine(keyOf(item.value), item.id))
+		.join("\n");
+	const tabIds = React.useMemo(() => idsOf(tabIdKey), [tabIdKey]);
+	const tabId = React.useCallback(
+		(tabValue: TabValue) =>
+			tabIds.get(keyOf(tabValue)) ?? tabIdOf(baseId, tabValue),
+		[tabIds, baseId],
+	);
+
 	// A tab names its panel once the panel is known: among Tabs' children, or registered from
 	// deeper down after mount, as the reference registers every panel.
-	const childPanels = new Set<TabValue>();
+	const childPanels = new Map<string, string | undefined>();
 	collectPanels(panels, childPanels);
-	const [registered, setRegistered] = React.useState<readonly TabValue[]>([]);
-	const registerPanel = React.useCallback((panelValue: TabValue) => {
-		setRegistered((previous) =>
-			previous.includes(panelValue) ? previous : [...previous, panelValue],
-		);
-		return () => {
+	const [registered, setRegistered] = React.useState<
+		ReadonlyMap<string, string | undefined>
+	>(() => new Map());
+	const registerPanel = React.useCallback(
+		(panelValue: TabValue, panelElementId: string | undefined) => {
+			const key = keyOf(panelValue);
 			setRegistered((previous) =>
-				previous.filter((item) => item !== panelValue),
+				previous.has(key) && previous.get(key) === panelElementId
+					? previous
+					: new Map(previous).set(key, panelElementId),
 			);
-		};
-	}, []);
-	// Keyed by content, so hasPanel stays the same function while the panels do.
-	const panelKey = [...childPanels].map((panel) => keyOf(panel)).join("\n");
-	const panelKeys = React.useMemo(
-		() => new Set(panelKey.split("\n")),
-		[panelKey],
+			return () => {
+				setRegistered((previous) => {
+					if (!previous.has(key)) {
+						return previous;
+					}
+
+					const next = new Map(previous);
+					next.delete(key);
+					return next;
+				});
+			};
+		},
+		[],
 	);
+	// Keyed by content, so hasPanel stays the same function while the panels do.
+	const panelKey = [...childPanels]
+		.map(([key, panelElementId]) => idLine(key, panelElementId))
+		.join("\n");
+	const panelIds = React.useMemo(() => idsOf(panelKey), [panelKey]);
 	const hasPanel = React.useCallback(
 		(tabValue: TabValue) =>
-			panelKeys.has(keyOf(tabValue)) || registered.includes(tabValue),
-		[panelKeys, registered],
+			panelIds.has(keyOf(tabValue)) || registered.has(keyOf(tabValue)),
+		[panelIds, registered],
+	);
+	const panelId = React.useCallback(
+		(tabValue: TabValue) =>
+			panelIds.get(keyOf(tabValue)) ??
+			registered.get(keyOf(tabValue)) ??
+			panelIdOf(baseId, tabValue),
+		[panelIds, registered, baseId],
 	);
 
 	const contextValue = React.useMemo<TabsContextValue>(
-		() => ({ variant, baseId, value, tabStop, hasPanel, registerPanel }),
-		[variant, baseId, value, tabStop, hasPanel, registerPanel],
+		() => ({
+			variant,
+			baseId,
+			value,
+			tabStop,
+			hasPanel,
+			tabId,
+			panelId,
+			registerPanel,
+		}),
+		[variant, baseId, value, tabStop, hasPanel, tabId, panelId, registerPanel],
 	);
 
 	// Which edges overflow (fades and scroll buttons), and where the underline mark sits. Compared
@@ -366,8 +442,8 @@ export function Tabs({
 		const tab =
 			value === false
 				? null
-				: // eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
-					ownerDocument(list).getElementById(tabIdOf(baseId, value));
+				: // eslint-disable-next-line unicorn/prefer-query-selector -- An id needs no CSS escaping here.
+					ownerDocument(list).getElementById(tabId(value));
 		const x = tab && list.contains(tab) ? markLeft(tab) : undefined;
 		if (shown.mark === x) {
 			return;
@@ -381,7 +457,7 @@ export function Tabs({
 		.join("|");
 	useIsoLayoutEffect(() => {
 		measure();
-	}, [measure, value, variant, isVertical, tabKey]);
+	}, [measure, value, variant, isVertical, tabKey, tabId]);
 	React.useEffect(() => {
 		const list = listRef.current;
 		if (!list || typeof ResizeObserver === "undefined") {
@@ -412,15 +488,15 @@ export function Tabs({
 			value !== false &&
 			list.scrollWidth > list.clientWidth + 1
 		) {
-			// eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
-			const tab = ownerDocument(list).getElementById(tabIdOf(baseId, value));
+			// eslint-disable-next-line unicorn/prefer-query-selector -- An id needs no CSS escaping here.
+			const tab = ownerDocument(list).getElementById(tabId(value));
 			if (tab && list.contains(tab)) {
 				revealTab(list, tab, hasPaintedRef.current && !shouldReduceMotion);
 			}
 		}
 
 		hasPaintedRef.current = true;
-	}, [value, isVertical, baseId, shouldReduceMotion]);
+	}, [value, isVertical, tabId, shouldReduceMotion]);
 
 	// The next enabled tab from `from` (an index in `items`), wrapping at the ends.
 	const enabledFrom = (from: number, direction: 1 | -1) => {
@@ -447,9 +523,7 @@ export function Tabs({
 		// Base UI's own navigation would land on disabled tabs and leave the selection behind.
 		event.preventBaseUIHandler();
 		const activeId = ownerDocument(list).activeElement?.id;
-		const current = items.findIndex(
-			(item) => tabIdOf(baseId, item.value) === activeId,
-		);
+		const current = items.findIndex((item) => item.id === activeId);
 		if (current === -1 || enabled.length === 0) {
 			return;
 		}
@@ -477,8 +551,8 @@ export function Tabs({
 		}
 
 		event.preventDefault();
-		// eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
-		ownerDocument(list).getElementById(tabIdOf(baseId, target))?.focus();
+		// eslint-disable-next-line unicorn/prefer-query-selector -- An id needs no CSS escaping here.
+		ownerDocument(list).getElementById(tabId(target))?.focus();
 		// Automatic activation: the selection follows focus.
 		select(event, target);
 	};
@@ -593,6 +667,7 @@ export function Tab({
 	disabled = false,
 	className,
 	onClick,
+	onKeyDown,
 	children,
 	ref,
 	...rest
@@ -631,6 +706,7 @@ export function Tab({
 				disabled={disabled}
 				className={cx("gl-tab", className)}
 				onClick={onClick}
+				onKeyDown={onKeyDown}
 				{...rest}
 			>
 				{content}
@@ -638,20 +714,28 @@ export function Tab({
 		);
 	}
 
-	const { baseId, tabStop, hasPanel } = context;
+	const { tabStop, hasPanel, tabId, panelId } = context;
 	return (
 		<BaseTabs.Tab
 			ref={ref}
 			value={value}
 			disabled={disabled}
-			id={tabIdOf(baseId, value)}
-			aria-controls={hasPanel(value) ? panelIdOf(baseId, value) : undefined}
+			id={tabId(value)}
+			aria-controls={hasPanel(value) ? panelId(value) : undefined}
 			tabIndex={tabStop === value ? 0 : -1}
 			className={cx("gl-tab", className)}
 			onClick={(event) => {
 				rememberReactEvent(event);
 				onClick?.(event);
 				// As in the reference, a click your handler prevents doesn't select.
+				if (event.defaultPrevented) {
+					event.preventBaseUIHandler();
+				}
+			}}
+			onKeyDown={(event) => {
+				onKeyDown?.(event);
+				// A cancelled Space or Enter doesn't select, as on the reference's native button. Base
+				// UI selects on keydown and checks only its own flag.
 				if (event.defaultPrevented) {
 					event.preventBaseUIHandler();
 				}
@@ -669,6 +753,7 @@ The content for one tab: hidden until its tab is selected, then faded in with th
 export function TabPanel({
 	value,
 	keepMounted = true,
+	id,
 	className,
 	style,
 	children,
@@ -689,7 +774,10 @@ export function TabPanel({
 	}
 
 	const registerPanel = context?.registerPanel;
-	useIsoLayoutEffect(() => registerPanel?.(value), [registerPanel, value]);
+	useIsoLayoutEffect(
+		() => registerPanel?.(value, id),
+		[registerPanel, value, id],
+	);
 	const panelClassName = cx(
 		"gl-tab-panel",
 		shouldAnimate && "gl-tab-panel-animate",
@@ -704,6 +792,7 @@ export function TabPanel({
 		return (
 			<div
 				ref={ref}
+				id={id}
 				role="tabpanel"
 				tabIndex={0}
 				className={panelClassName}
@@ -715,14 +804,14 @@ export function TabPanel({
 		);
 	}
 
-	const { baseId } = context;
+	const { baseId, tabId } = context;
 	return (
 		<BaseTabs.Panel
 			ref={ref}
 			keepMounted
 			value={value}
-			id={panelIdOf(baseId, value)}
-			aria-labelledby={tabIdOf(baseId, value)}
+			id={id ?? panelIdOf(baseId, value)}
+			aria-labelledby={tabId(value)}
 			hidden={!isActive}
 			className={panelClassName}
 			style={panelStyle}

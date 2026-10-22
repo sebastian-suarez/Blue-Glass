@@ -1,4 +1,5 @@
 "use client";
+import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import * as React from "react";
@@ -146,6 +147,13 @@ function toArray(selection: Selection | undefined): string[] {
 }
 
 /**
+A value as Base UI holds it. Base UI's Toggle swaps an empty value for a generated id, so every
+value gets a prefix that keeps "" a value of its own.
+*/
+const toBaseValue = (value: string) => `v${value}`;
+const fromBaseValue = (value: string) => value.slice(1);
+
+/**
 The button a click came from, for a press that reaches the group without a ToggleButton's own
 handler seeing it.
 */
@@ -166,6 +174,7 @@ export function ToggleButton({
 	onChange,
 	onClick,
 	onFocus,
+	onKeyDown,
 	size: sizeProp,
 	fullWidth = false,
 	disabled = false,
@@ -181,7 +190,7 @@ export function ToggleButton({
 		<Toggle
 			{...rest}
 			ref={ref}
-			value={value}
+			value={toBaseValue(value)}
 			// Alone, Base UI keeps the pressed state; in a group the group's value decides.
 			pressed={selected}
 			defaultPressed={defaultSelected}
@@ -212,6 +221,14 @@ export function ToggleButton({
 				onFocus?.(event);
 				group?.onItemFocus(value);
 			}}
+			onKeyDown={(event) => {
+				onKeyDown?.(event);
+				// A cancelled Space or Enter doesn't press it, as on a native button. In a group Base
+				// UI presses on keydown and checks only its own flag.
+				if (event.defaultPrevented) {
+					event.preventBaseUIHandler();
+				}
+			}}
 		>
 			<span className="gl-toggle-button-label">{children}</span>
 		</Toggle>
@@ -234,9 +251,13 @@ export function ToggleButtonGroup({
 	className,
 	children,
 	onKeyDown,
+	onFocus,
 	ref,
 	...rest
 }: ToggleButtonGroupProps & { ref?: React.Ref<HTMLDivElement> }) {
+	// Base UI's arrow keys follow its DirectionProvider, not the page. The reference reads the
+	// group's computed direction, so the group reads it whenever focus comes in, before any key.
+	const [direction, setDirection] = React.useState<"ltr" | "rtl">("ltr");
 	// The group keeps the value, so it knows what's pressed while it renders its tab stop, and
 	// Base UI's ToggleGroup always runs controlled.
 	const [value, setValue] = useControlled<Selection>(
@@ -277,44 +298,57 @@ export function ToggleButtonGroup({
 	);
 
 	return (
-		<ToggleGroup
-			ref={ref}
-			value={pressed}
-			multiple={!exclusive}
-			orientation={orientation}
-			disabled={disabled}
-			className={cx(
-				"gl-toggle-group",
-				`gl-toggle-group-${size}`,
-				orientation === "vertical" && "gl-toggle-group-vertical",
-				fullWidth && "gl-toggle-group-full",
-				disabled && "gl-toggle-group-disabled",
-				className,
-			)}
-			onValueChange={(next, details) => {
-				const selection: Selection = exclusive ? (next.at(0) ?? null) : next;
-				setValue(selection);
-				onChange?.(
-					documentedEvent(
-						details.event,
-						buttonOf(details.event),
-					) as React.MouseEvent<HTMLButtonElement>,
-					selection,
-				);
-			}}
-			onKeyDown={(event) => {
-				onKeyDown?.(event);
-				// The documented way to take over the keys. Base UI's arrow keys run after this
-				// handler and don't check defaultPrevented.
-				if (event.defaultPrevented) {
-					event.preventBaseUIHandler();
-				}
-			}}
-			{...rest}
-		>
-			<ToggleButtonGroupContext value={context}>
-				{children}
-			</ToggleButtonGroupContext>
-		</ToggleGroup>
+		<DirectionProvider direction={direction}>
+			<ToggleGroup
+				ref={ref}
+				value={pressed.map((item) => toBaseValue(item))}
+				multiple={!exclusive}
+				orientation={orientation}
+				disabled={disabled}
+				className={cx(
+					"gl-toggle-group",
+					`gl-toggle-group-${size}`,
+					orientation === "vertical" && "gl-toggle-group-vertical",
+					fullWidth && "gl-toggle-group-full",
+					disabled && "gl-toggle-group-disabled",
+					className,
+				)}
+				onValueChange={(next, details) => {
+					const values = next.map((item) => fromBaseValue(item));
+					const selection: Selection = exclusive
+						? (values.at(0) ?? null)
+						: values;
+					setValue(selection);
+					onChange?.(
+						documentedEvent(
+							details.event,
+							buttonOf(details.event),
+						) as React.MouseEvent<HTMLButtonElement>,
+						selection,
+					);
+				}}
+				onKeyDown={(event) => {
+					onKeyDown?.(event);
+					// The documented way to take over the keys. Base UI's arrow keys run after this
+					// handler and don't check defaultPrevented.
+					if (event.defaultPrevented) {
+						event.preventBaseUIHandler();
+					}
+				}}
+				onFocus={(event) => {
+					onFocus?.(event);
+					setDirection(
+						getComputedStyle(event.currentTarget).direction === "rtl"
+							? "rtl"
+							: "ltr",
+					);
+				}}
+				{...rest}
+			>
+				<ToggleButtonGroupContext value={context}>
+					{children}
+				</ToggleButtonGroupContext>
+			</ToggleGroup>
+		</DirectionProvider>
 	);
 }
