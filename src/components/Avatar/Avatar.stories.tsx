@@ -4,6 +4,9 @@ import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Labelled, Row } from "../../../stories/blocks/preview-kit.js";
 import { Avatar, AvatarGroup } from "./Avatar.js";
 
+// The preview's Example section waits for Tooltip in phase 2: it wraps each employer's avatar
+// in a Tooltip with its name.
+
 const meta = {
 	title: "Data display/Avatar",
 	component: Avatar,
