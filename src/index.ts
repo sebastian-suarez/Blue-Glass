@@ -53,6 +53,7 @@ export {
 } from "./components/Icon/index.js";
 export * from "./components/List/index.js";
 export * from "./components/Table/index.js";
+export { type TooltipProps, Tooltip } from "./components/Tooltip/index.js";
 export {
 	Typography,
 	type TypographyColor,

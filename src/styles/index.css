@@ -16,6 +16,7 @@
 @import "../components/Divider/Divider.css";
 @import "../components/List/List.css";
 @import "../components/Table/Table.css";
+@import "../components/Tooltip/Tooltip.css";
 @import "../components/Alert/Alert.css";
 @import "../components/Progress/Progress.css";
 @import "../components/Skeleton/Skeleton.css";
