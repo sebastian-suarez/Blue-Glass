@@ -12,6 +12,7 @@ Revision 3. It answers Codex's two attacks, which are logged in `docs/reviews/pl
 - **Name:** `@sebastian-suarez/blue-glass`. Stays `private: true` until you pick a registry.
 - **Scope:** all 66 components. The 5 sections become Storybook examples, not exports.
 - **React:** peer `^19` only. Widening it later means adding a React 18 runtime test matrix first.
+- **Type** (your call, 22 Oct 2026): Satoshi, the variable font from Fontshare, named first in `--font-sans` over the system stack. Its licence forbids passing the files on, so neither the repository nor the package holds them: `npm run fonts` downloads them for the gates, Storybook and the specs, and each site self-hosts its own copy.
 
 ## Package shape
 

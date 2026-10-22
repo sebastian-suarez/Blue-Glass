@@ -42,6 +42,7 @@ import {
 	type Step,
 } from "../../tests/storybook/interactions.ts";
 import { newContext, settle as settlePreview } from "../lib/capture.ts";
+import { waitForFonts } from "../lib/fonts.ts";
 import { startServer, writePage, type Server } from "../lib/pages.ts";
 import { scope as phaseScope } from "../lib/phases.ts";
 import { previews, root, type Preview } from "../lib/reference.ts";
@@ -289,6 +290,7 @@ async function openCanvas(
 ): Promise<Frame> {
 	const frame = await open(worker, server, `/story/${id}`);
 	await waitForEvent(frame, { type: "storyRendered", id, since: 0 });
+	await waitForFonts(frame);
 	await settled(frame);
 	return frame;
 }
@@ -300,6 +302,7 @@ async function openDocs(
 ): Promise<Frame> {
 	const frame = await open(worker, server, `/docs/${docsId}`);
 	await waitForEvent(frame, { type: "docsRendered", id: docsId, since: 0 });
+	await waitForFonts(frame);
 	await settled(frame);
 	return frame;
 }
@@ -1142,6 +1145,7 @@ async function qualify(browser: Browser, server: Server): Promise<Result[]> {
 			await page.goto(`${server.origin}${writePage(preview, "reference")}`, {
 				waitUntil: "networkidle",
 			});
+			await waitForFonts(page);
 			await settlePreview(page);
 			if (await hasDefaultSection(page)) {
 				const log = new Log();

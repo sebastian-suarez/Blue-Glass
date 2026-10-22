@@ -1,4 +1,11 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import { satoshiFontFace } from "../scripts/lib/font-face.ts";
+import { assertFonts } from "../scripts/lib/fonts.ts";
+
+// Satoshi comes from `npm run fonts`, not the repository (scripts/lib/fonts.ts). Checked here, it
+// fails with that advice before Storybook fails on a missing static folder.
+// eslint-disable-next-line unicorn/no-top-level-side-effects -- the check has to run when the config loads
+assertFonts();
 
 type DocgenProp = {
 	readonly declarations?: ReadonlyArray<{ readonly fileName: string }>;
@@ -34,6 +41,9 @@ const config: StorybookConfig = {
 				) ?? true,
 		},
 	},
+	// The canvas loads Satoshi from fonts/, which the build copies next to iframe.html.
+	staticDirs: [{ from: "../fonts", to: "/fonts" }],
+	previewHead: (head) => `${head}\n<style>${satoshiFontFace("fonts")}</style>`,
 	features: {
 		// The frame paints the canvas colour itself; a backgrounds toolbar would paint over it.
 		backgrounds: false,

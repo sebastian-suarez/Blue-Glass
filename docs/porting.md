@@ -47,6 +47,7 @@ Also read:
   - Keep the reference's class names (`gl-*`) and its media queries for hover, reduced motion and reduced transparency.
   - Move selectors to Base UI's DOM and data attributes.
   - Use tokens, never new raw values.
+  - Type comes from the tokens (`--font-sans` and the `text-*` classes). Add no font files or `@font-face`: Satoshi's licence forbids shipping them (`tests/README.md`, "Fonts").
   - Base UI positions popups with `--transform-origin`, `--anchor-width` and `--available-height`.
 - **Renamed helpers:** the reference's `contains` is `isInside`, and its `usePrefersReducedMotion` is `useShouldReduceMotion`.
 - **Style.**
@@ -60,7 +61,7 @@ Also read:
 
 ## Done means
 
-Run with the manifest at the phase:
+Once per checkout: `npm ci && npm run fonts` (Satoshi, which the repository doesn't hold: `tests/README.md`, "Fonts"). Then run with the manifest at the phase:
 
 ```sh
 npm run typecheck && npx xo && npm run build

@@ -2,6 +2,8 @@
 
 Every gate reads its scope from `tests/phases.json`: the modules ported up to the current phase, their exports, and the previews whose components all exist by then. `BLUE_GLASS_PHASE=N` or `--phase N` overrides it. Reports go to `reports/`, which git ignores.
 
+The gates, Storybook and the behaviour specs render in Satoshi, so run `npm run fonts` once per checkout first (Fonts, below).
+
 | Gate              | Command                                      | Fails when                                                                                                                                                                                                                                                                                                                                                                               |
 | ----------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Parity            | `npm run parity`                             | A preview's package page logs an error, has a different size, or has a section with more differing pixels than its budget, at rest or in an opened state                                                                                                                                                                                                                                 |
@@ -61,6 +63,12 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 - The portfolio hydrates its interactive sections late, as islands. `tests/ssr/fixtures/islands.tsx` holds them: the client-work Tabs, a project's Tabs, the career Accordion and the capabilities PaneAccordion.
 - `scripts/ssr/islands.ts` renders each in Node, loads the HTML with JavaScript on but not hydrated, and checks what the READMEs promise: the chosen tab or open rows show and the rest don't, tabs and panels name each other, and Tab reaches the selected tab and then its panel, or the first summary. Only then does the island hydrate, and it must do so with no error, no text moving more than 2px and focus kept, then answer End, Enter, the arrows and clicks as documented. At 390px and 1280px.
 - `--target reference` runs the same checks on the reference, and `--self` plants 15 defects there that each must add its problem: at least one of every kind above but the ARIA wiring, which the reference's own defect shows failing (`docs/reference-defects.md`).
+
+## Fonts
+
+- The system's typeface is Satoshi, from Fontshare: `--font-sans` names it first, with the system stack as fallback. Its licence (ITF Free Font License) allows self-hosting but not passing the files on, through a repository or a package among other ways, so neither the repository nor the package holds them. `check:package` fails a tarball with a font file in it.
+- `npm run fonts` (`scripts/fonts.ts`) downloads the official variable file from Fontshare into `fonts/`, which git ignores, and checks it against the release the baselines were made with (`satoshiSha256` in `scripts/lib/fonts.ts`). A new release fails it: take one on purpose, then run the self-tests again.
+- Every gate page declares the face (`fontStyle` in `scripts/lib/pages.ts`, served from `/fonts/`), and `openPage` waits until the page has loaded it, so nothing is measured or captured in a fallback face. A preview page also holds its first render until the font has loaded (`fontShim`): some references measure text once, at mount (an open Popover places itself from its anchor's size and moves only on a window resize), and a render before the font arrived made the parity self-test depend on load timing. Storybook copies `fonts/` next to `iframe.html` and declares the face in its preview head; the behaviour specs load it in `tests/behaviour/setup-fonts.ts`.
 
 ## After porting a module
 

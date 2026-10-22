@@ -75,6 +75,8 @@ function behaviour(target: keyof typeof targets) {
 		test: {
 			name: `behaviour:${target}`,
 			include: ["tests/behaviour/**/*.test.tsx"],
+			// The specs measure text in Satoshi, the system's typeface.
+			setupFiles: ["tests/behaviour/setup-fonts.ts"],
 			browser: chromium(),
 		},
 	};

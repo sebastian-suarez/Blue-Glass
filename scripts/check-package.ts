@@ -126,10 +126,24 @@ function packTarball(): string {
 			"--pack-destination",
 			packDirectory,
 		]),
-	) as Array<{ filename: string; size: number; files: unknown[] }>;
+	) as Array<{
+		filename: string;
+		size: number;
+		files: Array<{ path: string }>;
+	}>;
 	if (path.join(packDirectory, packed.filename) !== tarball) {
 		throw new Error(
 			`npm pack wrote ${packed.filename}, expected ${path.basename(tarball)}`,
+		);
+	}
+
+	// Satoshi's licence forbids passing its files on (scripts/lib/fonts.ts), and no other font ships.
+	const fonts = packed.files.filter((file) =>
+		/\.(?:woff2?|ttf|otf|eot)$/v.test(file.path),
+	);
+	if (fonts.length > 0) {
+		throw new Error(
+			`the tarball holds font files: ${fonts.map((file) => file.path).join(", ")}`,
 		);
 	}
 

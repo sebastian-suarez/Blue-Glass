@@ -34,7 +34,7 @@ One light theme. The site has no dark mode by design, and neither does this syst
 
 ## Type
 
-- Set everything in the system stack (`--font-sans`): SF Pro on the Mac the site is built on. There are no web fonts. Code uses `--font-mono`.
+- Set everything in Satoshi (`--font-sans`): the variable font from Fontshare, weights 300 to 900, with the system stack as its fallback. Each site loads it itself: its licence (ITF Free Font License) allows self-hosting but not passing the files on, so they aren't part of this system or its package. Code uses `--font-mono`.
 - Use the style classes the tokens generate (`.text-display`, `.text-heading`, `.text-body`…) or the components that wrap them (`Typography`).
 - Display through heading styles are weight 400–500 with negative tracking: `text-display` is 80px at -0.05em, `text-heading` 32px at -0.035em. That's tighter than common guidance, and it's the brand. Keep it. Body text has no tracking.
 - On the site the display sizes are fluid. Each token holds the desktop size, and its note has the `clamp()` (`text-display`: `clamp(44px, 5.6vw, 80px)`).
@@ -129,7 +129,7 @@ React 18 components on `window.BlueGlass`, styled by `components/bundle.css` wit
 
 ## Not synced
 
-- **Fonts:** none to fetch; the site uses the system stack.
+- **Fonts:** none synced. Satoshi was chosen for this system after the sync (22 Oct 2026); the site still uses the system stack until it adopts the system. Its font files aren't part of the system (see Type).
 - **Logos and icons:** not brought in. The site's `favicon.svg` mark wasn't selected; the arrow is in `Icon` as a glyph.
 - **Components:** the repository is a static Astro site with build-time React sections, not a component library. Its components were rebuilt by hand from `src/components/*.tsx` and `global.css`, never built or run from the repo (the read-only route). Each README names the class it comes from.
 - **Not carried:** the résumé page's own styles (`resume.css`) beyond `color-line-strong` and `color-link`; the print styles.

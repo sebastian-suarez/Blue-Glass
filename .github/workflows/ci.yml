@@ -28,6 +28,9 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Satoshi
+        run: npm run fonts
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium chromium-headless-shell
 

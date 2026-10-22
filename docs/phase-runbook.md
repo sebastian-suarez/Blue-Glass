@@ -30,7 +30,7 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 
 1. **Preflight.**
    - Main checkout, on `feat/blue-glass`, clean. If `git status`, `git worktree list` or another session shows someone else working, use a worktree on its own branch and say why.
-   - `npm ci`, then every command under "Done means" in `docs/porting.md`, at phase N−1. All green before anything changes.
+   - `npm ci && npm run fonts`, then every command under "Done means" in `docs/porting.md`, at phase N−1. All green before anything changes.
 2. **Open the phase** on branch `phase-N`, from `feat/blue-glass`. This writes the phase's part of the suite, which freezes when the step is committed.
    - `tests/phases.json`: `current` becomes N.
    - Behaviour specs in `tests/behaviour/`, from each in-scope README's Keyboard and props sections. Run them on the reference (`npx vitest run --project behaviour:reference`). A spec that fails there is wrong, or its defect gets a row in `docs/reference-defects.md`.
@@ -81,7 +81,8 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 - **Phase 2:**
   - Open content the reference renders in place (the Modal, Dialog, Drawer and Snackbar examples) must be visible in the server HTML. The gate no longer accepts leaving it out.
   - iOS 26 Safari backdrops: see "iOS 26+ Safari" in Base UI's quick start (`node_modules/@base-ui/react/docs/react/overview/quick-start.md`).
-  - `ModalLayer` listens on the page's `document`, so a layer inside an iframe isn't supported. Escape's `onClose` gets the native KeyboardEvent.
+  - `ModalLayer` listens on the page's `document`, so a layer inside an iframe isn't supported. Its Escape gives `onClose` the native KeyboardEvent; the other Base UI popups wrap it (`src/internal/events.ts`), which the documented union allows.
+  - The type switched to Satoshi on 22 Oct 2026, after the suite first opened and before any attempt finished. The tokens name it, so a port reads it like any other token. Every checkout needs `npm run fonts` (`tests/README.md`, "Fonts"), and the Codex worktree needs it before Codex starts, since its sandbox has no network.
   - A non-modal popup already open in body when an in-place modal opens gets hidden with the rest of the page.
   - Stories follow the Controls rules in `stories/README.md`, which the guard in the unit project (`tests/unit/stories.test.ts`) checks. An overlay's Default lists `open` through `LiveArg`: its own dismissal (Escape, the backdrop, a close button) calls `onClose`, which logs and sets it back to false. If a portalled overlay's `open` changes nothing in the server HTML, list it under `afterHydration` in `tests/unit/stories.json` with that reason. `npm run check:storybook` checks that a control change, each step in `tests/storybook/interactions.ts` (an opening click, a dismissal) and the docs page all keep the story and the panel in step.
 - **Phase 3:** Checkbox, Radio and Switch follow deviations 1 to 6. Deviation 6 (a Radio outside a RadioGroup) is the gap to watch.
@@ -89,3 +90,5 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
   - The packed `package.json` still carries `"prepare": "husky"`. Strip it before publishing.
   - The `dist` source maps point to `src`, which isn't shipped. Ship it or drop the maps.
   - The package stays `private: true` until you pick a registry. The CI workflow isn't pushed.
+  - The README tells consumers to get Satoshi from Fontshare and self-host it, with its `@font-face` (the variable file, weights 300 to 900). Its licence forbids shipping the files, and `check:package` fails a tarball that holds one.
+  - Mermaid's reference sets its diagrams in a hardcoded system stack (`Mermaid/reference.tsx`, line 8). Decide whether the port follows `--font-sans` and Satoshi.

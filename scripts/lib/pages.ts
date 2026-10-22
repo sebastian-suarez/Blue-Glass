@@ -8,6 +8,8 @@ import fs from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
+import { satoshiFontFace } from "./font-face.ts";
+import { assertFonts, fontsDirectory } from "./fonts.ts";
 import { previewScript, root, type Preview } from "./reference.ts";
 
 export type Runtime = "reference" | "package";
@@ -71,6 +73,7 @@ function resolveRequest(url: string): string | undefined {
 		["/story/", path.join(root, ".cache/story-gate")],
 		["/islands/", path.join(root, ".cache/islands")],
 		["/storybook/", path.join(root, "storybook-static")],
+		["/fonts/", fontsDirectory],
 	];
 	for (const [prefix, directory] of mounts) {
 		if (pathname.startsWith(prefix)) {
@@ -90,9 +93,15 @@ function resolveRequest(url: string): string | undefined {
 export type Server = { origin: string; close: () => Promise<void> };
 
 /**
-Serves the pages, the runtimes, Mermaid and the built Storybook on a free local port.
+Satoshi for a gate's page, from the folder this server mounts at /fonts/.
+*/
+export const fontStyle = `<style>${satoshiFontFace("/fonts")}</style>`;
+
+/**
+Serves the pages, the runtimes, Mermaid, Satoshi and the built Storybook on a free local port.
 */
 export async function startServer(): Promise<Server> {
+	assertFonts();
 	const server = http.createServer((request, response) => {
 		const file = resolveRequest(request.url ?? "/");
 		if (file === undefined || !fs.existsSync(file)) {
@@ -122,6 +131,28 @@ export async function startServer(): Promise<Server> {
 		},
 	};
 }
+
+/**
+Holds the preview's first render until Satoshi has loaded. Some references measure text once, at
+mount (an open Popover places itself from its anchor's size and moves only on a window resize),
+so a render that ran before the font arrived would leave positions that depend on load timing.
+Wraps whatever createRoot is by then, the hydration shim's included.
+*/
+const fontShim = `<script>
+(() => {
+	const dom = window.ReactDOM;
+	const createRoot = dom.createRoot;
+	dom.createRoot = (container, options) => {
+		const root = createRoot(container, options);
+		const render = root.render.bind(root);
+		root.render = (tree) => {
+			const go = () => render(tree);
+			document.fonts.load('400 16px "Satoshi"').then(go, go);
+		};
+		return root;
+	};
+})();
+</script>`;
 
 /**
 Turns the preview's createRoot(...).render(tree) into hydrateRoot(...), recording every
@@ -154,6 +185,7 @@ export function writePage(
 ): string {
 	const isScripted = options.noScript !== true;
 	const head = [
+		fontStyle,
 		`<link rel="stylesheet" href="/runtimes/${runtime}.css">`,
 		...(options.css === undefined
 			? []
@@ -165,6 +197,7 @@ export function writePage(
 				]
 			: []),
 		...(isScripted && options.hydrate === true ? [hydrationShim] : []),
+		...(isScripted ? [fontShim] : []),
 	].join("\n");
 	let html = fs.readFileSync(preview.file, "utf8");
 	if (!isScripted) {

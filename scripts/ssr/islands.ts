@@ -30,7 +30,7 @@ import {
 	textPositions,
 	viewports,
 } from "../lib/capture.ts";
-import { startServer, type Server } from "../lib/pages.ts";
+import { fontStyle, startServer, type Server } from "../lib/pages.ts";
 import { currentPhase } from "../lib/phases.ts";
 import { root } from "../lib/reference.ts";
 import { buildRuntimes, reactGlobals } from "../runtimes.ts";
@@ -886,6 +886,7 @@ function writeShell(
 		[
 			'<!doctype html><html lang="en"><head><meta charset="utf-8">',
 			'<meta name="viewport" content="width=device-width, initial-scale=1">',
+			fontStyle,
 			`<link rel="stylesheet" href="/runtimes/${target}.css">`,
 			...(mutation?.css === undefined
 				? []

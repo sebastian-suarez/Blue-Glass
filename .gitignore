@@ -202,3 +202,6 @@ tests/api/generated/
 
 # Vitest browser mode's failure screenshots
 .vitest/
+
+# Satoshi, downloaded by `npm run fonts`: its licence forbids redistributing the files.
+/fonts/

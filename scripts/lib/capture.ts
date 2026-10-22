@@ -10,6 +10,7 @@ Without this, two runs of the same page differ by animation phase alone.
 */
 import type { Buffer } from "node:buffer";
 import type { Browser, BrowserContext, Page } from "playwright";
+import { waitForFonts } from "./fonts.ts";
 import { mermaidUrl } from "./pages.ts";
 import { root } from "./reference.ts";
 import { viewports } from "./viewports.ts";
@@ -54,7 +55,7 @@ export async function newContext(
 }
 
 /**
-Opens a page, recording its page errors and console errors.
+Opens a page, recording its page errors and console errors, and waits for Satoshi.
 */
 export async function openPage(
 	context: BrowserContext,
@@ -73,6 +74,7 @@ export async function openPage(
 	// Date reads the fixed moment from the first script on; timers keep running.
 	await page.clock.setFixedTime(fixedNow);
 	await page.goto(url, { waitUntil: "networkidle" });
+	await waitForFonts(page);
 	return { page, errors };
 }
 
