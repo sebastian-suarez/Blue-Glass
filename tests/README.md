@@ -24,7 +24,7 @@ Every gate reads its scope from `tests/phases.json`: the modules ported up to th
 
 - `scripts/lib/server-render.ts` runs each preview's script in Node with stand-ins for `window` and `document`, and renders its tree with `renderToString`.
 - The rules are in `scripts/lib/ssr-rules.ts` and have tests of their own.
-- Text shown only after JavaScript is hidden (in the server HTML, invisible) or absent (not there at all). Hidden always fails. Absent fails unless the reference didn't show it before JavaScript either.
+- Text shown only after JavaScript is hidden (in the server HTML, invisible) or absent (not there at all). Hidden always fails. Absent fails unless the reference's server HTML lacked it too: what the reference held, even hidden, the package must show. Texts count by occurrence, so a visible caption doesn't stand in for a hidden copy of the same words.
 - `tests/ssr/reference-baseline.json` records the reference's hidden and absent texts. Re-record it only after `design-system/` is regenerated: `node scripts/ssr/run.ts --reference --record`.
 - `tests/ssr/exceptions.json` excuses named texts, or a whole preview, with a reason.
 

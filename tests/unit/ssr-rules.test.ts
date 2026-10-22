@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import type { Preview } from "../../scripts/lib/reference.ts";
 import {
 	judge,
+	missingTexts,
 	type Observation,
 	type Rules,
 } from "../../scripts/lib/ssr-rules.ts";
@@ -69,13 +70,54 @@ test("text the server HTML hides fails, even where the reference hid it too", ()
 	expect(result.problems.join(",")).toContain("hidden until JavaScript");
 });
 
-test("text the reference hid may be left out of the package's server HTML", () => {
+test("text the reference held but hid may not be left out of the package's server HTML", () => {
 	const result = judge(
 		preview,
 		{ ...clean, absent: ["Fading in"] },
 		packageRules,
 	);
-	expect(result.passed).toBe(true);
+	expect(result.passed).toBe(false);
+	expect(result.problems.join(",")).toContain("Fading in");
+});
+
+test("each copy the reference lacked excuses one missing copy", () => {
+	const once = judge(
+		preview,
+		{ ...clean, absent: ["Keep draft"] },
+		packageRules,
+	);
+	const twice = judge(
+		preview,
+		{ ...clean, absent: ["Keep draft", "Keep draft"] },
+		packageRules,
+	);
+	expect(once.passed).toBe(true);
+	expect(twice.passed).toBe(false);
+});
+
+test("a visible copy of a text doesn't stand in for its hidden copy", () => {
+	// The Transitions preview: each label inside a transition that starts invisible, and again
+	// as a visible caption.
+	expect(
+		missingTexts(
+			["Fade", "Fade", "Grow"],
+			["Fade", "Grow"],
+			["Fade", "Fade", "Grow"],
+		),
+	).toEqual({ hidden: ["Fade"], absent: [] });
+});
+
+test("missing copies are hidden while the server HTML holds them, absent after", () => {
+	expect(missingTexts(["Retry", "Retry", "Retry"], [], ["Retry"])).toEqual({
+		hidden: ["Retry"],
+		absent: ["Retry", "Retry"],
+	});
+	expect(
+		missingTexts(["Retry"], ["Retry", "Retry"], ["Retry", "Retry"]),
+	).toEqual({
+		hidden: [],
+		absent: [],
+	});
 });
 
 test("an exception without texts excuses every text, and says why", () => {

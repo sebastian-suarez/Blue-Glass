@@ -11,7 +11,8 @@ scope it:
    layout gate, scripts/ssr/layout.ts, fails layout shifts).
 
 What fails is in scripts/lib/ssr-rules.ts: any error, any text the server HTML hides, and any
-text it lacks that the reference's server HTML had (tests/ssr/reference-baseline.json).
+text it lacks that the reference's server HTML held, visible or not
+(tests/ssr/reference-baseline.json).
 
 Usage:
   node scripts/ssr/run.ts                       the gate, on the package's build (npm run build first)
@@ -46,6 +47,7 @@ import { previews, root, type Preview } from "../lib/reference.ts";
 import { renderPreview } from "../lib/server-render.ts";
 import {
 	judge,
+	missingTexts,
 	type Baseline,
 	type Exception,
 	type Observation,
@@ -113,7 +115,7 @@ async function observe(
 		`${server.origin}${writePage(preview, runtime)}`,
 	);
 	await settle(client.page);
-	const shown = new Set(await visibleTexts(client.page));
+	const shown = await visibleTexts(client.page);
 	await clientContext.close();
 
 	const staticUrl = writePage(preview, runtime, {
@@ -126,8 +128,8 @@ async function observe(
 		staticContext,
 		`${server.origin}${staticUrl}`,
 	);
-	const shownWithoutScript = new Set(await visibleTexts(staticPage.page));
-	const inServerHtml = new Set(await allTexts(staticPage.page));
+	const shownWithoutScript = await visibleTexts(staticPage.page);
+	const inServerHtml = await allTexts(staticPage.page);
 	await staticContext.close();
 
 	const hydrateUrl = writePage(preview, runtime, {
@@ -159,10 +161,8 @@ async function observe(
 	const after = await positionsOn(browser, server, hydrateUrl, true);
 	const shifted = compareLayouts(before, after).moved.length;
 
-	const clientOnly = shown.difference(shownWithoutScript);
 	return {
-		hidden: [...clientOnly.intersection(inServerHtml)],
-		absent: [...clientOnly.difference(inServerHtml)],
+		...missingTexts(shown, shownWithoutScript, inServerHtml),
 		hydrationErrors,
 		pageErrors,
 		shifted,

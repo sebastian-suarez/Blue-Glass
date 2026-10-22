@@ -6,9 +6,12 @@ Text the client render shows that the server HTML doesn't comes in two kinds:
 - hidden: in the server HTML but not visible, such as a transition that starts invisible. That's
   a visibility defect, and it always fails the package: it should render visibly, or not at all.
 - absent: not in the server HTML at all, such as a popup open on load that renders through a
-  portal, or content measured on the client. The package may leave out what the reference
-  didn't show before JavaScript either, absent or hidden (tests/ssr/reference-baseline.json),
-  but nothing the reference showed.
+  portal, or content measured on the client. The package may leave out what the reference's
+  server HTML lacked too (tests/ssr/reference-baseline.json), but not what the reference held,
+  even hidden: hidden open content is the reference's defect, and leaving it out is no fix.
+
+Texts count by occurrence, not as a set: a caption that repeats a label doesn't stand in for the
+label's hidden copy.
 
 The package also fails on any error in its pages and on any hydration error. An exception in
 tests/ssr/exceptions.json excuses a preview's named texts, or all of them, with its reason.
@@ -74,6 +77,40 @@ export type Rules = {
 
 const sample = (texts: string[]) => `"${texts.slice(0, 3).join('", "')}"`;
 
+function countOf(texts: readonly string[]): Map<string, number> {
+	const counts = new Map<string, number>();
+	for (const text of texts) {
+		counts.set(text, (counts.get(text) ?? 0) + 1);
+	}
+
+	return counts;
+}
+
+/**
+The copies of each text the client render shows that the page without JavaScript doesn't, split
+into those the server HTML holds but hides, and those it lacks. Each list repeats a text once per
+missing copy.
+*/
+export function missingTexts(
+	shown: readonly string[],
+	shownWithoutScript: readonly string[],
+	inServerHtml: readonly string[],
+): { hidden: string[]; absent: string[] } {
+	const visible = countOf(shownWithoutScript);
+	const present = countOf(inServerHtml);
+	const hidden: string[] = [];
+	const absent: string[] = [];
+	for (const [text, count] of countOf(shown)) {
+		const seen = visible.get(text) ?? 0;
+		const hiddenCopies = Math.max(0, (present.get(text) ?? 0) - seen);
+		for (let copy = 0; copy < count - seen; copy++) {
+			(copy < hiddenCopies ? hidden : absent).push(text);
+		}
+	}
+
+	return { hidden, absent };
+}
+
 export function judge(
 	preview: Preview,
 	observation: Observation,
@@ -115,15 +152,16 @@ export function judge(
 		);
 	}
 
-	const reference = baseline[preview.id];
-	const notShownByReference = new Set<string>([
-		...(reference?.absent ?? []),
-		...(reference?.hidden ?? []),
-	]);
+	// Each copy the reference lacked excuses one missing copy here.
+	const allowance = countOf(baseline[preview.id]?.absent ?? []);
 	const missing =
 		runtime === "reference"
 			? observation.absent
-			: observation.absent.filter((text) => !notShownByReference.has(text));
+			: observation.absent.filter((text) => {
+					const left = allowance.get(text) ?? 0;
+					allowance.set(text, left - 1);
+					return left <= 0;
+				});
 	const inherited = observation.absent.length - missing.length;
 	const newlyMissing = excused(missing, "missing from the server HTML");
 	if (newlyMissing.length > 0) {
