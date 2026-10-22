@@ -257,6 +257,15 @@
 				"components/Skeleton/preview.html": "5089fe28366d4d5d",
 				"components/Skeleton/reference.tsx": "c76f83c092476135"
 			}
+		},
+		"Badge": {
+			"files": {
+				"components/Badge/README.md": "f39bde1575d0ea05",
+				"components/Badge/api.d.ts": "5ffbbceb620ac803",
+				"components/Badge/styles.css": "71bbfb698fac1061",
+				"components/Badge/preview.html": "2b22e2980a294f42",
+				"components/Badge/reference.tsx": "16fd689f2948c3cf"
+			}
 		}
 	}
 }
