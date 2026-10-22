@@ -62,9 +62,9 @@ Adapter: `src/internal/modal.tsx`. Tests: `src/internal/modal.test.tsx`.
 
 - **Component:** Modal (Dialog and Drawer take the same flags).
 - **Documented:** Modal makes "the rest of the page inert", while `hideBackdrop` keeps the page behind "clickable outside the content" and `disableEnforceFocus` lets "focus leave the content".
-- **Actual:** while focus is enforced, the rest of the page is `aria-hidden` (Base UI marks it through the portal; the adapter does in place, with `disablePortal`), and the page is never `inert`. With `hideBackdrop` an outside press reaches the page, and focus comes back to the content unless `disableEnforceFocus` is set. With `disableEnforceFocus` Tab reaches the page, which stays exposed to assistive tech.
+- **Actual:** while focus is enforced, the rest of the page is `aria-hidden` (Base UI marks it through the portal; the adapter does in place, with `disablePortal`), and the page is never `inert`. With stacked layers, the page is hidden for the top one, and a layer opened above an in-place one stays exposed, whether it renders in place or through a portal. With `hideBackdrop` an outside press reaches the page, and focus comes back to the content unless `disableEnforceFocus` is set. With `disableEnforceFocus` Tab reaches the page, which stays exposed to assistive tech.
 - **Reason:** `inert` would break both documented flags. The reference sets it and breaks them, a reference defect.
-- **Test:** the eight `disableEnforceFocus` × `disableScrollLock` × `hideBackdrop` cases, each through the portal and in place, "focus, Tab, scroll, outside clicks, Escape and focus return follow the flags".
+- **Tests:** the eight `disableEnforceFocus` × `disableScrollLock` × `hideBackdrop` cases, each through the portal and in place, "focus, Tab, scroll, outside clicks, Escape and focus return follow the flags"; "a layer opened over an in-place one is exposed, and closing it hands back".
 
 ### 8. A nested Modal renders inside the outer one's portal
 

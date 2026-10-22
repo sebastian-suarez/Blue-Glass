@@ -640,6 +640,163 @@ describe("stacked layers", () => {
 	});
 });
 
+const noFlags: Flags = {};
+
+describe.each([false, true])(
+	"an open layer that unmounts, disablePortal=%s",
+	(disablePortal) => {
+		function Toggle({
+			isShown,
+			flags = noFlags,
+		}: {
+			readonly isShown: boolean;
+			readonly flags?: Flags;
+		}) {
+			return (
+				<>
+					<button type="button" id="opener">
+						Open
+					</button>
+					{isShown ? (
+						<ModalLayer open disablePortal={disablePortal} {...flags}>
+							<Surface />
+						</ModalLayer>
+					) : null}
+				</>
+			);
+		}
+
+		async function openThenUnmount(
+			view: ReturnType<typeof render>,
+			wrap: (node: React.ReactElement) => React.ReactElement,
+			flags: Flags = {},
+		) {
+			byId("opener").focus();
+			view.rerender(wrap(<Toggle isShown flags={flags} />));
+			await expect.poll(() => isInsideLayer(document.activeElement)).toBe(true);
+			view.rerender(wrap(<Toggle isShown={false} flags={flags} />));
+			await frames();
+		}
+
+		const plain = (node: React.ReactElement) => node;
+
+		test("sends focus back to the opener, as a close does", async () => {
+			const view = render(<Toggle isShown={false} />);
+			await openThenUnmount(view, plain);
+			expect(document.activeElement).toBe(byId("opener"));
+		});
+
+		test("disableRestoreFocus leaves focus where the unmount put it", async () => {
+			const view = render(<Toggle isShown={false} />);
+			await openThenUnmount(view, plain, { disableRestoreFocus: true });
+			expect(document.activeElement).toBe(document.body);
+		});
+
+		test("StrictMode's replay of the effects doesn't send focus out", async () => {
+			const strict = (node: React.ReactElement) => (
+				<React.StrictMode>{node}</React.StrictMode>
+			);
+			const view = render(strict(<Toggle isShown={false} />));
+			byId("opener").focus();
+			view.rerender(strict(<Toggle isShown />));
+			await expect.poll(() => isInsideLayer(document.activeElement)).toBe(true);
+			await frames();
+			expect(isInsideLayer(document.activeElement)).toBe(true);
+			view.rerender(strict(<Toggle isShown={false} />));
+			await frames();
+			expect(document.activeElement).toBe(byId("opener"));
+		});
+	},
+);
+
+describe("stacked layers and what assistive tech sees", () => {
+	const isExposed = (element: Element) =>
+		element.closest('[aria-hidden="true"]') === null;
+	const quiet: Flags = { hideBackdrop: true, disableScrollLock: true };
+
+	function Panel({ id }: { readonly id: string }) {
+		return (
+			<div id={id} role="dialog" aria-label={id}>
+				<button type="button">{id}</button>
+			</div>
+		);
+	}
+
+	function Siblings({
+		first,
+		second,
+		isSecondInPlace,
+	}: {
+		readonly first: boolean;
+		readonly second: boolean;
+		readonly isSecondInPlace: boolean;
+	}) {
+		return (
+			<div>
+				<button type="button" id="page-button">
+					Page
+				</button>
+				<ModalLayer disablePortal keepMounted open={first} {...quiet}>
+					<Panel id="first" />
+				</ModalLayer>
+				<ModalLayer
+					keepMounted
+					disablePortal={isSecondInPlace}
+					open={second}
+					{...quiet}
+				>
+					<Panel id="second" />
+				</ModalLayer>
+			</div>
+		);
+	}
+
+	test.each([true, false])(
+		"a layer opened over an in-place one is exposed, and closing it hands back; second in place=%s",
+		async (isSecondInPlace) => {
+			const view = render(
+				<Siblings
+					first={false}
+					second={false}
+					isSecondInPlace={isSecondInPlace}
+				/>,
+			);
+			await frames();
+			view.rerender(
+				<Siblings first second={false} isSecondInPlace={isSecondInPlace} />,
+			);
+			await frames();
+			expect(isExposed(byId("first"))).toBe(true);
+			expect(isExposed(byId("page-button"))).toBe(false);
+
+			view.rerender(
+				<Siblings first second isSecondInPlace={isSecondInPlace} />,
+			);
+			await frames();
+			expect(isExposed(byId("second"))).toBe(true);
+			expect(isExposed(byId("first"))).toBe(false);
+			expect(isExposed(byId("page-button"))).toBe(false);
+
+			view.rerender(
+				<Siblings first second={false} isSecondInPlace={isSecondInPlace} />,
+			);
+			await frames();
+			expect(isExposed(byId("first"))).toBe(true);
+			expect(isExposed(byId("page-button"))).toBe(false);
+
+			view.rerender(
+				<Siblings
+					first={false}
+					second={false}
+					isSecondInPlace={isSecondInPlace}
+				/>,
+			);
+			await frames();
+			expect(document.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
+		},
+	);
+});
+
 describe("disablePortal on the server", () => {
 	test("the server HTML holds the open layer in place, hydrates without errors, and then works", async () => {
 		const calls: ModalCloseReason[] = [];
@@ -868,6 +1025,33 @@ describe("exit transitions", () => {
 			}
 
 			expect(document.activeElement).toBe(byId("opener"));
+		},
+	);
+
+	test.each([false, true])(
+		"disablePortal=%s: re-opened before the child has exited, focus goes back in",
+		async (disablePortal) => {
+			render(<Harness flags={{ disablePortal }} onExited={() => undefined} />);
+			await userEvent.click(byId("opener"));
+			await expect
+				.poll(() => byId("transition").dataset.transition)
+				.toBe("entered");
+			await expect.poll(() => isInsideLayer(document.activeElement)).toBe(true);
+
+			act(() => {
+				byId("close").click();
+			});
+			expect(byId("transition").dataset.transition).toBe("exiting");
+			expect(document.activeElement).toBe(byId("opener"));
+
+			act(() => {
+				byId("opener").click();
+			});
+			await expect
+				.poll(() => byId("transition").dataset.transition)
+				.toBe("entered");
+			await frames();
+			expect(isInsideLayer(document.activeElement)).toBe(true);
 		},
 	);
 });

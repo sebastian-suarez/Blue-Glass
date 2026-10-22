@@ -24,8 +24,9 @@ Each flag maps on its own instead:
 |                       | page (focus still comes back in unless `disableEnforceFocus`).             |
 | `disableAutoFocus`    | Focus stays put. Otherwise it goes to `[data-autofocus]` or `[autofocus]`  |
 |                       | in the content, else the surface with `tabindex="-1"`.                     |
-| `disableRestoreFocus` | Focus stays put. Otherwise it returns, as the layer closes, to the element |
-|                       | that had it when the layer opened, even if it moved since.                 |
+| `disableRestoreFocus` | Focus stays put. Otherwise it returns, as the layer closes or unmounts     |
+|                       | open, to the element that had it when the layer opened, even if it moved   |
+|                       | since.                                                                     |
 | `keepMounted`         | The layer stays in the DOM while closed, its root with `gl-modal-hidden`.  |
 | `disablePortal`       | The layer renders in place, without Base UI (see below).                   |
 | `container`           | The portal's container; `null` or a function returning `null` means body.  |
@@ -57,7 +58,9 @@ controlled). Base UI's own pointer and focus-out dismissal is off (`disablePoint
 Base UI's other close reasons aren't documented ones: they're cancelled.
 
 Stacking. Open modals form a stack, as in the reference: only the top one reports Escape and
-backdrop clicks and pulls focus back. Scroll stays locked while any open modal locks it.
+backdrop clicks and pulls focus back. Scroll stays locked while any open modal locks it. In
+place, the page is hidden for the top layer that hides it, and layers opened above that one stay
+exposed, wherever they render.
 
 Left to the Modal port: the Blue Glass Backdrop component (`BackdropProps` takes its props, but
 the backdrop here is a plain element with the `gl-backdrop` classes).
@@ -187,11 +190,21 @@ export function useScrollLock(isActive: boolean): void {
 	}, [isActive]);
 }
 
+type Layer = {
+	/**
+	The layer's root element, once mounted.
+	*/
+	rootRef: React.RefObject<HTMLElement | null>;
+};
+
 // Open layers in opening order. Only the last one reports Escape and backdrop clicks and
 // enforces focus, as in the reference.
-const openLayers: object[] = [];
+const openLayers: Layer[] = [];
 
-function isTopLayer(layer: object): boolean {
+// The open layers that hide the rest of the page themselves: in place, with focus enforced.
+const pageHiders = new WeakSet<Layer>();
+
+function isTopLayer(layer: Layer): boolean {
 	return openLayers.at(-1) === layer;
 }
 
@@ -247,9 +260,8 @@ function focusEdge(content: HTMLElement | null, edge: "first" | "last"): void {
 	}
 }
 
-// How many in-place layers want each element hidden, and which ones this module hid.
-const hiddenCounts = new WeakMap<Element, number>();
-const hiddenHere = new WeakSet<Element>();
+// The elements this module hid, so it only ever un-hides its own.
+const hiddenHere = new Set<Element>();
 
 function shouldStayExposed(element: Element): boolean {
 	return (
@@ -260,15 +272,14 @@ function shouldStayExposed(element: Element): boolean {
 }
 
 /**
-Hides the rest of the page from assistive tech, as Base UI does for its own popups: every
-sibling along the path from body down to `root`. Returns the undo.
+Every sibling along the path from body down to `root`: what Base UI hides for its own popups.
 */
-function hideOthers(root: Element): () => void {
-	const hidden: Element[] = [];
+function siblingsAlongPath(root: Element): Element[] {
+	const siblings: Element[] = [];
 	let node = root;
 	while (node.parentElement && node !== node.ownerDocument.body) {
 		const keep = node;
-		hidden.push(
+		siblings.push(
 			...[...node.parentElement.children].filter(
 				(sibling) => sibling !== keep && !shouldStayExposed(sibling),
 			),
@@ -276,29 +287,55 @@ function hideOthers(root: Element): () => void {
 		node = node.parentElement;
 	}
 
-	for (const element of hidden) {
-		const count = hiddenCounts.get(element) ?? 0;
-		hiddenCounts.set(element, count + 1);
-		if (count > 0 || element.getAttribute("aria-hidden") === "true") {
+	return siblings;
+}
+
+/**
+Hides the rest of the page from assistive tech for the top layer that hides it, and exposes
+again what no layer wants hidden any more. Layers opened above that one stay exposed, along with
+everything that contains them: an in-place sibling, or a portal kept mounted in body before the
+page was hidden. Runs whenever a layer opens, closes, or starts or stops hiding the page.
+*/
+function syncHiddenPage(): void {
+	const index = openLayers.findLastIndex(
+		(layer) => pageHiders.has(layer) && layer.rootRef.current !== null,
+	);
+	const root = index === -1 ? undefined : openLayers[index]?.rootRef.current;
+	const wanted = new Set<Element>();
+	if (root) {
+		const above = openLayers
+			.slice(index + 1)
+			.map((layer) => layer.rootRef.current)
+			.filter((element) => element !== null);
+		for (const element of siblingsAlongPath(root)) {
+			if (
+				above.every((other) => element !== other && !element.contains(other))
+			) {
+				wanted.add(element);
+			}
+		}
+	}
+
+	for (const element of hiddenHere) {
+		if (wanted.has(element)) {
+			continue;
+		}
+
+		hiddenHere.delete(element);
+		element.removeAttribute("aria-hidden");
+	}
+
+	for (const element of wanted) {
+		if (
+			hiddenHere.has(element) ||
+			element.getAttribute("aria-hidden") === "true"
+		) {
 			continue;
 		}
 
 		element.setAttribute("aria-hidden", "true");
 		hiddenHere.add(element);
 	}
-
-	return () => {
-		for (const element of hidden) {
-			const count = (hiddenCounts.get(element) ?? 1) - 1;
-			hiddenCounts.set(element, count);
-			if (count > 0 || !hiddenHere.has(element)) {
-				continue;
-			}
-
-			hiddenHere.delete(element);
-			element.removeAttribute("aria-hidden");
-		}
-	};
 }
 
 /**
@@ -418,7 +455,7 @@ an effect after this one does.
 */
 function useStackEntry(
 	isOpen: boolean,
-	layer: object,
+	layer: Layer,
 ): React.RefObject<Element | null> {
 	const openerRef = React.useRef<Element | null>(null);
 	useIsoLayoutEffect(() => {
@@ -426,13 +463,21 @@ function useStackEntry(
 			return undefined;
 		}
 
-		openerRef.current = document.activeElement;
+		// StrictMode replays this after focus has moved in (in place): the opener stays then.
+		const active = document.activeElement;
+		if (!isInside(layer.rootRef.current, active)) {
+			openerRef.current = active;
+		}
+
 		openLayers.push(layer);
+		syncHiddenPage();
 		return () => {
 			const index = openLayers.indexOf(layer);
 			if (index !== -1) {
 				openLayers.splice(index, 1);
 			}
+
+			syncHiddenPage();
 		};
 	}, [isOpen, layer]);
 	return openerRef;
@@ -440,7 +485,8 @@ function useStackEntry(
 
 /**
 Sends focus back to the opener as the layer closes, before any exit transition, as in the
-reference. Base UI's finalFocus is off, so both paths do it here.
+reference, and as an open layer unmounts (`{isShown && <Modal open />}`). Base UI's finalFocus
+is off, so both paths do it here.
 */
 function useRestoreFocus(
 	isOpen: boolean,
@@ -448,6 +494,17 @@ function useRestoreFocus(
 	openerRef: React.RefObject<Element | null>,
 ): void {
 	const wasOpenRef = React.useRef(false);
+	const restore = useEventCallback(() => {
+		const opener = openerRef.current;
+		if (
+			shouldRestore &&
+			opener instanceof HTMLElement &&
+			opener.isConnected &&
+			opener !== opener.ownerDocument.body
+		) {
+			opener.focus({ preventScroll: true });
+		}
+	});
 	React.useEffect(() => {
 		if (isOpen) {
 			wasOpenRef.current = true;
@@ -459,16 +516,27 @@ function useRestoreFocus(
 		}
 
 		wasOpenRef.current = false;
-		const opener = openerRef.current;
-		if (
-			shouldRestore &&
-			opener instanceof HTMLElement &&
-			opener.isConnected &&
-			opener !== opener.ownerDocument.body
-		) {
-			opener.focus({ preventScroll: true });
-		}
-	}, [isOpen, shouldRestore, openerRef]);
+		restore();
+	}, [isOpen, restore]);
+
+	// StrictMode replays effects by unmounting and remounting at once, so an unmount waits a
+	// microtask and restores only if the layer didn't come back.
+	const isMountedRef = React.useRef(false);
+	React.useEffect(() => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+			if (!wasOpenRef.current) {
+				return;
+			}
+
+			queueMicrotask(() => {
+				if (!isMountedRef.current) {
+					restore();
+				}
+			});
+		};
+	}, [restore]);
 }
 
 /**
@@ -479,7 +547,7 @@ records the event) before the event reaches the document.
 */
 function useFocusGuard(
 	isActive: boolean,
-	layer: object,
+	layer: Layer,
 	rootRef: React.RefObject<HTMLElement | null>,
 	contentRef: React.RefObject<HTMLElement | null>,
 ): (event: React.FocusEvent) => void {
@@ -532,18 +600,57 @@ function useInitialFocus(
 }
 
 /**
-In place, the rest of the page is hidden from assistive tech while focus is enforced (Base UI
-does it on the portal path).
+Through the portal, Base UI's dialog stays open while a transition child exits, so a re-open in
+that time is no open to Base UI and its initialFocus doesn't run: focus goes in here instead.
 */
-function useHideOthers(
+function useFocusOnReopen(
+	isOpen: boolean,
+	isPresent: boolean,
 	isActive: boolean,
-	rootRef: React.RefObject<HTMLElement | null>,
+	contentRef: React.RefObject<HTMLElement | null>,
 ): void {
+	const isExitingRef = React.useRef(false);
 	React.useEffect(() => {
-		const root = rootRef.current;
-		return isActive && root ? hideOthers(root) : undefined;
-	}, [isActive, rootRef]);
+		if (!isOpen) {
+			isExitingRef.current = isPresent;
+			return;
+		}
+
+		if (!isExitingRef.current) {
+			return;
+		}
+
+		isExitingRef.current = false;
+		const content = contentRef.current;
+		if (isActive && content && !isInside(content, document.activeElement)) {
+			initialFocusTarget(content)?.focus({ preventScroll: true });
+		}
+	}, [isOpen, isPresent, isActive, contentRef]);
 }
+
+/**
+In place, the rest of the page is hidden from assistive tech while focus is enforced (Base UI
+does it on the portal path). The stack decides what that hides (syncHiddenPage).
+*/
+function useHidePage(isActive: boolean, layer: Layer): void {
+	useIsoLayoutEffect(() => {
+		if (!isActive) {
+			return undefined;
+		}
+
+		pageHiders.add(layer);
+		syncHiddenPage();
+		return () => {
+			pageHiders.delete(layer);
+			syncHiddenPage();
+		};
+	}, [isActive, layer]);
+}
+
+// Escape events a layer has handled. With the React root on document itself (hydrateRoot on the
+// whole document), the content's handler and the in-place listener both see one event, and
+// stopPropagation doesn't stop other listeners on the same node.
+const handledEscapes = new WeakSet<KeyboardEvent>();
 
 /**
 In place, Escape with focus outside the content. With focus inside, the content's onKeyDown
@@ -709,8 +816,8 @@ export function ModalLayer(props: ModalLayerProps) {
 		ref,
 	} = props;
 	const behaviour = resolveModalBehaviour(props);
-	const [layer] = React.useState(() => ({}));
 	const rootRef = React.useRef<HTMLDivElement | null>(null);
+	const [layer] = React.useState<Layer>(() => ({ rootRef }));
 	const contentRef = React.useRef<HTMLDivElement | null>(null);
 	const handleRootRef = useForkRef(rootRef, ref);
 
@@ -730,9 +837,19 @@ export function ModalLayer(props: ModalLayerProps) {
 	);
 	const isOpenInPlace = open && disablePortal;
 	useInitialFocus(isOpenInPlace && behaviour.shouldAutoFocus, contentRef);
-	useHideOthers(isOpenInPlace && behaviour.shouldEnforceFocus, rootRef);
+	useFocusOnReopen(
+		open,
+		isPresent,
+		!disablePortal && behaviour.shouldAutoFocus,
+		contentRef,
+	);
+	useHidePage(isOpenInPlace && behaviour.shouldEnforceFocus, layer);
 
 	const closeOnEscape = useEventCallback((event: KeyboardEvent): boolean => {
+		if (handledEscapes.has(event)) {
+			return true;
+		}
+
 		if (
 			!open ||
 			!behaviour.shouldCloseOnEscape ||
@@ -744,6 +861,7 @@ export function ModalLayer(props: ModalLayerProps) {
 		}
 
 		event.preventDefault();
+		handledEscapes.add(event);
 		onClose?.(event, "escapeKeyDown");
 		return true;
 	});
