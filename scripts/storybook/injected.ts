@@ -1,0 +1,174 @@
+/**
+The scripts the Storybook gate (run.ts) runs in every frame before Storybook's own: one that
+records the preview's events and errors, and the defects its self-test plants.
+*/
+import type { Check } from "./run.ts";
+
+/**
+Runs in every frame before its scripts: records the channel's events and the page's errors,
+and lets a planted defect hook the channel as soon as Storybook creates it.
+*/
+export const recordEvents = `(() => {
+	const w = window;
+	w.__glEvents = [];
+	w.__glErrors = [];
+	w.__glFired = 0;
+	w.addEventListener("error", (event) => {
+		w.__glErrors.push(String(event.message));
+	});
+	w.addEventListener("unhandledrejection", (event) => {
+		w.__glErrors.push(String((event.reason && event.reason.message) || event.reason));
+	});
+	const watched = ["storyRendered", "storyArgsUpdated", "docsRendered", "storyErrored", "storyThrewException", "storyMissing", "playFunctionThrewException"];
+	const plain = (payload) => {
+		try {
+			return JSON.parse(JSON.stringify(payload));
+		} catch {
+			return String(payload);
+		}
+	};
+	const hooks = [];
+	let channel;
+	w.__glOnChannel = (hook) => {
+		hooks.push(hook);
+		if (channel) hook(channel);
+	};
+	Object.defineProperty(w, "__STORYBOOK_ADDONS_CHANNEL__", {
+		configurable: true,
+		get: () => channel,
+		set(next) {
+			channel = next;
+			for (const type of watched) {
+				next.on(type, (payload) => {
+					w.__glEvents.push({ type, payload: plain(payload) });
+				});
+			}
+			for (const hook of hooks) hook(next);
+		},
+	});
+})();`;
+
+/**
+A defect planted at runtime for the self-test. `script` runs in every frame after the recorder,
+with TARGET set to the story's id; it bumps window.__glFired each time it acts.
+*/
+export type Mutation = {
+	name: string;
+	story: string;
+	where: "canvas" | "docs";
+	check: Check;
+	script: string;
+};
+
+// The preview's iframe starts at about:blank, whose window the browser keeps for iframe.html, so
+// the scripts below run before the preview's URL is known: each checks it when it acts, and
+// listens on the window, which outlives the first document.
+const inPreview = `if (!location.pathname.endsWith("/iframe.html")) return;`;
+const selection = `(window.__STORYBOOK_PREVIEW__ && window.__STORYBOOK_PREVIEW__.currentSelection) || {}`;
+
+export const mutations: Mutation[] = [
+	{
+		name: "the preview drops the panel's arg updates",
+		story: "inputs-button--default",
+		where: "canvas",
+		check: "controls",
+		script: `window.__glOnChannel((channel) => {
+			${inPreview}
+			const transport = channel.transports[0];
+			const handler = transport.handler;
+			transport.handler = function (event, ...rest) {
+				if (event && event.type === "updateStoryArgs" && event.args && event.args[0] && event.args[0].storyId === TARGET) {
+					window.__glFired++;
+					return;
+				}
+				return handler.call(this, event, ...rest);
+			};
+		});`,
+	},
+	{
+		name: "the story's updateArgs never reaches the panel",
+		story: "navigation-tabs--default",
+		where: "canvas",
+		check: "interactions",
+		script: `window.__glOnChannel((channel) => {
+			${inPreview}
+			const transport = channel.transports[0];
+			const send = transport.send;
+			transport.send = function (event, ...rest) {
+				if (event && event.type === "storyArgsUpdated" && event.args && event.args[0] && event.args[0].storyId === TARGET) {
+					window.__glFired++;
+					return;
+				}
+				return send.call(this, event, ...rest);
+			};
+		});`,
+	},
+	{
+		name: "the first click inside the story throws",
+		story: "surfaces-accordion--default",
+		where: "canvas",
+		check: "interactions",
+		script: `let thrown = false;
+		window.addEventListener("click", (event) => {
+			${inPreview}
+			const current = ${selection};
+			if (!thrown && current.storyId === TARGET && current.viewMode === "story" && event.target.closest && event.target.closest("#storybook-root")) {
+				thrown = true;
+				window.__glFired++;
+				throw new Error("Planted: the first click in the story throws");
+			}
+		}, true);`,
+	},
+	{
+		name: "the docs page swallows clicks in its story blocks",
+		story: "inputs-togglebutton--default",
+		where: "docs",
+		check: "interactions",
+		script: `window.addEventListener("click", (event) => {
+			${inPreview}
+			const current = ${selection};
+			if (current.viewMode === "docs" && event.target.closest && event.target.closest("#anchor--" + TARGET)) {
+				event.stopImmediatePropagation();
+				event.preventDefault();
+				window.__glFired++;
+			}
+		}, true);`,
+	},
+	{
+		name: "the docs page writes its change to the args",
+		story: "navigation-tabs--default",
+		where: "docs",
+		check: "interactions",
+		script: `window.addEventListener("click", (event) => {
+			${inPreview}
+			const current = ${selection};
+			if (current.viewMode === "docs" && event.target.closest && event.target.closest("#anchor--" + TARGET)) {
+				setTimeout(() => {
+					window.__STORYBOOK_ADDONS_CHANNEL__.emit("updateStoryArgs", { storyId: TARGET, updatedArgs: { value: "projects" } });
+					window.__glFired++;
+				}, 0);
+			}
+		}, true);`,
+	},
+	{
+		name: "the panel hides one listed control",
+		story: "inputs-button--default",
+		where: "canvas",
+		check: "panel",
+		script: `window.__glOnChannel((channel) => {
+			${inPreview}
+			const transport = channel.transports[0];
+			const send = transport.send;
+			transport.send = function (event, ...rest) {
+				const prepared = event && event.type === "storyPrepared" && event.args && event.args[0];
+				if (prepared && prepared.id === TARGET && prepared.argTypes && prepared.argTypes.size) {
+					const argTypes = { ...prepared.argTypes };
+					delete argTypes.size;
+					window.__glFired++;
+					return send.call(this, { ...event, args: [{ ...prepared, argTypes }, ...event.args.slice(1)] }, ...rest);
+				}
+				return send.call(this, event, ...rest);
+			};
+		});`,
+	},
+];

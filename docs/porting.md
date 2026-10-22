@@ -54,7 +54,7 @@ Also read:
   - Regexes in `src/` use the `u` flag.
   - Comments are short and say why.
 - **Off limits:**
-  - `design-system/` and the frozen suite: the phase's `tests/behaviour/` specs, `tests/parity/`, `tests/ssr/`, `tests/api/` (including `allowlist.json`), `tests/phases.json`, and the gates and their helpers in `scripts/`.
+  - `design-system/` and the frozen suite: the phase's `tests/behaviour/` specs, `tests/parity/`, `tests/ssr/`, `tests/api/` (including `allowlist.json`), `tests/storybook/`, `tests/phases.json`, and the gates and their helpers in `scripts/`.
   - New dependencies.
   - If a budget, a spec or a needed API waiver looks wrong or missing, say so in the report instead of changing it. Waivers for deviations agreed before the phase are already in `tests/api/allowlist.json`.
 
@@ -67,7 +67,7 @@ npm run typecheck && npx xo && npm run build
 npx vitest run
 npm run check:api && npm run parity && npm run check:ssr && npm run check:sync
 npm run check:layout && npm run check:islands
-npm run check:package && npm run build-storybook
+npm run check:package && npm run build-storybook && npm run check:storybook
 ```
 
 Every command has to pass.

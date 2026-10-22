@@ -73,6 +73,9 @@ jobs:
       - name: Storybook
         run: npm run build-storybook
 
+      - name: Storybook in the browser
+        run: npm run check:storybook
+
       - name: Keep the reports
         if: always()
         uses: actions/upload-artifact@v7

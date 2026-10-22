@@ -7,6 +7,8 @@
 		{ "file": "stories/sections/ProjectCard.stories.tsx", "phase": 1 },
 		{ "file": "stories/sections/ContactSlab.stories.tsx", "phase": 1 },
 		{ "file": "src/components/Tabs/Tabs.stories.tsx", "phase": 1 },
-		{ "file": "src/components/Accordion/Accordion.stories.tsx", "phase": 1 }
+		{ "file": "src/components/Accordion/Accordion.stories.tsx", "phase": 1 },
+		{ "file": "src/components/Dialog/Dialog.stories.tsx", "phase": 2 },
+		{ "file": "src/components/Snackbar/Snackbar.stories.tsx", "phase": 2 }
 	]
 }

@@ -57,6 +57,7 @@ const contentTypes: Record<string, string> = {
 	".json": "application/json",
 	".png": "image/png",
 	".svg": "image/svg+xml",
+	".woff2": "font/woff2",
 };
 
 function resolveRequest(url: string): string | undefined {
@@ -69,11 +70,17 @@ function resolveRequest(url: string): string | undefined {
 		["/mermaid/", mermaidDirectory],
 		["/story/", path.join(root, ".cache/story-gate")],
 		["/islands/", path.join(root, ".cache/islands")],
+		["/storybook/", path.join(root, "storybook-static")],
 	];
 	for (const [prefix, directory] of mounts) {
 		if (pathname.startsWith(prefix)) {
 			const file = path.join(directory, pathname.slice(prefix.length));
-			return file.startsWith(directory) ? file : undefined;
+			if (!file.startsWith(directory)) {
+				return undefined;
+			}
+
+			// The built Storybook's manager is its folder's index.html.
+			return pathname.endsWith("/") ? path.join(file, "index.html") : file;
 		}
 	}
 
@@ -83,7 +90,7 @@ function resolveRequest(url: string): string | undefined {
 export type Server = { origin: string; close: () => Promise<void> };
 
 /**
-Serves the pages, the runtimes and Mermaid on a free local port.
+Serves the pages, the runtimes, Mermaid and the built Storybook on a free local port.
 */
 export async function startServer(): Promise<Server> {
 	const server = http.createServer((request, response) => {
