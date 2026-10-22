@@ -11,10 +11,14 @@
 @import "../components/ButtonGroup/ButtonGroup.css";
 @import "../components/ToggleButton/ToggleButton.css";
 @import "../components/Avatar/Avatar.css";
+@import "../components/Badge/Badge.css";
 @import "../components/Chip/Chip.css";
 @import "../components/Divider/Divider.css";
 @import "../components/List/List.css";
 @import "../components/Table/Table.css";
+@import "../components/Alert/Alert.css";
+@import "../components/Progress/Progress.css";
+@import "../components/Skeleton/Skeleton.css";
 @import "../components/Accordion/Accordion.css";
 @import "../components/AppBar/AppBar.css";
 @import "../components/Card/Card.css";

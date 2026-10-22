@@ -1,0 +1,152 @@
+/* Blue Glass — Alert, ported from design-system/components/Alert/styles.css. */
+
+@layer gl-components {
+	/* Alert — an addition, matching MUI's Alert. The status set (danger, warning, success, info and
+	   their -soft grounds) carries the colour; the plate is the site's well radius (radius-well:
+	   .project-figure, .project-selector). Every border is a full 1px line, never a side stripe. */
+	.gl-alert {
+		--gl-alert-tone: var(--info);
+		--gl-alert-soft: var(--info-soft);
+		display: flex;
+		align-items: flex-start;
+		gap: var(--space-sm);
+		min-width: 0;
+		padding: 14px 18px;
+		border: 1px solid transparent;
+		border-radius: var(--radius-well);
+		color: var(--color-ink);
+		font-size: 14px;
+		line-height: 1.55;
+		text-align: left;
+	}
+	.gl-alert-success {
+		--gl-alert-tone: var(--success);
+		--gl-alert-soft: var(--success-soft);
+	}
+	.gl-alert-info {
+		--gl-alert-tone: var(--info);
+		--gl-alert-soft: var(--info-soft);
+	}
+	.gl-alert-warning {
+		--gl-alert-tone: var(--warning);
+		--gl-alert-soft: var(--warning-soft);
+	}
+	.gl-alert-error {
+		--gl-alert-tone: var(--danger);
+		--gl-alert-soft: var(--danger-soft);
+	}
+
+	/* standard: the -soft ground with a hairline of its own status colour all the way round
+	   (color-line where color-mix is missing) */
+	.gl-alert-standard {
+		background: var(--gl-alert-soft);
+		border-color: var(--color-line);
+		border-color: color-mix(in srgb, var(--gl-alert-tone) 24%, transparent);
+	}
+	/* outlined: the chip's glass-control fill (.chip) for alerts that sit on a glass panel */
+	.gl-alert-outlined {
+		background: var(--glass-control);
+		border-color: var(--gl-alert-tone);
+	}
+	/* filled: the status fill under on-ink (5.9:1 or more on every status) */
+	.gl-alert-filled {
+		background: var(--gl-alert-tone);
+		color: var(--on-ink);
+	}
+
+	/* The icon box matches the first line (14px x 1.55) so the glyph centres on it. */
+	.gl-alert-icon {
+		display: inline-flex;
+		flex: none;
+		padding-block: 1px;
+		color: var(--gl-alert-tone);
+	}
+	.gl-alert-message {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow-wrap: break-word;
+		text-wrap: pretty;
+	}
+	.gl-alert-title {
+		margin-bottom: 2px;
+		font-weight: 600;
+		color: var(--gl-alert-tone);
+	}
+	/* Action: negative block margins keep a 28px text button from growing the plate. */
+	.gl-alert-action {
+		display: flex;
+		flex: none;
+		align-items: center;
+		gap: var(--space-xs);
+		margin-block: -3px;
+		color: var(--gl-alert-tone);
+	}
+	.gl-alert-action .gl-button-text {
+		color: inherit;
+		font-weight: 500;
+	}
+	.gl-alert-filled .gl-alert-icon,
+	.gl-alert-filled .gl-alert-title,
+	.gl-alert-filled .gl-alert-action {
+		color: inherit;
+	}
+
+	/* Close: a 32px round target (size-control-sm), pulled into the padding so the glyph lines up. */
+	.gl-alert-close {
+		display: inline-grid;
+		place-items: center;
+		flex: none;
+		width: var(--size-control-sm);
+		height: var(--size-control-sm);
+		margin: -5px -8px -5px -4px;
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-pill);
+		background: transparent;
+		color: var(--color-muted);
+		font: inherit;
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+		transition:
+			background var(--duration-hover) ease,
+			color var(--duration-hover) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-alert-close:focus-visible {
+		outline-offset: 2px;
+	}
+	.gl-alert-close:active {
+		transform: scale(0.98);
+	}
+	.gl-alert-filled .gl-alert-close {
+		color: inherit;
+	}
+	/* The focus colour disappears on a status fill; the ring turns on-ink there. */
+	.gl-alert-filled :focus-visible {
+		outline-color: var(--on-ink);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-alert-close:hover {
+			background: var(--glass-raised);
+			color: var(--color-ink);
+		}
+		.gl-alert-filled .gl-alert-close:hover {
+			background: rgba(255, 255, 255, 0.16);
+			color: inherit;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-alert-close {
+			transition: none;
+		}
+		.gl-alert-close:active {
+			transform: none;
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.gl-alert-outlined {
+			background: var(--glass-solid);
+		}
+	}
+}

@@ -284,6 +284,43 @@
 				"components/TextareaAutosize/preview.html": "aea4fa1fddaa1e7f",
 				"components/TextareaAutosize/reference.tsx": "73db287aa691d9ba"
 			}
+		},
+		"Skeleton": {
+			"files": {
+				"components/Skeleton/README.md": "01dce518ac208033",
+				"components/Skeleton/api.d.ts": "78c4c92708f47553",
+				"components/Skeleton/styles.css": "3783e65164a793df",
+				"components/Skeleton/preview.html": "5089fe28366d4d5d",
+				"components/Skeleton/reference.tsx": "c76f83c092476135"
+			}
+		},
+		"Badge": {
+			"files": {
+				"components/Badge/README.md": "f39bde1575d0ea05",
+				"components/Badge/api.d.ts": "5ffbbceb620ac803",
+				"components/Badge/styles.css": "71bbfb698fac1061",
+				"components/Badge/preview.html": "2b22e2980a294f42",
+				"components/Badge/reference.tsx": "16fd689f2948c3cf"
+			}
+		},
+		"Alert": {
+			"files": {
+				"components/Alert/README.md": "a01509476d9110aa",
+				"components/Alert/api.d.ts": "8070f068c106084e",
+				"components/Alert/styles.css": "3c3283eca2f22afd",
+				"components/Alert/preview.html": "d43caacc60360c34",
+				"components/Alert/reference.tsx": "e7d01b1039e7a3c1",
+				"shared/_feedback-live.ts": "fc6737562912f11f"
+			}
+		},
+		"Progress": {
+			"files": {
+				"components/Progress/README.md": "34704c6ae373eb9a",
+				"components/Progress/api.d.ts": "e8cfc8af395fc347",
+				"components/Progress/styles.css": "2f9e2c4167cf54bd",
+				"components/Progress/preview.html": "130bcdbf9230579a",
+				"components/Progress/reference.tsx": "1e1cb52e90e459a6"
+			}
 		}
 	}
 }
