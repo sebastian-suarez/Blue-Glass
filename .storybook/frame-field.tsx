@@ -1,8 +1,8 @@
+import { LightField } from "../src/components/LightField/index.ts";
+
 /**
-The field behind every frame. The reference previews draw `<LightField variant="compact" />`
-here. LightField is ported in phase 1, which replaces this placeholder with it; until then the
-frame shows the bare canvas.
+The field behind every frame, as the reference previews draw it: `<LightField variant="compact" />`.
 */
 export function FrameField() {
-	return null;
+	return <LightField variant="compact" />;
 }
