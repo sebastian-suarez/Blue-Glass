@@ -22,7 +22,9 @@ const target = path.relative(root, satoshiPath);
 if (hasSatoshi()) {
 	console.log(`${target} is up to date.`);
 } else {
-	const response = await fetch(satoshiSource.url);
+	const response = await fetch(satoshiSource.url, {
+		signal: AbortSignal.timeout(60_000),
+	});
 	if (!response.ok) {
 		throw new Error(`Fontshare answered ${response.status} for Satoshi.`);
 	}
