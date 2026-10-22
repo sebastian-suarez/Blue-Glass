@@ -73,7 +73,9 @@ function HeroGrid() {
 			}}
 		>
 			<span className="text-subtitle">
-				{isOneColumn ? "One column at 899px and below" : "Two columns from 900px"}
+				{isOneColumn
+					? "One column at 899px and below"
+					: "Two columns from 900px"}
 			</span>
 			<Paper variant="inset" style={{ height: 80 }} />
 		</Paper>

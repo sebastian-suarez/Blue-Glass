@@ -166,7 +166,9 @@ function ScrollingPage({
 						}),
 			}}
 		>
-			<div style={{ position: "relative", isolation: "isolate", overflow: "clip" }}>
+			<div
+				style={{ position: "relative", isolation: "isolate", overflow: "clip" }}
+			>
 				<LightField variant="compact" />
 				{children}
 			</div>

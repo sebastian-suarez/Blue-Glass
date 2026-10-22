@@ -233,7 +233,9 @@ export const Variants: Story = {
 								style={{ minHeight: 64 }}
 							>
 								<ListItemText
-									primary={<span className="text-body-lg">{role.employer}</span>}
+									primary={
+										<span className="text-body-lg">{role.employer}</span>
+									}
 									secondary={role.title}
 								/>
 							</ListItem>

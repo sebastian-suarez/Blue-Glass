@@ -311,9 +311,7 @@ export function TableCell({
 	return (
 		<Component
 			ref={ref}
-			scope={
-				isHeader ? (scope ?? (section === "head" ? "col" : "row")) : scope
-			}
+			scope={isHeader ? (scope ?? (section === "head" ? "col" : "row")) : scope}
 			aria-sort={
 				isHeader && sortDirection ? ariaSort[sortDirection] : undefined
 			}

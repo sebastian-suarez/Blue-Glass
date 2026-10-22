@@ -87,10 +87,7 @@ function DiagramHeader() {
 			>
 				<div style={{ display: "grid", gap: 2 }}>
 					<span className="text-subtitle">How this site works</span>
-					<span
-						className="text-micro"
-						style={{ color: "var(--color-muted)" }}
-					>
+					<span className="text-micro" style={{ color: "var(--color-muted)" }}>
 						A merged pull request, published and served.
 					</span>
 				</div>

@@ -5,12 +5,7 @@ import { cx } from "../../internal/cx.js";
 import { Icon } from "../Icon/index.js";
 
 export type ChipTone =
-	| "default"
-	| "accent"
-	| "danger"
-	| "warning"
-	| "success"
-	| "info";
+	"default" | "accent" | "danger" | "warning" | "success" | "info";
 
 export type ChipProps = Omit<React.HTMLAttributes<HTMLElement>, "onClick"> & {
 	/**

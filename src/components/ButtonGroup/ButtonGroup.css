@@ -154,7 +154,9 @@
 		justify-content: flex-start;
 		padding-inline: 2px;
 	}
-	.gl-button-group-vertical.gl-button-group-text .gl-button + .gl-button::before {
+	.gl-button-group-vertical.gl-button-group-text
+		.gl-button
+		+ .gl-button::before {
 		display: none;
 	}
 

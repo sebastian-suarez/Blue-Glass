@@ -80,7 +80,9 @@ test("hydrating the server HTML raises no error, changes nothing and animates no
 	});
 	container.innerHTML = html;
 	const children = [
-		...container.querySelectorAll<HTMLElement>("#transition, [data-transition]"),
+		...container.querySelectorAll<HTMLElement>(
+			"#transition, [data-transition]",
+		),
 	];
 	expect(children).toHaveLength(6);
 	for (const element of children) {

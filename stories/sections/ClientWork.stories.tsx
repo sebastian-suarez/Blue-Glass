@@ -135,7 +135,10 @@ const stripeAccess: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [{ text: "Express.js backend", bold: true }, "subscription status"],
+			lines: [
+				{ text: "Express.js backend", bold: true },
+				"subscription status",
+			],
 			tone: "accent",
 		},
 		{

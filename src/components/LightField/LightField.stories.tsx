@@ -69,8 +69,7 @@ export const Default: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"compact: the rings and fold scaled to whatever box holds them.",
+				story: "compact: the rings and fold scaled to whatever box holds them.",
 			},
 		},
 	},

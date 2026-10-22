@@ -82,11 +82,7 @@ const scale: ReadonlyArray<{
 				"19px / 1.6",
 				"Node.js, TypeScript and AWS backends for product teams.",
 			],
-			[
-				"lede-sm",
-				"18px / 1.6",
-				"Owned two microservices for the mobile apps.",
-			],
+			["lede-sm", "18px / 1.6", "Owned two microservices for the mobile apps."],
 			[
 				"body-lg",
 				"17px / 1.5 · −0.02em",
@@ -302,7 +298,9 @@ function ClientWorkPanel() {
 				</Typography>
 				<Typography variant="body-lg">
 					{/* A word joiner after the dash keeps the range on one line. */}
-					{"Cut PDF generation time from about 6 seconds to 10–\u206020 milliseconds."}
+					{
+						"Cut PDF generation time from about 6 seconds to 10–\u206020 milliseconds."
+					}
 				</Typography>
 				<Typography
 					variant="nano"
@@ -332,11 +330,7 @@ export const Default: Story = {
 			<Typography gutterBottom variant="heading">
 				What I bring to a team
 			</Typography>
-			<Typography
-				variant="body-sm"
-				color="muted"
-				style={{ maxWidth: "62ch" }}
-			>
+			<Typography variant="body-sm" color="muted" style={{ maxWidth: "62ch" }}>
 				Node.js and TypeScript services with Clean Architecture boundaries and
 				DDD vocabulary. Java and Spring before that.
 			</Typography>

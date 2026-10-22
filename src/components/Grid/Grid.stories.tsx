@@ -236,7 +236,9 @@ export const Variants: Story = {
 						<Cell accent>{"offset={{ md: 7 }}"}</Cell>
 					</Grid>
 				</Grid>
-				<Caption>offset pushes an item from where it would sit, as in MUI</Caption>
+				<Caption>
+					offset pushes an item from where it would sit, as in MUI
+				</Caption>
 			</Stack>
 			<Stack gap={8}>
 				<Grid container spacing="xl">

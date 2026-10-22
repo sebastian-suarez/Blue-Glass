@@ -126,7 +126,10 @@ function ReviewGate() {
 			}}
 		>
 			<path d="M 180 72 L 283 72" style={edge} />
-			<path d="M 287 72 L 279 76 L 279 68 Z" style={{ fill: "var(--dg-edge)" }} />
+			<path
+				d="M 287 72 L 279 76 L 279 68 Z"
+				style={{ fill: "var(--dg-edge)" }}
+			/>
 			<path d="M 289 96 L 187 96" style={{ ...edge, strokeDasharray: "6 6" }} />
 			<path
 				d="M 183 96 L 191 92 L 191 100 Z"
@@ -146,7 +149,10 @@ function ReviewGate() {
 				d="M 380 150 L 90 150 L 90 127"
 				style={{ ...edge, strokeLinejoin: "round" }}
 			/>
-			<path d="M 90 123 L 86 131 L 94 131 Z" style={{ fill: "var(--dg-edge)" }} />
+			<path
+				d="M 90 123 L 86 131 L 94 131 Z"
+				style={{ fill: "var(--dg-edge)" }}
+			/>
 			<GateNode
 				x={0}
 				y={48}

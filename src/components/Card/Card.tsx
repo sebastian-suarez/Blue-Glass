@@ -240,7 +240,9 @@ export function CardActions({
 							// Chips have no ids of their own, and the list is rendered as given.
 							// eslint-disable-next-line @eslint-react/no-array-index-key
 							key={isTextChip(chip) ? `${chip}-${index}` : index}
-							className={isTextChip(chip) ? "gl-card-chip" : "gl-card-chips-item"}
+							className={
+								isTextChip(chip) ? "gl-card-chip" : "gl-card-chips-item"
+							}
 						>
 							{chip}
 						</li>

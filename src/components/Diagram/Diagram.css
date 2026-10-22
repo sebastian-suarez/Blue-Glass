@@ -170,7 +170,10 @@
 	/* Hidden entrance states: screen only, so print never catches a diagram mid-entrance.
    `armed` is set by the component; `gl-js` on <html> is the site's `.js` pre-state for server-rendered pages. */
 	@media screen and (prefers-reduced-motion: no-preference) {
-		:is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal]))
+		:is(
+				.gl-dg-wrap[data-reveal="armed"],
+				:root.gl-js .gl-dg-wrap:not([data-reveal])
+			)
 			:is(
 				.gl-dg-region,
 				.gl-dg-label,
@@ -180,12 +183,18 @@
 			) {
 			opacity: 0;
 		}
-		:is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal]))
+		:is(
+				.gl-dg-wrap[data-reveal="armed"],
+				:root.gl-js .gl-dg-wrap:not([data-reveal])
+			)
 			.gl-dg-node {
 			opacity: 0;
 			transform: translateY(8px);
 		}
-		:is(.gl-dg-wrap[data-reveal="armed"], :root.gl-js .gl-dg-wrap:not([data-reveal]))
+		:is(
+				.gl-dg-wrap[data-reveal="armed"],
+				:root.gl-js .gl-dg-wrap:not([data-reveal])
+			)
 			.gl-dg-edge-draw {
 			stroke-dashoffset: 1;
 		}

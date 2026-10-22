@@ -90,7 +90,8 @@ export const Variants: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "Specific sides win over axes, axes over all: pt beats py beats p.",
+				story:
+					"Specific sides win over axes, axes over all: pt beats py beats p.",
 			},
 		},
 	},
@@ -98,7 +99,11 @@ export const Variants: Story = {
 		<>
 			<Row gap={14} align="flex-end">
 				{paddings.map(([token, length]) => (
-					<Labelled key={token} label={`p="${token}" · ${length}`} minHeight={110}>
+					<Labelled
+						key={token}
+						label={`p="${token}" · ${length}`}
+						minHeight={110}
+					>
 						<Box p={token} style={well}>
 							<span style={plate}>{token}</span>
 						</Box>
@@ -222,7 +227,10 @@ export const Example: Story = {
 					<span className="text-title-sm">
 						Open to backend lead and architect roles.
 					</span>
-					<span className="text-body-sm" style={{ color: "var(--color-muted)" }}>
+					<span
+						className="text-body-sm"
+						style={{ color: "var(--color-muted)" }}
+					>
 						Product teams first. Remote from Medellín, Colombia, with full
 						US-hours overlap.
 					</span>
@@ -235,7 +243,9 @@ export const Example: Story = {
 				</Box>
 			</Paper>
 			<Caption>
-				{'Paper gives the surface; Box p="2xl" gives the card padding, gap="md" the rhythm.'}
+				{
+					'Paper gives the surface; Box p="2xl" gives the card padding, gap="md" the rhythm.'
+				}
 			</Caption>
 		</>
 	),

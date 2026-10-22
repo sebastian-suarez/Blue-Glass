@@ -282,10 +282,7 @@ const pipeline: DiagramData = {
 			y: 260,
 			w: 180,
 			h: 72,
-			lines: [
-				{ text: "AWS + Cloudflare", bold: true },
-				"IAM and site stacks",
-			],
+			lines: [{ text: "AWS + Cloudflare", bold: true }, "IAM and site stacks"],
 		},
 	],
 	edges: [
@@ -674,10 +671,7 @@ const reviewGate: DiagramData = {
 			y: 48,
 			w: 180,
 			h: 72,
-			lines: [
-				{ text: "Codex review gate", bold: true },
-				"GPT-6 Astra, xhigh",
-			],
+			lines: [{ text: "Codex review gate", bold: true }, "GPT-6 Astra, xhigh"],
 			tone: "accent",
 		},
 		{

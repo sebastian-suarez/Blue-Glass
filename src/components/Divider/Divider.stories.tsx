@@ -4,12 +4,7 @@ import { componentDocs } from "../../../stories/blocks/component-docs.js";
 import { Caption, Row, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Button } from "../Button/index.js";
 import { Icon } from "../Icon/index.js";
-import {
-	List,
-	ListItem,
-	ListItemIcon,
-	ListItemText,
-} from "../List/index.js";
+import { List, ListItem, ListItemIcon, ListItemText } from "../List/index.js";
 import { Paper } from "../Paper/index.js";
 import { Typography } from "../Typography/index.js";
 import { Divider } from "./Divider.js";

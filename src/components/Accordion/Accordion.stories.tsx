@@ -95,7 +95,14 @@ const capabilities: PaneAccordionItem[] = [
 		title: "Backend",
 		tone: "default",
 		text: "Node.js and TypeScript services with Clean Architecture boundaries and DDD vocabulary. Java and Spring before that.",
-		chips: ["Node.js", "TypeScript", "Express.js", "NestJS", "REST APIs", "DDD"],
+		chips: [
+			"Node.js",
+			"TypeScript",
+			"Express.js",
+			"NestJS",
+			"REST APIs",
+			"DDD",
+		],
 	},
 	{
 		title: "Frontend & mobile",
@@ -177,7 +184,9 @@ function OneOpenAtATime() {
 						setOpen(isExpanded ? project.id : false);
 					}}
 				>
-					<AccordionSummary meta={project.meta}>{project.title}</AccordionSummary>
+					<AccordionSummary meta={project.meta}>
+						{project.title}
+					</AccordionSummary>
 					<AccordionDetails inset={false}>
 						<p>{project.text}</p>
 					</AccordionDetails>
@@ -313,8 +322,8 @@ export const Variants: Story = {
 			<Stack gap={8}>
 				<OneOpenAtATime />
 				<Caption>
-					controlled: one open at a time (expanded + onChange); details run
-					full width with inset=false
+					controlled: one open at a time (expanded + onChange); details run full
+					width with inset=false
 				</Caption>
 			</Stack>
 			<Stack gap={8}>

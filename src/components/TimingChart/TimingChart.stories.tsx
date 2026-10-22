@@ -121,7 +121,9 @@ export const Variants: Story = {
 				<Figure caption="PDF generation, before and after.">
 					<TimingChart data={pdfTiming} minScale={0.6} />
 				</Figure>
-				<Caption>minScale 0.6 in a narrow host: it scrolls, with the hint</Caption>
+				<Caption>
+					minScale 0.6 in a narrow host: it scrolls, with the hint
+				</Caption>
 			</Stack>
 		</>
 	),
@@ -189,7 +191,9 @@ export const Example: Story = {
 					Outcome
 				</span>
 				<p className="text-body-lg" style={{ margin: 0 }}>
-					{"Cut PDF generation time from about 6 seconds to 10–⁠20 milliseconds."}
+					{
+						"Cut PDF generation time from about 6 seconds to 10–⁠20 milliseconds."
+					}
 				</p>
 			</div>
 			<Figure caption="PDF generation for one training specification, on a linear scale.">

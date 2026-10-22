@@ -106,10 +106,7 @@ export const Example: Story = {
 		},
 	},
 	render: () => (
-		<Paper
-			component="figure"
-			style={{ margin: 0, padding: 28, maxWidth: 560 }}
-		>
+		<Paper component="figure" style={{ margin: 0, padding: 28, maxWidth: 560 }}>
 			<Paper
 				variant="inset"
 				style={{

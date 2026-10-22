@@ -116,10 +116,7 @@ function ProjectViews() {
 			>
 				<div style={{ display: "grid", gap: 2 }}>
 					<span className="text-subtitle">RS50 force-feedback bridge</span>
-					<span
-						className="text-micro"
-						style={{ color: "var(--color-muted)" }}
-					>
+					<span className="text-micro" style={{ color: "var(--color-muted)" }}>
 						Rust · Wine · macOS
 					</span>
 				</div>

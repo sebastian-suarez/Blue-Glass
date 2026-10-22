@@ -166,9 +166,9 @@ type AccordionContextValue = {
 	regionId: string;
 };
 
-const AccordionContext = React.createContext<
-	AccordionContextValue | undefined
->(undefined);
+const AccordionContext = React.createContext<AccordionContextValue | undefined>(
+	undefined,
+);
 
 /**
 The heading elements Base UI's Header renders as, by level.

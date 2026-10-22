@@ -130,8 +130,8 @@ export const Variants: Story = {
 					note="the full width, up to the cap"
 				/>
 				<Caption>
-					At this card&apos;s real width every cap is wider than 90%, so only the
-					gutters show.
+					At this card&apos;s real width every cap is wider than 90%, so only
+					the gutters show.
 				</Caption>
 			</Stack>
 		</>

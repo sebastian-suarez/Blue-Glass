@@ -15,7 +15,8 @@ const data: DiagramData = {
 	width: 600,
 	height: 120,
 	label: "Two hops",
-	description: "A request goes from the browser to the edge, then to the bucket.",
+	description:
+		"A request goes from the browser to the edge, then to the bucket.",
 	nodes: [
 		{ x: 0, y: 24, w: 160, h: 72, lines: ["Browser"] },
 		{ x: 220, y: 24, w: 160, h: 72, lines: ["Edge"] },

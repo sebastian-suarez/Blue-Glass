@@ -87,7 +87,9 @@ function Transitions() {
 					</Zoom>
 				</Specimen>
 				<Specimen label="Slide">
-					<div style={{ overflow: "hidden", borderRadius: "var(--radius-panel)" }}>
+					<div
+						style={{ overflow: "hidden", borderRadius: "var(--radius-panel)" }}
+					>
 						<Slide in={isShown} direction="right">
 							<Paper style={box}>
 								<span className="text-caption">Slide</span>

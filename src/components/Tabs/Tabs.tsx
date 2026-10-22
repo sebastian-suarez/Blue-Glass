@@ -258,7 +258,10 @@ export function Tabs({
 					orb: child.props.orb ?? ((items.length % 3) as 0 | 1 | 2),
 				}),
 			);
-			items.push({ value: tabValue, isDisabled: Boolean(child.props.disabled) });
+			items.push({
+				value: tabValue,
+				isDisabled: Boolean(child.props.disabled),
+			});
 		} else {
 			panels.push(child);
 		}
@@ -303,7 +306,10 @@ export function Tabs({
 	}, []);
 	// Keyed by content, so hasPanel stays the same function while the panels do.
 	const panelKey = [...childPanels].map(keyOf).join("\n");
-	const panelKeys = React.useMemo(() => new Set(panelKey.split("\n")), [panelKey]);
+	const panelKeys = React.useMemo(
+		() => new Set(panelKey.split("\n")),
+		[panelKey],
+	);
 	const hasPanel = React.useCallback(
 		(tabValue: TabValue) =>
 			panelKeys.has(keyOf(tabValue)) || registered.includes(tabValue),
