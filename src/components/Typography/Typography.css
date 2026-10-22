@@ -1,0 +1,86 @@
+/* Blue Glass — Typography, ported from design-system/components/Typography/styles.css. */
+
+@layer gl-components {
+	/* Typography — the type tokens (.text-* from tokens.css) on the right element. The token class sets
+   family, size, line height, weight and tracking; this file only adds what tokens don't carry. */
+	.gl-typography {
+		margin: 0;
+	}
+
+	/* Colour tokens, all 4.5:1 or more on color-canvas and glass. */
+	.gl-typography-ink {
+		color: var(--color-ink);
+	}
+	.gl-typography-muted {
+		color: var(--color-muted);
+	}
+	.gl-typography-ink-soft {
+		color: var(--ink-soft);
+	}
+	.gl-typography-accent {
+		color: var(--color-accent);
+	}
+	.gl-typography-link {
+		color: var(--color-link);
+	}
+	.gl-typography-blue-deep {
+		color: var(--color-blue-deep);
+	}
+	.gl-typography-danger {
+		color: var(--danger);
+	}
+	.gl-typography-warning {
+		color: var(--warning);
+	}
+	.gl-typography-success {
+		color: var(--success);
+	}
+	.gl-typography-info {
+		color: var(--info);
+	}
+
+	.gl-typography-align-left {
+		text-align: left;
+	}
+	.gl-typography-align-center {
+		text-align: center;
+	}
+	.gl-typography-align-right {
+		text-align: right;
+	}
+	.gl-typography-align-justify {
+		text-align: justify;
+	}
+
+	/* Line breaking: the site balances h1–h4 and makes paragraphs pretty (global.css @layer base). */
+	.gl-typography-balance {
+		text-wrap: balance;
+	}
+	.gl-typography-pretty {
+		text-wrap: pretty;
+	}
+	.gl-typography-wrap {
+		text-wrap: wrap;
+	}
+
+	.gl-typography-nowrap {
+		display: block;
+		min-width: 0;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.gl-typography-gutter {
+		margin-bottom: 0.5em;
+	}
+
+	/* Inline code: .hiw-section code */
+	.gl-typography-code {
+		padding: 1px 5px;
+		border: 1px solid rgba(88, 108, 143, 0.16);
+		border-radius: var(--radius-code);
+		background: rgba(255, 255, 255, 0.7);
+		overflow-wrap: anywhere;
+	}
+}

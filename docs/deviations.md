@@ -73,3 +73,15 @@ Adapter: `src/internal/modal.tsx`. Tests: `src/internal/modal.test.tsx`.
 - **Actual:** a Modal rendered inside another Modal, or inside any Base UI popup, goes into that layer's portal element, Base UI's default. One outside every portal goes into body, and `container` still picks the mount point.
 - **Reason:** Base UI's focus trap and `aria-hidden` marking treat a nested popup as part of its parent when it sits inside the parent's portal.
 - **Test:** "only the top layer reports Escape and backdrop clicks; the lock lasts until the last locking layer closes".
+
+## Transitions
+
+Adapter: `src/internal/transition.ts`. Tests: `src/internal/transition.test.ts` and `transition.browser.test.tsx`, and on the components `src/components/Transitions/Transitions.server.test.ts` and `Transitions.test.tsx`.
+
+### 9. `appear` runs on client-side mounts only
+
+- **Components:** Transition, Fade, Grow, Zoom, Slide, Collapse and `useTransition`, and the overlays that animate through them.
+- **Documented:** `appear` (default true; Collapse's false) runs "the enter transition on first mount when `in` starts true".
+- **Actual:** a child that is `in` when React renders it on the server, or hydrates it, starts entered whatever `appear` says: its server HTML is visible, and hydrating it reports `onEntered` and animates nothing, as `appear={false}` would. `appear` still runs the enter transition on client-side mounts: `createRoot`, a portal, a Suspense boundary that renders on the client, and anything mounted after hydration.
+- **Reason:** server HTML must be usable before hydration (`docs/package-plan.md`). The reference starts an appearing child at exited, so its server HTML holds `<Fade in>` and the other transitions at opacity 0 and visibility hidden until the script runs, a reference defect (`docs/reference-defects.md`).
+- **Tests:** "content that is in renders entered and visible, even with appear" (the adapter's and the components'); "hydrating the server HTML raises no error and animates nothing" (the adapter's) and "… changes nothing and animates nothing" (the components'); the behaviour specs' client mounts with `appear`.

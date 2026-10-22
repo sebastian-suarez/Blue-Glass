@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type CSSProperties, type ReactNode, useId } from "react";
+import { Icon, type IconName } from "../src/components/Icon/index.ts";
 import { componentDocs } from "./blocks/component-docs.tsx";
 import { Caption, Labelled, Row, Tiles } from "./blocks/preview-kit.tsx";
 
@@ -16,42 +17,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// Glyphs from Icon's set (24-unit grid, 1.5 stroke), until Icon is ported in phase 1.
-const glyphs = {
-	check: ["M5 12.5l4.5 4.5L19 7.5"],
-	file: ["M6.5 3.5h7L18 8v12.5H6.5Z", "M13.5 3.5V8H18"],
-	folder: [
-		"M3.5 7.5A1.5 1.5 0 0 1 5 6h4.5l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18Z",
-	],
-	layers: ["M12 4 3 9l9 5 9-5Z", "M3 14l9 5 9-5"],
-};
-
-function Glyph({
-	name,
-	size = 18,
-}: {
-	readonly name: keyof typeof glyphs;
-	readonly size?: number;
-}) {
-	return (
-		<svg
-			width={size}
-			height={size}
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={1.5}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			aria-hidden="true"
-		>
-			{glyphs[name].map((d) => (
-				<path key={d} d={d} />
-			))}
-		</svg>
-	);
-}
-
 // One row with Select's Option markup, on divs: XO's jsx-a11y rules reject a listbox role on
 // ul and an option role on li.
 function Option({
@@ -63,7 +28,7 @@ function Option({
 }: {
 	readonly children: ReactNode;
 	readonly secondary?: string;
-	readonly icon?: keyof typeof glyphs;
+	readonly icon?: IconName;
 	readonly selected?: boolean;
 	readonly disabled?: boolean;
 }) {
@@ -76,7 +41,7 @@ function Option({
 		>
 			{icon === undefined ? null : (
 				<span className="gl-option-icon">
-					<Glyph name={icon} />
+					<Icon name={icon} />
 				</span>
 			)}
 			<span className="gl-option-text">
@@ -87,7 +52,7 @@ function Option({
 			</span>
 			{selected ? (
 				<span className="gl-option-end">
-					<Glyph name="check" size={16} />
+					<Icon name="check" size={16} />
 				</span>
 			) : null}
 		</div>

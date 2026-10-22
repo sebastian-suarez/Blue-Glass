@@ -3,5 +3,15 @@
    which the build checks. */
 @import "./tokens.css";
 @import "./foundation.css";
+@import "../components/Icon/Icon.css";
+@import "../components/Transitions/Transitions.css";
+@import "../components/Paper/Paper.css";
+@import "../components/Button/Button.css";
+@import "../components/Typography/Typography.css";
+@import "../components/Divider/Divider.css";
+@import "../components/LightField/LightField.css";
+@import "../components/Container/Container.css";
+@import "../components/Grid/Grid.css";
+@import "../components/Stack/Stack.css";
 @import "../components/Diagram/Diagram.css";
 @import "../components/TimingChart/TimingChart.css";
