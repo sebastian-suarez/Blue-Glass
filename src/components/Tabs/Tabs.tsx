@@ -49,7 +49,7 @@ export type TabsProps = Omit<
 	*/
 	onChange?: (event: React.SyntheticEvent, value: TabValue) => void;
 	/**
-	underline: tabs in a row over a sliding ink mark (default). pill: the site's nav pill. side: the client-work selector beside its panels.
+	`underline`: tabs in a row over a sliding ink mark (default). `pill`: the site's nav pill. `side`: the client-work selector beside its panels.
 	*/
 	variant?: "underline" | "pill" | "side";
 	/**
@@ -134,7 +134,7 @@ const TabsContext = React.createContext<TabsContextValue | undefined>(
 // Values become id fragments: keep [A-Za-z0-9-] and encode the rest, so "a b" and "a-b" stay apart.
 const slug = (value: TabValue) =>
 	String(value).replaceAll(
-		/[^\dA-Za-z-]/gu,
+		/[^\d\-A-Za-z]/gu,
 		(character) => `_${(character.codePointAt(0) ?? 0).toString(16)}`,
 	);
 const tabIdOf = (baseId: string, value: TabValue) =>
@@ -148,6 +148,15 @@ const keyOf = (value: TabValue) => `${typeof value}:${value}`;
 The indicator's width: the site's mobile tab mark is 16px.
 */
 const markWidth = 16;
+
+/**
+Where the indicator starts to sit centred under `tab`, to the pixel.
+*/
+function markLeft(tab: HTMLElement): number {
+	const halfTab = tab.offsetWidth / 2;
+	const halfMark = markWidth / 2;
+	return Math.round(tab.offsetLeft + halfTab - halfMark);
+}
 
 /**
 Room kept clear of the faded edge when a tab is scrolled into view.
@@ -305,7 +314,7 @@ export function Tabs({
 		};
 	}, []);
 	// Keyed by content, so hasPanel stays the same function while the panels do.
-	const panelKey = [...childPanels].map(keyOf).join("\n");
+	const panelKey = [...childPanels].map((panel) => keyOf(panel)).join("\n");
 	const panelKeys = React.useMemo(
 		() => new Set(panelKey.split("\n")),
 		[panelKey],
@@ -339,28 +348,33 @@ export function Tabs({
 
 		const max = isVertical ? 0 : list.scrollWidth - list.clientWidth;
 		const position = Math.abs(list.scrollLeft);
-		const start = max > 1 && position > 1;
-		const end = max > 1 && position < max - 1;
+		const isPastStart = max > 1 && position > 1;
+		const isBeforeEnd = max > 1 && position < max - 1;
 		const shown = shownRef.current;
-		if (shown.overflow.start !== start || shown.overflow.end !== end) {
-			shown.overflow = { start, end };
+		if (
+			shown.overflow.start !== isPastStart ||
+			shown.overflow.end !== isBeforeEnd
+		) {
+			shown.overflow = { start: isPastStart, end: isBeforeEnd };
 			setOverflow(shown.overflow);
 		}
 
-		if (variant === "underline") {
-			const tab =
-				value === false
-					? null
-					: ownerDocument(list).getElementById(tabIdOf(baseId, value));
-			const x =
-				tab && list.contains(tab)
-					? Math.round(tab.offsetLeft + tab.offsetWidth / 2 - markWidth / 2)
-					: undefined;
-			if (shown.mark !== x) {
-				shown.mark = x;
-				setMark(x);
-			}
+		if (variant !== "underline") {
+			return;
 		}
+
+		const tab =
+			value === false
+				? null
+				: // eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
+					ownerDocument(list).getElementById(tabIdOf(baseId, value));
+		const x = tab && list.contains(tab) ? markLeft(tab) : undefined;
+		if (shown.mark === x) {
+			return;
+		}
+
+		shown.mark = x;
+		setMark(x);
 	});
 	const tabKey = items
 		.map((item) => `${String(item.value)}:${item.isDisabled ? 1 : 0}`)
@@ -398,6 +412,7 @@ export function Tabs({
 			value !== false &&
 			list.scrollWidth > list.clientWidth + 1
 		) {
+			// eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
 			const tab = ownerDocument(list).getElementById(tabIdOf(baseId, value));
 			if (tab && list.contains(tab)) {
 				revealTab(list, tab, hasPaintedRef.current && !shouldReduceMotion);
@@ -411,7 +426,8 @@ export function Tabs({
 	const enabledFrom = (from: number, direction: 1 | -1) => {
 		const count = items.length;
 		for (let step = 1; step <= count; step++) {
-			const item = items[(((from + direction * step) % count) + count) % count];
+			const offset = direction * step;
+			const item = items[(((from + offset) % count) + count) % count];
 			if (!item.isDisabled) {
 				return item.value;
 			}
@@ -461,6 +477,7 @@ export function Tabs({
 		}
 
 		event.preventDefault();
+		// eslint-disable-next-line unicorn/prefer-query-selector -- An id from useId and slug needs no CSS escaping here.
 		ownerDocument(list).getElementById(tabIdOf(baseId, target))?.focus();
 		// Automatic activation: the selection follows focus.
 		select(event, target);
@@ -496,7 +513,7 @@ export function Tabs({
 				onValueChange={(next: TabValue | null, details) => {
 					// Only presses come through: the root is controlled, so Base UI never picks a
 					// value of its own.
-					if (details.reason === "none" && next !== null) {
+					if (next !== null && details.reason === "none") {
 						select(documentedEvent(details.event), next);
 					}
 				}}
@@ -582,7 +599,8 @@ export function Tab({
 }: TabProps & { ref?: React.Ref<HTMLButtonElement> }) {
 	const context = React.use(TabsContext);
 	const variant = context?.variant ?? "underline";
-	let lead: React.ReactNode = icon ? (
+	const hasIcon = Boolean(icon);
+	let lead: React.ReactNode = hasIcon ? (
 		<span className="gl-tab-icon">{icon}</span>
 	) : null;
 	if (variant === "side" && icon === undefined) {

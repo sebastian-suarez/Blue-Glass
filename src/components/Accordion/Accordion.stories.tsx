@@ -172,7 +172,7 @@ function CareerRow({
 /**
 The site's own projects, one open at a time: expanded and onChange kept in this parent.
 */
-function OneOpenAtATime() {
+function SingleOpenProjects() {
 	const [open, setOpen] = useState<string | false>("vsebcode");
 	return (
 		<div className="gl-accordion-surface">
@@ -277,10 +277,8 @@ export const Variants: Story = {
 						<AccordionDetails meta="Remote">
 							<p>
 								{
-									"I reworked PDF generation for training specifications. Before: about 6 seconds. After: 10–"
+									"I reworked PDF generation for training specifications. Before: about 6 seconds. After: 10–\u{2060}20 milliseconds."
 								}
-								{"⁠"}
-								{"20 milliseconds."}
 							</p>
 						</AccordionDetails>
 					</Accordion>
@@ -320,7 +318,7 @@ export const Variants: Story = {
 				</Caption>
 			</Stack>
 			<Stack gap={8}>
-				<OneOpenAtATime />
+				<SingleOpenProjects />
 				<Caption>
 					controlled: one open at a time (expanded + onChange); details run full
 					width with inset=false

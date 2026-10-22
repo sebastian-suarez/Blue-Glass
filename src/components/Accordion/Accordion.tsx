@@ -45,6 +45,7 @@ export type AccordionProps = Omit<
 	/**
 	Called when the summary is pressed, with the requested state.
 	*/
+	// eslint-disable-next-line unicorn/consistent-boolean-name -- The documented parameter name.
 	onChange?: (event: React.SyntheticEvent, expanded: boolean) => void;
 	/**
 	Dims the row; the summary can't be focused or pressed.
@@ -57,7 +58,6 @@ export type AccordionProps = Omit<
 	/**
 	Props for the Collapse that reveals the details: timeout ({ enter: 300, exit: 200 } by default), unmountOnExit.
 	*/
-	// eslint-disable-next-line @typescript-eslint/naming-convention -- The documented name.
 	TransitionProps?: Partial<
 		Pick<
 			CollapseProps,
@@ -124,7 +124,7 @@ export type PaneAccordionItem = {
 	*/
 	more?: React.ReactNode;
 	/**
-	default: glass-control. alt: fainter glass. accent: the ring-tinted pane with an accent title; one per set.
+	`default`: glass-control. `alt`: fainter glass. `accent`: the ring-tinted pane with an accent title; one per set.
 	*/
 	tone?: "default" | "alt" | "accent";
 };
@@ -138,8 +138,8 @@ export type PaneAccordionProps = Omit<
 	*/
 	items: PaneAccordionItem[];
 	/**
-	auto: the site's layout, panes side by side, stacked at 899px and below.
-	horizontal: side by side down to 701px, stacked on phones. vertical: always stacked.
+	`auto`: the site's layout, panes side by side, stacked at 899px and below.
+	`horizontal`: side by side down to 701px, stacked on phones. `vertical`: always stacked.
 	*/
 	orientation?: "auto" | "horizontal" | "vertical";
 	/**
@@ -173,6 +173,7 @@ const AccordionContext = React.createContext<AccordionContextValue | undefined>(
 /**
 The heading elements Base UI's Header renders as, by level.
 */
+/* eslint-disable jsx-a11y-x/heading-has-content -- Base UI's Header renders the summary inside. */
 const headings: Record<HeadingLevel, React.ReactElement> = {
 	2: <h2 />,
 	3: <h3 />,
@@ -180,6 +181,7 @@ const headings: Record<HeadingLevel, React.ReactElement> = {
 	5: <h5 />,
 	6: <h6 />,
 };
+/* eslint-enable jsx-a11y-x/heading-has-content */
 
 /**
 The value of a row's one item, and the root's value open and closed.
@@ -308,13 +310,27 @@ function moveBetweenRows(event: React.KeyboardEvent<HTMLButtonElement>): void {
 		return;
 	}
 
-	let next = count - 1;
-	if (key === "ArrowDown") {
-		next = (index + 1) % count;
-	} else if (key === "ArrowUp") {
-		next = (index - 1 + count) % count;
-	} else if (key === "Home") {
-		next = 0;
+	let next: number;
+	switch (key) {
+		case "ArrowDown": {
+			next = (index + 1) % count;
+			break;
+		}
+
+		case "ArrowUp": {
+			next = (index - 1 + count) % count;
+			break;
+		}
+
+		case "Home": {
+			next = 0;
+			break;
+		}
+
+		case "End": {
+			next = count - 1;
+			break;
+		}
 	}
 
 	event.preventDefault();
@@ -342,6 +358,7 @@ export function AccordionSummary({
 	const context = React.use(AccordionContext);
 	const hasSecondary = isShown(secondary);
 	const hasMeta = isShown(meta);
+	const hasExpandIcon = Boolean(expandIcon);
 	const buttonClassName = cx(
 		"gl-accordion-summary",
 		hasSecondary && "gl-accordion-summary-has-secondary",
@@ -364,7 +381,7 @@ export function AccordionSummary({
 			{hasMeta ? (
 				<span className="gl-accordion-summary-meta">{meta}</span>
 			) : null}
-			{expandIcon ? (
+			{hasExpandIcon ? (
 				<span className="gl-accordion-expand-icon" aria-hidden="true">
 					{expandIcon}
 				</span>
@@ -448,14 +465,16 @@ export function AccordionDetails({
 	);
 }
 
-/* ---------- PaneAccordion: the site's horizontal accordion (.acc, scripts/accordion.ts) ---------- */
+// ---------- PaneAccordion: the site's horizontal accordion (.acc, scripts/accordion.ts) ----------
 
 function slugOf(title: React.ReactNode, index: number): string {
 	if (typeof title === "string" || typeof title === "number") {
+		// The first replace turns each run of other characters into one dash, so at most one
+		// dash sits at either end.
 		const slug = String(title)
 			.toLowerCase()
-			.replaceAll(/[^a-z\d]+/gu, "-")
-			.replaceAll(/^-+|-+$/gu, "");
+			.replaceAll(/[^\da-z]+/gu, "-")
+			.replaceAll(/^-|-$/gu, "");
 		if (slug !== "") {
 			return slug;
 		}
@@ -530,16 +549,17 @@ export function PaneAccordion({
 		const keys = isCompact && !isControlled ? ids : (defaultOpen ?? []);
 		return Object.fromEntries(keys.map((key) => [key, true]));
 	});
-	const stateOf = (key: string): boolean | undefined =>
+	// Open, closed, or undefined while the pane is untouched.
+	const isPaneOpen = (key: string): boolean | undefined =>
 		isControlled ? (open ?? []).includes(key) : inner[key];
 
 	const press = useEventCallback((event: React.SyntheticEvent, key: string) => {
-		const isOpening = stateOf(key) !== true;
+		const isOpening = !isPaneOpen(key);
 		const next: Record<string, boolean> = {};
 		for (const other of ids) {
-			const state = stateOf(other);
-			if (state !== undefined) {
-				next[other] = state;
+			const isOpen = isPaneOpen(other);
+			if (isOpen !== undefined) {
+				next[other] = isOpen;
 			}
 		}
 
@@ -588,13 +608,29 @@ export function PaneAccordion({
 			return;
 		}
 
-		let next = count - 1;
-		if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-			next = (index + 1) % count;
-		} else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-			next = (index - 1 + count) % count;
-		} else if (event.key === "Home") {
-			next = 0;
+		let next: number;
+		switch (event.key) {
+			case "ArrowRight":
+			case "ArrowDown": {
+				next = (index + 1) % count;
+				break;
+			}
+
+			case "ArrowLeft":
+			case "ArrowUp": {
+				next = (index - 1 + count) % count;
+				break;
+			}
+
+			case "Home": {
+				next = 0;
+				break;
+			}
+
+			default: {
+				// End.
+				next = count - 1;
+			}
 		}
 
 		event.preventDefault();
@@ -606,7 +642,7 @@ export function PaneAccordion({
 			ref={ref}
 			multiple
 			id={id}
-			value={ids.filter((key) => stateOf(key) === true)}
+			value={ids.filter((key) => isPaneOpen(key))}
 			className={cx(
 				"gl-pane-accordion",
 				`gl-pane-accordion-${orientation}`,
@@ -624,7 +660,7 @@ export function PaneAccordion({
 						key={key}
 						value={key}
 						className={cx("gl-pane", `gl-pane-${item.tone ?? "default"}`)}
-						data-state={stateName(stateOf(key))}
+						data-state={stateName(isPaneOpen(key))}
 						onOpenChange={(_isOpen, details) => {
 							press(documentedEvent(details.event), key);
 						}}
