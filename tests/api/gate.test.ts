@@ -91,6 +91,16 @@ const mutations: Record<string, Expectation> = {
 			`"useTransition(1).current"`,
 		],
 	},
+	"rest-any": {
+		failing: [
+			"ToggleButtonProps#any-props",
+			"ToggleButton#any-props",
+			"TabsProps#any-props",
+			"Tabs#any-props",
+			"useMediaQuery#any",
+		],
+		says: [`"onChange(0)"`, `"onChange(1)"`, `"useMediaQuery(0)"`],
+	},
 	refs: {
 		failing: [
 			"Button#props",

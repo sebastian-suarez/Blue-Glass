@@ -138,24 +138,35 @@ type NewAny<Documented, Package, Depth extends unknown[] = []> =
 						  >;
 
 /**
-The parameter indexes both functions have. Mapping over an intersection of keys, rather
-than over one side's keys with -?, keeps optional parameters' undefined on both sides:
-otherwise the two sides would never look identical and the walk would never stop early.
+The documented parameter indexes. Mapping over an intersection of keys, rather than over
+Documented's keys with -?, keeps optional parameters' undefined: otherwise the two sides would
+never look identical and the walk would never stop early.
 */
-type SharedIndexes<Documented, Package> = keyof Documented &
-	keyof Package &
-	`${number}`;
+type DocumentedIndexes<Documented> = keyof Documented & `${number}`;
+
+/**
+The package's parameter at a documented index: its own, else its rest parameter's element
+(`...args: any[]` has a numeric index but no "0" key), else never when it takes fewer.
+*/
+type ParameterAt<
+	Package extends readonly unknown[],
+	K extends string,
+> = K extends keyof Package
+	? Package[K]
+	: number extends Package["length"]
+		? Package[number]
+		: never;
 
 type NewAnyInParameters<
 	Documented extends readonly unknown[],
 	Package extends readonly unknown[],
 	Depth extends unknown[],
 > = {
-	[K in SharedIndexes<Documented, Package>]: Prefix<
+	[K in DocumentedIndexes<Documented>]: Prefix<
 		`(${K})`,
-		NewAny<Documented[K], Package[K], Depth>
+		NewAny<Documented[K], ParameterAt<Package, K>, Depth>
 	>;
-}[SharedIndexes<Documented, Package>];
+}[DocumentedIndexes<Documented>];
 
 /**
 True when either side is never: then there's no place both have, so nothing to compare.
