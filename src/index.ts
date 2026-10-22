@@ -26,6 +26,7 @@ export {
 	LightField,
 	type LightFieldProps,
 } from "./components/LightField/index.js";
+export { Link, type LinkProps } from "./components/Link/index.js";
 export * from "./components/Box/index.js";
 export * from "./components/Container/index.js";
 export * from "./components/Grid/index.js";

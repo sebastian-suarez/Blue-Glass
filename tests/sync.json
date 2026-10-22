@@ -137,6 +137,15 @@
 				"components/ButtonGroup/preview.html": "8541145583762922",
 				"components/ButtonGroup/reference.tsx": "d5f0def5cc33432d"
 			}
+		},
+		"Link": {
+			"files": {
+				"components/Link/README.md": "4d14307fbc071945",
+				"components/Link/api.d.ts": "d77740caefb813da",
+				"components/Link/styles.css": "0301fa9535f969c6",
+				"components/Link/preview.html": "ca2c3adf6e2da28e",
+				"components/Link/reference.tsx": "b9339a0c7afa11ca"
+			}
 		}
 	}
 }
