@@ -59,7 +59,23 @@ function glyph(name: string): string {
 }
 
 /**
-Waits for the photo to load: the image named by alt is an <img> showing the source.
+Whether the element shows on screen: not hidden or transparent, and with a size.
+*/
+function isShown(element: Element): boolean {
+	const box = element.getBoundingClientRect();
+	return (
+		element.checkVisibility({
+			opacityProperty: true,
+			visibilityProperty: true,
+		}) &&
+		box.width > 0 &&
+		box.height > 0
+	);
+}
+
+/**
+Waits for the photo to load: the image named by alt is an <img> showing the source, decoded and
+visible.
 */
 async function loadedPhoto(name: string, source: string) {
 	return vi.waitFor(
@@ -71,10 +87,22 @@ async function loadedPhoto(name: string, source: string) {
 
 			expect(image).toHaveAttribute("src", source);
 			expect(image.complete).toBe(true);
+			expect(image.naturalWidth).toBeGreaterThan(0);
+			expect(isShown(image)).toBe(true);
 			return image;
 		},
 		{ timeout: 5000 },
 	);
+}
+
+/**
+Checks that no photo shows. A failed one may stay in the document, hidden; one still exposed to
+assistive tech would also make the avatar's role query find two images.
+*/
+function expectNoPhotoShown() {
+	for (const image of document.querySelectorAll("img")) {
+		expect(isShown(image)).toBe(false);
+	}
 }
 
 /**
@@ -184,7 +212,7 @@ describe("Avatar", () => {
 		await vi.waitFor(() => {
 			expect(avatar("Sebastian Suarez")).toHaveTextContent("S");
 		});
-		expect(document.querySelector("img")).toBeNull();
+		expectNoPhotoShown();
 	});
 
 	test("when the photo fails with no children, the initials from alt show", async () => {
@@ -192,7 +220,7 @@ describe("Avatar", () => {
 		await vi.waitFor(() => {
 			expect(avatar("Sebastian Suarez")).toHaveTextContent("SS");
 		});
-		expect(document.querySelector("img")).toBeNull();
+		expectNoPhotoShown();
 	});
 
 	test("when the photo fails with no children or alt, the user glyph shows", async () => {
@@ -202,7 +230,7 @@ describe("Avatar", () => {
 		await vi.waitFor(() => {
 			expect(ref.current?.querySelector("svg")?.getHTML()).toBe(user);
 		});
-		expect(document.querySelector("img")).toBeNull();
+		expectNoPhotoShown();
 	});
 
 	test("variant is circle by default, and each variant puts its class on the root", () => {
