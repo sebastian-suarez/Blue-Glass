@@ -18,7 +18,11 @@ type Story = StoryObj<typeof meta>;
 
 type MediaName = keyof typeof media;
 
-const names = Object.keys(media) as MediaName[];
+// Storybook's docgen attaches __docgenInfo to exported objects, so keep only the queries.
+const names = Object.keys(media).filter(
+	(name): name is MediaName =>
+		typeof (media as Record<string, unknown>)[name] === "string",
+);
 
 /**
 One query's live answer: ink while it matches, glass while it doesn't, and in words for screen
