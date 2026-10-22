@@ -6,9 +6,10 @@ The two-mode MenuItem, and the standalone MenuList it shares with Menu
 Why two modes: Base UI's `Menu.Item` throws "MenuRootContext is missing" outside `Menu.Root`, but
 the documented MenuList also stands alone, as an always-visible menu. So a context tells each
 MenuItem where it is:
-- Inside a Base UI menu (under `BaseMenuItems`, which `MenuPopupList` puts inside `Menu.Popup`),
-  it renders `Menu.Item`, or `Menu.LinkItem` with `href`. Base UI then owns the roving focus,
-  the arrow keys, Home and End, typeahead, wrapping (`loopFocus`) and closing on a choice.
+- Inside a Base UI menu (under `BaseMenuItems`, which the Menu port puts inside Base UI's
+  `Menu.List`, and `MenuPopupList` inside `Menu.Popup`), it renders `Menu.Item`, or
+  `Menu.LinkItem` with `href`. Base UI then owns the roving focus, the arrow keys, Home and End,
+  typeahead, wrapping (`loopFocus`) and closing on a choice.
 - Inside the standalone `MenuList`, or with no list at all, it renders the reference's own item,
   and `MenuList` owns the roving tab stop and the keys, ported from the reference.
 
@@ -24,22 +25,25 @@ handler (`preventBaseUIHandler`). The item also remembers its React click event
 `documentedEvent(details.event, popup)`. A disabled item stays reachable with the arrows but
 its `onClick` doesn't run.
 
-`MenuList` here is the reference's, ready for the Menu port to grow: `autoFocusItem`, `dense`,
-`disableListWrap`, Up and Down, Home and End, typeahead (a word typed within 500ms, or one
-letter repeated to cycle), and Tab leaves it. Its roving tab stop is set during render (the
-selected item, else the first enabled one, among the MenuItems it holds directly), so the server
-HTML already has one tabbable item and hydration matches it. Items it can't see while rendering
-(inside a fragment, or rendered by another component) are each tabbable until it mounts, so the
-server HTML can still be tabbed into. Once mounted, the list keeps the stop where focus last was. Inside a Base UI menu the list is `Menu.Popup` itself
-(`MenuPopupList`), so `disableListWrap` becomes `Menu.Root`'s `loopFocus={false}`.
+`MenuList` here is the reference's, which the Menu module exports as the standalone MenuList:
+`autoFocusItem`, `dense`, `disableListWrap`, Up and Down, Home and End, typeahead (a word typed
+within 500ms, or one letter repeated to cycle), and Tab leaves it. Its roving tab stop is set
+during render (the selected item, else the first enabled one, among the MenuItems it holds
+directly), so the server HTML already has one tabbable item and hydration matches it. Items it
+can't see while rendering (inside a fragment, or rendered by another component) are each
+tabbable until it mounts, so the server HTML can still be tabbed into. Once mounted, the list
+keeps the stop where focus last was. Inside a Base UI menu the list is Base UI's (`Menu.List` in
+the Menu port, `Menu.Popup` itself in `MenuPopupList`), so `disableListWrap` becomes
+`Menu.Root`'s `loopFocus={false}`.
 
-`BaseUiMenu` is the smallest controlled Base UI menu around `MenuPopupList`, enough for tests;
-the Menu port replaces it. Its `onClose` gets `documentedEvent` and `menuCloseReason` from the
-events adapter.
+`BaseUiMenu` is the smallest controlled Base UI menu around `MenuPopupList`, enough for this
+adapter's tests; the Menu port (src/components/Menu) is the documented one. Its `onClose` gets
+`documentedEvent` and `menuCloseReason` from the events adapter.
 */
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import type { BaseUIEvent } from "@base-ui/react/types";
 import * as React from "react";
+import { Icon } from "../components/Icon/Icon.js";
 import { cx } from "./cx.js";
 import {
 	documentedEvent,
@@ -435,28 +439,6 @@ export type MenuItemProps = Omit<
 	ref?: React.Ref<HTMLElement>;
 };
 
-// The reference's Icon "check" glyph, inlined until the Icon component is ported.
-function CheckIcon() {
-	return (
-		<svg
-			aria-hidden
-			className="gl-icon"
-			data-icon="check"
-			viewBox="0 0 24 24"
-			width={16}
-			height={16}
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={1.5}
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			focusable="false"
-		>
-			<path d="M5 12.5l4.5 4.5L19 7.5" />
-		</svg>
-	);
-}
-
 function MenuItemContent({
 	icon,
 	secondary,
@@ -484,7 +466,7 @@ function MenuItemContent({
 			{hasEnd ? (
 				<span className="gl-option-end">
 					{end}
-					{isSelected ? <CheckIcon /> : null}
+					{isSelected ? <Icon name="check" size={16} /> : null}
 				</span>
 			) : null}
 		</>

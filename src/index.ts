@@ -94,6 +94,15 @@ export {
 } from "./components/LightField/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export {
+	type MenuCloseReason,
+	type MenuListProps,
+	MenuList,
+	type MenuItemProps,
+	MenuItem,
+	type MenuProps,
+	Menu,
+} from "./components/Menu/index.js";
+export {
 	type TabValue,
 	type TabsProps,
 	Tabs,
