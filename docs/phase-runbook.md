@@ -4,14 +4,15 @@ How to run one phase of `docs/package-plan.md` in a fresh session. One phase per
 
 ## Status
 
-| Phase                                                  | State                               | Tip on `feat/blue-glass` | Review log                |
-| ------------------------------------------------------ | ----------------------------------- | ------------------------ | ------------------------- |
-| 0. Foundation                                          | Done 21 Oct 2026, two review rounds | `f07c0d9`                | `docs/reviews/phase-0.md` |
-| 1. Site set (26)                                       | Done 22 Oct 2026, two review rounds | `432ca83`                | `docs/reviews/phase-1.md` |
-| 2. Overlays and feedback (17)                          | Next, waiting for your go           |                          |                           |
-| 3. Inputs (11)                                         |                                     |                          |                           |
-| 4. Navigation and layout (7)                           |                                     |                          |                           |
-| 5. Charts (5), then README, CHANGELOG, release dry run |                                     |                          |                           |
+| Phase                                                  | State                               | Tip on `feat/blue-glass` | Review log                  |
+| ------------------------------------------------------ | ----------------------------------- | ------------------------ | --------------------------- |
+| 0. Foundation                                          | Done 21 Oct 2026, two review rounds | `f07c0d9`                | `docs/reviews/phase-0.md`   |
+| 1. Site set (26)                                       | Done 22 Oct 2026, two review rounds | `432ca83`                | `docs/reviews/phase-1.md`   |
+| Storybook controls and viewports (between 1 and 2)     | Done 22 Oct 2026, two review rounds | `b11d4fd`                | `docs/reviews/storybook.md` |
+| 2. Overlays and feedback (17)                          | Next, waiting for your go           |                          |                             |
+| 3. Inputs (11)                                         |                                     |                          |                             |
+| 4. Navigation and layout (7)                           |                                     |                          |                             |
+| 5. Charts (5), then README, CHANGELOG, release dry run |                                     |                          |                             |
 
 Each session updates its row as its last commit.
 
