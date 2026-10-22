@@ -19,8 +19,6 @@
 		line-height: 1.45;
 		text-align: left;
 		overflow-wrap: break-word;
-		/* Inside a modal layer, whose root lets the pointer through, it still takes it. */
-		pointer-events: auto;
 	}
 	.gl-tooltip-arrowed {
 		--gl-tooltip-gap: 12px;

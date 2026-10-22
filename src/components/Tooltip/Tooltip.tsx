@@ -239,27 +239,37 @@ function statusOf({
 	return open && transitionStatus !== "starting" ? "entered" : "exiting";
 }
 
+type Container = HTMLElement | React.RefObject<HTMLElement>;
+
 /**
-Base UI's portal container for the popper slot's `container`: an element as it is, and a
-function's element once mounted, while Base UI waits (null). Null, or a function that finds
-none, is Base UI's default: body, or the Base UI popup it sits in.
+Body, the documented mount point. Base UI's own default is the Base UI popup the tooltip sits in
+(a Dialog's portal), so it's passed explicitly, as a ref: Base UI reads it only once mounted, so
+body is never read while rendering.
+*/
+const body: React.RefObject<HTMLElement> = {
+	get current() {
+		return document.body;
+	},
+};
+
+/**
+The portal's container for the popper slot's `container`: an element as it is, a function's
+element once mounted (Base UI waits on null until then), and body for none.
 */
 function usePortalContainer(
 	container: PopperProps["container"],
-): HTMLElement | null | undefined {
-	const [resolved, setResolved] = React.useState<HTMLElement | null | undefined>(
-		null,
-	);
+): Container | null {
+	const [resolved, setResolved] = React.useState<Container | null>(null);
 	useIsoLayoutEffect(() => {
 		if (typeof container === "function") {
-			setResolved((container() as HTMLElement | null) ?? undefined);
+			setResolved((container() as HTMLElement | null) ?? body);
 		}
 	}, [container]);
 	if (typeof container === "function") {
 		return resolved;
 	}
 
-	return (container as HTMLElement | null | undefined) ?? undefined;
+	return (container as HTMLElement | null | undefined) ?? body;
 }
 
 /**
