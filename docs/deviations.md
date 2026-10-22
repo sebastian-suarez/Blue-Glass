@@ -60,11 +60,11 @@ Adapter: `src/internal/modal.tsx`. Tests: `src/internal/modal.test.tsx`.
 
 ### 7. The rest of the page is `aria-hidden`, not inert
 
-- **Component:** Modal (Dialog and Drawer take the same flags).
+- **Component:** Modal (Dialog and Drawer take the same flags). Popover and Menu too: the reference puts them on its Modal, as a transparent layer with the same flags.
 - **Documented:** Modal makes "the rest of the page inert", while `hideBackdrop` keeps the page behind "clickable outside the content" and `disableEnforceFocus` lets "focus leave the content".
-- **Actual:** while focus is enforced, the rest of the page is `aria-hidden` (Base UI marks it through the portal; the adapter does in place, with `disablePortal`), and the page is never `inert`. With stacked layers, the page is hidden for the top one, and a layer opened above an in-place one stays exposed, whether it renders in place or through a portal. With `hideBackdrop` an outside press reaches the page, and focus comes back to the content unless `disableEnforceFocus` is set. With `disableEnforceFocus` Tab reaches the page, which stays exposed to assistive tech.
+- **Actual:** while focus is enforced, the rest of the page is `aria-hidden` (Base UI marks it through the portal; the adapter does in place, with `disablePortal`), and the page is never `inert`. With stacked layers, the page is hidden for the top one, and a layer opened above an in-place one stays exposed, whether it renders in place or through a portal. With `hideBackdrop` an outside press reaches the page, and focus comes back to the content unless `disableEnforceFocus` is set. With `disableEnforceFocus` Tab reaches the page, which stays exposed to assistive tech. Popover's and Menu's layer (`src/internal/popup-layer.tsx`) marks the page itself, through the portal and in place, since Base UI's Popover and Menu don't, and it shares Modal's stack.
 - **Reason:** `inert` would break both documented flags. The reference sets it and breaks them, a reference defect.
-- **Tests:** the eight `disableEnforceFocus` × `disableScrollLock` × `hideBackdrop` cases, each through the portal and in place, "focus, Tab, scroll, outside clicks, Escape and focus return follow the flags"; "a layer opened over an in-place one is exposed, and closing it hands back".
+- **Tests:** the eight `disableEnforceFocus` × `disableScrollLock` × `hideBackdrop` cases, each through the portal and in place, "focus, Tab, scroll, outside clicks, Escape and focus return follow the flags"; "a layer opened over an in-place one is exposed, and closing it hands back". Popover: "while it's open the rest of the page is hidden from assistive tech, and exposed again once it closes"; "disableEnforceFocus lets focus leave for the page, which stays exposed, while the popover stays open".
 
 ### 8. A nested Modal renders inside the outer one's portal
 
