@@ -248,6 +248,42 @@
 				"components/Accordion/preview.html": "5cf629db02aa8e4f",
 				"components/Accordion/reference.tsx": "ecf35c4dcbe0f2ec"
 			}
+		},
+		"Portal": {
+			"files": {
+				"components/Portal/README.md": "30bc7dd87969cc6d",
+				"components/Portal/api.d.ts": "7422ca1b17e6df30",
+				"components/Portal/styles.css": "59ff1d966c9e556b",
+				"components/Portal/preview.html": "5d092a4adff68d97",
+				"components/Portal/reference.tsx": "06475a66011f3426"
+			}
+		},
+		"Popper": {
+			"files": {
+				"components/Popper/README.md": "320829e9de721eea",
+				"components/Popper/api.d.ts": "0946a77755dfe9c9",
+				"components/Popper/styles.css": "60a7db2c2b93ce15",
+				"components/Popper/preview.html": "8f6974200e1bb75f",
+				"components/Popper/reference.tsx": "c9b3bef191a97583"
+			}
+		},
+		"ClickAwayListener": {
+			"files": {
+				"components/ClickAwayListener/README.md": "16922718c1176313",
+				"components/ClickAwayListener/api.d.ts": "05172aac60be5016",
+				"components/ClickAwayListener/styles.css": "c814d98619324aa6",
+				"components/ClickAwayListener/preview.html": "9bd264e6b4e09663",
+				"components/ClickAwayListener/reference.tsx": "81b0b9d6a714ee94"
+			}
+		},
+		"TextareaAutosize": {
+			"files": {
+				"components/TextareaAutosize/README.md": "dee88fa29cc7732a",
+				"components/TextareaAutosize/api.d.ts": "9c05ba225ed5690c",
+				"components/TextareaAutosize/styles.css": "b4bcd57f27162007",
+				"components/TextareaAutosize/preview.html": "aea4fa1fddaa1e7f",
+				"components/TextareaAutosize/reference.tsx": "73db287aa691d9ba"
+			}
 		}
 	}
 }
