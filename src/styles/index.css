@@ -4,3 +4,4 @@
 @import "./tokens.css";
 @import "./foundation.css";
 @import "../components/Diagram/Diagram.css";
+@import "../components/TimingChart/TimingChart.css";

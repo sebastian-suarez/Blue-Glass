@@ -1,3 +1,4 @@
 // Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
 // and tests/api checks the exports against design-system/source/index.d.ts.
 export * from "./components/Diagram/index.js";
+export * from "./components/TimingChart/index.js";
