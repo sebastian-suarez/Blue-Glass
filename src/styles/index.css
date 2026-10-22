@@ -3,6 +3,7 @@
    which the build checks. */
 @import "./tokens.css";
 @import "./foundation.css";
+@import "../components/Divider/Divider.css";
 @import "../components/Container/Container.css";
 @import "../components/Grid/Grid.css";
 @import "../components/Stack/Stack.css";
