@@ -10,7 +10,7 @@ This step overturns a rejection in phase 1's log: "Chip's, ToggleButton's and Ic
 
 ## Round 1, 22 Oct 2026
 
-- **Verification first.** All 12 "Done means" commands passed on `5b7a3f5`. Every one of the 81 existing stories rendered the same server HTML as before (a before-and-after snapshot), and each of the 7 phone twins matched its source. A scripted pass through the built Storybook passed 13 of 13 checks: the panel, clicks, the toolbar and the docs page.
+- **Verification first.** All 12 "Done means" commands passed on `5b7a3f5`. Every one of the 81 existing stories rendered the same server HTML as before (a before-and-after snapshot), and each of the 7 phone twins matched its source. A scripted pass through the built Storybook passed 13 of 13 checks: the panel, clicks, the toolbar and the docs page. The script is a scratch file (`.cache/ui-check.ts`, which git ignores), not part of the suite.
 - **Code-only review: Fable** (xhigh). It saw only `d88ed08..5b7a3f5`, and ran the guard, the typecheck and Tabs' stories.
 - **Task-aware review: Codex** (GPT-6 Astra), `/codex:adversarial-review` against `d88ed08`.
 - Both returned findings, each checked against Storybook's installed code, a run, or the repo's docs before acting.
@@ -34,3 +34,28 @@ Found while fixing:
 
 - **An arg routed only into a hidden element passes the guard** (Codex, medium). The guard proves an arg reaches the server HTML. Proving that a reader sees the change would mean a browser oracle for each story. `tests/README.md` now states the limit, and `stories/README.md` asks for a check in Storybook.
 - **The layout gate renders each twin again at both widths** (Fable, low). The twins render byte for byte like their sources, so the result can't differ. The cost is 23 seconds of `check:layout`, and leaving the gate unchanged keeps its self-test as it was.
+
+## Round 2, 22 Oct 2026
+
+The round reviewed round 1's fixes, `5b7a3f5..c8c215a`.
+
+- **Verification first.** All 12 "Done means" commands passed on `c8c215a` (1,700 tests). The scratch pass through the rebuilt Storybook passed 21 of 21 checks, the docs pages and the console included.
+- **Code-only review: Fable** (xhigh). It saw only the diff, and drove its own build of Storybook (28 of 28 of its checks passed).
+- **Task-aware review: Codex** (GPT-6 Astra), `/codex:adversarial-review` against `5b7a3f5`, with the task and round 1's log, and asked to attack the rejections too. Neither rejection drew a new finding.
+- Codex returned "needs attention"; Fable found no high or medium defect.
+
+| #   | From           | Finding                                                                                                                 | Check                                                                                 | Disposition                                                                                                                                                     |
+| --- | -------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Codex (medium) | A click then Reset, coalesced into one render, leaves the canvas on the click while the panel shows the reset           | Read: `LiveArg` resynced only when the incoming arg differed from the last one it saw | Fixed (`e0d37be`): on the canvas the arg is the truth and changes go straight to `updateArgs`. Only a docs page (`viewMode === "docs"`) keeps a local value     |
+| 2   | Codex (medium) | An anonymous `memo` component isn't found by name                                                                       | Read: `memo((props) => …)` has no runtime name                                        | Fixed: the guard finds the meta's component by identity among the component modules' exports. An anonymous fixture passes                                       |
+| 3   | Fable (low)    | The brief says a docs page drops `updateArgs`; the args store still changes, so the canvas then opens on the docs click | Fable's run: after a docs click on Projects, the canvas opened on Projects            | Fixed with #1: a docs page no longer writes the args. The scratch pass checks that the canvas opens on Work after a docs click, and the brief says what happens |
+| 4   | Fable (low)    | The log leans on a browser script that isn't in the repository                                                          | True                                                                                  | Logged as a scratch file (above). Making it a gate is left to you                                                                                               |
+| 5   | Fable (low)    | Two options that render alike pass if both differ from the default                                                      | Read                                                                                  | Fixed: each value must render unlike the default and unlike each other. A fixture fails                                                                         |
+| 6   | Fable (low)    | `tests/README.md`'s `memo` sentence states half the condition                                                           | Read                                                                                  | Fixed with #2: the sentence now describes the lookup by identity                                                                                                |
+
+After the fixes, the guard passes 69 of 69, the 81 existing stories render as before, axe passes all 88 stories, and the scratch pass passes 22 of 22.
+
+Two rounds is the limit, so this step goes to you with these open:
+
+- **The browser check isn't a gate.** Only the scratch script sees a story break after a click or on its docs page. Phase 2 checks its overlays in Storybook by hand, as the runbook says, unless you want the script made into a gate first.
+- **Portalled overlays and the guard.** A portal renders nothing on the server, so a Tooltip's or Popover's `open` may change nothing in the server HTML. The runbook tells phase 2 to list such an arg under `afterHydration`, with its reason.
