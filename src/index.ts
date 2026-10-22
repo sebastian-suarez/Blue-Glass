@@ -17,6 +17,17 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
+export {
+	type AccordionProps,
+	Accordion,
+	type AccordionSummaryProps,
+	AccordionSummary,
+	type AccordionDetailsProps,
+	AccordionDetails,
+	type PaneAccordionItem,
+	type PaneAccordionProps,
+	PaneAccordion,
+} from "./components/Accordion/index.js";
 export { Paper, type PaperProps } from "./components/Paper/index.js";
 export {
 	LightField,
