@@ -1,9 +1,4 @@
-/* Blue Glass — Tooltip, ported from design-system/components/Tooltip/styles.css. The surface is
-   Base UI's Tooltip.Popup, which carries the side it landed on as data-side; the layer is its
-   Positioner. */
-
 @layer gl-components {
-	/* Tooltip — a short ink label (the fill and lift of .btn-primary) floating at z-tooltip. */
 	.gl-tooltip {
 		--gl-tooltip-gap: 8px;
 		position: relative;
@@ -23,8 +18,6 @@
 	.gl-tooltip-arrowed {
 		--gl-tooltip-gap: 12px;
 	}
-
-	/* A bridge over the gap to the anchor, so the pointer can move onto the tooltip without it closing. */
 	.gl-tooltip::before {
 		content: "";
 		position: absolute;
@@ -56,8 +49,6 @@
 	.gl-tooltip-popper-static .gl-tooltip::before {
 		display: none;
 	}
-
-	/* Arrow: an 8px square turned 45deg, half under the surface, centred on the anchor. */
 	.gl-tooltip-arrow {
 		position: absolute;
 		width: 8px;

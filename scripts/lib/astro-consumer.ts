@@ -1,8 +1,3 @@
-/**
-The Astro consumer (tests/consumer/astro), a stand-in for the portfolio. Once
-scripts/check-package.ts has installed the packed package there and built the site, these
-checks serve its dist/ and load the pages in Chromium, with JavaScript on and off.
-*/
 import fs from "node:fs";
 import http from "node:http";
 import { createRequire } from "node:module";
@@ -17,21 +12,9 @@ export const consumer = path.join(root, "tests/consumer/astro");
 export type Outcome = { name: string; ok: boolean; detail: string };
 
 type PageCheck = {
-	/**
-	Its line in the summary.
-	*/
 	name: string;
-	/**
-	The page's path in the built site.
-	*/
 	path: string;
-	/**
-	With JavaScript off, the page is what a reader gets from the server HTML alone.
-	*/
 	javaScript: boolean;
-	/**
-	Throws when the page fails the check, else returns the details for the summary.
-	*/
 	run: (page: Page) => Promise<string>;
 };
 
@@ -42,7 +25,6 @@ type TypeStyle = {
 	letterSpacing?: string;
 };
 
-// The layer order to declare next to Tailwind 4, as src/styles/global.css does.
 const documentedLayers = [
 	"theme",
 	"base",
@@ -53,9 +35,6 @@ const documentedLayers = [
 	"utilities",
 ];
 
-/**
-A type style from the installed package's tokens.json, which its type classes are built from.
-*/
 function typeStyle(name: string): TypeStyle {
 	const { resolve } = createRequire(path.join(consumer, "package.json"));
 	const tokens = JSON.parse(
@@ -97,16 +76,11 @@ async function computedStyle(page: Page, selector: string) {
 	});
 }
 
-/**
-Runs in the page. The top-level cascade layers in the order the stylesheets establish them
-(a layer's first mention fixes its place), and the layer holding each selector's rule.
-*/
 function cascade(selectors: string[]) {
 	const layers: string[] = [];
 	const layerOf: Record<string, string> = {};
 	const visit = (rules: CSSRuleList, layer: string) => {
 		for (const rule of rules) {
-			// Style rules come first: with CSS nesting they're grouping rules too.
 			if (rule instanceof CSSStyleRule) {
 				if (selectors.includes(rule.selectorText)) {
 					layerOf[rule.selectorText] = layer;
@@ -139,9 +113,6 @@ function cascade(selectors: string[]) {
 	return { layers, layerOf };
 }
 
-/**
-The checks, page by page. Phase 1 adds its pages here (tests/consumer/astro/README.md).
-*/
 const checks: PageCheck[] = [
 	{
 		name: "stylesheet",
@@ -168,10 +139,8 @@ const checks: PageCheck[] = [
 		javaScript: true,
 		async run(page) {
 			const style = await computedStyle(page, "#utilities-win");
-			// Tailwind 4's text-2xl is 1.5rem, and font-semibold is 600.
 			expectEqual(style.fontSize, "24px", "font-size");
 			expectEqual(style.fontWeight, "600", "font-weight");
-			// The type class still sets what Tailwind leaves alone.
 			const tracking = typeStyle("text-heading").letterSpacing ?? "0em";
 			expectEqual(
 				Number(style.letterSpacing.replace(/px$/v, "")).toFixed(2),
@@ -253,10 +222,6 @@ const contentTypes: Record<string, string> = {
 	".woff2": "font/woff2",
 };
 
-/**
-Serves a built site on a free local port the way a static host does: a folder's index.html
-for its path, and 404 for anything missing.
-*/
 async function serve(directory: string) {
 	const server = http.createServer((request, response) => {
 		const { pathname } = new URL(request.url ?? "/", "http://localhost");
@@ -293,10 +258,6 @@ async function serve(directory: string) {
 	};
 }
 
-/**
-Loads the check's page in a fresh context. Page errors, console errors and failed requests
-fail the check too.
-*/
 async function runCheck(
 	browser: Browser,
 	origin: string,
@@ -337,10 +298,6 @@ async function runCheck(
 	}
 }
 
-/**
-Serves the consumer's dist/ and runs every check on it, in parallel. The outcomes keep the
-checks' order.
-*/
 export async function checkSite(): Promise<Outcome[]> {
 	const server = await serve(path.join(consumer, "dist"));
 	try {

@@ -26,14 +26,10 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
-*/
 function boldLine(text: string): Exclude<DiagramNodeLine, string> {
 	return { text, bold: true };
 }
 
-// The preview's datasets, from facts in the CV.
 const cmsPipeline: DiagramData = {
 	id: "cms-pipeline",
 	width: 760,
@@ -197,7 +193,6 @@ const stripeAccess: DiagramData = {
 	],
 };
 
-// "10–20 ms" keeps the preview's word joiner (U+2060), so the range never breaks.
 const pdfTiming: TimingData = {
 	id: "pdf-timing",
 	label: "PDF generation time, before and after the rework",
@@ -269,10 +264,6 @@ const projects: Array<{
 	},
 ];
 
-/**
-The folio: the side selector beside a glass stage, one panel per project with its outcome and
-the figure that proves it.
-*/
 function Folio() {
 	return (
 		<Tabs variant="side" aria-label="Choose a project" defaultValue="limber">
@@ -412,8 +403,6 @@ export const Default: Story = {
 	),
 };
 
-// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

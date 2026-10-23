@@ -1,10 +1,4 @@
 "use client";
-/**
-TextareaAutosize, ported from design-system/components/TextareaAutosize/reference.tsx: a plain
-textarea whose height follows its content, measured after every render (so a controlled value
-resizes it) and on input when uncontrolled, and again when its width changes and the text
-rewraps. The server HTML is a textarea `minRows` rows tall; the browser sets the height.
-*/
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
 import { useForkRef, useIsoLayoutEffect } from "../../internal/hooks.js";
@@ -16,19 +10,10 @@ function toPixels(value: string): number {
 
 export type TextareaAutosizeProps =
 	React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-		/**
-		Height floor in rows. Default 1.
-		*/
 		minRows?: number;
-		/**
-		Height ceiling in rows; scrolls past it.
-		*/
 		maxRows?: number;
 	};
 
-/**
-A plain textarea that grows with its content between minRows and maxRows. Unstyled: TextField styles it.
-*/
 export function TextareaAutosize({
 	minRows = 1,
 	maxRows,
@@ -55,7 +40,6 @@ export function TextareaAutosize({
 			toPixels(computed.paddingTop) + toPixels(computed.paddingBottom);
 		const border =
 			toPixels(computed.borderTopWidth) + toPixels(computed.borderBottomWidth);
-		// Collapsed first, so scrollHeight is the content's own height.
 		textarea.style.height = "0px";
 		const content = textarea.scrollHeight - padding;
 		let height = Math.max(content, minRows * line);
@@ -80,7 +64,6 @@ export function TextareaAutosize({
 			return;
 		}
 
-		// Only a new width rewraps the text; the height is the one resize sets.
 		let lastWidth = textarea.clientWidth;
 		const observer = new ResizeObserver(() => {
 			if (textarea.clientWidth === lastWidth) {
@@ -105,7 +88,6 @@ export function TextareaAutosize({
 			value={value}
 			onChange={(event) => {
 				onChange?.(event);
-				// A controlled value resizes on the render it causes.
 				if (value === undefined) {
 					resize();
 				}

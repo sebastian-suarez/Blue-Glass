@@ -21,15 +21,10 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
-*/
 function boldLine(text: string): Exclude<DiagramNodeLine, string> {
 	return { text, bold: true };
 }
 
-// The preview picks these with useMediaQuery(media.tablet) and useMediaQuery(media.phone). Here
-// CSS picks them under the same queries, so the server HTML lays out as the hydrated page does.
 const styles = `
 .hero {
 	grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
@@ -58,7 +53,6 @@ const styles = `
 }
 `;
 
-// The site's own deploy flow, the preview's dataset.
 const siteFlow: DiagramData = {
 	id: "site-flow",
 	width: 600,
@@ -240,8 +234,6 @@ export const Default: Story = {
 	),
 };
 
-// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

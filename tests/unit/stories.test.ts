@@ -1,10 +1,3 @@
-/**
-The stories guard (stories/README.md). A component's Default story lists in
-parameters.controls.include the args it renders through, and changing any one of them changes its
-server HTML. Every other story turns Controls off, so no panel offers a control that does nothing.
-Each stories file tests/ssr/layout.json lists by the current phase has a story pinned to the phone
-viewport, so its axe test runs at 390px too. tests/unit/stories.json holds the exemptions.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -50,18 +43,11 @@ const compose = (module: CsfModule) =>
 
 type Controls = { readonly disable?: boolean; readonly include?: unknown };
 
-/**
-The annotations the guard reads straight from a stories module: the inferred argTypes on a
-composed story cover every arg, so only these say which ones the story declares.
-*/
 type Annotations = {
 	readonly component?: unknown;
 	readonly argTypes?: Readonly<Record<string, unknown>>;
 };
 
-/**
-A component's props, each with its options when its type is a union of literals.
-*/
 type Props = ReadonlyMap<string, readonly unknown[] | undefined>;
 
 const root = path.resolve(import.meta.dirname, "../..");
@@ -98,9 +84,6 @@ async function load(file: string): Promise<CsfModule> {
 
 const notLiteral = Symbol("not a literal");
 
-/**
-A prop's options, when its type is a union of string, number or boolean literals.
-*/
 function literalOptions(
 	checker: ts.TypeChecker,
 	type: ts.Type,
@@ -120,10 +103,6 @@ function literalOptions(
 	return values.includes(notLiteral) ? undefined : values;
 }
 
-/**
-A component's props, from the type of its first parameter. Undefined for an export that isn't a
-component: no call signature, or a name that doesn't start with a capital.
-*/
 function propsOf(
 	checker: ts.TypeChecker,
 	symbol: ts.Symbol,
@@ -149,11 +128,6 @@ function propsOf(
 	);
 }
 
-/**
-The props of every component src/components and the guard's fixtures export, read from their
-types as Storybook's docgen reads them for the Controls panel: a union of literals gives a prop
-its options.
-*/
 function readProps(): ReadonlyMap<string, Props> {
 	const config = ts.getParsedCommandLineOfConfigFile(
 		path.join(root, "tsconfig.json"),
@@ -190,8 +164,6 @@ function readProps(): ReadonlyMap<string, Props> {
 
 const componentProps = readProps();
 
-// The component modules and the fixtures, so a meta's component is found by what it is, not by
-// its runtime name: a memo or an anonymous function has none.
 const componentModules = import.meta.glob<Record<string, unknown>>(
 	[
 		"../../src/components/*/*.tsx",
@@ -215,10 +187,6 @@ const render = (story: ComposedStory, args: Record<string, unknown> = {}) =>
 const controlsOf = (story: ComposedStory) =>
 	(story.parameters.controls ?? {}) as Controls;
 
-/**
-The other values a listed arg can take: every other option when it has options, or else a
-flipped boolean, a moved number or a longer string. Empty when there's none.
-*/
 function alternatives(
 	value: unknown,
 	options: readonly unknown[] | undefined,
@@ -238,15 +206,9 @@ function alternatives(
 	return typeof value === "string" ? [`${value} changed`] : [];
 }
 
-// A default* prop is read only at mount, so its control would do nothing after the first render.
 const isMountOnly = (key: string) =>
 	key.startsWith("default") && key.charAt(7) !== key.charAt(7).toLowerCase();
 
-/**
-What's wrong with a stories module's Controls. In a component's file, Default lists the args it
-renders through, and each value each one can take changes its server HTML; every other story
-turns Controls off. In a docs or section file, every story does.
-*/
 function controlProblems(
 	module: CsfModule,
 	{
@@ -284,7 +246,6 @@ function controlProblems(
 		return [...problems, "Default lists no args in controls.include"];
 	}
 
-	// Storybook gives Controls only to a story whose render takes the args (its arity).
 	if (story.parameters.__isArgsStory !== true) {
 		return [...problems, "Default's render takes no args"];
 	}
@@ -323,7 +284,6 @@ function controlProblems(
 			return [`${key} is read only at mount, so list the controlled prop`];
 		}
 
-		// The story's own argTypes win, as in the panel; a prop's own options come next.
 		const declared =
 			annotations.default?.argTypes?.[key] ??
 			annotations.Default?.argTypes?.[key];
@@ -350,7 +310,6 @@ function controlProblems(
 			return [];
 		}
 
-		// Each value must render unlike the default and unlike every other value.
 		const seen = new Map<string, unknown>([[base, value]]);
 		const dead: string[] = [];
 		for (const other of others) {
@@ -373,10 +332,6 @@ function controlProblems(
 const viewportOf = (story: ComposedStory) =>
 	(story.globals.viewport as { value?: string } | undefined)?.value;
 
-/**
-What's wrong with the phone twins of a stories file the layout gate lists: it needs one, and
-none may show on the docs page.
-*/
 function phoneProblems(module: CsfModule): string[] {
 	const pinned = Object.entries(compose(module)).filter(
 		([, story]) => viewportOf(story) === "phone",

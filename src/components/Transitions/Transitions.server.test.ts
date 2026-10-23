@@ -1,16 +1,9 @@
-/*
-The transitions rendered on the server, in Node with no DOM globals. Transitions.test.tsx renders
-the same tree in Chromium to the same file snapshot, and hydrates it.
-*/
 /* eslint-disable @eslint-react/jsx-no-children-prop -- A Node test is a .ts file, so it builds trees with createElement, which types a required children only as a prop. */
 import { createElement, Fragment } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { Collapse, Fade, Grow, Slide, Transition, Zoom } from "./index.js";
 
-/**
-Content that is `in` when the page renders, with `appear` at its default (Collapse's set).
-*/
 function serverTree() {
 	return createElement(
 		Fragment,
@@ -60,7 +53,6 @@ describe("the transitions on the server", () => {
 		expect(html.match(/data-transition="entered"/gu)).toHaveLength(5);
 		expect(html).toContain('id="transition" data-status="entered"');
 		expect(html).not.toMatch(/opacity:0|visibility:hidden|aria-hidden/u);
-		// Nothing waits away from its place: no start scale, no start offset.
 		expect(html).not.toMatch(/scale\(|translate3d\(/u);
 		expect(html).toContain("grid-template-rows:minmax(0px, 1fr)");
 	});

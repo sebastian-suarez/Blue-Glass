@@ -6,7 +6,6 @@ import { Caption, Stack } from "../../../stories/blocks/preview-kit.js";
 import { Paper } from "../Paper/index.js";
 import { TimingChart, type TimingData } from "./TimingChart.js";
 
-// The preview's datasets. "10–20 ms" keeps its word joiner, so the range never breaks.
 const pdfTiming: TimingData = {
 	id: "pdf-timing",
 	label: "PDF generation time, before and after the rework",
@@ -44,9 +43,6 @@ const payloadSize: TimingData = {
 	],
 };
 
-/**
-The inset well the README puts a chart in: an inset Paper as a figure, with a text-micro caption.
-*/
 function Figure({
 	caption,
 	maxWidth,

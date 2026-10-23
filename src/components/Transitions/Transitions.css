@@ -1,6 +1,3 @@
-/* Transitions, ported from design-system/components/Transitions/styles.css. Their motion is
-   inline per status; Collapse uses the site's grid-rows reveal (.pane .more). */
-
 @layer gl-components {
 	.gl-collapse {
 		min-width: 0;

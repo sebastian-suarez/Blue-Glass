@@ -1,9 +1,3 @@
-// Behaviour specs for Drawer, from design-system/components/Drawer/README.md and api.d.ts. A
-// temporary drawer sits on Modal and takes its flags, with deviations 7 and 8
-// (docs/deviations.md): while focus is kept in, the rest of the page is hidden from assistive
-// tech, never made inert. Modal's own spec covers its flag matrix; these check that Drawer passes
-// each flag on. The panel is found through PaperProps, which reach the glass surface. They run at
-// the default test viewport (414 by 896).
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -21,8 +15,6 @@ beforeEach(() => {
 afterEach(() => {
 	cleanup();
 	window.scrollTo(0, 0);
-	// Once a test unmounts, nothing is left behind: no portal node, no page hidden from assistive
-	// tech or made inert, no scroll lock.
 	expect(
 		[...document.body.children].filter((child) => !bodyBefore.includes(child)),
 	).toEqual([]);
@@ -35,10 +27,6 @@ afterEach(() => {
 	);
 });
 
-/**
-Waits a few frames. Only for checks that something does not happen (focus not moving, the page
-not scrolling), where there is no condition to wait for.
-*/
 async function frames(count = 4) {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -68,17 +56,10 @@ function SiteLinks() {
 
 type PageProps = Omit<DrawerProps, "open" | "onClose"> & {
 	readonly calls?: CloseCall[];
-	/**
-	Whether onClose sets open to false: the parent decides.
-	*/
 	readonly closes?: boolean;
 	readonly pageClicks?: string[];
 };
 
-/**
-The site's menu: the button that opens the drawer, a page button in the strip of scrim a left
-drawer leaves beside it, and the drawer, with open in state.
-*/
 function MenuPage({
 	calls,
 	closes = true,
@@ -125,9 +106,6 @@ function MenuPage({
 	);
 }
 
-/**
-Clicks the page's Menu button and waits for the drawer. Returns the opener, which keeps focus.
-*/
 async function openMenu(drawerName = name) {
 	const opener = screen.getByRole("button", { name: "Menu" });
 	await userEvent.click(opener);
@@ -143,9 +121,6 @@ async function expectFocusInside(element: Element) {
 	await expect.poll(() => element.contains(document.activeElement)).toBe(true);
 }
 
-/**
-Hidden from assistive tech: under aria-hidden (deviation 7) or inert (the reference).
-*/
 function isHiddenFromAssistiveTech(element: Element) {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
@@ -154,7 +129,6 @@ function expectReactEvent(
 	event: React.SyntheticEvent | KeyboardEvent,
 	native: new (type: string) => Event = MouseEvent,
 ) {
-	// A React event (or one shaped like it), not a native one.
 	expect(event).not.toBeInstanceOf(Event);
 	expect((event as React.SyntheticEvent).nativeEvent).toBeInstanceOf(native);
 }
@@ -170,10 +144,6 @@ async function tabTrail(count: number, isShift = false) {
 	return trail;
 }
 
-/**
-Whether each step of the trail moves one place along the cycle of controls (backwards with
-Shift), wrapping at the ends.
-*/
 function followsCycle(
 	trail: Array<Element | null>,
 	controls: Element[],
@@ -192,9 +162,6 @@ function followsCycle(
 
 type Edge = "left" | "right" | "top" | "bottom";
 
-/**
-How far each side of the element is from the same side of the viewport, rounded to the pixel.
-*/
 function gaps(element: Element): Record<Edge, number> {
 	const rect = element.getBoundingClientRect();
 	const { clientWidth, clientHeight } = document.documentElement;
@@ -360,7 +327,6 @@ describe("onClose and its reasons", () => {
 		await userEvent.click(within(drawer).getByRole("button", { name: "Work" }));
 		expect(calls).toEqual([]);
 
-		// The page button sits in the strip of scrim beside the panel.
 		await userEvent.click(page, { force: true });
 		expect(reasons(calls)).toEqual(["backdropClick"]);
 		expectReactEvent(calls[0].event);
@@ -433,7 +399,6 @@ describe("onClose and its reasons", () => {
 		await userEvent.click(
 			within(drawer).getByRole("button", { name: "Close" }),
 		);
-		// Still open each time, so each one reports.
 		expect(reasons(calls)).toEqual([
 			"escapeKeyDown",
 			"backdropClick",
@@ -490,7 +455,6 @@ describe("anchor, inset and width", () => {
 			);
 			await screen.findByRole("dialog", { name: "Filters" });
 			await expect.poll(() => gaps(panel())[anchor]).toBe(12);
-			// It never touches the viewport, and it keeps to its own edge.
 			const all = gaps(panel());
 			expect(Math.min(...Object.values(all))).toBeGreaterThanOrEqual(12);
 			expect(all[opposite[anchor]]).toBeGreaterThan(40);
@@ -540,7 +504,6 @@ describe("anchor, inset and width", () => {
 		},
 	);
 
-	// 320px is 20rem at the 16px root size, 280px 17.5rem.
 	test.each([
 		{ width: undefined, label: "320px by default", rem: 20 },
 		{ width: 280, label: "a number of px", rem: 17.5 },
@@ -556,7 +519,6 @@ describe("anchor, inset and width", () => {
 		const rootFont = Number.parseFloat(
 			getComputedStyle(document.documentElement).fontSize,
 		);
-		// The offsetWidth is the laid-out width, whatever the slide is doing.
 		expect(panel().offsetWidth).toBe(rem * rootFont);
 	});
 
@@ -608,9 +570,6 @@ describe("anchor, inset and width", () => {
 	);
 });
 
-/**
-The preview's bottom sheet: share a project, with the sheet open from the start.
-*/
 function ShareSheet({ calls }: { readonly calls: CloseCall[] }) {
 	const [open, setOpen] = React.useState(true);
 	return (
@@ -638,7 +597,6 @@ describe("the bottom sheet", () => {
 		await expect.poll(() => gaps(panel()).bottom).toBe(12);
 		const { width, height } = panel().getBoundingClientRect();
 
-		// The handle sits at the top of the sheet: press on it and drag down the sheet's height.
 		await userEvent.dragAndDrop(panel(), panel(), {
 			sourcePosition: { x: width / 2, y: 12 },
 			targetPosition: { x: width / 2, y: height - 2 },
@@ -670,9 +628,6 @@ describe("the bottom sheet", () => {
 	});
 });
 
-/**
-The preview's persistent contents: a flex row with the drawer first and the content beside it.
-*/
 function Contents({
 	open,
 	onClose,
@@ -720,7 +675,6 @@ describe("persistent and permanent", () => {
 		const content = screen.getByRole("button", { name: "How this site works" });
 		await expect.element(path).toBeVisible();
 
-		// Nothing is covered: the content starts where the drawer ends.
 		const main = document.querySelector("#main")!;
 		const row = document.querySelector("#row")!;
 		expect(main.getBoundingClientRect().left).toBeGreaterThanOrEqual(
@@ -737,7 +691,6 @@ describe("persistent and permanent", () => {
 		view.rerender(<Contents open={false} onClose={onClose} />);
 		await expect.element(path).not.toBeVisible();
 		expect(screen.queryByRole("navigation", { name: "Contents" })).toBeNull();
-		// The content takes the drawer's place.
 		await expect
 			.poll(() =>
 				Math.round(
@@ -793,7 +746,6 @@ describe("persistent and permanent", () => {
 		await expect.element(summary).toBeVisible();
 		expect(nav).not.toHaveAttribute("aria-modal");
 		expect(screen.queryByRole("dialog")).toBeNull();
-		// A permanent drawer can't close, so onClose shows no button.
 		expect(within(nav).queryByRole("button", { name: "Close" })).toBeNull();
 
 		await userEvent.click(screen.getByRole("button", { name: "Before" }));
@@ -982,9 +934,7 @@ describe("Modal's flags, passed on by a temporary drawer", () => {
 
 		const closedAt = performance.now();
 		await userEvent.keyboard("{Escape}");
-		// Well before 600ms it's still on its way out...
 		expect(drawer.isConnected).toBe(true);
-		// ...and it's gone once the exit has run.
 		await expect.poll(() => drawer.isConnected, { timeout: 3000 }).toBe(false);
 		expect(performance.now() - closedAt).toBeGreaterThanOrEqual(500);
 	});

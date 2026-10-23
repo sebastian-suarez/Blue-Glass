@@ -26,10 +26,6 @@ const prose: CSSProperties = {
 	textWrap: "pretty",
 };
 
-/**
-The preview's panel: a prose link in a sentence, then a row of go links. "Copy page link"
-reads "Link copied" once pressed.
-*/
 function SitePanel() {
 	const [isCopied, setIsCopied] = useState(false);
 	return (

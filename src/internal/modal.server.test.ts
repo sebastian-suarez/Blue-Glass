@@ -1,7 +1,3 @@
-/*
-ModalLayer rendered on the server, in Node with no DOM globals. modal.test.tsx hydrates the same
-trees in Chromium.
-*/
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
@@ -14,7 +10,6 @@ const surface = createElement(
 );
 
 function render(props: Omit<ModalLayerProps, "children">): string {
-	// The children come as createElement's third argument, as JSX passes them.
 	const layerProps = props as ModalLayerProps;
 	return renderToString(
 		createElement(
@@ -25,7 +20,6 @@ function render(props: Omit<ModalLayerProps, "children">): string {
 	);
 }
 
-// No element exists on the server; the layer must not look at this one while rendering.
 const element = Object.create(null) as Element;
 
 const containers = [

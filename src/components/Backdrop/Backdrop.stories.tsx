@@ -18,10 +18,8 @@ const meta = {
 
 export default meta;
 
-// Only Default renders through its args, so the others need none, not even the required open.
 type Story = StoryObj<Partial<BackdropProps>>;
 
-// As in the preview: over its region, above the region's content, with its copy centred.
 const cover: React.CSSProperties = {
 	position: "absolute",
 	zIndex: 2,
@@ -30,9 +28,6 @@ const cover: React.CSSProperties = {
 	cursor: "pointer",
 };
 
-/**
-The loading cover's status line: a spinner and a word, on a raised pill.
-*/
 function Publishing() {
 	return (
 		<span
@@ -83,10 +78,6 @@ type RegionProps = BackdropProps & {
 	readonly onShow: () => void;
 };
 
-/**
-One of the preview's regions: page content and a button that shows the backdrop again, under a
-backdrop that a press dismisses.
-*/
 function Region({
 	label,
 	isLoading = false,
@@ -126,9 +117,6 @@ function Region({
 	);
 }
 
-/**
-A region that keeps its own open state, as each of the preview's does.
-*/
 function OwnRegion(props: Omit<RegionProps, "open" | "onShow" | "onClick">) {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
@@ -145,10 +133,6 @@ function OwnRegion(props: Omit<RegionProps, "open" | "onShow" | "onClick">) {
 	);
 }
 
-/**
-Default's region: the open arg shows the backdrop, a press on it sets it back to false, and the
-button shows it again.
-*/
 function ScrimWithArgs(
 	args: Partial<BackdropProps>,
 	{ viewMode }: { readonly viewMode: string },

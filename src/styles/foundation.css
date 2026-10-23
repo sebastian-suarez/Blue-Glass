@@ -1,11 +1,4 @@
-/* Blue Glass — foundation: layer order, token fallbacks, the base layer, glass material,
-   popover surface, option rows and overlay layers. Copied from design-system/foundation.css.
-   Tokens come from tokens.css; this file never redeclares a colour, spacing, radius or shadow token. */
-
 @layer gl-fallback, gl-base, gl-components;
-
-/* Defaults for the token families a page may not emit (blur, easing, duration, zIndex, size).
-   Layered, so the unlayered tokens.css always wins. */
 
 @layer gl-fallback {
 	:root {
@@ -39,8 +32,6 @@
 	}
 }
 
-/* The site's base layer (global.css @layer base), on tokens. */
-
 @layer gl-base {
 	*,
 	::before,
@@ -70,8 +61,6 @@
 	.gl-icon {
 		flex: none;
 	}
-
-	/* Glass material, shared by every glass surface. --gl-fill and --gl-blur pick the level. */
 	.gl-glass {
 		background: var(--gl-fill, var(--glass));
 		-webkit-backdrop-filter: blur(var(--gl-blur, var(--blur-panel)))
@@ -92,8 +81,6 @@
 			backdrop-filter: none;
 		}
 	}
-
-	/* Visually hidden, still read. */
 	.gl-sr-only {
 		position: absolute !important;
 		width: 1px;
@@ -105,8 +92,6 @@
 		white-space: nowrap;
 		border: 0;
 	}
-
-	/* Overlay layers */
 	.gl-modal {
 		position: fixed;
 		inset: 0;
@@ -128,9 +113,6 @@
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 	}
-	/* No ring on what the layer focuses when nothing in it asks to (the ring belongs to the
-	   controls inside). The package wraps the child in .gl-modal-content and focuses the
-	   surface, its [role="dialog"], so the reference's selector reaches neither. */
 	.gl-modal > :not(.gl-backdrop):not([data-gl-sentinel]),
 	.gl-modal-content > *,
 	.gl-modal-content :is([role="dialog"], [role="alertdialog"]) {
@@ -142,8 +124,6 @@
 			backdrop-filter: none;
 		}
 	}
-
-	/* Popover surface: the side selector's material (.project-selector), raised for floating use. */
 	.gl-popover {
 		--gl-fill: var(--glass);
 		--gl-blur: var(--blur-selector);
@@ -180,9 +160,6 @@
 			backdrop-filter: none;
 		}
 	}
-
-	/* Option rows — shared by Menu, Select, Autocomplete, List and TransferList.
-     The side selector's tab (.project-tab), denser: 40px rows on radius-control. */
 	.gl-listbox {
 		display: grid;
 		gap: 2px;
@@ -216,7 +193,6 @@
 			box-shadow var(--duration-state) ease,
 			border-color var(--duration-state) ease;
 	}
-	/* Keyboard position in an aria-activedescendant list: fill plus a focus-coloured inner ring. */
 	.gl-option[data-active] {
 		background: var(--glass-raised);
 		outline: 2px solid var(--focus);
@@ -227,7 +203,6 @@
 		outline: 2px solid var(--focus);
 		outline-offset: -2px;
 	}
-	/* Selected: the raised tab (.project-tab[aria-pressed=true]); pair it with a check or a word. */
 	.gl-option[aria-selected="true"],
 	.gl-option[data-selected] {
 		background: var(--glass-raised);

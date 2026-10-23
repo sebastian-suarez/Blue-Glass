@@ -5,7 +5,6 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-// The real overlay layout: .gl-modal and .gl-backdrop cover the viewport.
 import "../styles/index.css";
 import {
 	type ModalCloseReason,
@@ -185,7 +184,6 @@ test("resolveModalBehaviour maps each flag on its own", () => {
 	).toBe("none");
 });
 
-// Every combination, through Base UI's portal and rendered in place, which has its own path.
 const combinations = [false, true].flatMap((disablePortal) =>
 	[false, true].flatMap((disableEnforceFocus) =>
 		[false, true].flatMap((disableScrollLock) =>
@@ -206,17 +204,14 @@ describe.each(combinations)(
 			const modal = setup(flags);
 			await modal.open();
 
-			// Focus moves in, to the surface.
 			expect(document.activeElement).toBe(byId("surface"));
 
-			// The page is hidden from assistive tech while focus is enforced, and never inert.
 			const pageButton = byId("page-button");
 			expect(pageButton.closest('[aria-hidden="true"]') !== null).toBe(
 				!flags.disableEnforceFocus,
 			);
 			expect(pageButton.closest("[inert]")).toBeNull();
 
-			// Tab: kept in the content, or let out.
 			const trail = await tabTrail(4);
 			if (flags.disableEnforceFocus) {
 				expect(trail).toContain(byId("after"));
@@ -229,11 +224,9 @@ describe.each(combinations)(
 				]);
 			}
 
-			// Tabbing out may have scrolled the page to #after; start the scroll check from the top.
 			byId("first").focus();
 			window.scrollTo(0, 0);
 
-			// Page scroll: locked (overflow hidden on body) or free.
 			expect(document.body.style.overflow).toBe(
 				flags.disableScrollLock ? "" : "hidden",
 			);
@@ -248,7 +241,6 @@ describe.each(combinations)(
 			window.scrollTo(0, 0);
 			byId("first").focus();
 
-			// An outside press: the backdrop catches it, or the page gets it.
 			await userEvent.click(byId("page-button"), { force: true });
 			if (flags.hideBackdrop) {
 				expect(modal.pageClicks).toEqual(["page-button"]);
@@ -260,20 +252,17 @@ describe.each(combinations)(
 				]);
 			}
 
-			// Focus after that press: kept in, unless focus is free.
 			if (flags.disableEnforceFocus) {
 				expect(isInsideLayer(document.activeElement)).toBe(false);
 			} else {
 				expect(isInsideLayer(document.activeElement)).toBe(true);
 			}
 
-			// Escape reports escapeKeyDown with the KeyboardEvent, wherever focus is.
 			modal.calls.length = 0;
 			await userEvent.keyboard("{Escape}");
 			expect(modal.calls.map((call) => call.reason)).toEqual(["escapeKeyDown"]);
 			expect(modal.calls[0]?.event).toBeInstanceOf(KeyboardEvent);
 
-			// Closing returns focus to the opener and releases the page.
 			await modal.close();
 			await expect.poll(() => document.activeElement).toBe(byId("opener"));
 			expect(document.body.style.overflow).toBe("");
@@ -281,7 +270,6 @@ describe.each(combinations)(
 	},
 );
 
-// The in-place path has its own Escape, focus and keepMounted code, so these run on both.
 describe.each([false, true])(
 	"the remaining flags, disablePortal=%s",
 	(disablePortal) => {
@@ -524,7 +512,6 @@ describe("where the layer renders", () => {
 
 describe("scroll lock", () => {
 	test("pads body by the scrollbar's width, and restores it", async () => {
-		// Headless Chromium hides scrollbars, so the test fakes one 15px wide.
 		const innerWidth = vi
 			.spyOn(window, "innerWidth", "get")
 			.mockReturnValue(document.documentElement.clientWidth + 15);
@@ -611,7 +598,6 @@ describe("stacked layers", () => {
 		await frames();
 		expect(document.activeElement).toBe(byId("inner"));
 
-		// Base UI renders the inner layer inside the outer one's portal, not straight into body.
 		const outerRoot = byId("outer").closest(".gl-modal");
 		const innerRoot = byId("inner").closest(".gl-modal");
 		expect(outerRoot?.parentElement).toBe(document.body);
@@ -620,7 +606,6 @@ describe("stacked layers", () => {
 		await userEvent.keyboard("{Escape}");
 		expect(calls).toEqual(["inner:escapeKeyDown"]);
 
-		// The inner layer has no backdrop: the press lands on the outer one, which isn't on top.
 		calls.length = 0;
 		const outerBackdrop = document.querySelector<HTMLElement>(".gl-backdrop");
 		await userEvent.click(outerBackdrop!, {
@@ -629,7 +614,6 @@ describe("stacked layers", () => {
 		});
 		expect(calls).toEqual([]);
 
-		// The outer layer still locks scroll after the inner one closes.
 		view.rerender(<Stack inner={false} onClose={onClose} />);
 		await frames();
 		expect(document.body.style.overflow).toBe("hidden");
@@ -833,7 +817,6 @@ describe("disablePortal on the server", () => {
 			});
 			await frames();
 			expect(errors).toEqual([]);
-			// Adopted, not rendered again.
 			expect(host.querySelector("#surface")).toBe(serverSurface);
 			expect(document.activeElement).toBe(serverSurface);
 			await userEvent.keyboard("{Escape}");
@@ -880,7 +863,6 @@ describe("focus in content rendered elsewhere", () => {
 			await userEvent.click(byId("portaled"));
 			await frames();
 			expect(document.activeElement).toBe(byId("portaled"));
-			// Focus on the page itself still comes back.
 			byId("page-button").focus();
 			expect(document.activeElement).not.toBe(byId("page-button"));
 		},
@@ -890,7 +872,6 @@ describe("focus in content rendered elsewhere", () => {
 describe("exit transitions", () => {
 	const exitMs = 120;
 
-	// The reference's transition contract: Modal drives `in` and waits for onExited.
 	const TestFade = Object.assign(
 		(props: TransitionOptions & { readonly children: React.ReactNode }) => {
 			const nodeRef = React.useRef<HTMLDivElement | null>(null);
@@ -955,7 +936,6 @@ describe("exit transitions", () => {
 	async function close(how: Close) {
 		switch (how) {
 			case "controlled": {
-				// A close from outside the layer, as a timer or another control would.
 				act(() => {
 					byId("close").click();
 				});
@@ -996,12 +976,10 @@ describe("exit transitions", () => {
 			await expect
 				.poll(() => byId("transition").dataset.transition)
 				.toBe("entered");
-			// Kept mounted, the closed child mounted at exited, which already reported onExited.
 			const exitsBefore = onExited.mock.calls.length;
 			expect(exitsBefore).toBe(keepMounted ? 1 : 0);
 
 			await close(how);
-			// Closing: the child runs its exit inside the layer, which is still there.
 			expect(byId("transition").dataset.transition).toBe("exiting");
 			expect(document.querySelector(".gl-modal")).not.toBeNull();
 			expect(

@@ -1,8 +1,3 @@
-/*
-Proofs (b) to (e) in Chromium: hydrating the server HTML of transition.test.ts, client mounts,
-toggling `in`, and reduced motion. No act() here: these tests watch real timers and real CSS
-transitions, the way a page runs them.
-*/
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -39,11 +34,6 @@ function track(root: Root): Root {
 	return root;
 }
 
-/**
-Every value data-transition took on each element under `container`, in order. React sets an
-element's first value before inserting it, and each later change records the value it
-replaced, so the history is those replaced values plus the current one.
-*/
 function watchStatuses(container: HTMLElement): (id: string) => string[] {
 	const traces = new Map<string, { element: HTMLElement; before: string[] }>();
 	const traceOf = (element: HTMLElement) => {
@@ -85,9 +75,6 @@ function watchStatuses(container: HTMLElement): (id: string) => string[] {
 	};
 }
 
-/**
-The CSS properties with a transition running on the element now.
-*/
 function runningTransitions(element: Element): string[] {
 	return element
 		.getAnimations()
@@ -105,9 +92,6 @@ function byId(id: string): HTMLElement {
 	return element;
 }
 
-/**
-Waits for the element to show `status`, polling often: a step can be short.
-*/
 async function until(id: string, status: string): Promise<HTMLElement> {
 	return vi.waitFor(
 		() => {
@@ -119,9 +103,6 @@ async function until(id: string, status: string): Promise<HTMLElement> {
 	);
 }
 
-/**
-The four callbacks, each noting its name in `calls` when it runs.
-*/
 function recordCallbacks() {
 	const calls: string[] = [];
 	const note = (name: string) => () => {
@@ -150,7 +131,6 @@ const fast = { enter: 200, exit: 160 } as const;
 describe("(b) hydration", () => {
 	test("hydrating the server HTML raises no error and animates nothing", async () => {
 		const html = renderToString(<ServerTree />);
-		// The same bytes Node rendered in transition.test.ts.
 		await expect(html).toMatchFileSnapshot("./transition.server.html.txt");
 
 		const container = mountPoint();
@@ -158,7 +138,6 @@ describe("(b) hydration", () => {
 		const ids = ["fade", "grow", "zoom", "slide", "panel"];
 		const before = ids.map((id) => byId(id));
 		for (const element of before) {
-			// Visible with JavaScript off: what the server sent is final.
 			expect(getComputedStyle(element).opacity).toBe("1");
 			expect(getComputedStyle(element).visibility).toBe("visible");
 		}
@@ -195,12 +174,10 @@ describe("(b) hydration", () => {
 				},
 			}),
 		);
-		// Hydrated content starts entered, so each child reports onEntered on mount.
 		await vi.waitFor(() => {
 			expect(callbacks.onEntered).toHaveBeenCalledTimes(5);
 		});
 		expect(document.getAnimations()).toEqual([]);
-		// Longer than the slowest enter (Collapse, 450ms), to see nothing starts late either.
 		await settle(600);
 
 		expect(recoverable).toEqual([]);
@@ -210,7 +187,6 @@ describe("(b) hydration", () => {
 		expect(callbacks.onEnter).not.toHaveBeenCalled();
 		expect(callbacks.onExit).not.toHaveBeenCalled();
 		expect(callbacks.onExited).not.toHaveBeenCalled();
-		// React adopted the server's elements instead of rendering new ones.
 		expect(ids.map((id) => byId(id))).toEqual(before);
 		for (const element of before) {
 			expect(element.dataset.transition).toBe("entered");
@@ -228,7 +204,6 @@ describe("(c) client mounts", () => {
 			<Box in kind="grow" label="grow" timeout={fast} {...callbacks} />,
 		);
 		const element = await until("grow", "entering");
-		// A real CSS transition from the exited style: scale 0.96 and opacity 0.
 		expect(runningTransitions(element)).toEqual(["opacity", "transform"]);
 		await until("grow", "entered");
 		expect(statusesOf("grow")).toEqual(["exited", "entering", "entered"]);
@@ -275,7 +250,6 @@ describe("(d) toggling in", () => {
 			expect(element.isConnected).toBe(false);
 		});
 
-		// It reaches exited (onExited), then unmounts in the same frame.
 		expect(statusesOf("toggle")).toEqual([
 			"exited",
 			"entering",
@@ -298,7 +272,6 @@ describe("(d) toggling in", () => {
 		expect(runningTransitions(await until("toggle", "exiting"))).toEqual([
 			"transform",
 		]);
-		// Back in before the exit ends: straight to entering, never through exited.
 		root.render(<Toggle in kind="slide" timeout={slow} />);
 		await until("toggle", "entered");
 

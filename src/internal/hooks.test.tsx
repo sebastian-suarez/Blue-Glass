@@ -64,7 +64,6 @@ test("usePrevious returns the previous render's value, as the reference's does",
 	expect(result.current).toBeUndefined();
 	rerender({ value: 2 });
 	expect(result.current).toBe(1);
-	// An unrelated re-render: the previous render already had 2.
 	rerender({ value: 2 });
 	expect(result.current).toBe(2);
 });

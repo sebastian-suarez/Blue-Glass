@@ -29,9 +29,6 @@ const messages: ReadonlyArray<readonly [AlertSeverity, string]> = [
 	["error", "Couldn't reach the bucket."],
 ];
 
-/**
-The four severities in one fill, over the fill's name.
-*/
 function Fill({
 	variant,
 }: {
@@ -51,10 +48,6 @@ function Fill({
 	);
 }
 
-/**
-The preview's closable alert: its close button takes it away, and "Show it again" brings it
-back.
-*/
 function Closable() {
 	const [isShown, setIsShown] = useState(true);
 	return isShown ? (
@@ -80,10 +73,6 @@ function Closable() {
 	);
 }
 
-/**
-The preview's deploy panel: Retry spins for 1.2s, then the failure gives way to the success,
-whose close button leaves a way to replay the failed run.
-*/
 function DeployPanel() {
 	const [run, setRun] = useState<
 		"failed" | "retrying" | "published" | "dismissed"

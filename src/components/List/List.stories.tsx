@@ -54,7 +54,6 @@ const roles = [
 	},
 ];
 
-// "10–20 milliseconds" keeps the preview's word joiner (U+2060), so the range never breaks.
 const projects = [
 	{
 		id: "limber-health-pdf",
@@ -90,9 +89,6 @@ const projects = [
 	},
 ];
 
-/**
-The preview's nav list: links on the side selector's glass beside the chosen project.
-*/
 function ClientWorkNav() {
 	const [current, setCurrent] = React.useState(0);
 	const project = projects[current];
@@ -126,7 +122,6 @@ function ClientWorkNav() {
 							}}
 						>
 							<ListItemIcon>
-								{/* Three projects, one orb each. */}
 								<Avatar size="xs" orb={index as 0 | 1 | 2} aria-hidden="true">
 									{item.initials}
 								</Avatar>
@@ -214,9 +209,6 @@ export const Variants: Story = {
 					"divided is the career list (.career-row). Interactive rows are buttons or links on .gl-option; selected is the raised tab.",
 			},
 		},
-		// The preview names its "Repo" link "VSebCode repository", which leaves out the visible label
-		// (axe's label-content-name-mismatch, WCAG 2.5.3). The reference's preview fails the same
-		// rule; this story stays faithful to it.
 		a11y: {
 			config: {
 				rules: [{ id: "label-content-name-mismatch", enabled: false }],

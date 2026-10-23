@@ -49,10 +49,6 @@ const chipList: CSSProperties = {
 	listStyle: "none",
 };
 
-/**
-The preview's removable stack: deleting a chip moves focus to the next close button, and
-"Reset" brings the chips back once they're all gone.
-*/
 function DeletableStack() {
 	const [tags, setTags] = useState(stack);
 	const chipsRef = useRef<Array<HTMLElement | null>>([]);
@@ -96,10 +92,6 @@ function DeletableStack() {
 	);
 }
 
-/**
-The preview's project filter: toggling a stack chip filters the projects, and their matching
-tags take the accent tone.
-*/
 function ProjectFilter() {
 	const [chosen, setChosen] = useState(["TypeScript"]);
 	const toggle = (tag: string) => {

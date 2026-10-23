@@ -20,14 +20,10 @@ const meta = {
 
 export default meta;
 
-// Each story renders its own panel as the child; onClickAway goes to the Actions panel.
 type Story = StoryObj<ClickAwayListenerProps>;
 
 const waiting = "Press anywhere outside the panel.";
 
-/**
-A panel that a press outside closes, and a button that shows it again.
-*/
 function ClosingPanel({
 	label,
 	mouseEvent,

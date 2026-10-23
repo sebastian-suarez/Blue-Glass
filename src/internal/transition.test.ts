@@ -1,8 +1,3 @@
-/*
-Proof (a): server rendering runs here, in Node with no DOM globals. The Chromium half
-(transition.browser.test.tsx) renders the same tree, checks it gets the same HTML through the
-shared file snapshot, and hydrates it.
-*/
 import { createElement, Fragment } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
@@ -37,7 +32,6 @@ describe("server rendering", () => {
 		expect(html).not.toMatch(/opacity:0/u);
 		expect(html).not.toMatch(/visibility:hidden/u);
 		expect(html).not.toMatch(/aria-hidden/u);
-		// Nothing waits away from its final place: no start scale, no start offset.
 		expect(html).not.toMatch(/scale\(|translate3d\(/u);
 		expect(html).toContain("grid-template-rows:minmax(0px, 1fr)");
 	});

@@ -96,7 +96,6 @@ describe("toSyntheticEvent", () => {
 		expect(event.defaultPrevented).toBe(true);
 		expect(event.isDefaultPrevented()).toBe(true);
 
-		// Base UI's placeholder for a timer: never dispatched, not cancelable.
 		const placeholder = toSyntheticEvent(new Event("base-ui"));
 		placeholder.preventDefault();
 		expect(placeholder.nativeEvent.defaultPrevented).toBe(false);
@@ -123,7 +122,6 @@ describe("toSyntheticEvent", () => {
 		const stop = vi.spyOn(native, "stopPropagation");
 		target.dispatchEvent(native);
 		expect(stop).toHaveBeenCalledOnce();
-		// It's stopPropagation, not stopImmediatePropagation: the target's other listeners run.
 		expect(later).toHaveBeenCalledOnce();
 	});
 
@@ -242,7 +240,6 @@ describe("reasons", () => {
 
 	test("a reason no table knows maps to nothing, and says so once", () => {
 		const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-		// A reason a future Base UI might add: the types forbid it, so cast as an upgrade would.
 		const future = "trigger-swipe" as "none";
 		expect(menuCloseReason(future)).toBeUndefined();
 		expect(menuCloseReason(future)).toBeUndefined();
@@ -250,7 +247,6 @@ describe("reasons", () => {
 		expect(warn.mock.calls[0]?.[0]).toMatch(
 			/"trigger-swipe".*MenuCloseReason/u,
 		);
-		// Inherited keys aren't reasons either.
 		expect(modalCloseReason("toString" as "none")).toBeUndefined();
 		expect(warn).toHaveBeenCalledTimes(2);
 	});

@@ -1,7 +1,4 @@
-// Behaviour specs for Diagram and DiagramHost, from design-system/components/Diagram (README.md
-// and api.d.ts). They run on the reference and on the package through "#ui".
 import { cleanup, render, screen, within } from "@testing-library/react";
-// Type-only: the provider's types are what give the DevTools session its typed send().
 import type { CDPSession } from "@vitest/browser-playwright";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
@@ -16,14 +13,10 @@ import {
 	type DiagramNodeLine,
 } from "#ui";
 
-/**
-A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
-*/
 function boldLine(text: string): Exclude<DiagramNodeLine, string> {
 	return { text, bold: true };
 }
 
-// Every look the data offers but accent edges, whose pulses never sit still.
 const flow: DiagramData = {
 	id: "site-flow",
 	width: 600,
@@ -91,7 +84,6 @@ const flow: DiagramData = {
 	],
 };
 
-// Two accent edges with a muted one between them, far enough apart to tell whose pixels move.
 const lanes: DiagramData = {
 	id: "lanes",
 	width: 400,
@@ -134,9 +126,6 @@ function lineText(line: DiagramNodeLine): string {
 	return typeof line === "string" ? line : line.text;
 }
 
-/**
-Every line of text the data draws: node lines, then label lines.
-*/
 function textsOf(data: DiagramData): string[] {
 	return [
 		...data.nodes.flatMap((node) => node.lines.map((line) => lineText(line))),
@@ -167,17 +156,10 @@ afterEach(async () => {
 	});
 });
 
-/**
-The test page's DevTools session, which emulates media features for this page only.
-*/
 function devTools(): CDPSession {
 	return cdp();
 }
 
-/**
-Plays a reader's browser. The README names navigator.webdriver as what tells automated browsers
-apart, and those skip the entrance.
-*/
 function pretendNotAutomated() {
 	Object.defineProperty(navigator, "webdriver", {
 		configurable: true,
@@ -210,10 +192,6 @@ async function frames(count = 2) {
 	}
 }
 
-/**
-Whether the element is drawn at all: no ancestor has display none. (Chromium's checkVisibility
-calls SVG children of a hidden group visible.)
-*/
 function isRendered(element: Element): boolean {
 	for (
 		let node: Element | null = element;
@@ -228,10 +206,6 @@ function isRendered(element: Element): boolean {
 	return true;
 }
 
-/**
-Whether a sighted reader sees the element: drawn, not visibility-hidden, and with no ancestor at
-opacity 0.
-*/
 function isShown(element: Element): boolean {
 	if (
 		!isRendered(element) ||
@@ -264,10 +238,6 @@ function runningAnimations(root: Element): number {
 		.filter((animation) => animation.playState === "running").length;
 }
 
-/**
-Waits for an entrance that starts on its own, once the component sees the figure in view: until
-`text` shows, then until nothing animates any more.
-*/
 async function afterEntrance(root: HTMLElement, text: string) {
 	await expect
 		.poll(() => isShown(within(root).getByText(text)), { timeout: 5000 })
@@ -282,9 +252,6 @@ function name(element: Element): string {
 		: `<${element.tagName.toLowerCase()}> "${text}"`;
 }
 
-/**
-A shape a transform has squashed to nothing, such as a bar still at scaleX(0).
-*/
 function isCollapsed(element: SVGGraphicsElement): boolean {
 	const box = element.getBBox();
 	const rect = element.getBoundingClientRect();
@@ -293,10 +260,6 @@ function isCollapsed(element: SVGGraphicsElement): boolean {
 	);
 }
 
-/**
-What keeps a figure from being fully drawn and at rest: running animations, and drawn parts
-that are faded, hidden, squashed or not drawn in yet. Empty once the figure is finished.
-*/
 function unfinished(root: Element): string[] {
 	const problems: string[] = [];
 	const running = runningAnimations(root);
@@ -305,7 +268,6 @@ function unfinished(root: Element): string[] {
 	}
 
 	for (const element of [root, ...root.querySelectorAll("*")]) {
-		// Parts that aren't drawn at all, such as the hint while the host fits.
 		if (!isRendered(element)) {
 			continue;
 		}
@@ -331,9 +293,6 @@ function unfinished(root: Element): string[] {
 	return problems;
 }
 
-/**
-The figure's outermost SVG, whose viewBox is the data's coordinate space.
-*/
 function figureOf(root: Element): SVGSVGElement {
 	const svg = root.querySelector("svg");
 	if (!svg) {
@@ -352,9 +311,6 @@ function toFigure(svg: SVGSVGElement): DOMMatrix {
 	return matrix.inverse();
 }
 
-/**
-An element's box in the data's own coordinates.
-*/
 function boxOf(element: Element, svg: SVGSVGElement) {
 	const rect = element.getBoundingClientRect();
 	const matrix = toFigure(svg);
@@ -371,20 +327,12 @@ function boxOf(element: Element, svg: SVGSVGElement) {
 	};
 }
 
-/**
-Scrolls the page so that `fraction` of the element's height shows at the bottom of the viewport.
-*/
 function showFraction(element: Element, fraction: number) {
 	const rect = element.getBoundingClientRect();
 	const shown = fraction * rect.height;
 	window.scrollTo(0, rect.top + window.scrollY - window.innerHeight + shown);
 }
 
-/**
-Waits until the browser reports an intersection ratio for the element that `isReached` takes.
-The browser notifies every observer in the same task, so by then the component's own observer
-has seen the same scroll.
-*/
 async function intersection(
 	element: Element,
 	isReached: (ratio: number) => boolean,
@@ -442,11 +390,6 @@ function changedPixels(before: ImageData, after: ImageData): number[] {
 	return changed;
 }
 
-/**
-Screenshots the figure over and over for `duration` ms, and returns every pixel that changed
-from one shot to the next, as a point in the data's coordinates. Whatever moves (a pulse, a
-transition) shows up; a figure at rest returns nothing.
-*/
 async function motionOver(
 	root: HTMLElement,
 	duration: number,
@@ -468,7 +411,6 @@ async function motionOver(
 	const matrix = toFigure(figureOf(root));
 	const { width, height } = previous;
 	return [...changed].map((pixel) => {
-		// The pixel's centre, from screenshot pixels to page coordinates.
 		const x = (((pixel % width) + 0.5) * rect.width) / width;
 		const y = ((Math.floor(pixel / width) + 0.5) * rect.height) / height;
 		return new DOMPoint(rect.left + x, rect.top + y).matrixTransform(matrix);
@@ -549,7 +491,6 @@ describe("Diagram: content and naming", () => {
 				expect(box.bottom).toBeLessThanOrEqual(node.y + node.h + 0.5);
 			}
 
-			// Each line starts below the one before it.
 			for (const [index, box] of boxes.slice(1).entries()) {
 				expect(box.top).toBeGreaterThanOrEqual(boxes[index].bottom - 0.5);
 			}
@@ -575,7 +516,6 @@ describe("Diagram: content and naming", () => {
 		expect(Math.abs(publish.top - 160)).toBeLessThanOrEqual(2);
 		expect(everyMerge.left).toBeCloseTo(20, 0);
 		expect(everyMerge.top).toBeGreaterThanOrEqual(publish.bottom - 0.5);
-		// "merge" spans x 170 to 225, and "sync" x 375 to 430.
 		const merge = boxOf(screen.getByText("merge"), svg);
 		expect(merge.centerX).toBeCloseTo(197.5, 0);
 		expect(Math.abs(merge.top - 40)).toBeLessThanOrEqual(2);
@@ -690,8 +630,6 @@ describe("Diagram: scale and scrolling", () => {
 		const group = screen.getByRole("group", { name: flow.label });
 		const after = screen.getByRole("button", { name: "After" });
 		expect(await tabFromBefore()).toBe(group);
-		// Chromium's Tab reaches any scroller on its own; browsers that don't need the host's own
-		// tab stop.
 		expect(group.tabIndex).toBe(0);
 		await userEvent.tab();
 		expect(document.activeElement).toBe(after);
@@ -710,8 +648,6 @@ describe("Diagram: scale and scrolling", () => {
 		expect(group.scrollLeft).toBe(0);
 		await userEvent.keyboard("{ArrowRight}");
 		await expect.poll(() => group.scrollLeft).toBeGreaterThan(0);
-		// Chromium scrolls smoothly, and under load drops a key pressed mid-scroll: wait for the
-		// scroll to settle first.
 		let last = -1;
 		await expect
 			.poll(
@@ -915,8 +851,6 @@ describe("Diagram: entrance and pulses", () => {
 				.filter((point) => laneOf(point) === y)
 				.map((point) => point.x)
 				.toSorted((a, b) => a - b);
-			// The dot travels the edge, from x 20 to x 380, rather than blinking in one place:
-			// it moves both before 35% of the way along (x 146) and after 65% (x 254).
 			expect(
 				xs.length,
 				`pixels that moved along the edge at y ${y}`,
@@ -973,7 +907,6 @@ describe("Diagram: server markup", () => {
 	}, 15_000);
 });
 
-// Four gates on a line, each at its centre in the 600-unit space.
 const gates = [
 	{ name: "Spike 0", x: 70 },
 	{ name: "M1", x: 223.3 },
@@ -981,17 +914,11 @@ const gates = [
 	{ name: "M3", x: 529.9 },
 ];
 
-/**
-The reveal's stagger index, the --i custom property the README tells children to set.
-*/
 function order(index: number): React.CSSProperties {
 	const style: React.CSSProperties & { "--i": number } = { "--i": index };
 	return style;
 }
 
-/**
-A hand-drawn figure in DiagramHost, using the gl-dg classes the README offers its children.
-*/
 function Gates(
 	props: Readonly<
 		Partial<DiagramHostProps> & { ref?: React.Ref<HTMLDivElement> }

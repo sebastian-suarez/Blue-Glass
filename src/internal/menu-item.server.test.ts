@@ -1,7 +1,3 @@
-/*
-The standalone MenuList rendered on the server, in Node with no DOM globals. menu-item.test.tsx
-hydrates the same HTML in Chromium.
-*/
 import { createElement, Fragment } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, test } from "vitest";
@@ -21,7 +17,6 @@ function renderList(
 	);
 }
 
-// The labels of the items with tabindex="0", in order.
 function tabbable(html: string): string[] {
 	return html
 		.matchAll(
@@ -58,8 +53,6 @@ describe("MenuList on the server", () => {
 		expect(tabbable(html)).toEqual(["Archive"]);
 	});
 
-	// Items the list can't see while rendering: inside a fragment, or rendered by a component.
-	// Each is tabbable until the list mounts and picks one.
 	test("items inside a fragment are tabbable", () => {
 		const items = [
 			createElement(MenuItem, { key: "copy" }, "Copy link"),
@@ -76,7 +69,6 @@ describe("MenuList on the server", () => {
 	});
 
 	test("items a component renders are tabbable", () => {
-		// A component in a .ts file: createElement takes it as a function.
 		const shareItem = () => createElement(MenuItem, null, "Share");
 		const html = renderToString(
 			createElement(

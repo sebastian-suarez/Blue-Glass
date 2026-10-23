@@ -1,49 +1,16 @@
-/**
-The server-HTML gate's rules, apart from the browser work so they can be tested on their own.
-
-Text the client render shows that the server HTML doesn't comes in two kinds:
-
-- hidden: in the server HTML but not visible, such as a transition that starts invisible. That's
-  a visibility defect, and it always fails the package: it should render visibly, or not at all.
-- absent: not in the server HTML at all, such as a popup open on load that renders through a
-  portal, or content measured on the client. The package may leave out what the reference's
-  server HTML lacked too (tests/ssr/reference-baseline.json), but not what the reference held,
-  even hidden: hidden open content is the reference's defect, and leaving it out is no fix.
-
-Texts count by occurrence, not as a set: a caption that repeats a label doesn't stand in for the
-label's hidden copy.
-
-The package also fails on any error in its pages and on any hydration error. An exception in
-tests/ssr/exceptions.json excuses a preview's named texts, or all of them, with its reason.
-*/
 import type { Preview } from "./reference.ts";
 
 export type Runtime = "reference" | "package";
 
 export type Observation = {
-	/**
-	Texts the client render shows inside #root that the server HTML holds but hides.
-	*/
 	hidden: string[];
 
-	/**
-	Texts the client render shows inside #root that the server HTML doesn't hold at all.
-	*/
 	absent: string[];
 
-	/**
-	Recoverable hydration errors.
-	*/
 	hydrationErrors: string[];
 
-	/**
-	Page and console errors on the client-rendered and hydrated pages.
-	*/
 	pageErrors: string[];
 
-	/**
-	Texts that move by more than 2px when the page hydrates.
-	*/
 	shifted: number;
 	serverError?: string;
 };
@@ -56,9 +23,6 @@ export type Baseline = Record<
 export type Exception = {
 	reason: string;
 
-	/**
-	The texts excused. Without it, every text of the preview is.
-	*/
 	texts?: string[];
 };
 
@@ -86,11 +50,6 @@ function countOf(texts: readonly string[]): Map<string, number> {
 	return counts;
 }
 
-/**
-The copies of each text the client render shows that the page without JavaScript doesn't, split
-into those the server HTML holds but hides, and those it lacks. Each list repeats a text once per
-missing copy.
-*/
 export function missingTexts(
 	shown: readonly string[],
 	shownWithoutScript: readonly string[],
@@ -152,7 +111,6 @@ export function judge(
 		);
 	}
 
-	// Each copy the reference lacked excuses one missing copy here.
 	const allowance = countOf(baseline[preview.id]?.absent ?? []);
 	const missing =
 		runtime === "reference"

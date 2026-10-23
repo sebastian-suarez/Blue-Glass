@@ -1,9 +1,3 @@
-/**
-Positioning for a floating layer, ported from design-system/shared/position.ts: the
-internal/position section of design-system/source/index.d.ts, which Popper exports as its own.
-Base UI's positioners place Popover, Menu and Tooltip instead, with the same rules (anchor.ts).
-Nothing here runs during render.
-*/
 import type { Align, Placement, Side } from "./anchor.js";
 import { ownerWindow } from "./dom.js";
 
@@ -11,29 +5,11 @@ export type { Align, Placement, Side } from "./anchor.js";
 
 export type PositionOptions = {
 	placement?: Placement;
-	/**
-	Gap between the anchor and the floating element, px.
-	*/
 	offset?: number;
-	/**
-	Flip to the opposite side when the preferred side overflows.
-	*/
 	flip?: boolean;
-	/**
-	Keep the floating element inside the viewport on the cross axis.
-	*/
 	shift?: boolean;
-	/**
-	Viewport padding kept clear, px.
-	*/
 	padding?: number;
-	/**
-	Make the floating element at least as wide as the anchor (menus under a field).
-	*/
 	matchWidth?: boolean;
-	/**
-	The box to stay inside; default the window.
-	*/
 	viewport?: { width: number; height: number };
 };
 
@@ -41,9 +17,6 @@ export type PositionResult = {
 	x: number;
 	y: number;
 	placement: Placement;
-	/**
-	`transform-origin` for origin-aware scale-in, relative to the floating box.
-	*/
 	origin: string;
 	maxHeight: number;
 	minWidth?: number;
@@ -62,11 +35,7 @@ function isVertical(side: Side): boolean {
 	return side === "top" || side === "bottom";
 }
 
-/**
-Whether a computed style makes its element the containing block of fixed descendants.
-*/
 function isFixedContainingBlock(style: CSSStyleDeclaration): boolean {
-	// Safari before 18 has only the prefixed property.
 	const standardBackdropFilter = style.getPropertyValue("backdrop-filter");
 	const backdropFilter =
 		standardBackdropFilter === ""
@@ -82,11 +51,6 @@ function isFixedContainingBlock(style: CSSStyleDeclaration): boolean {
 	);
 }
 
-/**
-`position: fixed` is relative to the viewport unless an ancestor creates a containing block
-(transform, filter, backdrop-filter, contain, will-change). Returns that block's box in viewport
-coordinates, or null for the viewport.
-*/
 export function containingBlock(
 	element: Element | null,
 ): { x: number; y: number; width: number; height: number } | null {
@@ -94,7 +58,6 @@ export function containingBlock(
 	let node = element?.parentElement ?? null;
 	while (node !== null && node !== root) {
 		if (isFixedContainingBlock(ownerWindow(node).getComputedStyle(node))) {
-			// The padding box, which fixed descendants are placed in.
 			const rect = node.getBoundingClientRect();
 			return {
 				x: rect.left + node.clientLeft,
@@ -110,10 +73,6 @@ export function containingBlock(
 	return null;
 }
 
-/**
-`computePosition` for an element that is (or will be) position: fixed, in its own containing
-block's coordinates.
-*/
 export function positionFixed(
 	anchor: DOMRect,
 	floatingElement: HTMLElement,
@@ -140,19 +99,11 @@ export function positionFixed(
 	);
 }
 
-/**
-The side and alignment a placement names: "top-start" is top and start, "left" is left and
-center.
-*/
 export function splitPlacement(placement: Placement): [Side, Align] {
 	const [side, align] = placement.split("-") as [Side, Align | undefined];
 	return [side, align ?? "center"];
 }
 
-/**
-Where a box of `size` starts along the cross axis: at the anchor's start edge, against its end
-edge, or centred on it.
-*/
 function alignAlong(
 	start: number,
 	end: number,
@@ -207,17 +158,10 @@ function place(
 	};
 }
 
-/**
-`value` kept between `min` and `max`, and at `min` when there's no room between them.
-*/
 function clamp(value: number, min: number, max: number): number {
 	return Math.min(Math.max(value, min), Math.max(min, max));
 }
 
-/**
-Position a fixed floating box against an anchor rect, viewport coordinates.
-Flip on the main axis, shift on the cross axis, cap height to the space left.
-*/
 export function computePosition(
 	anchor: DOMRect,
 	floating: { width: number; height: number },
@@ -270,7 +214,6 @@ export function computePosition(
 		isVertical(side) ? space[side] : viewportHeight - bothPaddings,
 	);
 
-	// Origin: the edge facing the anchor, at the anchor's centre on the cross axis.
 	let origin: string;
 	if (isVertical(side)) {
 		const halfWidth = anchor.width / 2;

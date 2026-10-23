@@ -1,7 +1,3 @@
-/**
-CSF modules for the stories guard's self-test (tests/unit/stories.test.ts): a probe component, and
-Default stories that wire its args, or fail to, in the ways a real stories file can.
-*/
 import type { composeStories } from "@storybook/react-vite";
 import {
 	createContext,
@@ -15,9 +11,6 @@ import { useArgs } from "storybook/preview-api";
 
 type StoriesModule = Parameters<typeof composeStories>[0];
 
-/**
-A stories module: its meta as `default`, and its stories under their export names.
-*/
 export type CsfModule = Record<string, unknown> & {
 	readonly default: StoriesModule["default"];
 };
@@ -37,7 +30,6 @@ export function Probe({
 	tone = "plain",
 	style,
 }: ProbeProps) {
-	// Read only at mount, as the components' default* props are.
 	const [initial] = useState(defaultLabel);
 	return (
 		<span data-tone={tone} style={style}>
@@ -46,21 +38,12 @@ export function Probe({
 	);
 }
 
-/**
-Probe behind React's memo, which has no function name of its own.
-*/
 export const MemoProbe = memo(Probe);
 
-/**
-A component whose function has no name at all.
-*/
 export const AnonymousProbe = memo((props: ProbeProps) => <Probe {...props} />);
 
 const GroupValueContext = createContext<string | undefined>(undefined);
 
-/**
-Owns its items' selection, as ToggleButtonGroup does.
-*/
 function ProbeGroup({
 	value,
 	children,
@@ -71,9 +54,6 @@ function ProbeGroup({
 	return <GroupValueContext value={value}>{children}</GroupValueContext>;
 }
 
-/**
-Selected by its own prop alone, and by the group's value in a group.
-*/
 export function ProbeItem({ value = "a", selected = false }: ProbeProps) {
 	const group = use(GroupValueContext);
 	return (
@@ -83,9 +63,6 @@ export function ProbeItem({ value = "a", selected = false }: ProbeProps) {
 	);
 }
 
-/**
-A story's own helper, which passes the args on.
-*/
 function Wrapper(props: ProbeProps) {
 	return (
 		<div>
@@ -94,9 +71,6 @@ function Wrapper(props: ProbeProps) {
 	);
 }
 
-/**
-A story render that keeps its state in the args, through useArgs.
-*/
 function LabelSwitch(props: ProbeProps) {
 	const [, updateArgs] = useArgs<ProbeProps>();
 	return (
@@ -126,9 +100,6 @@ const good = {
 
 /* eslint-disable @typescript-eslint/naming-convention -- the keys are CSF export names */
 
-/**
-Each must fail the guard with its problem.
-*/
 export const failing: Record<
 	string,
 	{ readonly module: CsfModule; readonly problem: string }
@@ -232,7 +203,6 @@ export const failing: Record<
 		},
 		problem: "no Default story",
 	},
-	// Storybook gives no Controls to a render whose arity is 0, as a defaulted parameter makes it.
 	defaultParameter: {
 		module: {
 			default: meta,
@@ -286,7 +256,6 @@ export const failing: Record<
 						options: ["plain", "loud", "quiet"],
 					},
 				},
-				// "quiet" draws as "plain", so that option does nothing.
 				render: ({
 					tone,
 					...props
@@ -308,7 +277,6 @@ export const failing: Record<
 						options: ["plain", "loud", "quiet"],
 					},
 				},
-				// "quiet" draws as "loud": unlike the default, but no different from loud.
 				render: ({
 					tone,
 					...props
@@ -321,9 +289,6 @@ export const failing: Record<
 	},
 };
 
-/**
-Each must pass the guard.
-*/
 export const passing: Record<string, CsfModule> = {
 	memoComponent: {
 		default: { ...meta, component: MemoProbe },
@@ -381,9 +346,6 @@ export const passing: Record<string, CsfModule> = {
 
 const phone = { viewport: { value: "phone", isRotated: false } };
 
-/**
-Each must fail the phone check, which a stories file the layout gate lists must pass.
-*/
 export const phoneFailing: Record<
 	string,
 	{ readonly module: CsfModule; readonly problem: string }
@@ -402,9 +364,6 @@ export const phoneFailing: Record<
 	},
 };
 
-/**
-A twin as stories/README.md describes it, which passes.
-*/
 export const phonePassing: CsfModule = {
 	default: meta,
 	Default: good,

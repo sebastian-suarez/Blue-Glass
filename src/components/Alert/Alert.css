@@ -1,9 +1,4 @@
-/* Blue Glass — Alert, ported from design-system/components/Alert/styles.css. */
-
 @layer gl-components {
-	/* Alert — an addition, matching MUI's Alert. The status set (danger, warning, success, info and
-	   their -soft grounds) carries the colour; the plate is the site's well radius (radius-well:
-	   .project-figure, .project-selector). Every border is a full 1px line, never a side stripe. */
 	.gl-alert {
 		--gl-alert-tone: var(--info);
 		--gl-alert-soft: var(--info-soft);
@@ -35,26 +30,19 @@
 		--gl-alert-tone: var(--danger);
 		--gl-alert-soft: var(--danger-soft);
 	}
-
-	/* standard: the -soft ground with a hairline of its own status colour all the way round
-	   (color-line where color-mix is missing) */
 	.gl-alert-standard {
 		background: var(--gl-alert-soft);
 		border-color: var(--color-line);
 		border-color: color-mix(in srgb, var(--gl-alert-tone) 24%, transparent);
 	}
-	/* outlined: the chip's glass-control fill (.chip) for alerts that sit on a glass panel */
 	.gl-alert-outlined {
 		background: var(--glass-control);
 		border-color: var(--gl-alert-tone);
 	}
-	/* filled: the status fill under on-ink (5.9:1 or more on every status) */
 	.gl-alert-filled {
 		background: var(--gl-alert-tone);
 		color: var(--on-ink);
 	}
-
-	/* The icon box matches the first line (14px x 1.55) so the glyph centres on it. */
 	.gl-alert-icon {
 		display: inline-flex;
 		flex: none;
@@ -72,7 +60,6 @@
 		font-weight: 600;
 		color: var(--gl-alert-tone);
 	}
-	/* Action: negative block margins keep a 28px text button from growing the plate. */
 	.gl-alert-action {
 		display: flex;
 		flex: none;
@@ -90,8 +77,6 @@
 	.gl-alert-filled .gl-alert-action {
 		color: inherit;
 	}
-
-	/* Close: a 32px round target (size-control-sm), pulled into the padding so the glyph lines up. */
 	.gl-alert-close {
 		display: inline-grid;
 		place-items: center;
@@ -121,7 +106,6 @@
 	.gl-alert-filled .gl-alert-close {
 		color: inherit;
 	}
-	/* The focus colour disappears on a status fill; the ring turns on-ink there. */
 	.gl-alert-filled :focus-visible {
 		outline-color: var(--on-ink);
 	}

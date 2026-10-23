@@ -1,17 +1,4 @@
 "use client";
-/**
-Drawer, ported from design-system/components/Drawer/reference.tsx. A temporary drawer is a modal
-layer, as in the reference: the modal-flags adapter, `ModalLayer` in src/internal/modal.tsx, on
-Base UI's Drawer through the portal, and in place (`disablePortal`) on the layer's own elements, so
-an open drawer shows in the server HTML. Deviations 7 and 8 (docs/deviations.md) apply, as for
-Modal. A persistent or permanent drawer is a panel in the page.
-
-The bottom sheet's grab handle drags the sheet, and a drag far or fast enough down asks to close
-it (`swipe`), with the reference's thresholds: past 120px or 30% of the sheet's height, or faster
-than 0.5px/ms as it's let go. Base UI's own swipe is off: it starts on a press anywhere in the
-panel, and it measures a drag from the drag's first move, so one that arrives in a single move
-never counts.
-*/
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
 import type { DrawerCloseReason } from "../../internal/events.js";
@@ -34,94 +21,31 @@ export type DrawerProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"title"
 > & {
-	/**
-	Shown (temporary, persistent). A permanent drawer is always shown.
-	*/
 	open?: boolean;
-	/**
-	Called with the reason: backdropClick, escapeKeyDown, closeButton or swipe. Set open to false to close. Shows the close button.
-	*/
 	onClose?: (
 		event: React.SyntheticEvent | KeyboardEvent,
 		reason: DrawerCloseReason,
 	) => void;
-	/**
-	The edge it comes from. Default left.
-	*/
 	anchor?: DrawerAnchor;
-	/**
-	`temporary`: a modal panel over a scrim (default). `persistent`: slides in and pushes the content beside it. `permanent`: a static panel.
-	*/
 	variant?: "temporary" | "persistent" | "permanent";
-	/**
-	`true`: floats 12px in from the edges on radius-panel (default). `false`: flush to the edge, only the inner corners rounded.
-	*/
 	inset?: boolean;
-	/**
-	Panel width for left and right, a number in px or a CSS length. Default 320. Top and bottom size to their content.
-	*/
 	width?: number | string;
-	/**
-	The heading in the header slot; it also names the drawer.
-	*/
 	title?: React.ReactNode;
-	/**
-	Accessible name of the close button. Default "Close".
-	*/
 	closeLabel?: string;
-	/**
-	`temporary`: no scrim; the page behind stays visible.
-	*/
 	hideBackdrop?: boolean;
-	/**
-	`temporary`: keep the panel mounted while closed.
-	*/
 	keepMounted?: boolean;
-	/**
-	`temporary`: render in place instead of in document.body.
-	*/
 	disablePortal?: boolean;
-	/**
-	`temporary`: don't lock the page's scroll.
-	*/
 	disableScrollLock?: boolean;
-	/**
-	`temporary`: don't move focus into the panel on open.
-	*/
 	disableAutoFocus?: boolean;
-	/**
-	`temporary`: let focus leave the panel while open.
-	*/
 	disableEnforceFocus?: boolean;
-	/**
-	`temporary`: don't return focus to the opener on close.
-	*/
 	disableRestoreFocus?: boolean;
-	/**
-	`temporary`: Escape doesn't close it.
-	*/
 	disableEscapeKeyDown?: boolean;
-	/**
-	`temporary`: where to portal, default document.body.
-	*/
 	container?: Element | (() => Element | null) | null;
-	/**
-	`temporary`: slide timing in ms (default 280 in, 220 out).
-	*/
 	transitionDuration?: number | { enter?: number; exit?: number };
-	/**
-	Props for the glass surface (a Paper).
-	*/
 	PaperProps?: React.HTMLAttributes<HTMLElement>;
-	/**
-	The drawer's content, in a scrolling body under the header.
-	*/
 	children?: React.ReactNode;
 };
 
-/**
-Slide moves the panel in the direction it travels while entering: away from its edge.
-*/
 const slideFrom: Record<DrawerAnchor, SlideDirection> = {
 	left: "right",
 	right: "left",
@@ -143,10 +67,6 @@ type HandleEvents = Pick<
 	"onPointerDown" | "onPointerMove" | "onPointerUp" | "onPointerCancel"
 >;
 
-/**
-The bottom sheet follows a drag on its grab handle; far or fast enough down asks to close it, and
-otherwise, or when the parent keeps it open, it settles back. Ported from the reference.
-*/
 function useSheetDrag(
 	paperRef: React.RefObject<HTMLElement | null>,
 	{
@@ -189,7 +109,6 @@ function useSheetDrag(
 
 		dragRef.current = null;
 		const height = paperRef.current?.offsetHeight ?? 1;
-		// Speed at release, in px per ms.
 		const velocity =
 			(drag.dy - drag.previousDy) / Math.max(1, drag.time - drag.previousTime);
 		if (
@@ -198,7 +117,6 @@ function useSheetDrag(
 			(drag.dy > Math.min(120, height * 0.3) || velocity > 0.5)
 		) {
 			onSwipe(event);
-			// `onClose` only asks: a parent that keeps the sheet open gets it back in place.
 			requestAnimationFrame(() => {
 				if (isOpenNow()) {
 					offset(0, true);
@@ -234,7 +152,6 @@ function useSheetDrag(
 			const raw = event.clientY - drag.y0;
 			drag.previousDy = drag.dy;
 			drag.previousTime = drag.time;
-			// Pulling up meets resistance.
 			drag.dy = raw > 0 ? raw : raw / 4;
 			drag.time = event.timeStamp;
 			offset(drag.dy, false);
@@ -244,9 +161,6 @@ function useSheetDrag(
 	};
 }
 
-/**
-A glass panel from an edge of the screen: temporary over a scrim, persistent beside the content it pushes, or permanent.
-*/
 export function Drawer({
 	ref,
 	...props

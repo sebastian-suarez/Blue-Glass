@@ -1,11 +1,6 @@
 import type * as React from "react";
 import { cx } from "../../internal/cx.js";
 
-/**
-Glyphs on a 24-unit grid, 1.5 stroke, round caps and joins: the spec of the
-site's one icon, the north-east arrow (src/components/Icons.tsx), which is
-`arrow-ne` here verbatim. Every other glyph is drawn to match it.
-*/
 type Part =
 	| { d: string; fill?: boolean }
 	| { c: [number, number, number]; fill?: boolean }
@@ -139,9 +134,6 @@ export const GLYPHS: Record<string, Part[]> = {
 export type IconName = keyof typeof GLYPHS;
 export const iconNames: IconName[] = Object.keys(GLYPHS);
 
-/**
-A part's key: its geometry, which is unique within a glyph.
-*/
 function keyOf(part: Part): string {
 	if ("d" in part) {
 		return `d ${part.d}`;
@@ -153,7 +145,6 @@ function keyOf(part: Part): string {
 function renderParts(parts: Part[], isFilled: boolean): React.ReactNode[] {
 	return parts.map((part) => {
 		const isDot = part.fill === true;
-		// A dot is filled by design and has no stroke; `filled` fills a stroked outline too.
 		const paint =
 			isDot || isFilled
 				? { fill: "currentColor", stroke: isDot ? "none" : "currentColor" }
@@ -186,25 +177,13 @@ function renderParts(parts: Part[], isFilled: boolean): React.ReactNode[] {
 }
 
 export type SvgIconProps = React.SVGProps<SVGSVGElement> & {
-	/**
-	Box size in px. Default 18 (the site's .icon).
-	*/
 	size?: number | string;
-	/**
-	Accessible name. Without it the icon is decorative (aria-hidden).
-	*/
 	title?: string;
-	/**
-	Stroke width on the 24-unit grid. Default 1.5.
-	*/
 	strokeWidth?: number;
 	viewBox?: string;
 	children?: React.ReactNode;
 };
 
-/**
-The SVG shell every glyph uses: currentColor stroke, round caps and joins.
-*/
 export function SvgIcon({
 	size = 18,
 	title,
@@ -240,27 +219,16 @@ export function SvgIcon({
 }
 
 export type IconProps = Omit<SvgIconProps, "children"> & {
-	/**
-	Glyph name, e.g. "arrow-ne", "check", "chevron-down". See iconNames. The documented
-	`IconName | string`, which is IconName alone: GLYPHS is keyed by any string.
-	*/
 	name: IconName;
-	/**
-	Fill closed shapes (a filled star in Rating).
-	*/
 	filled?: boolean;
 };
 
-/**
-A named glyph from the Blue Glass set.
-*/
 export function Icon({
 	name,
 	filled = false,
 	ref,
 	...rest
 }: IconProps & { ref?: React.Ref<SVGSVGElement> }) {
-	// Own keys only, so a name like "constructor" draws nothing instead of throwing.
 	const parts = Object.hasOwn(GLYPHS, name) ? GLYPHS[name] : undefined;
 	return (
 		<SvgIcon ref={ref} data-icon={name} {...rest}>

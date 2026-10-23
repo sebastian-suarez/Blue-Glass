@@ -1,5 +1,3 @@
-// Behaviour specs for Portal, from design-system/components/Portal/README.md and api.d.ts. What
-// it renders without a DOM (nothing, on the server) is the server-HTML gate's.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, expect, test, vi } from "vitest";
@@ -9,7 +7,6 @@ import { Portal, type PortalProps } from "#ui";
 
 afterEach(() => {
 	cleanup();
-	// Nothing a Portal rendered outlives it.
 	expect(document.body.childElementCount).toBe(0);
 });
 
@@ -19,9 +16,6 @@ function child(): HTMLElement {
 	return screen.getByText(childText);
 }
 
-/**
-The preview's two places: where the Portal is written, and a container next to it.
-*/
 function Places({
 	isShown = true,
 	...props
@@ -77,7 +71,6 @@ test("disablePortal renders the children in place", () => {
 });
 
 test("the children follow container and disablePortal as they change", () => {
-	// The preview's container is a ref's element, so it arrives after the first render.
 	const { rerender } = render(<Places container={null} />);
 	expect(child().parentElement).toBe(document.body);
 	const target = place("target");

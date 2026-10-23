@@ -9,9 +9,6 @@ afterEach(() => {
 	cleanup();
 });
 
-// Directions here are single values or xs, which hold at every width. The sm to xl
-// breakpoints are viewport media queries, which these specs don't resize.
-
 function current<T>(ref: React.RefObject<T | null>): T {
 	if (ref.current === null) {
 		throw new Error("the ref is empty");
@@ -24,9 +21,6 @@ function rect(testId: string): DOMRect {
 	return screen.getByTestId(testId).getBoundingClientRect();
 }
 
-/**
-The element after this one, which must exist.
-*/
 function next(element: Element): Element {
 	const sibling = element.nextElementSibling;
 	if (sibling === null) {
@@ -36,9 +30,6 @@ function next(element: Element): Element {
 	return sibling;
 }
 
-/**
-The length a spacing token holds, in px, read from the stylesheet's custom property.
-*/
 function space(token: SpaceToken): number {
 	const value = getComputedStyle(document.documentElement)
 		.getPropertyValue(`--space-${token}`)
@@ -50,9 +41,6 @@ function space(token: SpaceToken): number {
 	return Number(value.slice(0, -2));
 }
 
-/**
-Renders a Stack of three labelled children, a, b and c.
-*/
 function stack(props: StackProps = {}): void {
 	render(
 		<Stack data-testid="stack" {...props}>

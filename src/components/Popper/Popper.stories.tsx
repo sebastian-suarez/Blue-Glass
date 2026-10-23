@@ -23,12 +23,8 @@ const meta = {
 
 export default meta;
 
-// Each story renders its own anchor and opens on it, so open and anchorEl aren't args.
 type Story = StoryObj<PopperProps>;
 
-/**
-The placements the Default's buttons offer, in the preview's order.
-*/
 const placements: Placement[] = [
 	"top-start",
 	"top",
@@ -40,10 +36,6 @@ const placements: Placement[] = [
 	"bottom-end",
 ];
 
-/**
-The preview's stage: an anchor in the middle, the Popper in place beside it (the stage's
-transform makes it the containing block), and a button per placement.
-*/
 function PlacementStage({
 	placement = "top",
 	onPlacementChange,
@@ -112,9 +104,6 @@ function PlacementStage({
 	);
 }
 
-/**
-Default's stage: the placement arg drives the Popper, and the buttons set it.
-*/
 function PlacementStageWithArgs(
 	args: PopperProps,
 	{ viewMode }: { readonly viewMode: string },
@@ -139,9 +128,6 @@ function PlacementStageWithArgs(
 	);
 }
 
-/**
-A virtual anchor at the pointer: a zero-size rect wherever it last moved over the area.
-*/
 function PointerAnchor() {
 	const [point, setPoint] = React.useState<{ x: number; y: number } | null>(
 		null,

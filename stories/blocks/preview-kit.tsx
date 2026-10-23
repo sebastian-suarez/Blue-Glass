@@ -1,16 +1,8 @@
-/**
-The layout helpers the reference previews share, ported exactly, so a story can carry a
-preview section's content over unchanged. Each preview.html defines them under minified names;
-the frame and the section grid come from the decorator in .storybook/frame.tsx.
-*/
 import type { CSSProperties, ReactNode } from "react";
 import { FrameField } from "../../.storybook/frame-field.tsx";
 
 type Children = { readonly children?: ReactNode };
 
-/**
-A column: a grid with a 12px gap.
-*/
 export function Stack({
 	children,
 	gap = 12,
@@ -26,9 +18,6 @@ export function Stack({
 	);
 }
 
-/**
-A wrapping row, centred on the cross axis.
-*/
 export function Row({
 	children,
 	gap = 12,
@@ -57,9 +46,6 @@ export function Row({
 	);
 }
 
-/**
-Equal tiles that fill the row: as many columns of at least `min` pixels as fit.
-*/
 export function Tiles({
 	children,
 	min = 180,
@@ -82,9 +68,6 @@ export function Tiles({
 	);
 }
 
-/**
-The muted 12px caption under a specimen.
-*/
 export function Caption({ children }: Children) {
 	return (
 		<span
@@ -95,9 +78,6 @@ export function Caption({ children }: Children) {
 	);
 }
 
-/**
-A specimen over its caption, in a cell at least 46px tall.
-*/
 export function Labelled({
 	label,
 	children,
@@ -126,10 +106,6 @@ export function Labelled({
 	);
 }
 
-/**
-A fixed-height well of canvas with its own LightField, for overlays, bars and anything
-positioned: the transform makes it the containing block of fixed descendants.
-*/
 export function Stage({
 	children,
 	height = 300,

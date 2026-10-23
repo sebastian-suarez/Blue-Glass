@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention, unicorn/consistent-boolean-name -- it redeclares documented components and useMediaQuery */
-// The documented API with any planted through rest parameters, which have a numeric index but
-// no "0" or "1" keys: ToggleButton's onChange and useMediaQuery take `...args: any[]`, and
-// Tabs' onChange keeps its event but takes the value as `...rest: any[]`. Each passes every
-// assignability check.
 import type * as React from "react";
 import type * as Documented from "../../../design-system/source/index.js";
 

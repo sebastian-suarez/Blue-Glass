@@ -1,10 +1,3 @@
-// Behaviour specs for Dialog, DialogTitle, DialogContent, DialogContentText and DialogActions,
-// from design-system/components/Dialog/README.md and api.d.ts. Dialog sits on Modal and takes its
-// flags, with deviations 7 and 8 (docs/deviations.md): while focus is kept in, the rest of the
-// page is hidden from assistive tech, never made inert. Modal's own spec covers its flag matrix;
-// these check that Dialog passes each flag on. They run at the default test viewport (414 by 896),
-// where a dialog fills the width less its side margins: the width caps are measured in a wider
-// in-place Stage, as the preview shows them. fullScreen="phone" is the layout gate's.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -31,8 +24,6 @@ beforeEach(() => {
 afterEach(() => {
 	cleanup();
 	window.scrollTo(0, 0);
-	// Once a test unmounts, nothing is left behind: no portal node, no page hidden from assistive
-	// tech or made inert, no scroll lock.
 	expect(
 		[...document.body.children].filter((child) => !bodyBefore.includes(child)),
 	).toEqual([]);
@@ -45,10 +36,6 @@ afterEach(() => {
 	);
 });
 
-/**
-Waits a few frames. Only for checks that something does not happen (focus not moving, the page
-not scrolling), where there is no condition to wait for.
-*/
 async function frames(count = 4) {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -67,10 +54,6 @@ const title = "Delete the RS50 bridge draft?";
 const description =
 	"The write-up and its two capture files go. The repository on GitHub stays as it is.";
 
-/**
-The preview's destructive confirm: the title asks, the text says what goes and what stays, and
-the safe action comes before the danger one.
-*/
 function DraftConfirm({
 	focusSafeAction = false,
 }: {
@@ -94,16 +77,9 @@ function DraftConfirm({
 
 type PageProps = Omit<DialogProps, "open" | "onClose"> & {
 	readonly calls?: CloseCall[];
-	/**
-	Whether onClose sets open to false: the parent decides.
-	*/
 	readonly closes?: boolean;
 };
 
-/**
-A page holding the dialog's open state: the button that opens it, a button of its own at the top
-(outside the centred surface), and the dialog.
-*/
 function Page({ calls, closes = true, children, ...props }: PageProps) {
 	const [isOpen, setIsOpen] = React.useState(false);
 	return (
@@ -133,9 +109,6 @@ function Page({ calls, closes = true, children, ...props }: PageProps) {
 	);
 }
 
-/**
-Clicks the page's opener and waits for the dialog. Returns the opener, which keeps focus.
-*/
 async function open(name = title) {
 	const opener = screen.getByRole("button", { name: "Delete draft…" });
 	await userEvent.click(opener);
@@ -147,15 +120,11 @@ async function expectClosed(role = "dialog") {
 	await expect.poll(() => screen.queryByRole(role)).toBeNull();
 }
 
-/**
-Hidden from assistive tech: under aria-hidden (deviation 7) or inert (the reference).
-*/
 function isHiddenFromAssistiveTech(element: Element) {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
 
 function expectReactEvent(event: React.SyntheticEvent | KeyboardEvent) {
-	// A React event (or one shaped like it), not a native one.
 	expect(event).not.toBeInstanceOf(Event);
 	expect((event as React.SyntheticEvent).nativeEvent).toBeInstanceOf(
 		MouseEvent,
@@ -221,7 +190,6 @@ describe("open and onClose", () => {
 		await userEvent.click(within(dialog).getByText(description));
 		expect(calls).toEqual([]);
 
-		// The page button sits above the centred surface, so a press there lands on the scrim.
 		await userEvent.click(pageButton, { force: true });
 		expect(calls.map((call) => call.reason)).toEqual(["backdropClick"]);
 		expectReactEvent(calls[0].event);
@@ -238,7 +206,6 @@ describe("open and onClose", () => {
 		await userEvent.keyboard("{Escape}");
 		await userEvent.click(pageButton, { force: true });
 		await userEvent.keyboard("{Escape}");
-		// Still open each time, so each one reports again.
 		expect(calls.map((call) => call.reason)).toEqual([
 			"escapeKeyDown",
 			"backdropClick",
@@ -566,9 +533,6 @@ const notes = Array.from(
 		`Release note ${index + 1}: the tabs crossfade instead of jumping.`,
 );
 
-/**
-The preview's release notes, made long enough to overflow the 896px viewport.
-*/
 function ReleaseNotes(props: Omit<DialogProps, "open" | "children">) {
 	return (
 		<Dialog open {...props}>
@@ -598,9 +562,7 @@ describe("DialogContent and scroll", () => {
 
 		await userEvent.tab();
 		const content = document.activeElement as HTMLElement;
-		// In the tab order by its own tabindex: some browsers make any scroller focusable, not all.
 		expect(content.getAttribute("tabindex")).toBe("0");
-		// The content itself: it holds the notes, but not the title or the actions.
 		expect(content.contains(screen.getByText(notes[0]))).toBe(true);
 		expect(content.contains(within(dialog).getByRole("heading"))).toBe(false);
 		expect(content.contains(done)).toBe(false);
@@ -638,7 +600,6 @@ describe("DialogContent and scroll", () => {
 		});
 		const heading = within(dialog).getByRole("heading");
 		const done = within(dialog).getByRole("button", { name: "Done" });
-		// The surface grows with its content, past the bottom of the screen.
 		expect(dialog.offsetHeight).toBeGreaterThan(window.innerHeight);
 		await expect.element(heading).toBeInViewport({ ratio: 1 });
 		await expect.element(done).not.toBeInViewport();
@@ -684,7 +645,6 @@ describe("DialogContent and scroll", () => {
 		const dialog = await screen.findByRole("dialog", {
 			name: "Publish to production",
 		});
-		// The text inside the form still describes the dialog.
 		await expect
 			.element(dialog)
 			.toHaveAccessibleDescription("The build goes to the private S3 bucket.");
@@ -700,10 +660,6 @@ describe("DialogContent and scroll", () => {
 	});
 });
 
-/**
-A box wider than the viewport that the in-place layer fills, as the preview's Stage does: its
-transform makes it the containing block of the fixed layer.
-*/
 function Stage({ children }: { readonly children: React.ReactNode }) {
 	return (
 		<div
@@ -747,7 +703,6 @@ describe("size: maxWidth, fullWidth and fullScreen", () => {
 			const dialog = await screen.findByRole("dialog", {
 				name: "Rename the draft?",
 			});
-			// The offsetWidth is the laid-out width, whatever scale the open transition is at.
 			expect(dialog.offsetWidth).toBe(width);
 		},
 	);
@@ -799,7 +754,6 @@ describe("size: maxWidth, fullWidth and fullScreen", () => {
 		await screen.findByRole("dialog", { name: "Rename the draft?" });
 		const margins = async () => {
 			const dialog = screen.getByRole("dialog", { name: "Rename the draft?" });
-			// Wait for the open transition to finish scaling the surface.
 			await expect
 				.poll(() => Math.round(dialog.getBoundingClientRect().width))
 				.toBe(dialog.offsetWidth);
@@ -1089,9 +1043,7 @@ describe("Modal's flags, passed on", () => {
 
 		const closedAt = performance.now();
 		await userEvent.keyboard("{Escape}");
-		// Well before 600ms it's still on its way out...
 		expect(dialog.isConnected).toBe(true);
-		// ...and it's gone once the exit has run.
 		await expect.poll(() => dialog.isConnected, { timeout: 3000 }).toBe(false);
 		expect(performance.now() - closedAt).toBeGreaterThanOrEqual(500);
 	});
@@ -1144,7 +1096,6 @@ describe("a Modal opened over the dialog", () => {
 			await screen.findByRole("button", { name: "Rename" }),
 		);
 		await screen.findByRole("dialog", { name: "Rename the draft" });
-		// Near the corner, outside both surfaces.
 		await userEvent.click(document.documentElement, {
 			force: true,
 			position: { x: 5, y: 5 },

@@ -1,10 +1,3 @@
-/**
-Builds dist/styles.css from src/styles/index.css with every import inlined, and copies
-dist/tokens.css, dist/baseline.css and dist/tokens.json. Nothing is minified: the consumer's bundler does that.
-
-It refuses to build when index.css breaks the reference bundle's cascade order or leaves out
-a component's stylesheet, because rules in one layer resolve by order.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import { checkOrder, entry, inline } from "./lib/css.ts";

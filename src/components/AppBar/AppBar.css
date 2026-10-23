@@ -1,8 +1,4 @@
-/* Blue Glass — AppBar, ported from design-system/components/AppBar/styles.css. The glass
-   material (.gl-glass) is in foundation.css. */
-
 @layer gl-components {
-	/* AppBar — the site's header: .identity-strip, .personal-name, .signature, the nav pill and .resume-action (global.css) */
 	.gl-app-bar {
 		display: block;
 		width: 100%;
@@ -12,7 +8,6 @@
 		position: relative;
 		background: transparent;
 	}
-	/* sticky / fixed (additions): the bar on glass with blur-control, a light lower edge */
 	.gl-app-bar-sticky,
 	.gl-app-bar-fixed {
 		--gl-fill: var(--glass);
@@ -43,8 +38,6 @@
 		margin-bottom: -1px;
 		pointer-events: none;
 	}
-
-	/* Toolbar: .identity-strip */
 	.gl-toolbar {
 		max-width: var(--size-header);
 		margin: auto;
@@ -63,9 +56,6 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
-
-	/* Parts you compose inside a Toolbar to get the site's identity strip. */
-	/* .personal-name */
 	.gl-app-bar-brand {
 		display: flex;
 		align-items: center;
@@ -75,7 +65,6 @@
 		text-decoration: none;
 		-webkit-tap-highlight-color: transparent;
 	}
-	/* .signature: the "ss" monogram tile */
 	.gl-app-bar-monogram {
 		flex: none;
 		display: flex;
@@ -96,14 +85,12 @@
 		display: block;
 		min-width: 0;
 	}
-	/* .personal-name strong */
 	.gl-app-bar-title {
 		display: block;
 		font-size: 17px;
 		font-weight: 600;
 		letter-spacing: -0.02em;
 	}
-	/* .personal-name > span > span */
 	.gl-app-bar-subtitle {
 		display: block;
 		margin-top: 2px;
@@ -111,7 +98,6 @@
 		line-height: 1.5;
 		color: var(--color-muted);
 	}
-	/* .identity-strip nav: the glass pill track */
 	.gl-app-bar-nav {
 		display: flex;
 		gap: 3px;
@@ -125,7 +111,6 @@
 		-webkit-backdrop-filter: blur(var(--blur-control));
 		backdrop-filter: blur(var(--blur-control));
 	}
-	/* .identity-strip nav a */
 	.gl-app-bar-link {
 		padding: 7px 17px;
 		font-size: 13px;
@@ -140,12 +125,10 @@
 	.gl-app-bar-link:focus-visible {
 		outline-offset: 2px;
 	}
-	/* The current page (an addition): the raised item of a glass group (.project-tab[aria-pressed=true]). */
 	.gl-app-bar-link[aria-current="page"] {
 		background: var(--glass-raised);
 		box-shadow: var(--shadow-raised);
 	}
-	/* .resume-action */
 	.gl-app-bar-action {
 		display: flex;
 		align-items: center;

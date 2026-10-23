@@ -39,9 +39,6 @@ function centre(element: Element): { x: number; y: number } {
 	return { x: box.left + halfWidth, y: box.top + halfHeight };
 }
 
-/**
-The elements an aria-labelledby attribute points at, in order.
-*/
 function labelledBy(element: Element): HTMLElement[] {
 	return (element.getAttribute("aria-labelledby") ?? "")
 		.split(/\s+/v)
@@ -51,10 +48,6 @@ function labelledBy(element: Element): HTMLElement[] {
 		);
 }
 
-/**
-The CSS properties the animations running on the element or inside it (pseudo-elements too)
-change.
-*/
 function animatedProperties(element: Element): Set<string> {
 	const meta = new Set(["offset", "computedOffset", "easing", "composite"]);
 	return new Set(
@@ -69,10 +62,6 @@ function animatedProperties(element: Element): Set<string> {
 	);
 }
 
-/**
-The duration and easing of the animations a change starts on the element or inside it, once
-there are some. Polls often: the change starts them on the next frame.
-*/
 async function startedTimings(
 	element: Element,
 ): Promise<Array<{ duration: number; easing: string }>> {
@@ -100,9 +89,6 @@ async function nextFrame(): Promise<void> {
 	});
 }
 
-/**
-Whether anything animates on the element or inside it during the next few frames.
-*/
 async function isAnimatingWithin(
 	element: Element,
 	frames = 6,
@@ -128,10 +114,6 @@ function Values({ value }: { readonly value: number }) {
 	);
 }
 
-/**
-Renders a bar and a ring at 20, lets the page draw them, then moves both to 80. A change
-before the first frame would start no transition, as on a page.
-*/
 async function changeValue(): Promise<void> {
 	const { rerender } = render(<Values value={20} />);
 	expect(progressbar("Bar")).toHaveAttribute("aria-valuenow", "20");
@@ -148,7 +130,6 @@ async function emulateMedia(
 	await session.send("Emulation.setEmulatedMedia", { features });
 }
 
-// The ease-out-quint and ease-in-out-quart tokens, and duration-expand.
 const easeOutQuint = "cubic-bezier(0.23, 1, 0.32, 1)";
 const easeInOutQuart = "cubic-bezier(0.77, 0, 0.175, 1)";
 const durationExpand = 450;
@@ -240,7 +221,6 @@ describe("LinearProgress", () => {
 		expect(labelledBy(bar).some((element) => element.contains(label))).toBe(
 			true,
 		);
-		// The 4px track runs below the label row.
 		expect(label.getBoundingClientRect().bottom).toBeLessThanOrEqual(
 			bar.getBoundingClientRect().bottom - 4,
 		);
@@ -288,7 +268,6 @@ describe("LinearProgress", () => {
 		const labelBox = label.getBoundingClientRect();
 		expect(Math.abs(labelBox.left - row.left)).toBeLessThanOrEqual(1);
 		expect(Math.abs(valueBox.right - row.right)).toBeLessThanOrEqual(1);
-		// Both on one row.
 		expect(centre(value).y).toBeGreaterThan(labelBox.top);
 		expect(centre(value).y).toBeLessThan(labelBox.bottom);
 	});
@@ -510,7 +489,6 @@ describe("CircularProgress", () => {
 describe("Progress motion", () => {
 	test("the bar's sweep eases with ease-in-out-quart", () => {
 		render(<LinearProgress aria-label="Bar" />);
-		// A CSS animation keeps its timing function on its keyframes, a script one on its timing.
 		const easings = progressbar("Bar")
 			.getAnimations({ subtree: true })
 			.flatMap((animation) => {

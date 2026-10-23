@@ -1,9 +1,3 @@
-// Behaviour specs for Snackbar, from design-system/components/Snackbar/README.md and api.d.ts: the
-// controlled API (open, onClose and its reasons), the live region, the pause-aware timer, the
-// edges, and a hosted Alert. The timers are the README's: short durations are passed as props,
-// and elapsed times are taken before the action that starts them, so they can only run long.
-// The window goes to the background for real: focus moves out of the test's frame to the page
-// that hosts it.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -22,10 +16,6 @@ import {
 
 const message = "Published to S3. CloudFront picks it up in about a minute.";
 
-/**
-Parks the pointer at the left of the page, mid-height. A snackbar that appears under a resting
-pointer is pointed at, which pauses its timer, as the README says.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -53,10 +43,6 @@ type PublishedProps = Omit<SnackbarProps, "open"> & {
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
-/**
-The Default example's snackbar, with a "Before" button ahead of it and "Elsewhere" to point at,
-both clear of the bottom edge it sits on.
-*/
 function Published({ open = true, ...props }: PublishedProps) {
 	return (
 		<>
@@ -71,9 +57,6 @@ function Published({ open = true, ...props }: PublishedProps) {
 	);
 }
 
-/**
-The same, closed by its parent for every reason but clickaway, as the preview does.
-*/
 function Closing({ onClose, ...props }: Omit<PublishedProps, "open">) {
 	const [open, setOpen] = React.useState(true);
 	return (
@@ -106,10 +89,6 @@ function box(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-/**
-Whether the element is in the document and drawn: a box, and neither display none nor
-visibility hidden on it or an ancestor.
-*/
 function isShown(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -132,9 +111,6 @@ async function expectGone(text = message, timeout = 1500): Promise<void> {
 	await expect.poll(() => shownWith(text).length, { timeout }).toBe(0);
 }
 
-/**
-Whether an aria-hidden or inert ancestor hides the element from assistive tech.
-*/
 function isHiddenFromAssistiveTech(element: Element): boolean {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
@@ -147,9 +123,6 @@ async function pause(ms: number): Promise<void> {
 
 type AnyEvent = React.SyntheticEvent | Event | null | undefined;
 
-/**
-The native event of a documented callback's event, which may be a React event or a native one.
-*/
 function nativeOf(event: AnyEvent): Event | undefined {
 	return event instanceof Event ? event : (event?.nativeEvent ?? undefined);
 }
@@ -162,10 +135,6 @@ async function calls(
 	await expect.poll(() => onClose.mock.calls.length, { timeout }).toBe(count);
 }
 
-/**
-Sends the test's window to the background, as switching to another window does: focus moves to
-a button on the page that hosts the test's frame. The function it returns brings it back.
-*/
 async function toBackground(): Promise<() => Promise<void>> {
 	window.focus();
 	await expect.poll(() => document.hasFocus()).toBe(true);
@@ -188,7 +157,6 @@ describe("Snackbar: what it shows and how it's read", () => {
 		const region = screen.getByRole("status");
 		await expectShown();
 		expect(region).toContainElement(shownWith(message)[0]);
-		// A role="status" is polite by itself; an explicit aria-live must say the same.
 		expect(region.getAttribute("aria-live") ?? "polite").toBe("polite");
 	});
 
@@ -240,7 +208,6 @@ describe("Snackbar: what it shows and how it's read", () => {
 		const [event, reason] = onClose.mock.calls[0];
 		expect(reason).toBe("closeButton");
 		expect(nativeOf(event)).toBeInstanceOf(MouseEvent);
-		// The open prop is still true, so it stays.
 		await pause(300);
 		expect(shownWith(message)).toHaveLength(1);
 	});
@@ -278,7 +245,6 @@ describe("Snackbar: what it shows and how it's read", () => {
 		expect(region).toContainElement(
 			shownWith("Couldn't reach the bucket. Try again.")[0],
 		);
-		// The Alert drops its own role, so the message isn't announced twice.
 		expect(screen.queryByRole("alert")).toBeNull();
 		expect(screen.queryByText("Ignored message")).toBeNull();
 		expect(screen.queryByRole("button", { name: "Ignored action" })).toBeNull();
@@ -398,7 +364,6 @@ describe("Snackbar: closing", () => {
 		expect(performance.now() - start).toBeGreaterThanOrEqual(450);
 		const [event, reason] = onClose.mock.calls[0];
 		expect(reason).toBe("timeout");
-		// The documented union: a React event, a native one, or null.
 		expect(event === null || nativeOf(event) instanceof Event).toBe(true);
 		await expectGone();
 	});
@@ -444,7 +409,6 @@ describe("Snackbar: closing", () => {
 		await calls(onClose, 1, 4000);
 		const elapsed = performance.now() - left;
 		expect(elapsed).toBeGreaterThanOrEqual(1400);
-		// Well short of the full 3000, with room for a slow, busy machine.
 		expect(elapsed).toBeLessThan(2700);
 	});
 
@@ -551,7 +515,6 @@ describe("Snackbar: closing", () => {
 		expect(native instanceof MouseEvent || native instanceof TouchEvent).toBe(
 			true,
 		);
-		// The open prop is still true, so it stays.
 		expect(shownWith(message)).toHaveLength(1);
 	});
 });
@@ -559,7 +522,6 @@ describe("Snackbar: closing", () => {
 describe("Snackbar: with a dialog open", () => {
 	afterEach(async () => {
 		cleanup();
-		// The dialog's scroll lock and hidden page are gone with it.
 		await vi.waitFor(() => {
 			expect(document.body.style.overflow).toBe("");
 			expect(
@@ -600,7 +562,6 @@ describe("Snackbar: with a dialog open", () => {
 		}
 
 		render(<Page />);
-		// Opened from the keyboard, so no press reaches the snackbar's click-away.
 		button("Delete draft").focus();
 		await userEvent.keyboard("{Enter}");
 		const dialog = await screen.findByRole("dialog", {

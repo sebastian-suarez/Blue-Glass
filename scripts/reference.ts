@@ -1,14 +1,3 @@
-/**
-Reassembles the reference implementation from design-system/ into .cache/reference/:
-
-- src/<category>/<Module>.tsx: each component's reference.tsx, at its original path.
-- src/<folder>/<helper>: the shared helpers, where the modules import them from.
-- src/index.ts: every value export, in source/index.d.ts order.
-- styles.css: tokens.css, then bundle.css.
-
-It's a test fixture for the parity runtime and the reference behaviour project. Any
-fixture-only repair goes in REPAIRS with its reason, and docs/reference-defects.md lists it.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -23,7 +12,6 @@ type Repair = { search: string; replacement: string; reason: string };
 const out = path.join(root, ".cache/reference");
 const source = path.join(out, "src");
 
-// Where each shared helper lived, judging by how the modules import it.
 const shared: Record<string, string> = {
 	"cx.ts": "internal",
 	"dom.ts": "internal",
@@ -38,7 +26,6 @@ const shared: Record<string, string> = {
 	"_surfaces-layout-system.ts": "layout",
 };
 
-// Fixture-only repairs, by file under src/. None are needed so far.
 const repairs: Record<string, Repair[]> = {};
 
 function put(relative: string, from: string) {

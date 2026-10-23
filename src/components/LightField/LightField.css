@@ -1,7 +1,4 @@
-/* Blue Glass — LightField, ported from design-system/components/LightField/styles.css. */
-
 @layer gl-components {
-	/* LightField — the site's .light-field, .light-ring and .light-fold (global.css), verbatim placements */
 	.gl-light-field {
 		position: absolute;
 		z-index: -1;
@@ -141,8 +138,6 @@
 	.gl-light-field-bottom .gl-light-fold {
 		display: none;
 	}
-
-	/* compact (addition): the same composition scaled to the box it sits in. */
 	.gl-light-field-compact {
 		inset: 0;
 		background:

@@ -1,6 +1,3 @@
-/**
-Joins class names, skipping falsy values.
-*/
 export function cx(
 	...parts: Array<string | false | 0 | null | undefined>
 ): string {

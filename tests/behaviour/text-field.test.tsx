@@ -1,8 +1,3 @@
-// Behaviour specs for TextField and InputAdornment, and the FieldBaseProps TextField takes, from
-// design-system/components/TextField/README.md and api.d.ts. The package ports the field onto
-// Base UI's Field and Input, so the specs find the input by its label and role, and the pill as
-// the bordered box around the input, never by class name. Tokens resolve through a probe element,
-// and a multiline field's height is counted in rows of its textarea's line height.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -18,10 +13,6 @@ import {
 	type TextFieldProps,
 } from "#ui";
 
-/**
-Parks the pointer in the bottom-right corner, clear of every field below: a pill under a resting
-pointer takes its hover fill.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -57,10 +48,6 @@ function asControl(element: HTMLElement): Control {
 	);
 }
 
-/**
-The field's input or textarea, by its accessible name. A password input has no role, so it's
-found through its label.
-*/
 function control(name: string): Control {
 	for (const role of ["textbox", "searchbox", "spinbutton"] as const) {
 		const found = screen.queryByRole(role, { name });
@@ -94,9 +81,6 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
@@ -105,10 +89,6 @@ function box(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-/**
-The pill: the nearest box around the control that draws a border. The bare input inside it has
-none.
-*/
 function pill(element: Element): HTMLElement {
 	for (
 		let node: HTMLElement | null =
@@ -125,18 +105,12 @@ function pill(element: Element): HTMLElement {
 	throw new Error("no bordered pill around the control");
 }
 
-/**
-The only label of a control: a real <label for> points at it.
-*/
 function labelOf(element: Control): HTMLLabelElement {
 	const labels = [...(element.labels ?? [])];
 	expect(labels).toHaveLength(1);
 	return labels[0];
 }
 
-/**
-What a token resolves to for a CSS property, read from a probe element styled with it.
-*/
 function resolved(token: string, property = "color"): string {
 	const probe = document.createElement("div");
 	probe.style.setProperty(property, `var(${token})`);
@@ -146,9 +120,6 @@ function resolved(token: string, property = "color"): string {
 	return value;
 }
 
-/**
-How light a colour looks on the white page, from 0 (black) to 255 (white), with its alpha.
-*/
 function lightness(colour: string): number {
 	const [red = 0, green = 0, blue = 0, alpha = 1] = (
 		colour.match(/[\d.]+/gv) ?? []
@@ -167,9 +138,6 @@ function lightness(colour: string): number {
 	return weighted[0] + weighted[1] + weighted[2];
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with an icon the field shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -177,10 +145,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-Whether the element is drawn: a box, and neither display none nor visibility hidden on it or an
-ancestor.
-*/
 function isShown(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -191,9 +155,6 @@ function isShown(element: Element): boolean {
 	);
 }
 
-/**
-The error glyph drawn on the line of `words`, before them, anywhere in `field`.
-*/
 function errorIconBefore(
 	field: Element,
 	words: Element,
@@ -214,9 +175,6 @@ function errorIconBefore(
 	});
 }
 
-/**
-Types at the end of the text: focus alone may leave the caret at the start.
-*/
 async function typeAtEnd(element: Control, text: string): Promise<void> {
 	element.focus();
 	if (
@@ -231,9 +189,6 @@ async function typeAtEnd(element: Control, text: string): Promise<void> {
 	await userEvent.keyboard(text);
 }
 
-/**
-Rows of text the textarea shows: its height inside the padding over its line height.
-*/
 function rowsOf(element: HTMLTextAreaElement): number {
 	const style = getComputedStyle(element);
 	const line = px(style.lineHeight);
@@ -253,9 +208,6 @@ async function expectRows(
 		.toBe(rows);
 }
 
-/**
-Whether the textarea's content scrolls: more of it than shows, and it moves when scrolled.
-*/
 function canScroll(element: HTMLTextAreaElement): boolean {
 	if (element.scrollHeight <= element.clientHeight + 1) {
 		return false;
@@ -268,9 +220,6 @@ function canScroll(element: HTMLTextAreaElement): boolean {
 	return hasMoved && getComputedStyle(element).overflowY !== "hidden";
 }
 
-/**
-Keys that type lines `from` to `to`, each after an Enter but the first.
-*/
 function typedLines(from: number, to: number): string {
 	return Array.from(
 		{ length: to - from + 1 },
@@ -296,9 +245,6 @@ function Around({ children }: { readonly children: React.ReactNode }) {
 	);
 }
 
-/**
-Starts keyboard navigation from the plain button rendered before the field.
-*/
 function focusBefore() {
 	button("Before").focus();
 }
@@ -313,9 +259,6 @@ type Edit = {
 	value: string;
 };
 
-/**
-Records what onChange saw at call time, while the event's currentTarget is still set.
-*/
 function recorder() {
 	const edits: Edit[] = [];
 	const onChange = vi.fn<NonNullable<TextFieldProps["onChange"]>>(
@@ -391,8 +334,6 @@ describe("TextField: label, name and description", () => {
 		expect(ref.current?.querySelector("label")).toBeNull();
 	});
 
-	// The README names aria-label and aria-describedby as the input's; aria-labelledby goes there
-	// too in the reference, where a name has to land.
 	test("aria-labelledby names the input", () => {
 		render(
 			<>
@@ -485,8 +426,6 @@ describe("TextField: label, name and description", () => {
 		expect(errorIconBefore(must(ref.current), helper, markup)).toBeDefined();
 	});
 
-	// The asterisk is drawn, not read: the reference hides it, so the name stays the label's words
-	// and the input's own required says it.
 	test("required puts an asterisk after the label's words, outside the name, and makes the input required; without it, neither", () => {
 		render(
 			<>
@@ -658,7 +597,6 @@ describe("TextField: keyboard and focus", () => {
 		await expect.element(button("Before")).toHaveFocus();
 	});
 
-	// The README is silent; in the reference the whole pill takes a press for its input.
 	test("a press on the pill's padding focuses the input", async () => {
 		render(<TextField label="Name" />);
 		const name = input("Name");
@@ -831,12 +769,10 @@ describe("TextField: type", () => {
 				</label>
 			</>,
 		);
-		// Where an up button sits: near the right edge, in the top half.
 		const upButton = (element: Element) => ({
 			x: box(element).width - 10,
 			y: box(element).height / 4,
 		});
-		// A plain number input steps up from a press there, which proves the spot.
 		const plain = input("Plain number");
 		await userEvent.click(plain, { position: upButton(plain) });
 		expect(plain).toHaveValue(121);

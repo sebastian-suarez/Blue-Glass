@@ -17,9 +17,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The preview's field look, since TextareaAutosize has none of its own.
-*/
 const field: CSSProperties = {
 	width: "100%",
 	padding: "10px 14px",

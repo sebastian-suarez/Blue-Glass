@@ -1,9 +1,3 @@
-// Behaviour specs for SpeedDial, SpeedDialAction and SpeedDialIcon, from
-// design-system/components/SpeedDial/README.md and api.d.ts. SpeedDial is a plain React port, so
-// the specs find the trigger as a button named by ariaLabel, its list as a menu and the actions as
-// menuitems named by tooltipTitle. The README's timers run in real time: the stagger is sampled
-// every few ms from a time taken before the dial opens, so a gap can only run long, under a
-// generous ceiling. Hover runs through Chromium's mouse, and a tap through its touch input (CDP).
 import { cleanup, render, screen, within } from "@testing-library/react";
 import type { CDPSession } from "@vitest/browser-playwright";
 import * as React from "react";
@@ -21,10 +15,6 @@ import {
 	type SpeedDialProps,
 } from "#ui";
 
-/**
-Parks the pointer in the page's bottom-left corner, clear of every dial below: a trigger that
-appears under a resting pointer can count as hovered without a move.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -45,14 +35,10 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-The number a computed value starts with: "0.85", "45deg", "0.22s" or "1 1".
-*/
 function leading(value: string): number {
 	return Number(/^-?[\d.]+/v.exec(value)?.[0] ?? NaN);
 }
 
-// The preview's actions, nearest the trigger first.
 const contact = [
 	{ icon: "mail", label: "Email me" },
 	{ icon: "link", label: "Copy link" },
@@ -92,9 +78,6 @@ function dimensions(element: Element): [number, number] {
 	return [Math.round(width), Math.round(height)];
 }
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -102,9 +85,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-How opaque the element is drawn: its opacity times its ancestors'.
-*/
 function opacityOf(element: Element): number {
 	let opacity = 1;
 	for (let node: Element | null = element; node; node = node.parentElement) {
@@ -114,9 +94,6 @@ function opacityOf(element: Element): number {
 	return opacity;
 }
 
-/**
-How much the element is scaled: the scale of its transforms and its ancestors'.
-*/
 function scaleOf(element: Element): number {
 	let scale = 1;
 	for (let node: Element | null = element; node; node = node.parentElement) {
@@ -134,9 +111,6 @@ function scaleOf(element: Element): number {
 	return scale;
 }
 
-/**
-How far the element is turned, in degrees, by its own transforms and its ancestors' up to `upTo`.
-*/
 function turnOf(element: Element, upTo: Element): number {
 	let degrees = 0;
 	for (
@@ -158,9 +132,6 @@ function turnOf(element: Element, upTo: Element): number {
 	return Math.round(degrees);
 }
 
-/**
-Whether the element is drawn in full: visible, opaque and at its size.
-*/
 function isShownInFull(element: Element): boolean {
 	return (
 		element.checkVisibility({ visibilityProperty: true }) &&
@@ -169,9 +140,6 @@ function isShownInFull(element: Element): boolean {
 	);
 }
 
-/**
-What a token resolves to, read from a probe element styled with it.
-*/
 function resolved(
 	property:
 		| "backgroundColor"
@@ -194,16 +162,10 @@ function resolved(
 	return value;
 }
 
-/**
-A duration token in whole ms.
-*/
 function resolvedMs(token: string): number {
 	return Math.round(leading(resolved("transitionDuration", token)) * 1000);
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with what a component shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -216,9 +178,6 @@ function glyphsIn(element: Element): string[] {
 	return [...element.querySelectorAll("svg")].map((svg) => svg.getHTML());
 }
 
-/**
-The drawing of that glyph inside the element.
-*/
 function glyphIn(element: Element, name: string): SVGSVGElement {
 	const markup = glyph(name);
 	return must(
@@ -230,16 +189,10 @@ function glyphIn(element: Element, name: string): SVGSVGElement {
 
 type AnyEvent = React.SyntheticEvent | Event | undefined;
 
-/**
-The DOM event behind a callback's event, whether it came wrapped or native.
-*/
 function nativeOf(event: AnyEvent): Event | undefined {
 	return event instanceof Event ? event : event?.nativeEvent;
 }
 
-/**
-A React event, as onOpen and an action's onClick get, of the given kind.
-*/
 function expectReactEvent(
 	event: React.SyntheticEvent | undefined,
 	kind: new (type: string) => Event,
@@ -252,9 +205,6 @@ function expectReactEvent(
 	}
 }
 
-/**
-A point in the test page's own coordinates, in the coordinates Chromium's input takes.
-*/
 function inputPoint(element: Element): { x: number; y: number } {
 	const frame = window.frameElement;
 	const offset = frame ? box(frame) : { left: 0, top: 0 };
@@ -281,10 +231,6 @@ async function tap(element: Element): Promise<void> {
 	});
 }
 
-/**
-Samples the elements every few ms until each has passed the check once, and returns when each
-first did, in ms after `start`.
-*/
 async function firstTimes(
 	elements: readonly Element[],
 	isMet: (element: Element) => boolean,
@@ -308,9 +254,6 @@ async function firstTimes(
 	return seen.map((time) => must(time));
 }
 
-/**
-Runs `sample` every few ms for `ms`.
-*/
 async function sampleFor(ms: number, sample: () => void): Promise<void> {
 	const end = performance.now() + ms;
 	while (performance.now() < end) {
@@ -325,10 +268,6 @@ type DialProps = Omit<SpeedDialProps, "ariaLabel"> & {
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
-/**
-A page with the dial in the middle of a tall stage, a button before and after it, and a corner
-to move the pointer to.
-*/
 function Dial({
 	ariaLabel = "Contact and share",
 	children,
@@ -358,9 +297,6 @@ function Dial({
 	);
 }
 
-/**
-The preview's four actions, each with props of its own and props they all share.
-*/
 function contactActions(
 	own: Partial<Record<Label, Partial<SpeedDialActionProps>>> = {},
 	shared: Partial<SpeedDialActionProps> = {},
@@ -384,9 +320,6 @@ function trigger(): HTMLElement {
 	return screen.getByRole("button", { name: "Contact and share" });
 }
 
-/**
-The trigger, found while it may be zoomed out of sight.
-*/
 function anyTrigger(): HTMLElement {
 	return screen.getByRole("button", {
 		name: "Contact and share",
@@ -402,10 +335,6 @@ function action(label: string): HTMLElement {
 	return screen.getByRole("menuitem", { name: label });
 }
 
-/**
-An action's button, found while it may be zoomed out of sight, by its place among the actions:
-a hidden element has no accessible name to find it by.
-*/
 function anyAction(
 	label: string,
 	among: readonly string[] = labels,
@@ -415,9 +344,6 @@ function anyAction(
 	);
 }
 
-/**
-An action's label pill: the element showing its tooltipTitle.
-*/
 function pill(label: string): HTMLElement {
 	return screen.getByText(label);
 }
@@ -426,9 +352,6 @@ function isOpen(): boolean {
 	return anyTrigger().getAttribute("aria-expanded") === "true";
 }
 
-/**
-The actions drawn in full, as menuitems.
-*/
 function shownActions(among: readonly string[] = labels): string[] {
 	return among.filter((label) => {
 		const element = screen.queryByRole("menuitem", { name: label });
@@ -452,9 +375,6 @@ async function tabToTrigger(): Promise<void> {
 	await expect.element(trigger()).toHaveFocus();
 }
 
-/**
-Presses each key in turn and waits for focus on the action named next to it, or the trigger.
-*/
 async function walk(
 	steps: ReadonlyArray<readonly [key: string, target: string]>,
 ): Promise<void> {
@@ -512,9 +432,6 @@ const directions = [
 
 type Side = SpeedDialDirection | Placement;
 
-/**
-Whether `far` lies wholly on that side of `near`.
-*/
 function isBeyond(side: Side, near: DOMRect, far: DOMRect): boolean {
 	switch (side) {
 		case "up":
@@ -537,9 +454,6 @@ function isBeyond(side: Side, near: DOMRect, far: DOMRect): boolean {
 	}
 }
 
-/**
-Whether the two boxes share the centre line that runs along that side.
-*/
 const verticalSides = new Set<Side>(["up", "down", "top", "bottom"]);
 
 function isCentredAlong(side: Side, a: DOMRect, b: DOMRect): boolean {
@@ -798,7 +712,6 @@ describe("SpeedDial: the pointer", () => {
 				{contactActions({ "Copy link": { disabled: true, onClick: onCopy } })}
 			</Dial>,
 		);
-		// A disabled Fab is dimmed, so it never shows in full.
 		await expectOpen(labels.filter((label) => label !== "Copy link"));
 		expect(isDisabled(action("Copy link"))).toBe(true);
 		await userEvent.click(action("Copy link"), { force: true });
@@ -808,7 +721,6 @@ describe("SpeedDial: the pointer", () => {
 		expect(isOpen()).toBe(true);
 	});
 
-	// The README names blur among the close reasons; the reference closes on a press outside too.
 	test('a press outside closes it, with onClose(press, "blur")', async () => {
 		const onClose = vi.fn<OnClose>();
 		render(<Dial openOnHover={false} onClose={onClose} />);
@@ -832,7 +744,6 @@ describe("SpeedDial: the pointer", () => {
 		const [openEvent, openReason] = onOpen.mock.calls[0] ?? [];
 		expect(openReason).toBe("mouseEnter");
 		expectReactEvent(openEvent, MouseEvent);
-		// Taken before the pointer leaves, so the elapsed time can only run long.
 		const left = performance.now();
 		await userEvent.hover(screen.getByText("Elsewhere"));
 		await expect.poll(() => isOpen()).toBe(false);
@@ -862,7 +773,6 @@ describe("SpeedDial: the pointer", () => {
 		const onOpen = vi.fn<OnOpen>();
 		const onClose = vi.fn<OnClose>();
 		render(<Dial onOpen={onOpen} onClose={onClose} />);
-		// The pointer arrives on the trigger, which opens it, and clicks at once.
 		await userEvent.click(trigger());
 		await expectOpen();
 		expect(onOpen.mock.calls[0]?.[1]).toBe("mouseEnter");
@@ -872,7 +782,6 @@ describe("SpeedDial: the pointer", () => {
 		expect(onClose).not.toHaveBeenCalled();
 	});
 
-	// "Right after" is the reference's 400ms.
 	test('a click well after a hover-open closes it, with "toggle"', async () => {
 		const onClose = vi.fn<OnClose>();
 		render(<Dial onClose={onClose} />);
@@ -1176,7 +1085,6 @@ describe("SpeedDial: hidden", () => {
 		expect(
 			fab.checkVisibility({ visibilityProperty: true, opacityProperty: true }),
 		).toBe(false);
-		// Out of sight, it's out of the tab order too.
 		button("Before").focus();
 		await userEvent.tab();
 		await expect.element(button("After")).toHaveFocus();
@@ -1473,7 +1381,6 @@ describe("SpeedDial: the icon and the motion", () => {
 		);
 		const { rerender } = render(view(false));
 		const buttons = labels.map((label) => anyAction(label));
-		// Taken before the dial opens, so each time can only run long.
 		const start = performance.now();
 		rerender(view(true));
 		const times = await firstTimes(
@@ -1526,7 +1433,6 @@ describe("SpeedDial: the icon and the motion", () => {
 		const { rerender } = render(view(false));
 		const farthest = anyAction("Download résumé");
 		rerender(view(true));
-		// Its turn comes last, so it still waits where it starts.
 		expect(scaleOf(farthest)).toBeCloseTo(0.85);
 		expect(opacityOf(farthest)).toBe(0);
 		const list = menu();

@@ -11,9 +11,6 @@ afterEach(async () => {
 	await emulateMedia("", []);
 });
 
-/**
-Emulates a media type and media features through Chromium's DevTools protocol; empty values clear them.
-*/
 async function emulateMedia(
 	media: string,
 	features: Array<{ name: string; value: string }>,
@@ -30,7 +27,6 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-// What the README asks of the container: position relative, isolation isolate, overflow clip.
 const box: React.CSSProperties = {
 	position: "relative",
 	isolation: "isolate",
@@ -39,9 +35,6 @@ const box: React.CSSProperties = {
 	height: 200,
 };
 
-/**
-Renders a field in the documented container and returns both, through the refs.
-*/
 function field(props: LightFieldProps = {}): {
 	container: HTMLElement;
 	field: HTMLDivElement;
@@ -69,7 +62,6 @@ test("the ref is the field's div, which takes className and other attributes", (
 	expect(element.id).toBe("hero-field");
 });
 
-// The api lists no default; the reference uses top, the hero's placement, and lists it first.
 test("the placement is top by default", () => {
 	const { field: element } = field();
 	expect(element.classList.contains("gl-light-field-top")).toBe(true);

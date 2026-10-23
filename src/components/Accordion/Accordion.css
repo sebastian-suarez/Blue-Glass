@@ -1,24 +1,15 @@
-/* Blue Glass — Accordion, ported from design-system/components/Accordion/styles.css. The selectors
-   hold on Base UI's DOM: its trigger is the summary button (natively disabled, aria-expanded), and
-   a row is one element, the root rendered as its item. */
-
 @layer gl-components {
-	/* Accordion — the site's career list (.career-surface.glass-panel, .career-row, .toggle) and its horizontal
-   accordion (.acc, .pane, .more), global.css. Rule order follows the site so the cascade matches. */
-
-	/* ---------- The list surface: .career-surface on .glass-panel ---------- */
 	.gl-accordion-surface {
 		position: relative;
 		isolation: isolate;
-		padding: 8px 30px; /* .career-surface */
+		padding: 8px 30px;
 		border-radius: var(--radius-pane);
-		background: rgba(255, 255, 255, 0.42); /* .career-surface */
-		border: 1px solid rgba(255, 255, 255, 0.95); /* .glass-panel */
+		background: rgba(255, 255, 255, 0.42);
+		border: 1px solid rgba(255, 255, 255, 0.95);
 		box-shadow: var(--shadow-panel);
 		-webkit-backdrop-filter: blur(var(--blur-surface));
 		backdrop-filter: blur(var(--blur-surface));
 	}
-	/* .glass-panel::before: the diagonal sheen */
 	.gl-accordion-surface::before {
 		content: "";
 		position: absolute;
@@ -28,8 +19,6 @@
 		background: linear-gradient(120deg, #fff4, transparent 40%, #fff1);
 		pointer-events: none;
 	}
-
-	/* ---------- A row: .career-row ---------- */
 	.gl-accordion {
 		border-bottom: 1px solid var(--color-line);
 		color: var(--color-ink);
@@ -42,8 +31,6 @@
 		font: inherit;
 		letter-spacing: normal;
 	}
-
-	/* .career-row summary */
 	.gl-accordion-summary {
 		display: grid;
 		grid-template-columns: 1fr 16px;
@@ -78,27 +65,22 @@
 		cursor: not-allowed;
 		opacity: 0.5;
 	}
-	/* .career-employer */
 	.gl-accordion-summary-primary {
 		min-width: 0;
 		font-size: 17px;
 		letter-spacing: -0.02em;
 	}
-	/* .career-position */
 	.gl-accordion-summary-secondary {
 		min-width: 0;
 		font-size: 13px;
 		color: var(--color-muted);
 	}
-	/* .career-date */
 	.gl-accordion-summary-meta {
 		min-width: 0;
 		font-size: 12px;
 		color: var(--color-muted);
 		text-align: right;
 	}
-
-	/* .toggle: two 1px strokes; the vertical one turns flat when the row opens (plus -> minus) */
 	.gl-accordion-toggle {
 		position: relative;
 		width: 13px;
@@ -135,20 +117,17 @@
 	.gl-accordion-summary[aria-expanded="true"] .gl-accordion-expand-icon {
 		transform: rotate(180deg);
 	}
-	/* Press: a full-width row doesn't scale; the title takes the hover colour and the toggle presses in. */
 	.gl-accordion-summary:active:not(:disabled) .gl-accordion-summary-primary {
 		color: #3a518a;
 	}
 	.gl-accordion-summary:active:not(:disabled) .gl-accordion-toggle {
 		transform: scale(0.85);
 	}
-
-	/* .career-description */
 	.gl-accordion-details {
 		padding: 0 5% 24px 26%;
 		font-size: 14px;
 		color: var(--color-muted);
-		text-wrap: pretty; /* the site's p */
+		text-wrap: pretty;
 	}
 	.gl-accordion-details-full {
 		padding-left: 0;
@@ -160,21 +139,17 @@
 	.gl-accordion-details > :last-child {
 		margin-bottom: 0;
 	}
-	/* .career-description > span */
 	.gl-accordion-details > .gl-accordion-details-meta {
 		display: block;
 		margin-top: 12px;
 		font-size: 11px;
 	}
-
-	/* ---------- PaneAccordion: .acc ---------- */
 	.gl-pane-accordion {
 		display: flex;
 		gap: 10px;
 		min-height: 420px;
 		min-width: 0;
 	}
-	/* .pane */
 	.gl-pane {
 		flex: 1 1 0;
 		min-width: 0;
@@ -197,23 +172,22 @@
 	}
 	.gl-pane-default {
 		background: var(--glass-control);
-	} /* .pane-default: rgba(255,255,255,0.55) */
+	}
 	.gl-pane-alt {
 		background: rgba(255, 255, 255, 0.36);
-	} /* .pane-alt */
+	}
 	.gl-pane-accent {
 		background: linear-gradient(
 			160deg,
 			rgba(142, 184, 232, 0.5),
 			rgba(255, 255, 255, 0.45)
 		);
-	} /* .pane-accent: color-ring at 50% */
+	}
 	.gl-pane-heading {
 		margin: 0;
 		font: inherit;
 		letter-spacing: normal;
 	}
-	/* .pane-btn */
 	.gl-pane-button {
 		all: unset;
 		cursor: pointer;
@@ -228,7 +202,6 @@
 		outline-offset: 5px;
 		border-radius: var(--radius-code);
 	}
-	/* The whole pane is the tap target (an addition: the site's target is the title alone). */
 	.gl-pane-button::after {
 		content: "";
 		position: absolute;
@@ -238,7 +211,6 @@
 	.gl-pane:has(> .gl-pane-heading > .gl-pane-button:active) {
 		transform: scale(0.98);
 	}
-	/* .pane-title */
 	.gl-pane-title {
 		display: block;
 		font-size: 22px;
@@ -262,7 +234,6 @@
 		color: var(--color-muted);
 		text-wrap: pretty;
 	}
-	/* .more: chips collapse to zero height when closed, so every blurb sits at the same height. */
 	.gl-pane-more {
 		display: grid;
 		grid-template-rows: 0fr;
@@ -271,14 +242,12 @@
 			grid-template-rows var(--duration-expand) var(--ease-out-quint),
 			opacity 250ms ease;
 	}
-	/* Above the pane's stretched tap target, so links in custom `more` content stay pressable. */
 	.gl-pane-more-inner {
 		position: relative;
 		z-index: 1;
 		min-height: 0;
 		overflow: hidden;
 	}
-	/* .chips + .chip.chip-sm */
 	.gl-pane-chips {
 		display: flex;
 		flex-wrap: wrap;
@@ -305,7 +274,6 @@
 		opacity: 1;
 		transition-delay: 150ms;
 	}
-	/* No hover, and a tap does not focus a button in Safari: chips stay visible unless closed. */
 	@media (hover: none) {
 		.gl-pane:not([data-state="closed"]) .gl-pane-more {
 			grid-template-rows: 1fr;
@@ -318,7 +286,6 @@
 	}
 
 	@media (hover: hover) and (pointer: fine) {
-		/* .career-row summary:hover .career-employer */
 		.gl-accordion-summary:not(:disabled):hover .gl-accordion-summary-primary {
 			color: #3a518a;
 		}
@@ -347,8 +314,6 @@
 			grid-template-columns: 1fr 1.5fr 1fr 13px;
 		}
 	}
-
-	/* Stacked panes: auto at 899px and below (the site), horizontal at 700px and below, vertical always. */
 	@media (max-width: 899px) {
 		.gl-pane-accordion-auto {
 			flex-direction: column;
@@ -368,7 +333,6 @@
 			flex-grow: 1;
 		}
 	}
-	/* horizontal holds the row down to 701px and stacks on phones. */
 	@media (max-width: 700px) {
 		.gl-pane-accordion-horizontal {
 			flex-direction: column;
@@ -465,8 +429,6 @@
 			font-size: 13px;
 		}
 	}
-
-	/* Fallbacks from the design: no blur support, or the reader asks for less transparency. */
 	@supports not (
 		(backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 	) {

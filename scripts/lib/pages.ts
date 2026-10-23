@@ -1,9 +1,3 @@
-/**
-Preview pages for the browser gates. A page is an unchanged preview.html with one runtime
-injected into its head: the stylesheet, React (react.js) and window.BlueGlass. Pages are served
-over HTTP from .cache/pages by a small local server, because module loading and Mermaid's
-import need a real origin.
-*/
 import fs from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
@@ -15,29 +9,14 @@ import { previewScript, root, type Preview } from "./reference.ts";
 export type Runtime = "reference" | "package";
 
 export type PageOptions = {
-	/**
-	Extra CSS after the runtime's stylesheet: the parity mutation test plants defects with it.
-	*/
 	css?: string;
 
-	/**
-	Server-rendered markup to put inside #root.
-	*/
 	ssr?: string;
 
-	/**
-	Load no scripts at all, so the page shows only the server-rendered markup.
-	*/
 	noScript?: boolean;
 
-	/**
-	Hydrate the server-rendered markup instead of rendering from scratch.
-	*/
 	hydrate?: boolean;
 
-	/**
-	Tells apart several pages of one preview, such as "nojs".
-	*/
 	variant?: string;
 };
 
@@ -45,9 +24,6 @@ const pagesDirectory = path.join(root, ".cache/pages");
 const runtimesDirectory = path.join(root, ".cache/runtimes");
 const mermaidDirectory = path.join(root, "node_modules/mermaid/dist");
 
-/**
-The URL the reference's MermaidDiagram loads Mermaid from; the gates serve the pinned copy.
-*/
 export const mermaidUrl =
 	"https://cdn.jsdelivr.net/npm/mermaid@11.16.1/dist/mermaid.min.js";
 
@@ -82,7 +58,6 @@ function resolveRequest(url: string): string | undefined {
 				return undefined;
 			}
 
-			// The built Storybook's manager is its folder's index.html.
 			return pathname.endsWith("/") ? path.join(file, "index.html") : file;
 		}
 	}
@@ -92,14 +67,8 @@ function resolveRequest(url: string): string | undefined {
 
 export type Server = { origin: string; close: () => Promise<void> };
 
-/**
-Satoshi for a gate's page, from the folder this server mounts at /fonts/.
-*/
 export const fontStyle = `<style>${satoshiFontFace("/fonts")}</style>`;
 
-/**
-Serves the pages, the runtimes, Mermaid, Satoshi and the built Storybook on a free local port.
-*/
 export async function startServer(): Promise<Server> {
 	assertFonts();
 	const server = http.createServer((request, response) => {
@@ -132,12 +101,6 @@ export async function startServer(): Promise<Server> {
 	};
 }
 
-/**
-Holds the preview's first render until Satoshi has loaded. Some references measure text once, at
-mount (an open Popover places itself from its anchor's size and moves only on a window resize),
-so a render that ran before the font arrived would leave positions that depend on load timing.
-Wraps whatever createRoot is by then, the hydration shim's included.
-*/
 const fontShim = `<script>
 (() => {
 	const dom = window.ReactDOM;
@@ -154,10 +117,6 @@ const fontShim = `<script>
 })();
 </script>`;
 
-/**
-Turns the preview's createRoot(...).render(tree) into hydrateRoot(...), recording every
-recoverable error in window.__glHydrationErrors.
-*/
 const hydrationShim = `<script>
 window.__glHydrationErrors = [];
 (() => {
@@ -175,9 +134,6 @@ window.__glHydrationErrors = [];
 })();
 </script>`;
 
-/**
-Writes a preview page for a runtime and returns its URL path.
-*/
 export function writePage(
 	preview: Preview,
 	runtime: Runtime,
@@ -221,9 +177,6 @@ export function writePage(
 	return `/pages/${runtime}/${name}`;
 }
 
-/**
-Checks a preview has the shape the gates rely on: an inline script and an empty #root.
-*/
 export function assertPreviewShape(preview: Preview): void {
 	previewScript(preview.file);
 	if (

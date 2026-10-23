@@ -17,7 +17,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-// One row is one 20px line; no padding or border, so the height counts rows alone.
 const line = 20;
 const bare: React.CSSProperties = {
 	width: 240,
@@ -36,10 +35,6 @@ function height(element: Element): number {
 	return element.getBoundingClientRect().height;
 }
 
-/**
-Waits until the element is that many rows tall, plus its padding and border, give or take a
-pixel. A failure shows the height it had.
-*/
 async function expectRows(
 	element: Element,
 	rows: number,
@@ -61,19 +56,12 @@ function lines(count: number): string {
 	);
 }
 
-/**
-Types at the end of the text: focus alone leaves the caret at the start.
-*/
 async function typeAtEnd(element: HTMLTextAreaElement, text: string) {
 	element.focus();
 	element.setSelectionRange(element.value.length, element.value.length);
 	await userEvent.keyboard(text);
 }
 
-/**
-Whether the textarea's content scrolls: there is more of it than shows, and it moves when
-scrolled.
-*/
 function canScroll(element: HTMLTextAreaElement): boolean {
 	if (element.scrollHeight <= element.clientHeight + 1) {
 		return false;

@@ -96,8 +96,6 @@ test("each copy the reference lacked excuses one missing copy", () => {
 });
 
 test("a visible copy of a text doesn't stand in for its hidden copy", () => {
-	// The Transitions preview: each label inside a transition that starts invisible, and again
-	// as a visible caption.
 	expect(
 		missingTexts(
 			["Fade", "Fade", "Grow"],

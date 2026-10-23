@@ -1,7 +1,4 @@
-/* Blue Glass — Badge, ported from design-system/components/Badge/styles.css. */
-
 @layer gl-components {
-	/* Badge — a count pill or dot in the ink of .btn-primary, cut out of its child by a 2px glass-edge ring. */
 	.gl-badge {
 		position: relative;
 		display: inline-flex;
@@ -66,7 +63,6 @@
 		--gl-badge-y: 50%;
 		transform-origin: 0 100%;
 	}
-	/* On a round child the corner is empty: move in to the circle's edge (14%). */
 	.gl-badge-circular.gl-badge-top-right > .gl-badge-badge {
 		top: 14%;
 		right: 14%;
@@ -99,16 +95,12 @@
 	.gl-badge-info > .gl-badge-badge {
 		background: var(--info);
 	}
-
-	/* Hidden: fade and scale to 0.85, never from nothing; the exit is quicker than the entrance. */
 	.gl-badge-badge.gl-badge-invisible {
 		opacity: 0;
 		transform: translate(var(--gl-badge-x), var(--gl-badge-y)) scale(0.85);
 		transition-duration: 140ms;
 		transition-timing-function: ease;
 	}
-
-	/* No child: the pill sits in the text flow. */
 	.gl-badge-standalone > .gl-badge-badge {
 		position: relative;
 		inset: auto;

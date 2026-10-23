@@ -28,10 +28,6 @@ function size(element: Element): [number, number] {
 	return [Math.round(width), Math.round(height)];
 }
 
-/**
-The CSS properties the animations running on the element or inside it (pseudo-elements too)
-change.
-*/
 function animatedProperties(element: Element): string[] {
 	const meta = new Set(["offset", "computedOffset", "easing", "composite"]);
 	return [
@@ -62,9 +58,6 @@ const variants = [
 	"circular",
 ] as const satisfies ReadonlyArray<SkeletonProps["variant"]>;
 
-/**
-The preview's three animations side by side, plus one with animation left unset.
-*/
 function renderAnimations() {
 	const refs = {
 		unset: React.createRef<HTMLSpanElement>(),
@@ -155,7 +148,6 @@ describe("Skeleton", () => {
 		);
 		const { width, height } = box(must(ref.current));
 		expect(width).toBeCloseTo(300, 0);
-		// A 30px line box (20px at 1.5), squeezed to 60%.
 		expect(Math.abs(height - 18)).toBeLessThanOrEqual(1);
 	});
 
@@ -236,7 +228,6 @@ describe("Skeleton", () => {
 		for (const breathing of [unset, pulse]) {
 			expect(breathing).toHaveClass("gl-skeleton-pulse");
 			expect(animatedProperties(breathing)).toEqual(["opacity"]);
-			// The skeleton itself breathes.
 			expect(breathing.getAnimations()).not.toHaveLength(0);
 		}
 

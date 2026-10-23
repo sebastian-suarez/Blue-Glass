@@ -33,9 +33,6 @@ const alignments = {
 	justify: "M4 6h16M4 10h16M4 14h16M4 18h16",
 };
 
-/**
-The preview's text-alignment glyph, drawn with SvgIcon.
-*/
 function AlignIcon({ to }: { readonly to: keyof typeof alignments }) {
 	return (
 		<SvgIcon size={16}>
@@ -54,9 +51,6 @@ const node = {
 	textAlign: "center",
 } as const;
 
-/**
-The preview's diagram view: the bridge from the sim to the wheel.
-*/
 function Bridge() {
 	return (
 		<div
@@ -104,10 +98,6 @@ fn to_torque(force: i32, max_nm: f32) -> f32 {
     (force as f32 / 10_000.0).clamp(-1.0, 1.0) * max_nm
 }`;
 
-/**
-The preview's project panel: a view switch that always keeps one view, since onChange ignores
-the null an exclusive group sends when the pressed button is pressed again.
-*/
 function ProjectViews() {
 	const [view, setView] = useState("diagram");
 	return (
@@ -195,9 +185,6 @@ function ProjectViews() {
 	);
 }
 
-/**
-Default's group: the args drive it, and a press sets the value arg.
-*/
 function ViewPickerWithArgs(
 	args: ToggleButtonGroupProps,
 	{ viewMode }: { readonly viewMode: string },
@@ -229,7 +216,6 @@ function ViewPickerWithArgs(
 	);
 }
 
-// The args go to the group, which owns which button is pressed.
 export const Default: StoryObj<typeof ToggleButtonGroup> = {
 	name: "Default",
 	args: {
@@ -242,7 +228,6 @@ export const Default: StoryObj<typeof ToggleButtonGroup> = {
 		fullWidth: false,
 		onChange: fn<() => void>(),
 	},
-	// The panel reads ToggleButton's own docs; these args are the group's, so they say so.
 	argTypes: {
 		value: {
 			control: "inline-radio",

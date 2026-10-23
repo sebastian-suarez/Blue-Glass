@@ -24,9 +24,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-A disabled native button, or an element marked aria-disabled: either way it's disabled.
-*/
 function isDisabled(element: Element): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -34,16 +31,12 @@ function isDisabled(element: Element): boolean {
 	);
 }
 
-/**
-True when `second` comes after `first` in the document, and neither holds the other.
-*/
 function isInOrder(first: Node, second: Node): boolean {
 	return (
 		first.compareDocumentPosition(second) === Node.DOCUMENT_POSITION_FOLLOWING
 	);
 }
 
-// A 4×4 SVG, so the image needs no network.
 const image =
 	"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'/%3E";
 
@@ -219,7 +212,6 @@ describe("CardMedia", () => {
 				</CardMedia>
 			</Card>,
 		);
-		// The preview never sets disablePadding, so parity can't see it: read the padding.
 		expect(getComputedStyle(must(flush.current)).padding).toBe("0px");
 		expect(getComputedStyle(must(padded.current)).paddingTop).not.toBe("0px");
 	});
@@ -415,7 +407,6 @@ describe("CardActionArea", () => {
 			name: "Clean Architecture template",
 		});
 		const { width, height } = card.getBoundingClientRect();
-		// Points in the card's own padding, far from the title: only the stretched hit area is there.
 		await userEvent.click(card, { position: { x: 8, y: height / 2 } });
 		await userEvent.click(card, { position: { x: width / 2, y: height - 8 } });
 		expect(onCard).toHaveBeenCalledTimes(2);
@@ -490,11 +481,9 @@ describe("CardActionArea", () => {
 		const link = screen.getByRole("link", { name: "CV" });
 		expect(isDisabled(button)).toBe(true);
 		expect(link).toHaveAttribute("aria-disabled", "true");
-		// Playwright waits for a disabled element to enable; force the presses.
 		await userEvent.click(button, { force: true });
 		await userEvent.click(link, { force: true });
 		for (const target of [button, link]) {
-			// Something that stays focusable while disabled must still ignore the key.
 			target.focus();
 			// eslint-disable-next-line no-await-in-loop -- one key per target, in turn
 			await userEvent.keyboard("{Enter}");

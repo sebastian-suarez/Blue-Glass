@@ -18,9 +18,6 @@ afterEach(() => {
 
 type Click = { type: string; currentTarget: EventTarget };
 
-/**
-Records what each click handler saw at call time: React resets currentTarget afterwards.
-*/
 function recordClicks() {
 	const seen: Click[] = [];
 	const onClick = vi.fn((event: React.MouseEvent<HTMLElement>) => {
@@ -37,9 +34,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-A disabled native button, or an element marked aria-disabled: either way it's disabled.
-*/
 function isDisabled(element: Element): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -47,9 +41,6 @@ function isDisabled(element: Element): boolean {
 	);
 }
 
-/**
-True when `second` comes after `first` in the document, and neither holds the other.
-*/
 function isInOrder(first: Node, second: Node): boolean {
 	return (
 		first.compareDocumentPosition(second) === Node.DOCUMENT_POSITION_FOLLOWING
@@ -215,7 +206,6 @@ describe("ListItem", () => {
 		const action = screen.getByRole("button", { name: "Repo" });
 		expect(row.contains(action)).toBe(false);
 		expect(action.contains(row)).toBe(false);
-		// The ListItem is the row's only li: the button brings no second one inside it.
 		const items = screen.getAllByRole("listitem");
 		expect(items).toHaveLength(1);
 		expect(items[0]).toBe(ref.current);
@@ -350,9 +340,7 @@ describe("ListItemButton", () => {
 		);
 		const row = screen.getByRole("button", { name: "Résumé" });
 		expect(isDisabled(row)).toBe(true);
-		// Playwright waits for a disabled element to enable; force the press.
 		await userEvent.click(row, { force: true });
-		// A row that stays focusable while disabled must still ignore the key.
 		row.focus();
 		await userEvent.keyboard("{Enter}");
 		expect(onClick).not.toHaveBeenCalled();
@@ -590,7 +578,6 @@ describe("ListItemText and ListItemIcon", () => {
 		);
 		expect(insetRef.current).toHaveClass("gl-list-text-inset");
 		expect(plainRef.current).not.toHaveClass("gl-list-text-inset");
-		// The preview never sets noWrap, so parity can't see it: read the style itself.
 		const cut = getComputedStyle(screen.getByText("RS50 bridge"));
 		expect(cut.whiteSpace).toBe("nowrap");
 		expect(cut.textOverflow).toBe("ellipsis");

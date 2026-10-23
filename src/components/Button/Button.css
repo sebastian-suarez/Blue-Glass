@@ -1,7 +1,4 @@
-/* Blue Glass — Button, ported from design-system/components/Button/styles.css. */
-
 @layer gl-components {
-	/* Button — the site's .btn, .btn-primary, .btn-glass and .replink (global.css) */
 	.gl-button {
 		display: inline-flex;
 		align-items: center;
@@ -42,14 +39,11 @@
 		display: inline-flex;
 		align-items: center;
 	}
-
-	/* primary: .btn-primary */
 	.gl-button-primary {
 		background: var(--color-ink);
 		color: var(--on-ink);
 		box-shadow: var(--shadow-primary);
 	}
-	/* glass: .btn-glass */
 	.gl-button-glass {
 		background: rgba(255, 255, 255, 0.5);
 		border-color: #fffc;
@@ -57,7 +51,6 @@
 		-webkit-backdrop-filter: blur(var(--blur-control));
 		backdrop-filter: blur(var(--blur-control));
 	}
-	/* text: .replink / .figure-link — a link-weight action, underlined under a pointer */
 	.gl-button-text {
 		min-height: var(--size-control-sm);
 		padding: 0 2px;
@@ -74,8 +67,6 @@
 	.gl-button-danger.gl-button-text {
 		color: var(--danger);
 	}
-
-	/* Sizes: md is the site's; sm and lg are additions on the same pill. */
 	.gl-button-sm {
 		min-height: 36px;
 		padding: 0 var(--space-md);

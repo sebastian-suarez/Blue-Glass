@@ -18,11 +18,6 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-A cell's look: the header's 12px at weight 600 (the README's "12px muted header cells"), or the
-body's larger type at the table's weight 400. No preview sets variant, so parity can't see the
-look: this reads it.
-*/
 function lookOf(element: HTMLElement): "head" | "body" | "neither" {
 	const style = getComputedStyle(element);
 	if (style.fontSize === "12px" && style.fontWeight === "600") {
@@ -54,9 +49,6 @@ const roles = [
 	["ActiveONE", "Oct 2017 – Apr 2019"],
 ] as const;
 
-/**
-The roles as body rows, each named by its employer.
-*/
 function RoleRows() {
 	return (
 		<TableBody>
@@ -79,10 +71,6 @@ function RolesTable({
 	captionSide?: "top" | "bottom";
 	stickyHeader?: boolean;
 	minWidth?: number;
-	/**
-	A sort label in the Employer header. Chromium lets Tab reach a scroll container with
-	nothing focusable inside on its own, so the label shows the container's own tab stop.
-	*/
 	isSortable?: boolean;
 }) {
 	return (
@@ -106,10 +94,6 @@ function RolesTable({
 
 type Column = "employer" | "dates";
 
-/**
-The README's sorting recipe: a TableSortLabel in each sortable header, and sortDirection on
-that header's cell. The rows stay put; only the sort state matters here.
-*/
 function SortableRoles({ onSort }: { onSort: (type: string) => void }) {
 	const [orderBy, setOrderBy] = React.useState<Column | undefined>();
 	const [direction, setDirection] = React.useState<"asc" | "desc">("asc");
@@ -273,7 +257,6 @@ describe("TableContainer", () => {
 		expect(region.scrollLeft).toBe(0);
 		await userEvent.keyboard("{ArrowRight}");
 		await expect.poll(() => region.scrollLeft).toBeGreaterThan(0);
-		// Then on into the table's own content.
 		await userEvent.tab();
 		expect(document.activeElement).toBe(
 			screen.getByRole("button", { name: "Employer" }),
@@ -297,7 +280,6 @@ describe("TableContainer", () => {
 		const { rerender } = render(<Page width={800} />);
 		const before = screen.getByRole("button", { name: "Before" });
 		const label = screen.getByRole("button", { name: "Employer" });
-		// It fits: no scrolling, so no tab stop of its own and no region.
 		before.focus();
 		await userEvent.tab();
 		expect(document.activeElement).toBe(label);
@@ -330,7 +312,6 @@ describe("TableContainer", () => {
 		);
 		const box = must(ref.current);
 		const before = screen.getByRole("button", { name: "Before" });
-		// No role to wait on: retry until the container has measured its overflow.
 		await vi.waitFor(async () => {
 			before.focus();
 			await userEvent.tab();
@@ -490,7 +471,6 @@ describe("TableRow", () => {
 		const cell = (name: string) => screen.getByRole("cell", { name });
 		const background = (name: string) =>
 			getComputedStyle(cell(name)).backgroundColor;
-		// The pointer may start over a row, from the test before: the rest is read once its fade ends.
 		const settled = async (name: string) => {
 			await Promise.allSettled(
 				cell(name)
@@ -690,7 +670,6 @@ describe("TableSortLabel", () => {
 		const employer = screen.getByRole("button", { name: "Employer" });
 		expect(employer).toBeInstanceOf(HTMLButtonElement);
 		expect(ref.current).toBe(employer);
-		// Active with the default direction, asc.
 		expect(
 			screen.getByRole("button", { name: /^Dates\W*sorted ascending\W*$/v }),
 		).toBeVisible();

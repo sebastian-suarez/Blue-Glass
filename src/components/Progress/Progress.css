@@ -1,11 +1,4 @@
-/* Blue Glass — Progress, ported from design-system/components/Progress/styles.css. */
-
 @layer gl-components {
-	/* Progress — an addition, matching MUI's LinearProgress and CircularProgress. A 4px pill track in
-	   color-line (the site's hairline) with a color-blue mark (the diagram accent: marks only, 4:1 on
-	   glass), round caps, ease-out-quint for value changes and ease-in-out-quart for the sweep. */
-
-	/* Linear */
 	.gl-linear-progress {
 		display: grid;
 		gap: var(--space-xs);
@@ -36,12 +29,9 @@
 		border-radius: var(--radius-pill);
 		background: var(--color-line);
 	}
-	/* The sweep runs the other way in right-to-left text. The bars need no flip: Base UI's
-	   indicator, and the buffer bar beside it, grow from the inline start. */
 	.gl-linear-progress-indeterminate .gl-linear-progress-track:dir(rtl) {
 		transform: scaleX(-1);
 	}
-	/* Base UI's Progress.Indicator sizes the bar with its width, so the width eases. */
 	.gl-linear-progress-bar,
 	.gl-linear-progress-buffer-bar {
 		position: absolute;
@@ -75,8 +65,6 @@
 			transform: translateX(280%);
 		}
 	}
-
-	/* Circular */
 	.gl-circular-progress {
 		position: relative;
 		display: inline-grid;
@@ -137,8 +125,6 @@
 			stroke-dashoffset: -99;
 		}
 	}
-
-	/* inherit: currentColor for dark grounds (an ink snackbar, a primary button) */
 	.gl-progress-inherit.gl-linear-progress,
 	.gl-progress-inherit.gl-circular-progress {
 		color: inherit;
@@ -179,7 +165,6 @@
 			opacity: 0.3;
 		}
 	}
-	/* Kept faint so a full-width bar never reads as finished. */
 	@keyframes gl-progress-breathe {
 		from {
 			opacity: 0.6;
@@ -188,8 +173,6 @@
 			opacity: 0.15;
 		}
 	}
-
-	/* Reduced motion: nothing sweeps or turns. Values jump; unknown lengths become a slow pulse. */
 	@media (prefers-reduced-motion: reduce) {
 		.gl-linear-progress-bar,
 		.gl-linear-progress-buffer-bar,

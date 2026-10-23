@@ -1,8 +1,3 @@
-/**
-What the Storybook gate (run.ts) reads from the manager and its preview frame: the events and
-errors the injected recorder keeps, and the story's snapshot, which counts as settled once it
-holds for 300ms.
-*/
 import { setTimeout as delay } from "node:timers/promises";
 import type { Frame, Page } from "playwright";
 import { GateError } from "./panel.ts";
@@ -51,9 +46,6 @@ export async function eventCount(frame: Frame): Promise<number> {
 	);
 }
 
-/**
-How many times the preview reported new args for this story after the first `since` events.
-*/
 export async function argWritesSince(
 	frame: Frame,
 	id: string,
@@ -73,10 +65,6 @@ export async function argWritesSince(
 	);
 }
 
-/**
-Waits for the preview to report `type` for this story or docs entry, after the first `since`
-events. A render error for it ends the wait as a failure.
-*/
 export async function waitForEvent(
 	frame: Frame,
 	wanted: {
@@ -129,10 +117,6 @@ export async function waitForEvent(
 	}
 }
 
-/**
-The story's snapshot, after pausing infinite and SVG animations at 0, which would otherwise
-never hold still.
-*/
 export async function snapshot(frame: Frame): Promise<string> {
 	return frame.evaluate(() => {
 		for (const animation of document.getAnimations()) {
@@ -171,9 +155,6 @@ export async function snapshot(frame: Frame): Promise<string> {
 	});
 }
 
-/**
-Waits until the snapshot holds for `settleFor`, within `settleWithin`, and returns it.
-*/
 export async function settled(frame: Frame): Promise<string> {
 	await frame.evaluate(async () => document.fonts.ready);
 	const start = Date.now();

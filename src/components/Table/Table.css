@@ -1,19 +1,13 @@
-/* Blue Glass — Table, ported from design-system/components/Table/styles.css. .gl-sr-only is in
-   foundation.css. */
-
 @layer gl-components {
-	/* Table — on the site's career list surface (.career-surface inside .glass-panel), its rows separated
-     like .career-row: color-line hairlines, none under the last. */
 	.gl-table-container {
 		--gl-table-pad-top: 8px;
 		position: relative;
 		max-width: 100%;
 		overflow: auto;
 		overscroll-behavior-x: contain;
-		padding: 8px 30px; /* .career-surface */
-		border: 1px solid rgba(255, 255, 255, 0.95); /* .glass-panel */
+		padding: 8px 30px;
+		border: 1px solid rgba(255, 255, 255, 0.95);
 		border-radius: var(--radius-pane);
-		/* The panel's diagonal sheen (.glass-panel::before) as a background layer, so it never scrolls away. */
 		background:
 			linear-gradient(120deg, #fff4, transparent 40%, #fff1),
 			rgba(255, 255, 255, 0.42);
@@ -34,7 +28,6 @@
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 	}
-	/* Rows reach 12px into the surface's padding so a highlight band has room; text still starts at 30px. */
 	.gl-table-container:not(.gl-table-container-plain) > .gl-table {
 		width: calc(100% + 24px);
 		margin-inline: -12px;
@@ -67,7 +60,6 @@
 		text-align: start;
 		vertical-align: middle;
 	}
-	/* The hairline is its own layer, so a lit row's rounded ends never bend it. */
 	.gl-table-cell::after {
 		content: "";
 		position: absolute;
@@ -81,7 +73,6 @@
 		padding-block: 8px;
 		font-size: 13px;
 	}
-	/* Header: 12px, weight 600, color-muted (.project-story h4). */
 	.gl-table-cell-head {
 		padding-block: 12px 10px;
 		color: var(--color-muted);
@@ -94,7 +85,6 @@
 		padding-block: 8px 6px;
 		font-size: 12px;
 	}
-	/* The body look keeps the table's weight on a th too, such as a body-look cell in the head. */
 	.gl-table-cell-body {
 		font-weight: inherit;
 	}
@@ -125,9 +115,6 @@
 	.gl-table-body > .gl-table-row:last-child > .gl-table-cell::after {
 		opacity: 0;
 	}
-
-	/* Hover and selected: the side selector's tab states (.project-tab), as a rounded band. The hairlines
-     either side of a lit row step aside so the band reads as one piece. */
 	.gl-table-row > .gl-table-cell {
 		transition: background-color var(--duration-state) ease;
 	}
@@ -148,17 +135,12 @@
 	.gl-table-row:has(+ .gl-table-row-selected) > .gl-table-cell::after {
 		opacity: 0;
 	}
-
-	/* Sticky header: an opaque band (glass-solid) the rows pass under. A scroll container's sticky edge is
-     its content box, so pull the band up over the surface's top padding. */
 	.gl-table-sticky .gl-table-head .gl-table-cell {
 		position: sticky;
 		top: calc(-1 * var(--gl-table-pad-top, 0px));
 		z-index: 1;
 		background: var(--glass-solid);
 	}
-
-	/* Sort label: a header-styled button with a direction arrow. */
 	.gl-table-sort {
 		display: inline-flex;
 		align-items: center;
@@ -215,14 +197,14 @@
 	@media (hover: hover) and (pointer: fine) {
 		.gl-table-row-hover:hover > .gl-table-cell {
 			background-color: #ffffff66;
-		} /* .project-tab:hover */
+		}
 		.gl-table-row-hover:hover > .gl-table-cell::after,
 		.gl-table-row:has(+ .gl-table-row-hover:hover) > .gl-table-cell::after {
 			opacity: 0;
 		}
 		.gl-table-row-selected.gl-table-row-hover:hover > .gl-table-cell {
 			background-color: #fff;
-		} /* .project-tab[aria-pressed]:hover */
+		}
 		.gl-table-sort:hover {
 			color: var(--color-ink);
 		}
@@ -239,7 +221,7 @@
 			--gl-table-pad-top: 3px;
 			padding: 3px 22px;
 			border-radius: var(--radius-panel-sm);
-		} /* .career-surface under 700px */
+		}
 		.gl-table-container-plain {
 			--gl-table-pad-top: 0px;
 			padding: 0;

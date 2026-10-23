@@ -1,7 +1,3 @@
-/**
-Test components on src/internal/transition.ts, shared by its Node and Chromium tests so both
-render the same tree: what Fade, Grow, Zoom, Slide and Collapse do, minus ref forwarding.
-*/
 import * as React from "react";
 import { useShouldReduceMotion } from "../../src/internal/hooks.ts";
 import {
@@ -65,7 +61,6 @@ export function Box({
 
 export function Panel(options: TransitionOptions) {
 	const ref = React.useRef<HTMLDivElement>(null);
-	// Collapse defaults appear to false.
 	const status = useTransition(
 		{ appear: false, ...options },
 		ref,
@@ -92,10 +87,6 @@ export function Panel(options: TransitionOptions) {
 	);
 }
 
-/**
-Content that is `in` when the page renders, with appear left at its default (Collapse's
-forced on), each with the callbacks a test may watch.
-*/
 export function ServerTree(callbacks: Partial<TransitionOptions>) {
 	return (
 		<>

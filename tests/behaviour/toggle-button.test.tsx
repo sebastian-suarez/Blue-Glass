@@ -21,9 +21,6 @@ type Press = {
 	value: unknown;
 };
 
-/**
-Records what onChange saw at call time, while the event's currentTarget is still set.
-*/
 function recorder() {
 	const calls: Press[] = [];
 	const onChange = vi.fn(
@@ -39,9 +36,6 @@ function recorder() {
 	return { calls, onChange };
 }
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -57,9 +51,6 @@ function group(name: string): HTMLElement {
 	return screen.getByRole("group", { name });
 }
 
-/**
-The names of the pressed buttons, in document order.
-*/
 function pressed(container: HTMLElement = document.body): string[] {
 	return within(container)
 		.getAllByRole("button")
@@ -75,9 +66,6 @@ function height(element: Element): number {
 	return Math.round(box(element).height);
 }
 
-/**
-The border radius a token resolves to, read from a probe element styled with it.
-*/
 function resolvedRadius(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderRadius = `var(${token})`;
@@ -87,9 +75,6 @@ function resolvedRadius(token: string): string {
 	return radius;
 }
 
-/**
-Starts keyboard navigation from a plain button rendered before the component.
-*/
 function focusBefore() {
 	button("Before").focus();
 }
@@ -476,8 +461,6 @@ describe("ToggleButtonGroup", () => {
 		expect(pressed()).toEqual(["Diagram"]);
 	});
 
-	// The README lists a ToggleButton's onChange under standalone use; api.d.ts says "every press",
-	// and the reference calls it inside a group too.
 	test("a ToggleButton's own onChange gets its value on every press inside a group too", async () => {
 		const { calls, onChange } = recorder();
 		render(

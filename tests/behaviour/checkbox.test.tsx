@@ -1,8 +1,3 @@
-// Behaviour specs for Checkbox, from design-system/components/Checkbox/README.md and api.d.ts.
-// The reference draws a box under a transparent native input; the package draws a span with the
-// role beside a hidden input that carries the form value (docs/deviations.md, 1 to 4). So the specs
-// find the checkbox by role and name, read the input through the ref, and find the drawn box by
-// its place: the bordered element that covers the checkbox.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -15,16 +10,10 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
 
-/**
-The element with an id, through a selector, as the lint rules prefer.
-*/
 function byId(id: string): HTMLElement | null {
 	return document.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
 }
@@ -38,10 +27,6 @@ type Change = {
 	checked: boolean;
 };
 
-/**
-Records what onChange saw at call time: the event's type and target, the input's checked state
-then, and the second argument.
-*/
 function recorder() {
 	const calls: Change[] = [];
 	const onChange = vi.fn<OnChange>((event, checked) => {
@@ -65,9 +50,6 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -75,9 +57,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether focus is on the control or inside it.
-*/
 function hasFocus(control: HTMLElement): boolean {
 	return (
 		control === document.activeElement ||
@@ -90,9 +69,6 @@ function size(element: Element): [number, number] {
 	return [Math.round(width), Math.round(height)];
 }
 
-/**
-The opacity the element is drawn with: its own times every ancestor's.
-*/
 function opacityOf(element: Element): number {
 	let opacity = 1;
 	for (
@@ -106,10 +82,6 @@ function opacityOf(element: Element): number {
 	return opacity;
 }
 
-/**
-The box drawn for the checkbox: the element with a border that covers it exactly. The package's
-checkbox draws itself; the reference's transparent input lies over a drawn box.
-*/
 function drawnBox(control: HTMLElement): HTMLElement {
 	const target = control.getBoundingClientRect();
 	const drawn = [
@@ -134,9 +106,6 @@ function drawnBox(control: HTMLElement): HTMLElement {
 	return drawn;
 }
 
-/**
-The markup of the glyphs the box shows, to compare with what Icon draws.
-*/
 function shownMarks(control: HTMLElement): string[] {
 	return [...drawnBox(control).querySelectorAll("svg")]
 		.filter(
@@ -147,9 +116,6 @@ function shownMarks(control: HTMLElement): string[] {
 		.map((svg) => svg.getHTML());
 }
 
-/**
-The markup of a glyph as Icon draws it.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -157,9 +123,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-What a CSS value, a token or a literal, resolves to for one property, read from a probe element.
-*/
 function resolved(property: string, value: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderStyle = "solid";
@@ -170,9 +133,6 @@ function resolved(property: string, value: string): string {
 	return result;
 }
 
-/**
-The element aria-describedby points at that holds the text.
-*/
 function describer(control: HTMLElement, text: string): HTMLElement {
 	const ids = (control.getAttribute("aria-describedby") ?? "")
 		.split(/\s+/v)
@@ -187,9 +147,6 @@ function describer(control: HTMLElement, text: string): HTMLElement {
 	return element;
 }
 
-/**
-The form's entries, as FormData has them.
-*/
 function entries(form: HTMLElement): Array<[string, string]> {
 	if (!(form instanceof HTMLFormElement)) {
 		throw new TypeError("not a form");
@@ -201,10 +158,6 @@ function entries(form: HTMLElement): Array<[string, string]> {
 	]);
 }
 
-/**
-Moves the pointer to the page's bottom-left corner, clear of everything the specs render, so no
-hover style lingers on a control from an earlier click.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -233,10 +186,6 @@ const projects = [
 	{ id: "template", label: "Clean Architecture template" },
 ];
 
-/**
-The preview's Example: a parent checkbox over three projects, checked when all are, mixed when
-some are, and a press on it checks or clears them all.
-*/
 function Projects({ onParentChange }: { readonly onParentChange?: OnChange }) {
 	const [checked, setChecked] = React.useState<string[]>(["rs50"]);
 	const isAll = checked.length === projects.length;
@@ -276,9 +225,6 @@ function Projects({ onParentChange }: { readonly onParentChange?: OnChange }) {
 	);
 }
 
-/**
-Which project checkboxes are checked, in order.
-*/
 function checkedProjects(): string[] {
 	const checked = screen.queryAllByRole("checkbox", { checked: true });
 	return projects
@@ -324,13 +270,11 @@ describe("Checkbox: what it shows", () => {
 		const rowBox = row.getBoundingClientRect();
 		const drawn = drawnBox(control).getBoundingClientRect();
 		const textBox = text.getBoundingClientRect();
-		// In the gap between the box and the text.
 		const gap = (drawn.right + textBox.left) / 2;
 		await userEvent.click(row, {
 			position: { x: gap - rowBox.left, y: rowBox.height / 2 },
 		});
 		expect(ref.current?.checked).toBe(false);
-		// In the row's padding, above the text.
 		await userEvent.click(row, {
 			position: { x: textBox.left - rowBox.left + 4, y: 1 },
 		});
@@ -462,8 +406,6 @@ describe("Checkbox: what it shows", () => {
 		expect(describer(valid, "Long-form notes").querySelector("svg")).toBeNull();
 	});
 
-	// The docs don't say whether the asterisk is read; the reference hides it from assistive tech
-	// (reference.tsx, line 91), which hears required from the input.
 	test("required sets required on the input and marks the label with an asterisk that isn't part of the name", () => {
 		const required = React.createRef<HTMLInputElement>();
 		const optional = React.createRef<HTMLInputElement>();
@@ -691,9 +633,6 @@ describe("Checkbox: checked and onChange", () => {
 		expect(ref.current?.checked).toBe(false);
 	});
 
-	// The reference sets its state before onChange runs (reference.tsx, lines 57 to 61): the
-	// browser puts the box back, but React already holds it checked, and the next press goes
-	// unreported.
 	referenceDefectTest(
 		"after a cancelled press, the next press is reported to onChange and can be cancelled too",
 		async () => {
@@ -731,8 +670,6 @@ describe("Checkbox: indeterminate", () => {
 		expect(checkbox("All projects")).toBePartiallyChecked();
 	});
 
-	// A press clears a native input's indeterminate property, and the reference sets it again only
-	// after a render (reference.tsx, lines 52 to 55), which a press its parent ignores doesn't cause.
 	referenceDefectTest(
 		"controlled and mixed, it stays mixed after a press its parent ignores",
 		async () => {

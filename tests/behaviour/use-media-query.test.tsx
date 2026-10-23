@@ -8,7 +8,6 @@ import { cdp, page } from "vitest/browser";
 import "#ui/styles.css";
 import { type UseMediaQueryOptions, media, useMediaQuery } from "#ui";
 
-// The test frame's size before any test resizes it, so each test can put it back.
 const frame = { width: window.innerWidth, height: window.innerHeight };
 
 afterEach(async () => {
@@ -17,9 +16,6 @@ afterEach(async () => {
 	await page.viewport(frame.width, frame.height);
 });
 
-/**
-Emulates media features through Chromium's DevTools protocol; an empty list clears them.
-*/
 async function emulateMedia(
 	features: Array<{ name: string; value: string }>,
 ): Promise<void> {
@@ -50,9 +46,6 @@ function values(list: readonly MediaName[]): Record<string, string | null> {
 	);
 }
 
-/**
-Waits for the probes of these media names to show the expected values.
-*/
 async function settle(
 	list: readonly MediaName[],
 	expected: Record<string, string>,
@@ -192,8 +185,6 @@ test("a new query takes over on the next render, and stays live", async () => {
 	await expect.poll(value).toBe("false");
 });
 
-// The README is open on whether a client render starts at defaultMatches; the reference reads
-// the browser from the first render, so a client-only page never shows the default.
 test("on a client render, the first render already has the live value, whatever defaultMatches says", () => {
 	const seen: boolean[] = [];
 	function Recorder({

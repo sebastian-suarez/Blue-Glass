@@ -1,6 +1,3 @@
-/* Blue Glass — CssBaseline's element resets as a file, for pages rendered without client React.
-   Copied from the CSS that design-system/components/CssBaseline/reference.tsx injects. */
-
 @layer gl-fallback, gl-base, gl-components;
 
 @layer gl-base {

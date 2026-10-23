@@ -17,7 +17,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// A specimen tile: tall enough to show the surface, with its label at the bottom.
 const tile: CSSProperties = {
 	padding: 22,
 	minHeight: 120,

@@ -8,7 +8,6 @@ import { root } from "../../scripts/lib/reference.ts";
 import { doesQueryMatch } from "../../scripts/lib/server-render.ts";
 
 test("the ported modules and shared files still match their reference", () => {
-	// Throws, failing the test, when check-sync exits 1 after design-system/ changes.
 	const output = execFileSync(
 		process.execPath,
 		[path.join(root, "scripts/check-sync.ts")],
@@ -19,7 +18,6 @@ test("the ported modules and shared files still match their reference", () => {
 	expect(output).toContain("in sync");
 });
 
-// The first phase with a module tests/sync.json doesn't record, whatever phase is current.
 const recorded = (
 	JSON.parse(fs.readFileSync(path.join(root, "tests/sync.json"), "utf8")) as {
 		components: Record<string, unknown>;

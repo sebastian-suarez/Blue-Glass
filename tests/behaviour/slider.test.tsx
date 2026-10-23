@@ -1,9 +1,3 @@
-// Behaviour specs for Slider and its SliderMark type, from design-system/components/Slider/README.md
-// and api.d.ts. The port runs on Base UI's Slider, whose thumbs are visually hidden range inputs
-// inside the thumb a reader sees, so the specs find each thumb by role and name, and the other
-// parts by what a reader sees: the rail by its color-line background, the fill by its color-blue
-// one, the value pill and the mark labels by their text. Drags run through Chromium's own mouse
-// input (CDP): a press, moves and a release, so the pointer capture is the browser's.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -16,10 +10,6 @@ type Point = { readonly x: number; readonly y: number };
 
 let isMouseDown = false;
 
-/**
-Parks the pointer in the page's bottom-left corner, clear of every slider below: a thumb that
-appears under a resting pointer counts as hovered.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -37,7 +27,6 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-	// A test that failed mid-drag would leave the button down for the next one.
 	if (isMouseDown) {
 		await releaseAt({ x: 0, y: 0 });
 	}
@@ -74,9 +63,6 @@ async function pause(ms: number): Promise<void> {
 	});
 }
 
-/**
-A point in the test page's own coordinates, in the coordinates Chromium's input takes.
-*/
 function inputPoint({ x, y }: Point): Point {
 	const frame = window.frameElement;
 	const offset = frame ? box(frame) : { left: 0, top: 0 };
@@ -107,9 +93,6 @@ async function pressAt(point: Point): Promise<void> {
 	await mouse("mousePressed", point);
 }
 
-/**
-Moves the mouse there: a drag while the button is down, a hover otherwise.
-*/
 async function moveTo(point: Point): Promise<void> {
 	await mouse("mouseMoved", point);
 }
@@ -137,9 +120,6 @@ type Property =
 	| "borderTopLeftRadius"
 	| "boxShadow";
 
-/**
-The computed value of a token (or a plain CSS value), read from a probe element styled with it.
-*/
 function resolved(
 	token: string,
 	property: Property = "backgroundColor",
@@ -156,9 +136,6 @@ function resolved(
 	return value;
 }
 
-/**
-The elements inside the slider painted with this token as their background.
-*/
 function painted(root: Element, token: string): HTMLElement[] {
 	const colour = resolved(token);
 	return [...root.querySelectorAll<HTMLElement>("*")].filter(
@@ -166,9 +143,6 @@ function painted(root: Element, token: string): HTMLElement[] {
 	);
 }
 
-/**
-The rail: the one color-line part.
-*/
 function railOf(root: Element): DOMRect {
 	const rails = painted(root, "--color-line");
 	if (rails.length !== 1) {
@@ -178,9 +152,6 @@ function railOf(root: Element): DOMRect {
 	return box(rails[0]);
 }
 
-/**
-The filled part: the one color-blue part with an area, or undefined when nothing is filled.
-*/
 function fillOf(root: Element): DOMRect | undefined {
 	const parts = painted(root, "--color-blue")
 		.map((element) => box(element))
@@ -194,9 +165,6 @@ function fillOf(root: Element): DOMRect | undefined {
 
 type Scale = { readonly min?: number; readonly max?: number };
 
-/**
-Where a value sits on the rail: from min at its left end (its bottom when vertical) to max.
-*/
 function pointAt(
 	root: Element,
 	value: number,
@@ -214,9 +182,6 @@ function pointAt(
 		: { x: rail.left + along, y: rail.top + halfHeight };
 }
 
-/**
-The dots on the rail: small round marks centred on its line.
-*/
 function dotsOf(root: Element): DOMRect[] {
 	const rail = railOf(root);
 	const halfRail = rail.height / 2;
@@ -234,9 +199,6 @@ function dotsOf(root: Element): DOMRect[] {
 		});
 }
 
-/**
-The horizontal middle of a box.
-*/
 function middleOf(rect: DOMRect): number {
 	const half = rect.width / 2;
 	return rect.left + half;
@@ -254,10 +216,6 @@ function valueOf(element: Element): number {
 	return Number(element.getAttribute("aria-valuenow"));
 }
 
-/**
-The value a thumb announces and the range it announces it in: its aria-valuenow, aria-valuemin
-and aria-valuemax, which a native range input takes from its value, min and max.
-*/
 function announced(element: HTMLElement): {
 	now: number;
 	min: number;
@@ -273,9 +231,6 @@ function announced(element: HTMLElement): {
 	};
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -283,10 +238,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether the element is drawn: a box, and no display none, visibility hidden or opacity 0 on it
-or an ancestor.
-*/
 function isDrawn(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -296,9 +247,6 @@ function isDrawn(element: Element): boolean {
 	);
 }
 
-/**
-The drawn elements inside the slider whose own text is `text`: a value pill showing.
-*/
 function drawn(root: HTMLElement, text: string): HTMLElement[] {
 	return within(root)
 		.queryAllByText(text)
@@ -313,10 +261,6 @@ async function expectPill(
 	await expect.poll(() => drawn(root, text).length).toBe(isShown ? 1 : 0);
 }
 
-/**
-What a callback's event is: a React event, or one shaped like it as the documented
-React.SyntheticEvent says, of a type, around a native event of a class.
-*/
 function eventOf(event: React.SyntheticEvent | Event): string {
 	if (event instanceof Event) {
 		return `native ${event.type}`;
@@ -342,9 +286,6 @@ function copied(value: number | number[]): number | number[] {
 	return Array.isArray(value) ? [...value] : value;
 }
 
-/**
-Records what onChange and onChangeCommitted saw at call time.
-*/
 function recorder() {
 	const changes: Change[] = [];
 	const commits: Commit[] = [];
@@ -376,9 +317,6 @@ type StageProps = SliderProps & {
 	readonly testId?: string;
 };
 
-/**
-A slider named "Volume" on a 300px stage, with room around it for its band and pill.
-*/
 function Stage({ testId = "stage", ...props }: StageProps) {
 	return (
 		<div
@@ -390,9 +328,6 @@ function Stage({ testId = "stage", ...props }: StageProps) {
 	);
 }
 
-/**
-A vertical slider named "Strength" in a 200px tall parent, as the README asks.
-*/
 function Upright(props: SliderProps) {
 	return (
 		<div
@@ -432,9 +367,6 @@ function formNamed(name: string): HTMLFormElement {
 	return form;
 }
 
-/**
-The slider's root: the first element it renders in its stage.
-*/
 function rootOf(testId = "stage"): HTMLElement {
 	const root = screen.getByTestId(testId).firstElementChild;
 	if (!(root instanceof HTMLElement)) {
@@ -444,26 +376,17 @@ function rootOf(testId = "stage"): HTMLElement {
 	return root;
 }
 
-/**
-Names a range's thumbs, as the api.d.ts example does.
-*/
 function ends(index: number): string {
 	return index === 0 ? "Lowest" : "Highest";
 }
 
 const degrees = [360, 540, 900, 1080];
 
-/**
-The preview's rotation marks: a labelled mark at each of these degrees.
-*/
 const rotation: SliderMark[] = degrees.map((value) => ({
 	value,
 	label: `${value}°`,
 }));
 
-/**
-Tabs from the Before button and waits for focus on the named thumb.
-*/
 async function tabInto(name = "Volume"): Promise<HTMLElement> {
 	button("Before").focus();
 	await userEvent.tab();
@@ -472,9 +395,6 @@ async function tabInto(name = "Volume"): Promise<HTMLElement> {
 	return target;
 }
 
-/**
-Presses each key in turn on the focused thumb and waits for the value after it.
-*/
 async function keys(
 	target: HTMLElement,
 	steps: ReadonlyArray<readonly [key: string, value: number]>,
@@ -635,7 +555,6 @@ describe("Slider: names and value text", () => {
 		expect(thumb("Latency budget")).toBeInTheDocument();
 	});
 
-	// The preview's range sets both: the visible label for the slider, getAriaLabel for each thumb.
 	test("getAriaLabel names each thumb of a range, over aria-labelledby", () => {
 		render(
 			<>
@@ -673,8 +592,6 @@ describe("Slider: names and value text", () => {
 		}
 	});
 
-	// The README makes aria-valuetext from these two props only; without them a screen reader
-	// reads the number, as in the reference.
 	test("without getAriaValueText or a format that returns a string, the thumbs have no aria-valuetext", () => {
 		render(
 			<>
@@ -766,8 +683,6 @@ describe("Slider: names and value text", () => {
 			.toHaveAttribute("aria-valuetext", "90 milliseconds, the fastest");
 	});
 
-	// The README says a thumb stops at the other thumb; the reference announces those stops as each
-	// thumb's range, as the APG's multi-thumb slider does, and moves them with the other thumb.
 	test("in a range each thumb's aria-valuemin and aria-valuemax are where it stops: the slider's end and the other thumb", async () => {
 		render(
 			<Around>
@@ -1151,7 +1066,6 @@ describe("Slider: onChange and onChangeCommitted", () => {
 		const root = rootOf();
 		await pressAt(pointAt(root, 30));
 		await moveTo(pointAt(root, 45));
-		// Down off the track, the same distance along: the value stays.
 		await moveTo({ x: pointAt(root, 45).x, y: pointAt(root, 45).y + 40 });
 		await moveTo(pointAt(root, 80));
 		await releaseAt(pointAt(root, 80));

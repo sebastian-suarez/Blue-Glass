@@ -1,15 +1,3 @@
-/**
-The steps a reader takes in each stateful Default, which the Storybook gate
-(scripts/storybook/run.ts) replays: on the canvas, where the Controls panel must follow each
-step; after a change in the panel, which the story must follow; and on the docs page, where the
-Default must respond without writing the args. `--self` replays each entry on the reference's
-preview page too, inside its "Default" section, since the Default story renders that section.
-
-Actions use tests/parity/states.ts's syntax, without its "#root >>" prefix: the gate looks
-inside the story first, then in what it portals into body. `arg` is the value the panel must
-show after the step; `shows` and `hides` are selectors that must be visible, or gone or
-hidden, afterwards.
-*/
 import type { Action } from "../parity/states.ts";
 
 export type Step = {
@@ -24,21 +12,7 @@ export type Interaction = { arg: string; steps: Step[] };
 const role = (name: string, accessibleName: string, state = "") =>
 	`internal:role=${name}[name=${JSON.stringify(accessibleName)}s]${state}`;
 
-/*
-Stateful Defaults without an entry, since no step could be checked on the reference's preview:
-- Popover: the Variants section's popovers open after the Default's and sit above it, so they
-  take Escape and every outside press; nothing inside the Default's popover closes it.
-- Tooltip: the preview holds the Default's tooltip open with no handlers, so on the reference
-  nothing a reader does closes it; the story adds the wiring.
-- TextField and Slider (phase 3): a step is one action, a key goes to the element that has
-  focus, and nothing has focus at load, so no single step changes their `value`: a click on the
-  field or the thumb doesn't move it, and a key before a click goes nowhere.
-- Rating (phase 3): its radios are visually hidden under the stars' hit labels, so a press by
-  role never lands on the reference, and a key needs focus first.
-The Controls check still proves their `open` and `value` act.
-*/
 export const interactions: Record<string, Interaction> = {
-	// Phase 1.
 	"navigation-tabs--default": {
 		arg: "value",
 		steps: [
@@ -107,11 +81,8 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// Phase 2. The Defaults that open in place on load start with a dismissal.
 	"utils-modal--default": {
 		arg: "open",
-		// Escape goes to the top layer, which at load is the Variants example's, opened after
-		// this one; once reopened, this one is on top.
 		steps: [
 			{
 				action: {
@@ -136,7 +107,6 @@ export const interactions: Record<string, Interaction> = {
 		arg: "open",
 		steps: [
 			{
-				// The backdrop is aria-hidden, so its own copy is what a press aims at.
 				action: { click: 'internal:text="Press to dismiss"s' },
 				arg: false,
 				hides: ['internal:text="Press to dismiss"s'],
@@ -167,7 +137,6 @@ export const interactions: Record<string, Interaction> = {
 		arg: "open",
 		steps: [
 			{
-				// "Copy link" also shows its shortcut, so its name is matched as a substring.
 				action: { click: 'internal:role=menuitem[name="Copy link"i]' },
 				arg: false,
 				hides: ["internal:role=menu"],
@@ -224,7 +193,6 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// The Popper's buttons set its placement, which Default lists through LiveArg.
 	"utils-popper--default": {
 		arg: "placement",
 		steps: [
@@ -243,7 +211,6 @@ export const interactions: Record<string, Interaction> = {
 	"feedback-snackbar--default": {
 		arg: "open",
 		steps: [
-			// The Default opens on load: its close button asks to close (closeButton).
 			{
 				action: { click: 'internal:role=button[name="Close"s]' },
 				arg: false,
@@ -258,7 +225,6 @@ export const interactions: Record<string, Interaction> = {
 					'internal:role=status >> internal:text="Published to S3. CloudFront picks it up in about a minute."s',
 				],
 			},
-			// README: "Escape closes an open snackbar (escapeKeyDown)."
 			{
 				action: { press: "Escape" },
 				arg: false,
@@ -268,7 +234,6 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// Phase 3. The form controls list their state; the lists and the dial list `open`.
 	"inputs-checkbox--default": {
 		arg: "checked",
 		steps: [
@@ -330,7 +295,6 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// The Default's list opens in place on load, the only layer open, so Escape closes it.
 	"inputs-select--default": {
 		arg: "open",
 		steps: [
@@ -351,8 +315,6 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// The Default's list opens in place on load with "a" typed and no focus; choosing a row closes
-	// it, a press on the input opens it again and leaves focus there for Escape.
 	"inputs-autocomplete--default": {
 		arg: "open",
 		steps: [
@@ -373,8 +335,6 @@ export const interactions: Record<string, Interaction> = {
 			},
 		],
 	},
-	// The Default's dial is open on load. A press on its trigger toggles it; the pointer then rests
-	// on the trigger, so no hover opens it in between, and Escape reaches the focused trigger.
 	"navigation-speeddial--default": {
 		arg: "open",
 		steps: [

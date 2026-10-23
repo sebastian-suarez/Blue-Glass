@@ -1,31 +1,4 @@
 "use client";
-/**
-Menu, MenuItem and MenuList, ported from design-system/components/Menu/reference.tsx.
-
-Menu runs on Base UI's Menu, anchored to `anchorEl` (src/internal/anchor.ts): `Menu.Popup` is the
-glass surface (the ref, a div), Base UI's `Menu.List` is the `role="menu"` list (a <ul> with the
-Menu's `id`, named by the anchor's id unless MenuListProps names it), and the items inside are
-Base UI's, through the two-mode MenuItem (src/internal/menu-item.tsx). Base UI owns the keys: Up
-and Down with wrapping (`loopFocus`, which MenuListProps' `disableListWrap` turns off), Home and
-End, typeahead, Enter and Space, and a choice closes it (`itemClick`, with the item's React click
-event, unless its onClick called preventDefault).
-
-The reference's Menu is a Popover, so it sits on the same transparent modal layer
-(src/internal/popup-layer.tsx), with Popover's flags: an outside press is the backdrop's
-(`backdropClick`), Escape is reported from Base UI's (`escapeKeyDown`), and Tab, which Base UI
-would let leave an anchored menu, closes it from the surface's keydown with that real event
-(`tabKeyDown`), as the reference's MenuList does. Focus returns to where it was before the menu
-opened: the button.
-
-Focus moves in to the selected item, else the first enabled one (`autoFocus`, or MenuListProps'
-`autoFocusItem`), as the surface starts to enter, so a key pressed right after the opening press
-lands on it. With `autoFocus={false}` it goes to the list, and with `disableAutoFocus` it stays
-put. Base UI would focus the list a frame later, so Menu.Popup's `initialFocus` is off: Base UI's
-source reads it, though its types and docs leave it out.
-
-MenuItem and MenuList are the adapter's: a MenuItem inside a Menu renders Base UI's item, and
-inside the standalone MenuList the reference's roving-focus item.
-*/
 import { Menu as BaseMenu } from "@base-ui/react/menu";
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
@@ -53,43 +26,20 @@ export type MenuProps = Omit<
 	PopoverProps,
 	"onClose" | "padding" | "children"
 > & {
-	/**
-	Called with the reason (backdropClick, escapeKeyDown, itemClick, tabKeyDown). Set open to false
-	to close.
-	*/
 	onClose?: (
 		event: React.SyntheticEvent | KeyboardEvent,
 		reason: MenuCloseReason,
 	) => void;
-	/**
-	Focus the selected item, else the first enabled one, when it opens. Default true.
-	*/
 	autoFocus?: boolean;
-	/**
-	Compact 32px rows.
-	*/
 	dense?: boolean;
-	/**
-	Id of the role="menu" list, for the button's aria-controls.
-	*/
 	id?: string;
-	/**
-	Props for the inner MenuList. aria-labelledby defaults to the anchor's id.
-	*/
 	MenuListProps?: Partial<MenuListProps>;
-	/**
-	MenuItems, with separators between groups.
-	*/
 	children?: React.ReactNode;
 };
 
 const itemSelector =
 	'[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
 
-/**
-Where focus goes as it opens: the selected item, else the first enabled one, else the first; or,
-without an item to focus, a marked element, else the list.
-*/
 function initialFocusTarget(
 	list: HTMLElement,
 	shouldFocusItem: boolean,
@@ -109,14 +59,8 @@ function initialFocusTarget(
 	);
 }
 
-// The layer moves focus in, a frame sooner than Menu.Popup's initialFocus would, so that's off.
-// Menu.Popup reads it, though its props type leaves it out.
 const popupFocusProps: { initialFocus: false } = { initialFocus: false };
 
-/**
-A list of actions on a glass popover anchored to the button that opens it, closing on a choice,
-an outside press, Escape or Tab.
-*/
 export function Menu({
 	open,
 	onClose,
@@ -156,7 +100,6 @@ export function Menu({
 	const shouldFocusItem = autoFocusItem ?? (autoFocus && !disableAutoFocus);
 	const listRef = React.useRef<HTMLUListElement | null>(null);
 	const handleListRef = useForkRef(listRef, listRefProp);
-	// The list's default name: the id of the element the menu is anchored to, as in the reference.
 	const anchorId =
 		anchorEl !== null &&
 		typeof anchorEl === "object" &&
@@ -194,8 +137,6 @@ export function Menu({
 	});
 	const handleRef = useForkRef(layer.surfaceRef, ref);
 
-	// `open` stays controlled: every change Base UI asks for is cancelled, and Escape and a choice
-	// are reported here. An outside press is the backdrop's to report, and Tab the keydown's below.
 	const handleOpenChange = useEventCallback(
 		(isOpen: boolean, details: BaseMenu.Root.ChangeEventDetails) => {
 			details.cancel();
@@ -248,7 +189,6 @@ export function Menu({
 								}}
 								onKeyDown={(event) => {
 									onKeyDown?.(event);
-									// A menu is one tab stop: Tab closes it, and focus returns to the button.
 									if (
 										event.key !== "Tab" ||
 										event.defaultPrevented ||

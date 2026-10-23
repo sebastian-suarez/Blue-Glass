@@ -1,21 +1,4 @@
 "use client";
-/**
-Popper, ported from design-system/components/Popper/reference.tsx: a position: fixed layer
-placed next to its anchor by positionFixed (src/internal/position.ts, which this module
-exports), through Portal. It flips and shifts, follows window scroll and resize and the anchor's
-and the layer's own size, and sets --gl-transform-origin and --gl-available-height for its
-content. It's non-modal: no backdrop, no focus move, nothing hidden from assistive tech.
-
-As in the reference, the position is measured in a layout effect after every render, so a
-function anchorEl is asked again each time, and the layer stays hidden until it has a position.
-Two changes:
-- The layer's element is also kept in state, so a layer that mounts after the Popper's own
-  render (the Portal adds its children only once hydration is over) is measured when it
-  arrives, not at the next scroll.
-- A new minWidth alone counts as a new position. The reference kept the old one, so turning
-  matchWidth on at a start placement, which moves nothing else, left the layer narrow until
-  something else moved.
-*/
 import * as React from "react";
 import type { AnchorEl, VirtualElement } from "../../internal/anchor.js";
 import { cx } from "../../internal/cx.js";
@@ -46,9 +29,6 @@ export type { AnchorEl, VirtualElement } from "../../internal/anchor.js";
 
 export type PopperChildProps = {
 	placement: Placement;
-	/**
-	Spread into a transition (Grow, Fade) so the Popper unmounts after it exits.
-	*/
 	TransitionProps: {
 		in: boolean;
 		onExited: () => void;
@@ -61,32 +41,14 @@ export type PopperProps = Omit<
 	"children"
 > & {
 	open: boolean;
-	/**
-	What to anchor to: an element, a virtual rect, or a function returning one.
-	*/
 	anchorEl: AnchorEl;
-	/**
-	Preferred side and alignment. Default "bottom". Flips when it doesn't fit.
-	*/
 	placement?: Placement;
-	/**
-	Gap to the anchor in px. Default 8.
-	*/
 	offset?: number;
-	/**
-	At least as wide as the anchor.
-	*/
 	matchWidth?: boolean;
-	/**
-	Children use a transition: the Popper stays mounted until TransitionProps.onExited.
-	*/
 	transition?: boolean;
 	keepMounted?: boolean;
 	disablePortal?: boolean;
 	container?: PortalProps["container"];
-	/**
-	`z-index`; default the z-modal token.
-	*/
 	zIndex?: string | number;
 	children?: React.ReactNode | ((props: PopperChildProps) => React.ReactNode);
 };
@@ -106,11 +68,6 @@ function isSamePosition(a: PositionResult, b: PositionResult): boolean {
 	);
 }
 
-/**
-Floats content next to an anchor with fixed positioning: flips to the other
-side when there is no room, shifts to stay on screen, follows scroll and
-resize, and exposes --gl-transform-origin so transitions grow from the anchor.
-*/
 export function Popper({
 	open,
 	anchorEl,
@@ -133,7 +90,6 @@ export function Popper({
 	const floatingRef = React.useRef<HTMLDivElement | null>(null);
 	const [floating, setFloating] = React.useState<HTMLDivElement | null>(null);
 	const handleRef = useForkRef(floatingRef, setFloating, ref);
-	// Opening ends any finished exit, in the same render, as the reference does.
 	if (open && isExited) {
 		setIsExited(false);
 	}
@@ -157,7 +113,6 @@ export function Popper({
 		);
 	});
 
-	// After every render: the anchor, the placement or the content may have moved.
 	useIsoLayoutEffect(() => {
 		if (isMounted) {
 			update();
@@ -174,7 +129,6 @@ export function Popper({
 			update();
 		};
 
-		// Capture, so a scrolling ancestor's scroll reaches it too.
 		window.addEventListener("scroll", onChange, { capture: true });
 		window.addEventListener("resize", onChange);
 		const observer =
@@ -221,7 +175,6 @@ export function Popper({
 		top: position === null ? 0 : position.y,
 		minWidth: position?.minWidth,
 		zIndex: zIndex ?? "var(--z-modal, 1300)",
-		// Hidden until measured, so it never shows at the corner first.
 		visibility: position === null ? "hidden" : undefined,
 		display: !open && !transition && keepMounted ? "none" : undefined,
 		"--gl-transform-origin": position?.origin ?? "center",

@@ -1,28 +1,11 @@
 "use client";
-/**
-ClickAwayListener, ported from design-system/components/ClickAwayListener/reference.tsx: it
-listens on its child's document for the press events chosen, and calls onClickAway with the DOM
-event when one lands outside the child. Outside follows the DOM, so a press in a portal the child
-renders is outside it.
-
-The press that mounts it never counts: listening starts a tick after mount. The press's own
-event can still be on its way up to the document when React mounts the listener (a click that
-opens a panel with mouseEvent="onClick" reaches the new listener), so until then every event is
-ignored.
-*/
 import * as React from "react";
 import { isInside, ownerDocument } from "../../internal/dom.js";
 import { useEventCallback, useForkRef } from "../../internal/hooks.js";
 
 export type ClickAwayListenerProps = {
-	/**
-	One element that can hold a ref.
-	*/
 	children: React.ReactElement;
 	onClickAway: (event: MouseEvent | TouchEvent | PointerEvent) => void;
-	/**
-	Event that counts as a click. Default "onPointerDown". false to ignore mouse.
-	*/
 	mouseEvent?:
 		| "onClick"
 		| "onPointerDown"
@@ -30,9 +13,6 @@ export type ClickAwayListenerProps = {
 		| "onMouseDown"
 		| "onMouseUp"
 		| false;
-	/**
-	Default "onTouchEnd". false to ignore touch.
-	*/
 	touchEvent?: "onTouchStart" | "onTouchEnd" | false;
 };
 
@@ -48,9 +28,6 @@ const domEvents = {
 
 type ChildProps = { ref?: React.Ref<Element> };
 
-/**
-Calls onClickAway when a press lands outside its child. Ignores the press that mounted it.
-*/
 export function ClickAwayListener({
 	children,
 	onClickAway,
@@ -66,7 +43,6 @@ export function ClickAwayListener({
 				return;
 			}
 
-			// The composed path also sees through shadow roots.
 			const isFromInside =
 				event.composedPath().includes(node) || isInside(node, event.target);
 			if (!isFromInside) {
@@ -76,7 +52,6 @@ export function ClickAwayListener({
 	);
 
 	React.useEffect(() => {
-		// Wait a tick, so the event that mounted it has passed.
 		const timer = setTimeout(() => {
 			isActiveRef.current = true;
 		}, 0);
@@ -98,7 +73,6 @@ export function ClickAwayListener({
 		};
 	}, [mouseEvent, touchEvent, handleEvent]);
 
-	// React 19 keeps an element's ref in its props; the child keeps its own.
 	const childRef = React.isValidElement<ChildProps>(children)
 		? children.props.ref
 		: undefined;

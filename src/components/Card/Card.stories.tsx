@@ -31,9 +31,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The card's repository link, named after the card so each "Repository" is unique.
-*/
 function RepositoryLink({ name }: { readonly name: string }) {
 	return (
 		<Button
@@ -67,9 +64,6 @@ const highlightedEdge: CSSProperties = { ...edge, stroke: "var(--color-blue)" };
 const nodeText: CSSProperties = { fill: "var(--color-ink)", fontSize: 15 };
 const edgeText: CSSProperties = { fill: "var(--color-muted)", fontSize: 13 };
 
-/**
-One box of the review gate: a rounded rect with a bold title over a detail line.
-*/
 function GateNode({
 	x,
 	y,
@@ -113,9 +107,6 @@ function GateNode({
 	);
 }
 
-/**
-The VSebCode card's figure: the review gate between the coding agent, the reviewer and the repo.
-*/
 function ReviewGate() {
 	return (
 		<svg
@@ -212,7 +203,6 @@ function ReviewGate() {
 	);
 }
 
-// The variant tiles: tighter than a full card.
 const tile: CSSProperties = { padding: 26, gap: 14 };
 
 export const Default: Story = {

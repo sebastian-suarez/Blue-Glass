@@ -19,7 +19,6 @@ const meta = {
 
 export default meta;
 
-// The stories render their own demos, so they take no args, not even the required children.
 type Story = StoryObj;
 
 const box = {
@@ -29,9 +28,6 @@ const box = {
 	placeItems: "center",
 } as const;
 
-/**
-A transition over its caption, in a cell of the box's size.
-*/
 function Specimen({
 	label,
 	children,
@@ -47,9 +43,6 @@ function Specimen({
 	);
 }
 
-/**
-Fade, Grow, Zoom and Slide on one switch, which the story's `in` arg holds.
-*/
 function Transitions({
 	isShown,
 	onToggle,
@@ -103,9 +96,6 @@ function Transitions({
 	);
 }
 
-/**
-A project card whose second paragraph Collapse reveals.
-*/
 function ReadMore() {
 	const [isOpen, setIsOpen] = React.useState(false);
 	return (
@@ -144,9 +134,6 @@ function ReadMore() {
 	);
 }
 
-/**
-Default's demo: the in arg shows or hides all four, and the button flips it.
-*/
 function TransitionsWithArgs(
 	args: { readonly in?: boolean },
 	{ viewMode }: { readonly viewMode: string },

@@ -1,10 +1,4 @@
-/* Blue Glass — Menu, ported from design-system/components/Menu/styles.css. The surface is
-   Base UI's Menu.Popup and the list its Menu.List, a <ul>, with the reference's classes, so the
-   selectors carry over unchanged. */
-
 @layer gl-components {
-	/* Menu — base .gl-popover (the side selector's material: glass, blur-selector, radius-well, the
-	   selector's 7px padding) holding .gl-option rows (.project-tab, denser) from base.css */
 	.gl-menu {
 		min-width: 200px;
 		max-width: min(340px, calc(100vw - 16px));
@@ -32,8 +26,6 @@
 	.gl-menu-item[aria-checked="true"] .gl-option-end {
 		color: var(--color-ink);
 	}
-
-	/* dense: 32px rows, the size-control-sm tap target */
 	.gl-menu-item-dense {
 		min-height: var(--size-control-sm);
 		padding: 5px 10px;
@@ -43,8 +35,6 @@
 	.gl-menu-item-dense .gl-option-secondary {
 		font-size: 11px;
 	}
-
-	/* danger: destructive items read in danger and highlight on danger-soft */
 	.gl-menu-item-danger,
 	.gl-menu-item-danger .gl-option-icon {
 		color: var(--danger);
@@ -52,8 +42,6 @@
 	.gl-menu-item-danger:focus-visible {
 		background: var(--danger-soft);
 	}
-
-	/* Separators: the site's hairline (color-line), between groups */
 	.gl-menu-separator,
 	.gl-menu-list > [role="separator"] {
 		display: block;

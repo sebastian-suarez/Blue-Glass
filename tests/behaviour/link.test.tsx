@@ -7,7 +7,6 @@ import { Icon, Link, type LinkProps } from "#ui";
 
 afterEach(() => {
 	cleanup();
-	// The keyboard tests follow hash hrefs; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
@@ -19,9 +18,6 @@ function link(name: string): HTMLElement {
 	return screen.getByRole("link", { name });
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with what a component shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -29,9 +25,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-The first text node inside the element that holds the text, wherever the port wraps it.
-*/
 function textNode(element: Element, text: string): Node {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let node = walker.nextNode();
@@ -46,9 +39,6 @@ function textNode(element: Element, text: string): Node {
 	throw new Error(`No text "${text}" in the element`);
 }
 
-/**
-Whether an svg drawing the glyph sits inside the element, after the text.
-*/
 function hasGlyphAfterText(element: HTMLElement, text: string, name: string) {
 	const markup = glyph(name);
 	const label = textNode(element, text);
@@ -63,9 +53,6 @@ function focusBefore() {
 	screen.getByRole("button", { name: "Before" }).focus();
 }
 
-/**
-Stands in for a router's link component.
-*/
 function RouterLink({ children, ...props }: React.ComponentProps<"a">) {
 	return (
 		<a {...props} data-router="">
@@ -101,7 +88,6 @@ describe("element and ref", () => {
 				Work
 			</Link>,
 		);
-		// RouterLink renders only the props it gets, so what reaches the anchor came through them.
 		const anchor = link("Work");
 		expect(anchor).toHaveAttribute("data-router");
 		expect(anchor).toHaveAttribute("href", "/work");

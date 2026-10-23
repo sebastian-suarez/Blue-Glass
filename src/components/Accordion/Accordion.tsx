@@ -1,21 +1,4 @@
 "use client";
-/**
-Accordion, AccordionSummary, AccordionDetails and PaneAccordion, ported from
-design-system/components/Accordion/reference.tsx onto Base UI's Accordion.
-
-- An Accordion is one row, and rows sit in any element (gl-accordion-surface is a class, not a
-  component), so each row is a Base UI Accordion of one item: the root renders as that item, one
-  element, the reference's row. Its Header and Trigger make the summary, a button in a heading.
-- The details open with Collapse, as the documented TransitionProps (Collapse's timeout,
-  mountOnEnter, unmountOnExit, onEntered, onExited) require. Base UI's Panel animates on its own
-  terms, without timeouts or callbacks, so it isn't used; the trigger points at the Collapse's
-  region instead.
-- Base UI 1.9 dropped the accordion's arrow keys (APG no longer asks for them). The README keeps
-  Up, Down, Home and End between the summaries of one list, and all four arrows between panes,
-  as the reference handles them.
-- PaneAccordion is one Base UI Accordion with a pane per item. Its state is the reference's: a
-  pane is open, closed, or not yet touched, which compact layouts show with its chips revealed.
-*/
 import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
@@ -34,98 +17,41 @@ export type AccordionProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"onChange"
 > & {
-	/**
-	Open (controlled). Pair with onChange.
-	*/
 	expanded?: boolean;
-	/**
-	Open on first render (uncontrolled).
-	*/
 	defaultExpanded?: boolean;
-	/**
-	Called when the summary is pressed, with the requested state.
-	*/
 	// eslint-disable-next-line unicorn/consistent-boolean-name -- The documented parameter name.
 	onChange?: (event: React.SyntheticEvent, expanded: boolean) => void;
-	/**
-	Dims the row; the summary can't be focused or pressed.
-	*/
 	disabled?: boolean;
-	/**
-	Level of the heading that wraps the summary button. Default 3.
-	*/
 	headingLevel?: HeadingLevel;
-	/**
-	Props for the Collapse that reveals the details: timeout ({ enter: 300, exit: 200 } by default), unmountOnExit.
-	*/
 	TransitionProps?: Partial<
 		Pick<
 			CollapseProps,
 			"timeout" | "unmountOnExit" | "mountOnEnter" | "onEntered" | "onExited"
 		>
 	>;
-	/**
-	An AccordionSummary first, then the AccordionDetails.
-	*/
 	children?: React.ReactNode;
 };
 
 export type AccordionSummaryProps =
 	React.ButtonHTMLAttributes<HTMLButtonElement> & {
-		/**
-		Second column, in color-muted (.career-position): a role, a short fact.
-		*/
 		secondary?: React.ReactNode;
-		/**
-		Third column, right-aligned in color-muted (.career-date): a date, a count.
-		*/
 		meta?: React.ReactNode;
-		/**
-		Replace the plus/minus toggle with an icon; it turns 180° when open (use chevron-down).
-		*/
 		expandIcon?: React.ReactNode;
-		/**
-		The row's title (.career-employer): 17px, -0.02em.
-		*/
 		children?: React.ReactNode;
 	};
 
 export type AccordionDetailsProps = React.HTMLAttributes<HTMLDivElement> & {
-	/**
-	A small closing line at 11px (.career-description > span), such as the role's location.
-	*/
 	meta?: React.ReactNode;
-	/**
-	Indent the details under the second column (26% on the left), as the site does. Default true; false runs full width.
-	*/
 	inset?: boolean;
 	children?: React.ReactNode;
 };
 
 export type PaneAccordionItem = {
-	/**
-	Stable id: the React key and the base of the pane's ids. Default: the title, slugified (or the index).
-	*/
 	id?: string;
-	/**
-	The pane's title (.pane-title), 22px.
-	*/
 	title: React.ReactNode;
-	/**
-	The blurb, always visible (.pane-text).
-	*/
 	text?: React.ReactNode;
-	/**
-	Tags revealed when the pane opens (.more > .chips).
-	*/
 	chips?: React.ReactNode[];
-	/**
-	Other content to reveal instead of chips.
-	*/
 	more?: React.ReactNode;
-	/**
-	`default`: glass-control. `alt`: fainter glass. `accent`: the ring-tinted pane with an accent title; one per set.
-	*/
 	tone?: "default" | "alt" | "accent";
 };
 
@@ -133,30 +59,11 @@ export type PaneAccordionProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"onChange"
 > & {
-	/**
-	The panes, left to right.
-	*/
 	items: PaneAccordionItem[];
-	/**
-	`auto`: the site's layout, panes side by side, stacked at 899px and below.
-	`horizontal`: side by side down to 701px, stacked on phones. `vertical`: always stacked.
-	*/
 	orientation?: "auto" | "horizontal" | "vertical";
-	/**
-	Ids of the open panes (controlled). Panes not listed are closed.
-	*/
 	open?: string[];
-	/**
-	Ids of the panes open on first render (uncontrolled).
-	*/
 	defaultOpen?: string[];
-	/**
-	Called when a pane is pressed, with the ids that are now open.
-	*/
 	onChange?: (event: React.SyntheticEvent, open: string[]) => void;
-	/**
-	Level of the heading around each pane's button. Default 3.
-	*/
 	headingLevel?: HeadingLevel;
 };
 
@@ -170,9 +77,6 @@ const AccordionContext = React.createContext<AccordionContextValue | undefined>(
 	undefined,
 );
 
-/**
-The heading elements Base UI's Header renders as, by level.
-*/
 /* eslint-disable jsx-a11y-x/heading-has-content -- Base UI's Header renders the summary inside. */
 const headings: Record<HeadingLevel, React.ReactElement> = {
 	2: <h2 />,
@@ -183,18 +87,10 @@ const headings: Record<HeadingLevel, React.ReactElement> = {
 };
 /* eslint-enable jsx-a11y-x/heading-has-content */
 
-/**
-The value of a row's one item, and the root's value open and closed.
-*/
 const rowItem = "row";
 const openRow = [rowItem];
 const closedRow: string[] = [];
 
-/**
-One row of the site's career list (.career-row): a summary button with the
-plus/minus toggle, its details revealed with Collapse. Stack rows inside an
-element with class "gl-accordion-surface" for the list's glass surface (.career-surface).
-*/
 export function Accordion({
 	expanded: expandedProp,
 	defaultExpanded = false,
@@ -202,7 +98,6 @@ export function Accordion({
 	disabled = false,
 	headingLevel = 3,
 	TransitionProps: transitionProps,
-	// A div's defaultValue does nothing, and Base UI's root would read it as its open items.
 	defaultValue,
 	id,
 	className,
@@ -236,7 +131,6 @@ export function Accordion({
 	return (
 		<BaseAccordion.Root
 			ref={ref}
-			// The root renders as its one item, so the row stays one element, as in the reference.
 			render={
 				<BaseAccordion.Item
 					value={rowItem}
@@ -277,9 +171,6 @@ export function Accordion({
 	);
 }
 
-/**
-Up/Down/Home/End move between sibling rows' summaries (WAI-ARIA APG accordion, optional keys).
-*/
 function moveBetweenRows(event: React.KeyboardEvent<HTMLButtonElement>): void {
 	const { key } = event;
 	if (
@@ -340,10 +231,6 @@ function moveBetweenRows(event: React.KeyboardEvent<HTMLButtonElement>): void {
 const isShown = (node: React.ReactNode) =>
 	node !== undefined && node !== null && node !== false;
 
-/**
-The row's header (.career-row summary): a full-width button in a heading,
-columns for title, secondary and meta, and the plus that turns into a minus.
-*/
 export function AccordionSummary({
 	secondary,
 	meta,
@@ -391,7 +278,6 @@ export function AccordionSummary({
 		</>
 	);
 	if (!context) {
-		// Outside an Accordion there is no row to open: a plain summary, as in the reference.
 		return (
 			<h3 className="gl-accordion-heading">
 				<button
@@ -416,13 +302,11 @@ export function AccordionSummary({
 			<BaseAccordion.Trigger
 				ref={ref}
 				id={context.summaryId}
-				// The details are the Collapse's region, not a Base UI panel.
 				aria-controls={context.regionId}
 				className={buttonClassName}
 				onClick={(event) => {
 					rememberReactEvent(event);
 					onClick?.(event);
-					// As in the reference, a press your handler prevents doesn't toggle the row.
 					if (event.defaultPrevented) {
 						event.preventBaseUIHandler();
 					}
@@ -436,9 +320,6 @@ export function AccordionSummary({
 	);
 }
 
-/**
-The revealed part of a row (.career-description): 14px copy in color-muted, paragraphs 10px apart.
-*/
 export function AccordionDetails({
 	meta,
 	inset = true,
@@ -465,12 +346,8 @@ export function AccordionDetails({
 	);
 }
 
-// ---------- PaneAccordion: the site's horizontal accordion (.acc, scripts/accordion.ts) ----------
-
 function slugOf(title: React.ReactNode, index: number): string {
 	if (typeof title === "string" || typeof title === "number") {
-		// The first replace turns each run of other characters into one dash, so at most one
-		// dash sits at either end.
 		const slug = String(title)
 			.toLowerCase()
 			.replaceAll(/[^\da-z]+/gu, "-")
@@ -483,9 +360,6 @@ function slugOf(title: React.ReactNode, index: number): string {
 	return `pane-${index}`;
 }
 
-/**
-A pane's data-state: open, closed, or none before it's first pressed.
-*/
 function stateName(state: boolean | undefined): "open" | "closed" | undefined {
 	if (state === undefined) {
 		return undefined;
@@ -494,10 +368,6 @@ function stateName(state: boolean | undefined): "open" | "closed" | undefined {
 	return state ? "open" : "closed";
 }
 
-/**
-Which layouts are compact (accordion.ts: (hover: none), (max-width: 899px)): every pane toggles
-on its own there, with its chips shown until it's closed.
-*/
 const compactQueries = {
 	auto: "(hover: none), (max-width: 899px)",
 	horizontal: "(hover: none), (max-width: 700px)",
@@ -513,11 +383,6 @@ const paneKeys = new Set([
 	"End",
 ]);
 
-/**
-The site's horizontal accordion (.acc): glass panes that widen to 2.6x on
-hover, focus or press and reveal their chips. Narrow screens and touch get a
-tap toggle with the chips shown, as scripts/accordion.ts does.
-*/
 export function PaneAccordion({
 	items,
 	orientation = "auto",
@@ -525,7 +390,6 @@ export function PaneAccordion({
 	defaultOpen,
 	onChange,
 	headingLevel = 3,
-	// A div's defaultValue does nothing, and Base UI's root would read it as its open items.
 	defaultValue,
 	id,
 	className,
@@ -540,16 +404,11 @@ export function PaneAccordion({
 	}));
 	const ids = panes.map((pane) => pane.key);
 	const [isControlled] = React.useState(open !== undefined);
-	// Behaviour only: CSS lays the panes out for the viewport before hydration.
 	const isCompact = useMediaQuery(compactQueries[orientation]);
-	// On compact layouts every pane starts open, its chips shown (the script's init). It reads
-	// the first render's answer, which during hydration is the server's: an island keeps the
-	// panes its server HTML opened.
 	const [inner, setInner] = React.useState<Record<string, boolean>>(() => {
 		const keys = isCompact && !isControlled ? ids : (defaultOpen ?? []);
 		return Object.fromEntries(keys.map((key) => [key, true]));
 	});
-	// Open, closed, or undefined while the pane is untouched.
 	const isPaneOpen = (key: string): boolean | undefined =>
 		isControlled ? (open ?? []).includes(key) : inner[key];
 
@@ -563,7 +422,6 @@ export function PaneAccordion({
 			}
 		}
 
-		// Side by side, one pane opens at a time; compact panes toggle on their own.
 		if (isOpening && !isCompact) {
 			for (const other of ids) {
 				if (other !== key) {
@@ -628,7 +486,6 @@ export function PaneAccordion({
 			}
 
 			default: {
-				// End.
 				next = count - 1;
 			}
 		}
@@ -671,7 +528,6 @@ export function PaneAccordion({
 						>
 							<BaseAccordion.Trigger
 								id={`${baseId}-${key}-button`}
-								// The body is always there, chips or not, as in the reference.
 								aria-controls={bodyId}
 								className="gl-pane-button"
 								onClick={(event) => {
@@ -694,7 +550,6 @@ export function PaneAccordion({
 											<ul className="gl-pane-chips">
 												{item.chips?.map((chip, chipIndex) => (
 													<li
-														// Chips that aren't strings have nothing but their place to key on.
 														// eslint-disable-next-line @eslint-react/no-array-index-key
 														key={typeof chip === "string" ? chip : chipIndex}
 														className="gl-pane-chip"

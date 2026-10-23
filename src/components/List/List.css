@@ -1,9 +1,4 @@
-/* Blue Glass — List, ported from design-system/components/List/styles.css. The option row
-   it builds on (.gl-option and its parts) is in foundation.css. */
-
 @layer gl-components {
-	/* List — static rows like the site's career list (.career-row: color-line hairlines, none under the last)
-     and interactive rows on the shared option row (.gl-option, the side selector's .project-tab, denser). */
 	.gl-list {
 		display: grid;
 		gap: 2px;
@@ -15,8 +10,6 @@
 	.gl-list-divided {
 		gap: 0;
 	}
-
-	/* Static row: the option row's geometry (13px = 12px padding + the 1px border an option row has). */
 	.gl-list-item {
 		position: relative;
 		display: flex;
@@ -48,8 +41,6 @@
 	.gl-list-item-divider {
 		border-bottom: 1px solid var(--color-line);
 	}
-
-	/* End slot: in flow on a static row; laid over the end of an interactive row. */
 	.gl-list-item-action {
 		display: inline-flex;
 		flex: none;
@@ -69,8 +60,6 @@
 	.gl-list-item-has-action > .gl-list-button {
 		padding-inline-end: var(--gl-list-action-space, 52px);
 	}
-
-	/* Interactive row: .gl-option plus the press. */
 	.gl-list-button {
 		transition:
 			background var(--duration-state) ease,
@@ -111,15 +100,13 @@
 	}
 	.gl-list-text-inset {
 		padding-inline-start: 29px;
-	} /* an 18px icon plus the 11px gap */
+	}
 	.gl-list-text-nowrap > .gl-list-primary,
 	.gl-list-text-nowrap > .gl-list-secondary {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-
-	/* Subheader: .gl-option-group, lined up with row text. */
 	.gl-list-subheader {
 		padding-inline: 13px;
 		list-style: none;

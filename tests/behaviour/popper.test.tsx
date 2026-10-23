@@ -1,7 +1,3 @@
-// Behaviour specs for Popper and the positioning it exports (computePosition, positionFixed,
-// containingBlock and splitPlacement), from design-system/components/Popper/README.md, api.d.ts
-// and the internal/position section of design-system/source/index.d.ts. Positions are read
-// from boxes at the default test viewport (414 by 896), with a pixel and a half of tolerance.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -26,7 +22,6 @@ afterEach(() => {
 
 type Box = { left: number; top: number; width: number; height: number };
 
-// Room on every side at the test viewport.
 const centre: Box = { left: 157, top: 420, width: 100, height: 40 };
 
 type HarnessProps = Omit<PopperProps, "open" | "anchorEl"> & {
@@ -35,10 +30,6 @@ type HarnessProps = Omit<PopperProps, "open" | "anchorEl"> & {
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
-/**
-A fixed button named "Anchor" at `at`, and a Popper anchored to it, open once the button exists
-(as the preview does), with an 80 by 30 "Hint" as its content unless children are given.
-*/
 function Harness({
 	open = true,
 	at = centre,
@@ -101,10 +92,6 @@ function expectNear(
 	).toBeLessThanOrEqual(tolerance);
 }
 
-/**
-Checks that `content` sits on the placement's side of `anchor`, `offset` away, and lines up with
-it as the placement names: centred, or along its start or end edge.
-*/
 function expectPlaced(
 	content: Element,
 	anchor: Element,
@@ -159,10 +146,6 @@ function expectPlaced(
 	}
 }
 
-/**
-Whether the element is in the document and drawn: a box, and neither display none nor
-visibility hidden on it or an ancestor.
-*/
 function isShown(element: Element | null): boolean {
 	if (!element?.isConnected) {
 		return false;
@@ -176,16 +159,10 @@ function isShown(element: Element | null): boolean {
 	);
 }
 
-/**
-Whether the element is hidden from assistive tech by an aria-hidden or inert ancestor.
-*/
 function isHiddenFromAssistiveTech(element: Element): boolean {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
 
-/**
-The number a CSS value such as "40px" or "100%" starts with.
-*/
 function leadingNumber(value: string): number {
 	// eslint-disable-next-line unicorn/prefer-number-coercion -- Number() turns a value with a unit into NaN
 	return Number.parseFloat(value);
@@ -336,7 +313,6 @@ describe("Popper", () => {
 				expect(c.top).toBeGreaterThanOrEqual(0);
 				expect(c.right).toBeLessThanOrEqual(window.innerWidth);
 				expect(c.bottom).toBeLessThanOrEqual(window.innerHeight);
-				// Still on its side of the anchor.
 				if (placement === "bottom") {
 					expectNear(c.top, a.bottom + 8, "top edge");
 				} else if (placement === "top") {
@@ -554,7 +530,6 @@ describe("Popper", () => {
 				{renderChild}
 			</Harness>,
 		);
-		// Grow is exiting: the Popper waits for its onExited.
 		expect(hint).toBeInTheDocument();
 		expect(renderChild.mock.lastCall?.[0].TransitionProps.in).toBe(false);
 		await expect.poll(() => screen.queryByText("Hint")).toBeNull();
@@ -770,7 +745,6 @@ describe("Popper", () => {
 			const a = box(anchorButton());
 			const space =
 				(placement === "bottom" ? window.innerHeight - a.bottom : a.top) - 8;
-			// The space past the 8px gap, less a viewport padding of up to 16px.
 			expect(available).toBeLessThanOrEqual(space);
 			expect(available).toBeGreaterThanOrEqual(space - 16);
 		},
@@ -779,13 +753,9 @@ describe("Popper", () => {
 
 describe("computePosition", () => {
 	const viewport = { width: 400, height: 800 };
-	// Left 150, top 300, right 250, bottom 340: room on every side.
 	const anchor = new DOMRect(150, 300, 100, 40);
 	const floating = { width: 80, height: 30 };
 
-	/**
-	The point an origin like "40px 0" or "100% 15px" names, in the floating box's own pixels.
-	*/
 	function originPoint(
 		origin: string,
 		size: { width: number; height: number },
@@ -857,7 +827,6 @@ describe("computePosition", () => {
 			padding: 8,
 			viewport,
 		});
-		// 800 less the anchor's bottom (340), the gap and the padding.
 		expect(result.maxHeight).toBe(444);
 	});
 
@@ -965,7 +934,6 @@ describe("positionFixed, containingBlock and splitPlacement", () => {
 		const { rerender } = render(
 			<Panel style={{ transform: "translateZ(0)" }} />,
 		);
-		// Viewport left 140, top 220: 100 and 100 inside the panel.
 		const target = new DOMRect(140, 220, 60, 30);
 		expect(
 			positionFixed(target, screen.getByText("Floating"), {

@@ -1,24 +1,4 @@
 #!/usr/bin/env node
-/**
- * design-system/tokens/tokens.json → src/styles/tokens.css
- *
- * A copy of design-system/tools/build-tokens.mjs with two changes: paths are arguments, and
- * the type classes sit in @layer gl-base. Unlayered, they'd beat every layered rule, so a
- * consumer's Tailwind utility could never override them. Custom properties stay unlayered.
- * tests/unit/tokens.test.ts checks the output still matches the reference apart from that.
- * It keeps the original's style (XO and Prettier skip it) so changes there carry over.
- *
- * Mirrors the Design System type's compile contract, so the CSS here matches what the
- * Blue Glass artifact page generates:
- *   :root, [data-theme="<first>"] { colours + shadows }
- *   [data-theme="<id>"]           { per further theme: overrides + aliases re-declared }
- *   :root                         { spacing, radius, every other family, --font-<key> }
- *   @layer gl-base { .<style> }   { one class per type style }
- *   @font-face                    { one per type.fonts entry }
- *
- * Invalid entries are dropped with a warning, the same way the page drops them.
- * Usage: node scripts/build-tokens.mjs [--strict] [--input <tokens.json>] [--output <tokens.css>]
- */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -52,13 +32,11 @@ const first = themes[0].id;
 const colorTokens = tokens.color?.tokens ?? [];
 const colorNames = new Set(colorTokens.map((t) => clean(t.name)));
 
-/** A token's raw value in one theme; a missing theme inherits the first theme's. */
 function rawIn(t, theme) {
   if (typeof t.value !== 'object' || t.value === null) return theme === first ? t.value : undefined;
   return t.value[theme] ?? (theme === first ? Object.values(t.value)[0] : undefined);
 }
 
-/** Validate a colour; follow aliases to catch missing targets and cycles. */
 function colorValue(name, value, theme, seen = new Set()) {
   if (typeof value !== 'string') return null;
   const v = value.trim();
@@ -89,7 +67,6 @@ function claim(name, family) {
   return true;
 }
 
-// ── Themed families: colour + shadow ────────────────────────────────────────────
 const themed = [];
 for (const t of colorTokens) if (claim(t.name, 'color')) themed.push({ ...t, kind: 'color' });
 for (const t of tokens.shadow?.tokens ?? []) if (claim(t.name, 'shadow')) themed.push({ ...t, kind: 'shadow' });
@@ -101,7 +78,7 @@ themes.forEach((theme, i) => {
     const raw = rawIn(t, theme.id);
     const isAlias = typeof raw === 'string' && ALIAS.test(raw.trim());
     const own = typeof t.value === 'object' && t.value !== null && t.value[theme.id] !== undefined;
-    if (i > 0 && !own && !isAlias) continue; // later themes: overrides and aliases only
+    if (i > 0 && !own && !isAlias) continue; 
     const value = t.kind === 'color' ? colorValue(clean(t.name), raw, theme.id) : shadowValue(raw);
     if (value == null) {
       if (i === 0) warn(`${t.kind}: dropped "${t.name}" (unreadable value ${JSON.stringify(raw)})`);
@@ -113,7 +90,6 @@ themes.forEach((theme, i) => {
   if (decls.length) blocks.push(`${selector} {\n${decls.join('\n')}\n}`);
 });
 
-// ── Unthemed families: spacing, radius, then every other {tokens:[…]} family ──
 const plain = [];
 const families = ['spacing', 'radius', ...Object.keys(tokens).filter((k) => !SKIP.has(k) && k !== 'spacing' && k !== 'radius')];
 for (const family of families) {
@@ -143,7 +119,6 @@ for (const [key, stack] of Object.entries(tokens.type?.families ?? {})) {
 }
 if (plain.length) blocks.push(`:root {\n${plain.join('\n')}\n}`);
 
-// ── Type styles → classes, in @layer gl-base ─────────────────────────────────────
 const styleNames = new Set();
 const typeBlocks = [];
 const px = (v) => (typeof v === 'number' ? `${v}px` : String(v));
@@ -178,7 +153,6 @@ if (typeBlocks.length) {
   blocks.push(`@layer gl-fallback, gl-base, gl-components;\n\n@layer gl-base {\n${indented}\n}`);
 }
 
-// ── Fonts ───────────────────────────────────────────────────────────────────────
 for (const f of tokens.type?.fonts ?? []) {
   if (!f.family || !f.file) continue;
   const file = f.file.includes('/') ? f.file : `fonts/${f.file}`;
@@ -189,8 +163,7 @@ for (const f of tokens.type?.fonts ?? []) {
   );
 }
 
-const header = `/* ${tokens.name ?? 'Tokens'} — generated from design-system/tokens/tokens.json by scripts/build-tokens.mjs. Do not edit by hand. */`;
-writeFileSync(output, `${header}\n\n${blocks.join('\n\n')}\n`);
+writeFileSync(output, `${blocks.join('\n\n')}\n`);
 console.log(`tokens.css: ${themed.length} themed, ${plain.length} plain, ${styleNames.size} type styles → ${output}`);
 for (const w of warnings) console.warn(`warn: ${w}`);
 if (warnings.length && process.argv.includes('--strict')) process.exit(1);

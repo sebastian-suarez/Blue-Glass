@@ -1,7 +1,4 @@
-/* Blue Glass — Icon, ported from design-system/components/Icon/styles.css. */
-
 @layer gl-components {
-	/* Icon — the site's .icon box (18px, flex: none) */
 	.gl-icon {
 		display: inline-block;
 		vertical-align: middle;

@@ -20,8 +20,6 @@ function rect(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-// A separator is horizontal unless aria-orientation says otherwise, so a horizontal one may
-// leave the attribute out (an hr) or spell it (Base UI's Separator).
 function orientation(element: Element): string {
 	return element.getAttribute("aria-orientation") ?? "horizontal";
 }
@@ -148,7 +146,6 @@ test("a vertical divider is 1px wide and one line of text tall, centred on its r
 	const line = rect(current(ref));
 	const box = rect(current(row));
 	expect(line.width).toBe(1);
-	// One line of text at 16px: at least 1em, at most the site's 1.6 line height.
 	expect(line.height).toBeGreaterThanOrEqual(16);
 	expect(line.height).toBeLessThanOrEqual(25.6);
 	expect((line.top + line.bottom) / 2).toBeCloseTo(

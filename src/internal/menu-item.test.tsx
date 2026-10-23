@@ -61,11 +61,6 @@ async function press(keys: string, expected: string[]) {
 	expect(seen).toEqual(expected);
 }
 
-/**
-Types one key on the focused element at a set moment, and returns the label focus lands on.
-Typeahead reads its 500ms window from key events' timeStamp, so setting it keeps the test off
-the real clock, whatever the machine's load.
-*/
 function typeAt(key: string, at: number): string | undefined {
 	const event = new KeyboardEvent("keydown", {
 		key,
@@ -213,9 +208,9 @@ describe("standalone MenuList", () => {
 	});
 
 	test("renders without a Base UI menu around it", () => {
-		const errors = vi.spyOn(console, "error").mockImplementation(() => {
-			// Silenced to assert on it.
-		});
+		const errors = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => undefined);
 		try {
 			render(<MenuList aria-label="Actions">{items(newClicks())}</MenuList>);
 			expect(errors).not.toHaveBeenCalled();
@@ -290,11 +285,8 @@ describe("standalone MenuList", () => {
 	test("typeahead: a letter, the same letter again, a word, and Space inside a word", async () => {
 		render(<MenuList aria-label="Actions">{items(newClicks())}</MenuList>);
 		item("Copy link").focus();
-		// From the real keyboard: a letter again moves on, in or out of the window alike.
 		await press("d d", ["Delete", "Download"]);
-		// Later than any real key so far, so the window starts over.
 		const start = performance.now() + 1000;
-		// Within 500ms the keys make a word; after it, they start over.
 		expect([typeAt("c", start), typeAt("u", start + 100)]).toEqual([
 			"Copy link",
 			"Cut",
@@ -313,7 +305,6 @@ describe("standalone MenuList", () => {
 			</MenuList>,
 		);
 		item("Cut").focus();
-		// One key every 50ms, well inside the window.
 		const word = performance.now() + 1000;
 		const moments = [0, 50, 100, 150, 200, 250].map((offset) => word + offset);
 		expect(
@@ -339,7 +330,6 @@ describe("standalone MenuList", () => {
 		expect(clicks.onDelete).toHaveBeenCalledTimes(2);
 		item("Archive").focus();
 		await userEvent.keyboard("{Enter}");
-		// Playwright waits for aria-disabled elements to enable; force the press.
 		await userEvent.click(item("Archive"), { force: true });
 		expect(clicks.onArchive).not.toHaveBeenCalled();
 	});
@@ -463,9 +453,9 @@ describe("MenuItem inside a Base UI menu", () => {
 				reasons.push(reason);
 			},
 		);
-		const errors = vi.spyOn(console, "error").mockImplementation(() => {
-			// Silenced to assert on it.
-		});
+		const errors = vi
+			.spyOn(console, "error")
+			.mockImplementation(() => undefined);
 		try {
 			render(<Harness clicks={clicks} onClose={onClose} {...options} />);
 			await frames();
@@ -556,7 +546,6 @@ describe("MenuItem inside a Base UI menu", () => {
 		const menu = await open();
 		item("Archive").focus();
 		await userEvent.keyboard("{Enter}");
-		// Playwright waits for aria-disabled elements to enable; force the press.
 		await userEvent.click(item("Archive"), { force: true });
 		expect(menu.clicks.onArchive).not.toHaveBeenCalled();
 		expect(menu.onClose).not.toHaveBeenCalled();
@@ -590,7 +579,6 @@ describe("MenuItem inside a Base UI menu", () => {
 	test.each(["click", "Enter", "Space"] as const)(
 		"%s activates a link item",
 		async (how) => {
-			// Calling preventDefault keeps the test page from following the link, and the menu open.
 			const onClick = vi.fn<OnClick>((event) => {
 				event.preventDefault();
 			});

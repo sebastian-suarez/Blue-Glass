@@ -15,10 +15,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The preview's browser-only child: it reads the window's width as it renders, which the server
-can't.
-*/
 function FrameWidth() {
 	return (
 		<span className="text-body">

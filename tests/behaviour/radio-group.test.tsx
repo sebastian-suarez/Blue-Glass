@@ -1,9 +1,3 @@
-// Behaviour specs for RadioGroup and Radio, from design-system/components/RadioGroup/README.md and
-// api.d.ts. The reference draws circles under transparent native radios; the package renders Base
-// UI's radios, spans with the role beside hidden inputs (docs/deviations.md, 1 to 6). So the specs
-// find radios by role and name, read each input through its ref, and find a drawn circle by its
-// place. A Radio outside a RadioGroup is specced as far as deviation 6 keeps it: checked,
-// defaultChecked, onChange(event, true) and its form value.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -16,16 +10,10 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
 
-/**
-The element with an id, through a selector, as the lint rules prefer.
-*/
 function byId(id: string): HTMLElement | null {
 	return document.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
 }
@@ -41,10 +29,6 @@ type Change<Value> = {
 	value: Value;
 };
 
-/**
-Records what an onChange saw at call time: the event, its type and target, the input's checked
-state and value then, and the second argument.
-*/
 function recorder<Value>() {
 	const calls: Array<Change<Value>> = [];
 	const onChange = vi.fn(
@@ -76,17 +60,11 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-The names among these whose radios are chosen, in order.
-*/
 function chosen(...names: string[]): string[] {
 	const checked = screen.queryAllByRole("radio", { checked: true });
 	return names.filter((name) => checked.includes(radio(name)));
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -94,9 +72,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether focus is on the control or inside it.
-*/
 function hasFocus(control: HTMLElement): boolean {
 	return (
 		control === document.activeElement ||
@@ -113,9 +88,6 @@ function box(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-/**
-The opacity the element is drawn with: its own times every ancestor's.
-*/
 function opacityOf(element: Element): number {
 	let opacity = 1;
 	for (
@@ -129,10 +101,6 @@ function opacityOf(element: Element): number {
 	return opacity;
 }
 
-/**
-The circle drawn for the radio: the element with a border that covers it exactly. The package's
-radio draws itself; the reference's transparent input lies over a drawn circle.
-*/
 function drawnCircle(control: HTMLElement): HTMLElement {
 	const target = box(control);
 	const drawn = [
@@ -157,10 +125,6 @@ function drawnCircle(control: HTMLElement): HTMLElement {
 	return drawn;
 }
 
-/**
-The dot shown inside a drawn circle: an element or a pseudo-element in it, filled and visible,
-with its width and colour. Null when the circle shows none.
-*/
 function shownDot(
 	circle: HTMLElement,
 ): { width: number; color: string } | null {
@@ -196,9 +160,6 @@ function shownDot(
 	return null;
 }
 
-/**
-The markup of a glyph as Icon draws it.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -206,9 +167,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-What a CSS value, a token or a literal, resolves to for one property, read from a probe element.
-*/
 function resolved(property: string, value: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderStyle = "solid";
@@ -219,16 +177,10 @@ function resolved(property: string, value: string): string {
 	return result;
 }
 
-/**
-The ids an aria-labelledby or aria-describedby holds.
-*/
 function idsIn(element: HTMLElement, attribute: string): string[] {
 	return (element.getAttribute(attribute) ?? "").split(/\s+/v).filter(Boolean);
 }
 
-/**
-The element aria-describedby points at that holds the text.
-*/
 function describer(control: HTMLElement, text: string): HTMLElement {
 	const element = idsIn(control, "aria-describedby")
 		.map((id) => byId(id))
@@ -240,9 +192,6 @@ function describer(control: HTMLElement, text: string): HTMLElement {
 	return element;
 }
 
-/**
-The form's entries, as FormData has them.
-*/
 function entries(form: HTMLElement): Array<[string, string]> {
 	if (!(form instanceof HTMLFormElement)) {
 		throw new TypeError("not a form");
@@ -254,10 +203,6 @@ function entries(form: HTMLElement): Array<[string, string]> {
 	]);
 }
 
-/**
-Moves the pointer to the page's bottom-left corner, clear of everything the specs render, so no
-hover style lingers on a control from an earlier click.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -282,9 +227,6 @@ function Around({ children }: { readonly children: React.ReactNode }) {
 
 const stack = ["Node.js and TypeScript", "Rust", "React and Next.js"];
 
-/**
-The preview's Default: three stacks, labelled "Preferred stack".
-*/
 function Stack(props: React.ComponentProps<typeof RadioGroup>) {
 	return (
 		<RadioGroup label="Preferred stack" {...props}>
@@ -322,8 +264,6 @@ describe("RadioGroup: the group", () => {
 		expect(group("What are you hiring for? Role")).toBeInTheDocument();
 	});
 
-	// The README says the label and helper ids derive from the group's; the reference says how:
-	// the group's id with -label and -helper (reference.tsx, lines 150 to 153).
 	test("id is the group's, generated when omitted, and the label's and helper's ids derive from it", () => {
 		render(
 			<>
@@ -469,8 +409,6 @@ describe("RadioGroup: the group", () => {
 		).toBeNull();
 	});
 
-	// The docs don't say whether the asterisk is read; the reference hides it from assistive tech
-	// (reference.tsx, line 187), which hears aria-required from the group.
 	test("required puts an asterisk on the label that isn't part of the name, aria-required on the group, and required on every radio", () => {
 		const lead = React.createRef<HTMLInputElement>();
 		const architect = React.createRef<HTMLInputElement>();
@@ -501,8 +439,6 @@ describe("RadioGroup: the group", () => {
 		expect(full.current?.required).toBe(false);
 	});
 
-	// The docs don't say whether disabled options take focus; the reference's options are native
-	// radios, which the browser leaves out of the tab order when disabled.
 	test("disabled disables every option: a press chooses nothing, and Tab passes the group by", async () => {
 		const remote = React.createRef<HTMLInputElement>();
 		const medellin = React.createRef<HTMLInputElement>();
@@ -563,7 +499,6 @@ describe("RadioGroup: the group", () => {
 			box(screen.getByText("Full-time")).right,
 		);
 
-		// Narrower than both options side by side, wide enough for each: the second wraps.
 		const container = screen.getByTestId("row");
 		const option = box(screen.getByText("Full-time")).right - full.left;
 		container.style.width = `${Math.ceil(option) + 10}px`;
@@ -654,8 +589,6 @@ describe("RadioGroup: choosing", () => {
 		expect(chosen(...stack)).toEqual([]);
 	});
 
-	// The order and the shared event aren't in the README; the reference passes the radio's change
-	// event on to the group after the Radio's own onChange (reference.tsx, lines 67 to 70).
 	test("onChange gets a change event on the chosen radio's input, already checked, and its value; the Radio's own onChange(event, true) runs first, with the same event", async () => {
 		const node = React.createRef<HTMLInputElement>();
 		const rust = React.createRef<HTMLInputElement>();
@@ -707,9 +640,6 @@ describe("RadioGroup: choosing", () => {
 		expect(chosen(...stack)).toEqual(["Node.js and TypeScript"]);
 	});
 
-	// The reference moves its state before onChange runs (reference.tsx, lines 156 to 159): the
-	// browser puts the old choice back, but React already holds the new one, and the next press
-	// goes unreported.
 	referenceDefectTest(
 		"after a cancelled press, the next press is reported to onChange and can be cancelled too",
 		async () => {
@@ -727,8 +657,6 @@ describe("RadioGroup: choosing", () => {
 		},
 	);
 
-	// The reference calls the group's onChange whatever the Radio's onChange did (reference.tsx,
-	// lines 67 to 70), so it reports a choice the browser has just undone.
 	referenceDefectTest(
 		"preventDefault() in a Radio's onChange cancels the choice, and the group's onChange isn't called",
 		async () => {

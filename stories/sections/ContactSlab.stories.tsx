@@ -16,9 +16,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The preview picks these with useMediaQuery(media.tablet) and useMediaQuery(media.phone),
-// including the email's icon size (20, or 17 on phones). Here CSS picks them under the same
-// queries, so the server HTML lays out as the hydrated page does.
 const styles = `
 .contact-slab {
 	grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -167,8 +164,6 @@ export const Default: Story = {
 	),
 };
 
-// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

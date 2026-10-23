@@ -32,9 +32,6 @@ const node = {
 	whiteSpace: "nowrap",
 } as const;
 
-/**
-The preview's pipeline: four services joined by arrows.
-*/
 function Pipeline() {
 	return (
 		<div
@@ -64,10 +61,6 @@ function Pipeline() {
 	);
 }
 
-/**
-The preview's diagram header: a small glass group zooms the pipeline between 50% and 150%,
-a primary split exports it, and text links sit under it.
-*/
 function DiagramHeader() {
 	const [zoom, setZoom] = useState(100);
 	const step = (by: number) => {

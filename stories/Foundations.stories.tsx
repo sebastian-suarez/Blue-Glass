@@ -17,8 +17,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// One row with Select's Option markup, on divs: XO's jsx-a11y rules reject a listbox role on
-// ul and an option role on li.
 function Option({
 	children,
 	secondary,
@@ -59,7 +57,6 @@ function Option({
 	);
 }
 
-// Grouped rows, as Autocomplete's groupBy marks them up.
 function GroupedOptions() {
 	const id = useId();
 	const groups = [

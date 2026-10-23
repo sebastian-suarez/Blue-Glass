@@ -22,11 +22,6 @@ type Column = {
 	gutterRight: number;
 };
 
-/**
-Renders a Container in a parent of the given width, and measures the column it makes. The
-widths in these tests don't depend on the viewport: the caps are fixed lengths, and the
-gutters are checked against the documented range (5% each side, 6% under 700px).
-*/
 function column(parentWidth: number, props: ContainerProps = {}): Column {
 	const parent = React.createRef<HTMLDivElement>();
 	const ref = React.createRef<HTMLElement>();

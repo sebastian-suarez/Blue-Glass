@@ -18,10 +18,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The preview's contact block: one primary, one glass and one text action. "Email me" shows
-its loading state for a moment, then reads "Sent".
-*/
 function ContactBlock() {
 	const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 	useEffect(() => {

@@ -1,9 +1,4 @@
-/* Blue Glass — Skeleton, ported from design-system/components/Skeleton/styles.css. */
-
 @layer gl-components {
-	/* Skeleton — an addition, matching MUI's Skeleton. Placeholders in color-line (the site's hairline)
-	   on the glass: text lines are pills (the .chip shape), rounded blocks take radius-well
-	   (.project-figure), and the wave is a white-alpha sheen like the panel's (.glass-panel::before). */
 	.gl-skeleton {
 		position: relative;
 		display: block;
@@ -11,8 +6,6 @@
 		overflow: hidden;
 		background: var(--color-line);
 	}
-	/* One line of the surrounding text: the line box, squeezed to 60% so lines keep their rhythm.
-	   The 600/1000 radius stays a true pill after the squeeze. */
 	.gl-skeleton-text {
 		height: auto;
 		margin: 0;
@@ -76,8 +69,6 @@
 			transform: translateX(100%);
 		}
 	}
-
-	/* Reduced motion: still placeholders. */
 	@media (prefers-reduced-motion: reduce) {
 		.gl-skeleton-pulse {
 			animation: none;

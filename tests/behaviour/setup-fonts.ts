@@ -1,5 +1,3 @@
-// Loads Satoshi, the system's typeface, before any spec measures text (scripts/lib/fonts.ts).
-// `npm run fonts` puts the file in fonts/, which Vite serves at /fonts/.
 import { satoshiFontFace } from "../../scripts/lib/font-face.ts";
 
 const style = document.createElement("style");

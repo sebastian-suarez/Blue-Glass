@@ -8,7 +8,6 @@ import { Avatar, Chip, Icon, type ChipTone } from "#ui";
 
 afterEach(() => {
 	cleanup();
-	// Link chips follow hash hrefs; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
@@ -16,9 +15,6 @@ afterEach(() => {
 	);
 });
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -35,9 +31,6 @@ function size(element: Element): [number, number] {
 	return [Math.round(box.width), Math.round(box.height)];
 }
 
-/**
-Records the type of every event onDelete gets.
-*/
 function deleteRecorder() {
 	const types: string[] = [];
 	const onDelete = vi.fn((event: React.SyntheticEvent) => {
@@ -50,9 +43,6 @@ function focusBefore() {
 	button("Before").focus();
 }
 
-/**
-The first text node inside the element that holds the text, wherever the port wraps it.
-*/
 function textNode(element: Element, text: string): Node {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let node = walker.nextNode();
@@ -176,8 +166,6 @@ describe("a static chip", () => {
 		expect(avatar.current && size(avatar.current)).toEqual([20, 20]);
 	});
 
-	// The api.d.ts doc of clickable: "hover and press styling without onClick, e.g. inside your own button".
-	// The reference renders a button instead (docs/reference-defects.md).
 	referenceDefectTest(
 		"clickable gives the clickable styling without making the chip a button, so it can sit inside your own",
 		() => {
@@ -247,7 +235,6 @@ describe("a clickable chip", () => {
 		);
 		expect(button("Rust")).toHaveAttribute("aria-pressed", "true");
 		expect(button("Wine")).toHaveAttribute("aria-pressed", "false");
-		// Without selected, a chip is an action, not a toggle.
 		expect(button("Reset")).not.toHaveAttribute("aria-pressed");
 	});
 
@@ -336,7 +323,6 @@ describe("a deletable chip", () => {
 		render(<Chip label="Rust" onDelete={onDelete} />);
 		const close = button("Remove Rust");
 		expect(size(close)).toEqual([18, 18]);
-		// 13px right of the centre is outside the 18px button but inside its 30px hit area.
 		const box = close.getBoundingClientRect();
 		const halfWidth = box.width / 2;
 		const halfHeight = box.height / 2;
@@ -360,7 +346,6 @@ describe("a deletable chip", () => {
 		);
 		const close = button("Remove the Rust tag");
 		expect(within(close).getByTestId("glyph")).toBeVisible();
-		// The default glyph is an Icon, an svg; the replacement leaves none behind.
 		expect(close.querySelector("svg")).toBeNull();
 	});
 

@@ -1,8 +1,3 @@
-/*
-Proof: a Base UI Popover positioned through the adapter lands where the reference's
-computePosition puts it, within 1px. The reference math is imported from the design system
-itself, so this compares against the source, not a copy.
-*/
 import { Popover } from "@base-ui/react/popover";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
@@ -40,9 +35,6 @@ type Case = {
 	anchor: AnchorEl;
 	placement: Placement;
 	offset?: number;
-	/**
-	The popup's size; omitted, it sizes to its content.
-	*/
 	popup?: { width: number; height: number };
 	matchWidth?: boolean;
 };
@@ -59,9 +51,6 @@ beforeAll(async () => {
 	await page.viewport(1280, 800);
 });
 
-/**
-A fixed element to anchor to, at a known place in the viewport.
-*/
 function placeAnchor({ left, top, width, height }: Box): HTMLElement {
 	const anchor = document.createElement("button");
 	anchor.textContent = "Anchor";
@@ -101,9 +90,6 @@ function positionerOf(id: string): HTMLElement | null {
 	return document.querySelector<HTMLElement>(`[data-case="${CSS.escape(id)}"]`);
 }
 
-/**
-A Base UI Popover positioned only through the adapter, as the ports will position theirs.
-*/
 function Anchored({ id, anchor, placement, offset, popup, matchWidth }: Case) {
 	return (
 		<Popover.Root open>
@@ -132,9 +118,6 @@ function Anchored({ id, anchor, placement, offset, popup, matchWidth }: Case) {
 	);
 }
 
-/**
-Opens one Popover per case and waits for all of them to settle.
-*/
 async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -156,7 +139,6 @@ async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 			cases.map(({ id }) => {
 				const popup = popupOf(id);
 				const positioner = positionerOf(id);
-				// Base UI holds the positioner at opacity 0 until it has a position.
 				if (!popup || !positioner || positioner.style.opacity === "0") {
 					throw new Error(`${id} isn't positioned yet`);
 				}
@@ -164,7 +146,6 @@ async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 				return [id, popup.getBoundingClientRect()];
 			}),
 		);
-	// Positioned, and still in the same place a few frames later.
 	return vi.waitFor(
 		async () => {
 			const first = measure();
@@ -181,9 +162,6 @@ async function open(cases: Case[]): Promise<Map<string, DOMRect>> {
 	);
 }
 
-/**
-What the positioner says it landed on, as a placement.
-*/
 function landedOn(id: string): Placement | undefined {
 	const positioner = positionerOf(id);
 	return toPlacement(
@@ -192,9 +170,6 @@ function landedOn(id: string): Placement | undefined {
 	);
 }
 
-/**
-Compares each popup with the reference math for the same anchor rect and popup size.
-*/
 async function expectReferencePositions(cases: Case[]): Promise<void> {
 	const rects = await open(cases);
 	for (const { id, anchor, placement, offset, matchWidth } of cases) {
@@ -303,9 +278,7 @@ describe("collisions", () => {
 	});
 
 	test("Base UI flips a pixel earlier than the reference: the documented difference", async () => {
-		// Exactly the room the popup needs below: the reference stays, Base UI flips...
 		const exact = placeAnchor({ left: 300, top: 654, width: 120, height: 40 });
-		// ...and with one more pixel both stay.
 		const spare = placeAnchor({ left: 700, top: 653, width: 120, height: 40 });
 		await open([
 			{ id: "exact", anchor: exact, placement: "bottom", popup: card },
@@ -393,9 +366,6 @@ describe("anchors", () => {
 	});
 
 	describe("a function anchor is asked again after every commit, as the reference asks it", () => {
-		/**
-		Renders one Popover into a root of its own, to render it again with new props.
-		*/
 		function rerenderable() {
 			const container = document.createElement("div");
 			document.body.append(container);
@@ -409,9 +379,6 @@ describe("anchors", () => {
 			};
 		}
 
-		/**
-		Waits for the popup to sit where the reference puts it against `box`, within 1px.
-		*/
 		async function expectAt(id: string, box: DOMRect): Promise<void> {
 			const expected = computePosition(box, card, {
 				placement: "bottom-start",
@@ -460,7 +427,6 @@ describe("anchors", () => {
 
 		test("a fresh virtual element on every call settles, and the popup follows its box", async () => {
 			let point = new DOMRect(200, 150, 0, 0);
-			// A new object on each call, the way a selection popover builds its anchor.
 			const anchor = vi.fn(() => ({ getBoundingClientRect: () => point }));
 			const render = rerenderable();
 			const props: Case = {
@@ -472,7 +438,6 @@ describe("anchors", () => {
 
 			render(props);
 			await expectAt("point", point);
-			// Settled: a box that didn't move doesn't make another render.
 			const calls = anchor.mock.calls.length;
 			await new Promise((done) => {
 				setTimeout(done, 100);

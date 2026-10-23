@@ -26,7 +26,6 @@ function shapes(svg: SVGSVGElement): SVGGeometryElement[] {
 	];
 }
 
-// The README counts 52 glyphs; the reference ships 54, so the count isn't pinned here.
 test("iconNames lists every glyph in GLYPHS once, from the site's arrow-ne to the status marks", () => {
 	expect(new Set(iconNames).size).toBe(iconNames.length);
 	expect(iconNames.toSorted()).toEqual(Object.keys(GLYPHS).toSorted());

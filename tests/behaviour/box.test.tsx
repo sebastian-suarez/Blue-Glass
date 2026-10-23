@@ -16,18 +16,12 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-/**
-Renders one Box and returns its root element's computed style, through the documented ref.
-*/
 function styleOf(props: BoxProps): CSSStyleDeclaration {
 	const ref = React.createRef<HTMLElement>();
 	render(<Box ref={ref} {...props} />);
 	return getComputedStyle(current(ref));
 }
 
-/**
-The length a spacing token holds, read from the stylesheet's custom property.
-*/
 function space(token: SpaceToken): string {
 	return getComputedStyle(document.documentElement)
 		.getPropertyValue(`--space-${token}`)

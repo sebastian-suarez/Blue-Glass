@@ -32,9 +32,6 @@ const cell: CSSProperties = {
 	color: "var(--ink-soft)",
 };
 
-/**
-An inset cell that shows where a grid item sits; accent raises the items a variant moves.
-*/
 function Cell({
 	children,
 	accent = false,
@@ -60,9 +57,6 @@ function Cell({
 	);
 }
 
-/**
-A client outcome on an inset Paper: where, the figure, and what changed.
-*/
 function Outcome({
 	figure,
 	title,
@@ -140,9 +134,6 @@ function bar(label: string, value: string, width: string, fill: string) {
 	);
 }
 
-/**
-The PDF generation time before and after, as two bars.
-*/
 function BeforeAfter() {
 	return (
 		<div

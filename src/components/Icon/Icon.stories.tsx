@@ -22,7 +22,6 @@ export const Default: Story = {
 	args: { name: "arrow-ne", size: 32, filled: false, strokeWidth: 1.5 },
 	argTypes: {
 		name: { control: "select", options: iconNames },
-		// Both take a number or a CSS length, so docgen alone gives them a JSON field.
 		size: { control: "number" },
 		strokeWidth: { control: "number" },
 	},

@@ -1,8 +1,3 @@
-/**
-The export names half of the API gate: src/index.ts exports every documented value and type
-in the phase's scope (BLUE_GLASS_PHASE overrides tests/phases.json), each value is defined,
-and nothing else is exported unless tests/api/allowlist.json gives the reason.
-*/
 import path from "node:path";
 import { expect, test } from "vitest";
 import { readAllowlist } from "../../scripts/api/allowlist.ts";

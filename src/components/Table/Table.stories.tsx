@@ -121,9 +121,6 @@ const months = [
 	"Dec",
 ];
 
-/**
-The first "Mon YYYY" in a role's dates, as a month count, so roles sort by start date.
-*/
 function monthOf(dates: string): number {
 	const { month = "", year = "" } =
 		/(?<month>[A-Z][a-z]{2}) (?<year>\d{4})/u.exec(dates)?.groups ?? {};
@@ -137,9 +134,6 @@ function monthOf(dates: string): number {
 
 const muted = { color: "var(--color-muted)" };
 
-/**
-The outcomes table: employers as row headers, figures right-aligned.
-*/
 function Outcomes(props: TableProps) {
 	return (
 		<TableContainer aria-label="Outcomes">
@@ -155,7 +149,6 @@ function Outcomes(props: TableProps) {
 					<TableRow>
 						<TableCell component="th">Limber Health</TableCell>
 						<TableCell>PDF generation for a training specification</TableCell>
-						{/* An en dash and a word joiner, so the range never breaks. */}
 						<TableCell numeric>10–⁠20 ms</TableCell>
 					</TableRow>
 					<TableRow>
@@ -181,9 +174,6 @@ function Outcomes(props: TableProps) {
 
 type Column = keyof Role;
 
-/**
-My experience from the CV, sortable by any column: the newest first, and ties newest first.
-*/
 function Experience() {
 	const [orderBy, setOrderBy] = React.useState<Column>("dates");
 	const [direction, setDirection] = React.useState<"asc" | "desc">("desc");

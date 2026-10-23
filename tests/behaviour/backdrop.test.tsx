@@ -1,6 +1,3 @@
-// Behaviour specs for Backdrop, from design-system/components/Backdrop/README.md and api.d.ts.
-// Used on its own, the backdrop is placed by its caller, as the preview places its loading
-// covers: absolute over a region, above the region's content.
 import { cleanup, render, screen } from "@testing-library/react";
 import type { CDPSession } from "@vitest/browser-playwright";
 import * as React from "react";
@@ -22,10 +19,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-The distinct durations, in whole ms, of the animations running on the element, once there are
-some. Polls often: an exit can be short.
-*/
 async function runningDurations(element: Element): Promise<number[]> {
 	return vi.waitFor(
 		() => {
@@ -41,9 +34,6 @@ async function runningDurations(element: Element): Promise<number[]> {
 	);
 }
 
-/**
-Waits until nothing animates on the element.
-*/
 async function atRest(element: Element): Promise<void> {
 	await vi.waitFor(
 		() => {
@@ -53,17 +43,11 @@ async function atRest(element: Element): Promise<void> {
 	);
 }
 
-/**
-The alpha of a computed colour: rgb() is opaque, rgba() carries its own.
-*/
 function alphaOf(color: string): number {
 	const channels = color.match(/[\d.]+/gv) ?? [];
 	return channels.length === 4 ? Number(channels[3]) : 1;
 }
 
-/**
-A colour token as the browser resolves it, read from a probe element painted with it.
-*/
 function resolvedColor(name: string): string {
 	const probe = document.createElement("div");
 	probe.style.backgroundColor = `var(${name})`;
@@ -73,16 +57,12 @@ function resolvedColor(name: string): string {
 	return color;
 }
 
-// As in the preview: over its region, above the region's content.
 const cover: React.CSSProperties = { position: "absolute", zIndex: 2 };
 
 type RegionProps = Omit<BackdropProps, "open"> & {
 	readonly onPagePress?: () => void;
 };
 
-/**
-A region with a control in it, covered by a backdrop that a press dismisses, as in the preview.
-*/
 function Region({ onClick, onPagePress, ...props }: RegionProps) {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
@@ -216,7 +196,6 @@ test("a press on it calls onClick with the click's React event and doesn't reach
 		/>,
 	);
 	const scrim = screen.getByTestId("scrim");
-	// Forced: the backdrop covers the control, and the press lands on whatever is on top.
 	await userEvent.click(screen.getByRole("button", { name: "Page action" }), {
 		force: true,
 	});
@@ -226,7 +205,6 @@ test("a press on it calls onClick with the click's React event and doesn't reach
 	expect(onPagePress).not.toHaveBeenCalled();
 	await expect.element(scrim).not.toBeInTheDocument();
 
-	// Gone, it no longer covers the region.
 	await userEvent.click(screen.getByRole("button", { name: "Page action" }));
 	expect(onPagePress).toHaveBeenCalledTimes(1);
 });

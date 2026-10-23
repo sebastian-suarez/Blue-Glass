@@ -1,15 +1,9 @@
-/*
-The popup layer that Popover and Menu share (popup-layer.tsx), for what their behaviour specs
-don't reach: a layer stacked with Modal's, Menu's own modal layer, the whole-pixel offsets
-against the reference's computePosition, and focus moving in within the opening task.
-*/
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { computePosition } from "../../design-system/shared/position.js";
-// The real overlay layout: .gl-modal and .gl-backdrop cover the viewport.
 import "../styles/index.css";
 import { Menu, MenuItem } from "../components/Menu/Menu.js";
 import { Modal } from "../components/Modal/Modal.js";
@@ -36,9 +30,6 @@ function isScrollLocked(): boolean {
 }
 
 describe("stacked with a Modal", () => {
-	/**
-	A Modal holding a button that opens a Popover over it, as a share task inside a dialog would.
-	*/
 	function SharingDialog({
 		onModalClose,
 		onPopoverClose,
@@ -89,7 +80,6 @@ describe("stacked with a Modal", () => {
 		const share = await vi.waitFor(() =>
 			screen.getByRole("button", { name: "Share" }),
 		);
-		// Focus moves into the popover (to its surface, with nothing marked data-autofocus).
 		const isInPopover = () =>
 			screen
 				.queryByRole("dialog", { name: "Share this project" })
@@ -104,7 +94,6 @@ describe("stacked with a Modal", () => {
 			);
 		});
 		expect(onModalClose).not.toHaveBeenCalled();
-		// Focus is back on Share, in the Modal, which now takes Escape.
 		await expect.element(share).toHaveFocus();
 		await userEvent.click(share);
 		await expect.poll(isInPopover).toBe(true);
@@ -197,7 +186,6 @@ describe("Menu's modal layer", () => {
 		await userEvent.click(
 			screen.getByRole("button", { name: "Project actions" }),
 		);
-		// No wait for the menu: the reference moves focus in an effect of the opening update.
 		await userEvent.keyboard("{ArrowDown}");
 		await expect
 			.element(screen.getByRole("menuitem", { name: "Share" }))
@@ -208,7 +196,6 @@ describe("Menu's modal layer", () => {
 describe("whole-pixel offsets", () => {
 	type Case = {
 		placement: Placement;
-		// A fractional size, as text with a fractional line height gives.
 		size: { width: number; height: number };
 	};
 
@@ -266,7 +253,6 @@ describe("whole-pixel offsets", () => {
 					expect(element).not.toBeNull();
 					return element!;
 				});
-				// The reference measures the popup in whole pixels.
 				const expected = computePosition(
 					anchor.getBoundingClientRect(),
 					{ width: positioner.offsetWidth, height: positioner.offsetHeight },

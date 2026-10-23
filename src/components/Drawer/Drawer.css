@@ -1,9 +1,4 @@
-/* Blue Glass — Drawer, ported from design-system/components/Drawer/styles.css. */
-
 @layer gl-components {
-	/* Drawer — a Paper (.glass-panel: glass, blur-panel, the 0.95 white edge, shadow-panel, radius-panel)
-	   from an edge. inset floats it 12px in from the edges (and the safe areas); flush keeps only the
-	   inner corners rounded. Slide (280ms in, 220ms out, ease-out-quint) moves the frame, never the panel. */
 	.gl-drawer {
 		--gl-drawer-gap: 12px;
 		display: flex;
@@ -21,8 +16,6 @@
 		min-height: 0;
 		overflow: hidden;
 	}
-
-	/* Left and right: a column var(--gl-drawer-width) wide plus the gap; the panel can shrink to fit. */
 	.gl-drawer:is(.gl-drawer-left, .gl-drawer-right) > .gl-drawer-paper {
 		flex: 0 1 var(--gl-drawer-width);
 		width: var(--gl-drawer-width);
@@ -57,8 +50,6 @@
 			max(var(--gl-drawer-gap), env(safe-area-inset-bottom, 0px))
 			max(var(--gl-drawer-gap), env(safe-area-inset-left, 0px));
 	}
-
-	/* flush: only the inner corners rounded and no edge where it meets the screen; the safe areas pad the inside. */
 	.gl-drawer-flush.gl-drawer-left > .gl-drawer-paper {
 		border-radius: 0 var(--radius-panel) var(--radius-panel) 0;
 		border-width: 0 1px 0 0;
@@ -83,8 +74,6 @@
 		padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
 			env(safe-area-inset-left, 0px);
 	}
-
-	/* temporary: a fixed frame on the Modal layer (z-drawer); its gap lets presses through to the scrim. */
 	.gl-drawer-temporary {
 		position: fixed;
 		pointer-events: none;
@@ -118,9 +107,6 @@
 		right: 0;
 		max-height: calc(100% - 48px);
 	}
-
-	/* persistent: in the layout; its column (or row) opens with the panel riding its inner edge, pushing the content.
-	   Clipped on the outer edge only (overflow: hidden would cut the panel's shadow along the inner edge). */
 	.gl-drawer-persistent {
 		flex: none;
 	}
@@ -181,8 +167,6 @@
 	.gl-drawer-persistent.gl-drawer-bottom > .gl-drawer-paper {
 		align-self: start;
 	}
-
-	/* permanent: a static panel in the layout. */
 	.gl-drawer-permanent {
 		flex: none;
 	}
@@ -190,8 +174,6 @@
 		width: calc(var(--gl-drawer-width) + var(--gl-drawer-gap));
 		max-width: 100%;
 	}
-
-	/* Header slot: the dialog title (text-title-sm) and a close button. */
 	.gl-drawer-header {
 		display: flex;
 		align-items: center;
@@ -246,8 +228,6 @@
 	.gl-drawer-paper > .gl-drawer-body:first-child {
 		padding-top: var(--space-lg);
 	}
-
-	/* The bottom sheet's grab handle: a color-line-family bar the sheet follows when dragged. */
 	.gl-drawer-handle {
 		display: flex;
 		justify-content: center;

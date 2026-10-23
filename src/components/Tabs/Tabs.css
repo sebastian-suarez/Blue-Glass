@@ -1,11 +1,4 @@
-/* Blue Glass — Tabs, ported from design-system/components/Tabs/styles.css. Base UI marks the
-   selected tab data-active and a disabled one data-disabled (it stays focusable, aria-disabled),
-   where the reference used data-selected and :disabled. */
-
 @layer gl-components {
-	/* Tabs — three looks from global.css: underline (the mobile tab mark, .project-tab[aria-pressed=true]::after),
-   pill (the nav pill, .identity-strip nav) and side (the client-work folio: .folio-layout,
-   .project-selector, .project-tab, .tab-orb, .tab-mark). Panels crossfade like project-tabs.ts. */
 	.gl-tabs {
 		display: grid;
 		gap: var(--space-md);
@@ -79,8 +72,6 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-
-	/* underline. The list keeps 5px of room so the focus ring isn't clipped by the scroller, and gives it back. */
 	.gl-tabs-underline .gl-tabs-list {
 		gap: 2px;
 		padding: 5px;
@@ -95,7 +86,6 @@
 	.gl-tabs-underline .gl-tab[data-active] {
 		color: var(--color-ink);
 	}
-	/* The site's mobile tab mark (16 × 2px, color-ink, 4px off the tab's foot), as one element that slides. */
 	.gl-tabs-indicator {
 		position: absolute;
 		left: 0;
@@ -107,8 +97,6 @@
 		pointer-events: none;
 		transition: transform var(--duration-tab) var(--ease-folio);
 	}
-
-	/* pill: the nav pill (.identity-strip nav and its links) */
 	.gl-tabs-pill .gl-tabs-bar {
 		justify-self: start;
 		max-width: 100%;
@@ -128,7 +116,6 @@
 		-webkit-backdrop-filter: blur(var(--blur-control));
 		backdrop-filter: blur(var(--blur-control));
 	}
-	/* .identity-strip nav a is padding 7px 17px; 1px goes to the border the raised state shows. */
 	.gl-tabs-pill .gl-tab {
 		padding: 6px 16px;
 		border-radius: 23px;
@@ -141,8 +128,6 @@
 		border-color: #fff;
 		box-shadow: var(--shadow-raised);
 	}
-
-	/* side: .folio-layout's 176px column beside the panels, .project-selector, .project-tab */
 	.gl-tabs-side {
 		grid-template-columns: 176px minmax(0, 1fr);
 		gap: var(--space-lg);
@@ -174,7 +159,6 @@
 		text-align: left;
 		white-space: normal;
 	}
-	/* .tab-orb, .orb-1, .orb-2 */
 	.gl-tab-orb {
 		display: block;
 		width: 12px;
@@ -192,7 +176,6 @@
 	.gl-tab-orb-2 {
 		background: linear-gradient(135deg, #edfaff, #82b9d5);
 	}
-	/* .tab-mark: shown on the selected tab only, its space always kept so labels never reflow */
 	.gl-tab-mark {
 		display: inline-flex;
 		flex: none;
@@ -213,7 +196,6 @@
 	.gl-tab-panel[hidden] {
 		display: none;
 	}
-	/* The site's crossfade: the incoming panel fades in over duration-tab on ease-folio. */
 	.gl-tab-panel-animate:not([hidden]) {
 		animation: gl-tab-panel-in var(--duration-tab) var(--ease-folio);
 	}
@@ -222,8 +204,6 @@
 			opacity: 0;
 		}
 	}
-
-	/* Scrolling row: faded edges, and chevrons for pointers that can't scroll sideways. */
 	.gl-tabs-bar[data-overflow-start] .gl-tabs-list {
 		-webkit-mask-image: linear-gradient(to right, transparent, #000 40px);
 		mask-image: linear-gradient(to right, transparent, #000 40px);
@@ -285,7 +265,6 @@
 			background: #fff;
 			color: var(--color-ink);
 		}
-		/* .project-tab:hover, .identity-strip nav a:hover */
 		.gl-tabs-underline .gl-tab:hover:not([data-disabled]),
 		.gl-tabs-side .gl-tab:hover:not([data-disabled]):not([data-active]) {
 			background: #ffffff66;
@@ -299,8 +278,6 @@
 			background: #fff;
 		}
 	}
-
-	/* Phones: the side selector becomes a row of tabs with the mark under the selected one (global.css ≤700px). */
 	@media (max-width: 700px) {
 		.gl-tabs-side {
 			display: flex;

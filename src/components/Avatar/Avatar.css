@@ -1,9 +1,4 @@
-/* Blue Glass — Avatar, ported from design-system/components/Avatar/styles.css. Chip.css also
-   styles gl-avatar, and foundation.css holds gl-sr-only. */
-
 @layer gl-components {
-	/* Avatar — initials on the site's orbs (.tab-orb, .company-orb, .orb-1, .orb-2) or the monogram tile
-   (.signature). Sizes scale from md (40px, the signature's size) with --gl-avatar-scale. */
 	.gl-avatar {
 		--gl-avatar-size: 40px;
 		--gl-avatar-scale: 1;
@@ -37,8 +32,6 @@
 		--gl-avatar-size: 56px;
 		--gl-avatar-scale: 1.4;
 	}
-
-	/* circle: the orb (.tab-orb / .company-orb), ink initials on top (5.1:1 at the gradient's darkest end) */
 	.gl-avatar-circle {
 		border-radius: 50%;
 		background: linear-gradient(135deg, #f6fbff, #93afcf);
@@ -48,19 +41,16 @@
 	}
 	.gl-avatar-orb-1 {
 		background: linear-gradient(135deg, #f1f8ff, #77a5d8);
-	} /* .orb-1 */
+	}
 	.gl-avatar-orb-2 {
 		background: linear-gradient(135deg, #edfaff, #82b9d5);
-	} /* .orb-2 */
-
-	/* tile: the monogram tile (.signature): glass gradient, #fff9 edge, shadow-tile, radius-tile at md */
+	}
 	.gl-avatar-tile {
 		border: 1px solid #fff9;
 		border-radius: calc(var(--radius-tile) * var(--gl-avatar-scale));
 		background: linear-gradient(135deg, #fff9, #fff3);
 		box-shadow: var(--shadow-tile);
 	}
-	/* Lowercase letters on a tile: the signature's "ss" — 26px at -5px tracking, nudged left 6px, at md. */
 	.gl-avatar-monogram {
 		padding-right: calc(6px * var(--gl-avatar-scale));
 		font-size: calc(26px * var(--gl-avatar-scale));
@@ -82,8 +72,6 @@
 		height: 58%;
 		color: var(--ink-soft);
 	}
-
-	/* Group: overlapping avatars, each cut out by a 2px canvas ring. */
 	.gl-avatar-group {
 		display: inline-flex;
 		align-items: center;

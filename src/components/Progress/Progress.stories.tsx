@@ -25,9 +25,6 @@ type Story = StoryObj<typeof meta>;
 
 type StepState = "done" | "active" | "waiting";
 
-/**
-A pipeline step: its state's mark, its title and detail, and the bar of the step that's moving.
-*/
 function Step({
 	title,
 	state,
@@ -93,17 +90,12 @@ type Stage = "upload" | "invalidate" | "done";
 
 const files = 214;
 
-// The invalidation step waits for the upload, then moves, then is done.
 const invalidations: Record<Stage, { state: StepState; detail: string }> = {
 	upload: { state: "waiting", detail: "Waiting" },
 	invalidate: { state: "active", detail: "About a minute" },
 	done: { state: "done", detail: "Done" },
 };
 
-/**
-The preview's deploy pipeline: "Run again" uploads the 214 files 9% at a time, then invalidates
-the cache for 2.2s while its bar slides.
-*/
 function Pipeline() {
 	const [uploaded, setUploaded] = useState(62);
 	const [stage, setStage] = useState<Stage>("upload");
@@ -123,7 +115,6 @@ function Pipeline() {
 
 				const next = Math.min(100, uploaded + 9);
 				setUploaded(next);
-				// A full upload hands over to the invalidation at once.
 				if (next >= 100) {
 					setStage("invalidate");
 				}

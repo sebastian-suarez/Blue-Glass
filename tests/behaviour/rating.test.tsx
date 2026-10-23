@@ -1,8 +1,3 @@
-// Behaviour specs for Rating, from design-system/components/Rating/README.md and api.d.ts. The port
-// runs on Base UI's RadioGroup, whose radios are spans with the role beside hidden inputs, so the
-// specs find the stars by role and name: a radiogroup of radios named by getLabelText, and a
-// read-only rating as one image. How full each star is drawn is read from a screenshot of the row:
-// the color-blue pixels in each half of each star's slot. The mouse goes to points across the row.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -10,10 +5,6 @@ import { page, userEvent } from "vitest/browser";
 import "#ui/styles.css";
 import { Rating, type RatingProps } from "#ui";
 
-/**
-Parks the pointer in the page's bottom-left corner, clear of every rating below: stars that
-appear under a resting pointer count as hovered.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -77,9 +68,6 @@ function checkedIn(container: HTMLElement): HTMLElement[] {
 	return within(container).queryAllByRole("radio", { checked: true });
 }
 
-/**
-Checks that the named radio is the only checked one in the group.
-*/
 function expectOnlyChecked(
 	name: string,
 	group: HTMLElement = stars(),
@@ -103,9 +91,6 @@ function formNamed(name: string): HTMLFormElement {
 	return form;
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -113,9 +98,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-How opaque the element is drawn: its opacity times its ancestors'.
-*/
 function drawnOpacity(element: Element): number {
 	let opacity = 1;
 	for (
@@ -154,10 +136,6 @@ function shareOf(part: Part): number {
 	return part === "second half" ? 0.75 : 0.5;
 }
 
-/**
-A point over a star (counted from 1) in a row of `count`, relative to the row: the middle of the
-star's slot, or of its first or second half.
-*/
 function over(
 	row: HTMLElement,
 	star: number,
@@ -191,9 +169,6 @@ async function pressStar(
 	await userEvent.click(row, { position: over(row, star, count, part), force });
 }
 
-/**
-The computed value of a colour token, read from a probe element styled with it.
-*/
 function resolvedColor(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.color = `var(${token})`;
@@ -242,10 +217,6 @@ function changedPixels(before: ImageData, after: ImageData): number {
 	return changed;
 }
 
-/**
-Counts, in each half of each star's slot, the pixels drawn in a token's colour: [first, second]
-per star. Only pixels at the colour count, so other colours and blended edges don't.
-*/
 async function pixelsIn(
 	row: HTMLElement,
 	token: string,
@@ -284,10 +255,6 @@ async function pixelsIn(
 	});
 }
 
-/**
-How full each star of the row is drawn, from a screenshot: 1 when color-blue fills both halves
-of its slot, 0.5 when only the first half, 0 when neither.
-*/
 async function fills(row: HTMLElement, count = 5): Promise<number[]> {
 	const halves = await pixelsIn(row, "--color-blue", count);
 	return halves.map(([first, second]) => {
@@ -306,10 +273,6 @@ type Changed = {
 	value: number | null;
 };
 
-/**
-Records what onChange saw at call time: the event's type, whether it came from a mouse, the
-input it targets with that input's state, and the value.
-*/
 function changes() {
 	const calls: Changed[] = [];
 	const onChange = vi.fn<OnChange>((event, value) => {
@@ -329,9 +292,6 @@ function changes() {
 
 type Active = { type: string; isMouse: boolean; value: number };
 
-/**
-Records what onChangeActive saw at call time.
-*/
 function previews() {
 	const calls: Active[] = [];
 	const onChangeActive = vi.fn<OnChangeActive>((event, value) => {
@@ -341,9 +301,6 @@ function previews() {
 			value,
 		});
 	});
-	/**
-	The values in order, a value repeated while the mouse stays on it counted once.
-	*/
 	const values = () =>
 		calls
 			.map((call) => call.value)
@@ -417,7 +374,6 @@ describe("Rating: what it renders", () => {
 			expect(radio(`${value} out of 10 stars`, group)).toBeInTheDocument();
 		}
 
-		// The stars sit side by side, so the row is max times the star size.
 		expect(box(group).width).toBe(180);
 	});
 
@@ -439,7 +395,6 @@ describe("Rating: what it renders", () => {
 				<Rating aria-label="lg" size="lg" />
 			</>,
 		);
-		// Five stars side by side.
 		expect(box(stars("Default")).width).toBe(120);
 		expect(box(stars("sm")).width).toBe(90);
 		expect(box(stars("md")).width).toBe(120);
@@ -484,7 +439,6 @@ describe("Rating: what it renders", () => {
 		render(<Rating ref={ref} id="template-rating" defaultValue={3} />);
 		const root = ref.current;
 		expect(root).toHaveAttribute("id", "template-rating");
-		// The documented inputs: the reference's radios, a port's hidden inputs beside them.
 		const ids = [...(root?.querySelectorAll("input") ?? [])].map(
 			(input) => input.id,
 		);
@@ -665,7 +619,6 @@ describe("Rating: mouse", () => {
 		]);
 	});
 
-	// Clearing changes no input, so the event is the press itself.
 	test('pressing the current star clears the rating: onChange gets the press and null, and "No rating" is checked', async () => {
 		const { calls, onChange } = changes();
 		render(<Rating defaultValue={3} onChange={onChange} />);
@@ -885,7 +838,6 @@ describe("Rating: disabled", () => {
 		await hoverStar(group, 4);
 		await pause(300);
 		expect(changedPixels(before, await screenshotPixels(group))).toBe(0);
-		// Playwright waits for an aria-disabled target to enable; force the press.
 		await pressStar(group, 4, { force: true });
 		await pause(100);
 		expect(onChange).not.toHaveBeenCalled();
@@ -895,8 +847,6 @@ describe("Rating: disabled", () => {
 });
 
 describe("Rating: forms", () => {
-	// With no rating the form gets the empty value of the checked "No rating" radio, as in the
-	// reference; the README doesn't say.
 	test("name is every radio input's; the form gets the rating, and an empty value without one", async () => {
 		render(
 			<form aria-label="Feedback">
