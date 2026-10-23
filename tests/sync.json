@@ -406,6 +406,111 @@
 				"components/Menu/preview.html": "62e396689d1a9bd1",
 				"components/Menu/reference.tsx": "54461a2732b66b8b"
 			}
+		},
+		"TextField": {
+			"files": {
+				"components/TextField/README.md": "f5c4ff4706c133b6",
+				"components/TextField/api.d.ts": "ffcfeb9b9ad1df0b",
+				"components/TextField/styles.css": "34c308d291f36762",
+				"components/TextField/preview.html": "f68b8e65a4727ce5",
+				"components/TextField/reference.tsx": "e5028f2d96459171",
+				"shared/_inputs-b-field.tsx": "335138065555e6d1"
+			}
+		},
+		"Select": {
+			"files": {
+				"components/Select/README.md": "4aa1ac47787a02ff",
+				"components/Select/api.d.ts": "26e6bd1d0722b61c",
+				"components/Select/styles.css": "62bff27d91cb6f2c",
+				"components/Select/preview.html": "6c108bb0265cd2cd",
+				"components/Select/reference.tsx": "f90275fa61a54f50",
+				"shared/_inputs-b-field.tsx": "335138065555e6d1",
+				"shared/_inputs-b-list.ts": "9142f53169d36584"
+			}
+		},
+		"Autocomplete": {
+			"files": {
+				"components/Autocomplete/README.md": "271ea1695fcea1e5",
+				"components/Autocomplete/api.d.ts": "ae59cdd343165700",
+				"components/Autocomplete/styles.css": "23d3abded3143b36",
+				"components/Autocomplete/preview.html": "792889b50b73aae8",
+				"components/Autocomplete/reference.tsx": "bc491f8ca6d756ff",
+				"shared/_inputs-b-field.tsx": "335138065555e6d1",
+				"shared/_inputs-b-list.ts": "9142f53169d36584"
+			}
+		},
+		"Checkbox": {
+			"files": {
+				"components/Checkbox/README.md": "2a0cf429a13105a6",
+				"components/Checkbox/api.d.ts": "8abd378846f568dd",
+				"components/Checkbox/styles.css": "3cb2b0e650cad3ec",
+				"components/Checkbox/preview.html": "bace08f9ce9830a3",
+				"components/Checkbox/reference.tsx": "9c9042ce30e81c73"
+			}
+		},
+		"RadioGroup": {
+			"files": {
+				"components/RadioGroup/README.md": "d46ea46c3c6d8389",
+				"components/RadioGroup/api.d.ts": "9a39c16e874b151f",
+				"components/RadioGroup/styles.css": "8e5976eab404a60d",
+				"components/RadioGroup/preview.html": "f134f7a3acde6b1b",
+				"components/RadioGroup/reference.tsx": "f0407dcfd7b7458c"
+			}
+		},
+		"Switch": {
+			"files": {
+				"components/Switch/README.md": "47d591e679fa110c",
+				"components/Switch/api.d.ts": "9f175328e5bd9fb4",
+				"components/Switch/styles.css": "1d56422c5c6c67d3",
+				"components/Switch/preview.html": "d649551e62077c6a",
+				"components/Switch/reference.tsx": "d7f821449ea390a6"
+			}
+		},
+		"Slider": {
+			"files": {
+				"components/Slider/README.md": "71db19c4e387214d",
+				"components/Slider/api.d.ts": "3bda2ceb93bb689d",
+				"components/Slider/styles.css": "f51837f451c536b5",
+				"components/Slider/preview.html": "ab3993040623b2c6",
+				"components/Slider/reference.tsx": "2a9af07db0db77a3"
+			}
+		},
+		"Rating": {
+			"files": {
+				"components/Rating/README.md": "9610ea4896d62c15",
+				"components/Rating/api.d.ts": "f1affb0bf553ac10",
+				"components/Rating/styles.css": "d16ea9834d4a8850",
+				"components/Rating/preview.html": "5e03e94ba04a3888",
+				"components/Rating/reference.tsx": "85c6de0f095f3223"
+			}
+		},
+		"TransferList": {
+			"files": {
+				"components/TransferList/README.md": "7840c4593b434bd3",
+				"components/TransferList/api.d.ts": "6c852dfca29c9b5b",
+				"components/TransferList/styles.css": "eb96620cb7c0350b",
+				"components/TransferList/preview.html": "67c76f1302257b99",
+				"components/TransferList/reference.tsx": "0298e83975b676e3",
+				"shared/_inputs-b-list.ts": "9142f53169d36584"
+			}
+		},
+		"Fab": {
+			"files": {
+				"components/Fab/README.md": "dd5f6967a488aec0",
+				"components/Fab/api.d.ts": "b083c3b6a15f7796",
+				"components/Fab/styles.css": "c9ae19d425a06b22",
+				"components/Fab/preview.html": "bc70adb7d697c294",
+				"components/Fab/reference.tsx": "b862a2f526ebc874"
+			}
+		},
+		"SpeedDial": {
+			"files": {
+				"components/SpeedDial/README.md": "e34db5ef2eb16448",
+				"components/SpeedDial/api.d.ts": "15701736c19a0776",
+				"components/SpeedDial/styles.css": "0b1085b06b4a796b",
+				"components/SpeedDial/preview.html": "dbb9cc04ab42d8c1",
+				"components/SpeedDial/reference.tsx": "047b8773d2dd1797"
+			}
 		}
 	}
 }

@@ -1,0 +1,215 @@
+/* RadioGroup: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+	/* RadioGroup and Radio — native radios drawn as circles: a 1.5px dg-edge outline (3:1) on glass-control;
+   chosen = a color-ink ring around an ink dot. The group label is text-label (13px, 600). */
+	.gl-radio-group {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		min-width: 0;
+		color: var(--color-ink);
+	}
+	.gl-radio-group-label {
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.6;
+	}
+	.gl-radio-group-asterisk {
+		color: var(--color-muted);
+		font-weight: 400;
+	}
+	.gl-radio-group-options {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		min-width: 0;
+	}
+	.gl-radio-group-row .gl-radio-group-options {
+		flex-direction: row;
+		flex-wrap: wrap;
+		column-gap: var(--space-lg);
+	}
+	.gl-radio-group-helper {
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+	.gl-radio-group-helper-icon {
+		width: 14px;
+		height: 14px;
+		margin-top: 2px;
+	}
+	.gl-radio-group-error .gl-radio-group-helper,
+	.gl-radio-group-error .gl-radio-group-asterisk {
+		color: var(--danger);
+	}
+	/* A disabled group dims once, not once per option on top of it. */
+	.gl-radio-group-disabled {
+		opacity: 0.5;
+	}
+	.gl-radio-group-disabled .gl-radio-disabled {
+		opacity: 1;
+	}
+
+	.gl-radio {
+		--gl-radio-size: 20px;
+		--gl-radio-dot: 8px;
+		--gl-radio-line: 20px;
+		--gl-radio-gap: 10px;
+		--gl-radio-pad: 6px;
+		display: inline-flex;
+		flex-direction: column;
+		max-width: 100%;
+		vertical-align: top;
+		color: var(--color-ink);
+	}
+	.gl-radio-sm {
+		--gl-radio-size: 16px;
+		--gl-radio-dot: 6px;
+		--gl-radio-line: 18px;
+		--gl-radio-gap: var(--space-xs);
+		--gl-radio-pad: 4px;
+	}
+	/* The whole row is the label: a 32px target at md. */
+	.gl-radio-row {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--gl-radio-gap);
+		padding-block: var(--gl-radio-pad);
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-radio-control {
+		position: relative;
+		flex: none;
+		display: inline-flex;
+		width: var(--gl-radio-size);
+		height: var(--gl-radio-size);
+		margin-block: calc((var(--gl-radio-line) - var(--gl-radio-size)) / 2);
+	}
+	/* The real input lies over the circle, transparent: it keeps native arrow keys, focus and touch. */
+	.gl-radio-input {
+		outline: 0;
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		cursor: inherit;
+	}
+	.gl-radio-circle {
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
+		border: 1.5px solid var(--dg-edge);
+		border-radius: 50%;
+		background: var(--glass-control);
+		transition:
+			background-color var(--duration-state) ease,
+			border-color var(--duration-state) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-radio-circle::after {
+		content: "";
+		width: var(--gl-radio-dot);
+		height: var(--gl-radio-dot);
+		border-radius: 50%;
+		background: var(--color-ink);
+		opacity: 0;
+		transform: scale(0.85);
+		transition:
+			opacity var(--duration-state) ease,
+			transform var(--duration-state) var(--ease-out-quint),
+			background-color var(--duration-state) ease;
+	}
+	.gl-radio-input[data-checked] > .gl-radio-circle {
+		border-color: var(--color-ink);
+	}
+	.gl-radio-input[data-checked] > .gl-radio-circle::after {
+		opacity: 1;
+		transform: none;
+	}
+	.gl-radio-input:focus-visible > .gl-radio-circle {
+		outline: 3px solid var(--focus);
+		outline-offset: 2px;
+	}
+	.gl-radio-label {
+		min-width: 0;
+		font-size: 14px;
+		line-height: var(--gl-radio-line);
+	}
+	.gl-radio-sm .gl-radio-label {
+		font-size: 13px;
+	}
+	/* Pulled up to its own label and spaced from the next option, so each hint groups with its option. */
+	.gl-radio-helper {
+		margin-top: calc(1px - var(--gl-radio-pad));
+		padding-inline-start: calc(var(--gl-radio-size) + var(--gl-radio-gap));
+		padding-bottom: 4px;
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+
+	.gl-radio-error .gl-radio-circle,
+	.gl-radio-error .gl-radio-input[data-checked] > .gl-radio-circle {
+		border-color: var(--danger);
+	}
+	.gl-radio-error .gl-radio-circle::after {
+		background: var(--danger);
+	}
+
+	.gl-radio-disabled {
+		opacity: 0.5;
+	}
+	.gl-radio-disabled .gl-radio-row {
+		cursor: not-allowed;
+	}
+
+	/* Press: 0.98 is sub-pixel on a 20px circle, so the circle takes 0.92 to be felt. */
+	.gl-radio:not(.gl-radio-disabled) .gl-radio-row:active .gl-radio-circle {
+		transform: scale(0.92);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-radio:not(.gl-radio-disabled) .gl-radio-row:hover .gl-radio-circle {
+			background: var(--glass-raised);
+		}
+		.gl-radio:not(.gl-radio-disabled):not(.gl-radio-error)
+			.gl-radio-row:hover
+			.gl-radio-input:not([data-checked])
+			> .gl-radio-circle {
+			border-color: var(--color-muted);
+		}
+		.gl-radio:not(.gl-radio-disabled):not(.gl-radio-error)
+			.gl-radio-row:hover
+			.gl-radio-input[data-checked]
+			> .gl-radio-circle {
+			border-color: var(--ink-hover);
+		}
+	}
+	/* Forced colours paint every background Canvas, which would erase the dot: draw it in a system colour. */
+	@media (forced-colors: active) {
+		.gl-radio-circle::after {
+			background: CanvasText;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-radio-circle,
+		.gl-radio-circle::after {
+			transition: none;
+		}
+		.gl-radio-circle::after {
+			transform: none;
+		}
+		.gl-radio:not(.gl-radio-disabled) .gl-radio-row:active .gl-radio-circle {
+			transform: none;
+		}
+	}
+}

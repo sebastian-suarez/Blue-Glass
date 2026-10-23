@@ -1,0 +1,275 @@
+/* Slider: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+	/* Slider — an addition matching MUI's Slider. A 4px pill track: color-line rail, color-blue fill (the diagram
+   accent, marks only); a white thumb with the dg-edge edge and shadow-raised (.project-tab[aria-pressed=true]);
+   the value label is an ink pill like .btn-primary. The band around the track is 32px for a mouse and 44px
+   (the size-control tap target, near enough) for touch. */
+	.gl-slider {
+		position: relative;
+		display: inline-block;
+		box-sizing: content-box;
+		width: 100%;
+		height: 4px;
+		padding: 14px 0;
+		vertical-align: middle;
+		cursor: pointer;
+		touch-action: none;
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-slider-vertical {
+		width: 4px;
+		height: 100%;
+		padding: 0 14px;
+	}
+	@media (pointer: coarse) {
+		.gl-slider {
+			padding: 20px 0;
+		}
+		.gl-slider-vertical {
+			padding: 0 20px;
+		}
+	}
+	.gl-slider-labelled.gl-slider-horizontal {
+		margin-bottom: 20px;
+	}
+
+	.gl-slider-rail,
+	.gl-slider-track {
+		position: absolute;
+		display: block;
+		border-radius: var(--radius-pill);
+	}
+	.gl-slider-horizontal .gl-slider-rail,
+	.gl-slider-horizontal .gl-slider-track {
+		top: 50%;
+		height: 4px;
+		margin-top: -2px;
+	}
+	.gl-slider-vertical .gl-slider-rail,
+	.gl-slider-vertical .gl-slider-track {
+		left: 50%;
+		width: 4px;
+		margin-left: -2px;
+	}
+	.gl-slider-horizontal .gl-slider-rail {
+		left: 0;
+		right: 0;
+	}
+	.gl-slider-vertical .gl-slider-rail {
+		top: 0;
+		bottom: 0;
+	}
+	.gl-slider-rail {
+		background: var(--color-line);
+	}
+	.gl-slider-track {
+		background: var(--color-blue);
+	}
+
+	.gl-slider-control {
+		position: absolute;
+		inset: 0;
+		display: block;
+	}
+	/* Marks: dg-edge dots on the rail, glass-edge dots on the fill. */
+	.gl-slider-mark {
+		position: absolute;
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--dg-edge);
+		pointer-events: none;
+	}
+	.gl-slider-mark[data-active] {
+		background: var(--glass-edge);
+	}
+	.gl-slider-horizontal .gl-slider-mark {
+		top: 50%;
+		margin: -2px 0 0 -2px;
+	}
+	.gl-slider-vertical .gl-slider-mark {
+		left: 50%;
+		margin: 0 0 -2px -2px;
+	}
+	.gl-slider-mark-label {
+		position: absolute;
+		color: var(--color-muted);
+		font-size: 12px;
+		line-height: 1.5;
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+		pointer-events: none;
+	}
+	.gl-slider-mark-label[data-active] {
+		color: var(--color-ink);
+	}
+	.gl-slider-horizontal .gl-slider-mark-label {
+		top: calc(50% + 14px);
+		transform: translateX(-50%);
+	}
+	/* The end labels align to the track's ends instead of hanging past them. */
+	.gl-slider-horizontal .gl-slider-mark-label[data-edge="start"] {
+		transform: none;
+	}
+	.gl-slider-horizontal .gl-slider-mark-label[data-edge="end"] {
+		transform: translateX(-100%);
+	}
+	.gl-slider-vertical .gl-slider-mark-label {
+		left: calc(50% + 18px);
+		transform: translateY(50%);
+	}
+
+	/* The thumb. */
+	.gl-slider-thumb {
+		position: absolute;
+		display: block;
+		width: 20px;
+		height: 20px;
+		border: 1px solid var(--dg-edge);
+		border-radius: 50%;
+		background: #fff;
+		box-shadow: var(--shadow-raised);
+		cursor: grab;
+		transition:
+			left var(--duration-state) var(--ease-out-quint),
+			bottom var(--duration-state) var(--ease-out-quint),
+			border-color var(--duration-hover) ease,
+			box-shadow var(--duration-hover) ease;
+	}
+	.gl-slider-horizontal .gl-slider-thumb {
+		top: 50%;
+		margin: 0;
+	}
+	.gl-slider-vertical .gl-slider-thumb {
+		left: 50%;
+		margin: 0;
+	}
+	.gl-slider-thumb:has(input:focus-visible) {
+		outline: 3px solid var(--focus);
+		outline-offset: 2px;
+	}
+	.gl-slider-thumb[data-active] {
+		border-color: var(--color-ink);
+		box-shadow: var(--shadow-control);
+		cursor: grabbing;
+	}
+	.gl-slider[data-dragging] {
+		cursor: grabbing;
+	}
+	.gl-slider-track {
+		transition:
+			left var(--duration-state) var(--ease-out-quint),
+			width var(--duration-state) var(--ease-out-quint),
+			bottom var(--duration-state) var(--ease-out-quint),
+			height var(--duration-state) var(--ease-out-quint);
+	}
+	/* While dragging the thumb follows the pointer exactly. */
+	.gl-slider[data-dragging] .gl-slider-thumb {
+		transition:
+			border-color var(--duration-hover) ease,
+			box-shadow var(--duration-hover) ease;
+	}
+	.gl-slider[data-dragging] .gl-slider-track {
+		transition: none;
+	}
+
+	/* Value label: the ink pill above the thumb (left of it when vertical). */
+	.gl-slider-value {
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 50%;
+		padding: 3px 9px;
+		border-radius: var(--radius-pill);
+		background: var(--color-ink);
+		box-shadow: var(--shadow-primary);
+		color: var(--on-ink);
+		font-size: 12px;
+		font-weight: 500;
+		line-height: 1.5;
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+		pointer-events: none;
+		opacity: 0;
+		transform: translateX(-50%) scale(0.85);
+		transform-origin: 50% 100%;
+		transition:
+			opacity var(--duration-hover) ease,
+			transform var(--duration-hover) var(--ease-out-quint);
+	}
+	.gl-slider-vertical .gl-slider-value {
+		top: 50%;
+		right: calc(100% + 8px);
+		bottom: auto;
+		left: auto;
+		transform: translateY(-50%) scale(0.85);
+		transform-origin: 100% 50%;
+	}
+	.gl-slider-label-on .gl-slider-value,
+	.gl-slider-label-auto
+		.gl-slider-thumb:has(input:focus-visible)
+		.gl-slider-value,
+	.gl-slider-label-auto .gl-slider-thumb[data-active] .gl-slider-value {
+		opacity: 1;
+		transform: translateX(-50%);
+	}
+	.gl-slider-vertical.gl-slider-label-on .gl-slider-value,
+	.gl-slider-vertical.gl-slider-label-auto
+		.gl-slider-thumb:has(input:focus-visible)
+		.gl-slider-value,
+	.gl-slider-vertical.gl-slider-label-auto
+		.gl-slider-thumb[data-active]
+		.gl-slider-value {
+		transform: translateY(-50%);
+	}
+
+	.gl-slider-disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.gl-slider-disabled .gl-slider-thumb {
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-slider:not(.gl-slider-disabled) .gl-slider-thumb:hover {
+			border-color: var(--color-ink);
+		}
+		.gl-slider-label-auto:not(.gl-slider-disabled)
+			.gl-slider-thumb:hover
+			.gl-slider-value {
+			opacity: 1;
+			transform: translateX(-50%);
+		}
+		.gl-slider-vertical.gl-slider-label-auto:not(.gl-slider-disabled)
+			.gl-slider-thumb:hover
+			.gl-slider-value {
+			transform: translateY(-50%);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-slider-thumb,
+		.gl-slider-track {
+			transition: none;
+		}
+		.gl-slider-value {
+			transition: opacity var(--duration-hover) ease;
+			transform: translateX(-50%);
+		}
+		.gl-slider-vertical .gl-slider-value {
+			transform: translateY(-50%);
+		}
+	}
+	/* Forced colours drop backgrounds: keep the rail and the fill as system colours. */
+	@media (forced-colors: active) {
+		.gl-slider-track {
+			background: Highlight;
+		}
+		.gl-slider-rail {
+			background: GrayText;
+		}
+	}
+}

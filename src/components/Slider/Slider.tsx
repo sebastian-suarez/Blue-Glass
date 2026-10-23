@@ -1,0 +1,473 @@
+"use client";
+import { Slider as BaseSlider } from "@base-ui/react/slider";
+import * as React from "react";
+import { documentedEvent, rememberReactEvent } from "../../internal/events.js";
+import { cx } from "../../internal/cx.js";
+import {
+	useControlled,
+	useForkRef,
+	useIsoLayoutEffect,
+} from "../../internal/hooks.js";
+
+export type SliderMark = {
+	/**
+Where the mark sits, in the slider's units.
+*/
+	value: number;
+	/**
+Text under the mark (12px, color-muted; ink inside the filled range).
+*/
+	label?: React.ReactNode;
+};
+export type SliderProps = Omit<
+	React.HTMLAttributes<HTMLSpanElement>,
+	"onChange" | "defaultValue"
+> & {
+	/**
+The value (controlled): a number, or [low, high] for a range with two thumbs.
+*/
+	value?: number | number[];
+	/**
+The starting value (uncontrolled). An array makes a range. Default: min.
+*/
+	defaultValue?: number | number[];
+	/**
+Called on every change, while dragging too, with the new value and the thumb that moved.
+*/
+	onChange?: (
+		event: React.SyntheticEvent,
+		value: number | number[],
+		activeThumb: number,
+	) => void;
+	/**
+Called once a drag ends or a key changes the value: the moment to save.
+*/
+	onChangeCommitted?: (
+		event: React.SyntheticEvent,
+		value: number | number[],
+	) => void;
+	/**
+Lowest value. Default 0.
+*/
+	min?: number;
+	/**
+Highest value. Default 100.
+*/
+	max?: number;
+	/**
+Granularity. Default 1. null snaps to the marks only.
+*/
+	step?: number | null;
+	/**
+The jump for Page Up/Down and Shift+arrow. Default 10 steps.
+*/
+	shiftStep?: number;
+	/**
+True puts a dot at every step; an array places labelled marks.
+*/
+	marks?: boolean | SliderMark[];
+	/**
+Default horizontal. Vertical fills its parent's height, so give the parent one.
+*/
+	orientation?: "horizontal" | "vertical";
+	/**
+Dims to 50%; no pointer or keyboard changes.
+*/
+	disabled?: boolean;
+	/**
+Which part is filled in color-blue: up to the value (normal), from it (inverted), or none.
+*/
+	track?: "normal" | "inverted" | false;
+	/**
+The ink value pill over the thumb: auto shows it while dragging, hovered or keyboard-focused; on always; off never.
+*/
+	valueLabelDisplay?: "auto" | "on" | "off";
+	/**
+Format the value pill, e.g. (v) => `${v} ms`. A returned string also becomes aria-valuetext.
+*/
+	valueLabelFormat?:
+		string | ((value: number, index: number) => React.ReactNode);
+	/**
+The text a screen reader says for a value, e.g. "120 milliseconds".
+*/
+	getAriaValueText?: (value: number, index: number) => string;
+	/**
+Names each thumb of a range, e.g. (i) => (i ? 'Highest' : 'Lowest').
+*/
+	getAriaLabel?: (index: number) => string;
+	/**
+Form field name: one hidden input per thumb.
+*/
+	name?: string;
+};
+function clamp(value: number, minimum: number, maximum: number): number {
+	return Math.min(maximum, Math.max(minimum, value));
+}
+
+function decimals(value: number): number {
+	const text = String(value);
+	if (text.includes("e-")) {
+		return Number(text.split("e-", 2)[1]);
+	}
+
+	const index = text.indexOf(".");
+	return index === -1 ? 0 : text.length - index - 1;
+}
+
+export function Slider({
+	ref,
+	value: valueProp,
+	defaultValue,
+	onChange,
+	onChangeCommitted,
+	min = 0,
+	max = 100,
+	step = 1,
+	shiftStep,
+	marks: marksProp = false,
+	orientation = "horizontal",
+	disabled = false,
+	track = "normal",
+	valueLabelDisplay = "auto",
+	valueLabelFormat,
+	getAriaValueText,
+	getAriaLabel,
+	name,
+	className,
+	"aria-label": ariaLabel,
+	"aria-labelledby": ariaLabelledby,
+	"aria-describedby": ariaDescribedby,
+	...rest
+}: SliderProps & { ref?: React.Ref<HTMLSpanElement> }) {
+	const [state, setState] = useControlled(valueProp, defaultValue ?? min);
+	const isRange = Array.isArray(state);
+	const values = (
+		Array.isArray(state) ? state.toSorted((a, b) => a - b) : [state]
+	).map((value) => clamp(value, min, max));
+	const isVertical = orientation === "vertical";
+	const rootRef = React.useRef<HTMLSpanElement | null>(null);
+	const handleRef = useForkRef(rootRef, ref);
+	const currentRef = React.useRef(values);
+	useIsoLayoutEffect(() => {
+		currentRef.current = values;
+	});
+	const marks = React.useMemo<SliderMark[]>(() => {
+		if (Array.isArray(marksProp)) {
+			return marksProp;
+		}
+
+		if (!marksProp || step === null || step <= 0) {
+			return [];
+		}
+
+		const count = Math.floor((max - min) / step);
+		if (count > 200) {
+			return [];
+		}
+
+		const result: SliderMark[] = [];
+		const precision = decimals(step);
+		for (let index = 0; index <= count; index++) {
+			const increment = index * step;
+			const position = min + increment;
+			result.push({ value: Number(position.toFixed(precision)) });
+		}
+
+		return result;
+	}, [marksProp, step, min, max]);
+	const markValues = marks.map((mark) => mark.value).toSorted((a, b) => a - b);
+	const bounds = (current: number[], index: number): [number, number] => [
+		index > 0 ? current[index - 1] : min,
+		index < current.length - 1 ? current[index + 1] : max,
+	];
+	const output = (current: number[]): number | number[] =>
+		isRange ? current : current[0];
+	const snap = (raw: number): number => {
+		const value = clamp(raw, min, max);
+		if (step === null) {
+			if (markValues.length === 0) {
+				return value;
+			}
+
+			let nearest = markValues[0];
+			for (const mark of markValues) {
+				if (Math.abs(mark - value) < Math.abs(nearest - value)) {
+					nearest = mark;
+				}
+			}
+
+			return nearest;
+		}
+
+		if (step <= 0) {
+			return value;
+		}
+
+		const rounded = Math.round((value - min) / step) * step;
+		const position = Number((rounded + min).toFixed(decimals(step)));
+		return clamp(position, min, max);
+	};
+
+	const commit = (event: React.SyntheticEvent, index: number, raw: number) => {
+		const { current } = currentRef;
+		const [low, high] = bounds(current, index);
+		const value = clamp(snap(raw), low, high);
+		if (value === current[index]) {
+			return;
+		}
+
+		const next = [...current];
+		next[index] = value;
+		currentRef.current = next;
+		setState(output(next));
+		onChange?.(event, output(next), index);
+		onChangeCommitted?.(event, output(next));
+	};
+
+	const onMarkKeyDown = (
+		event: React.KeyboardEvent<HTMLInputElement>,
+		index: number,
+	) => {
+		if (disabled || step !== null) {
+			return;
+		}
+
+		const { current } = currentRef;
+		const [low, high] = bounds(current, index);
+		let next: number;
+		switch (event.key) {
+			case "ArrowRight":
+			case "ArrowUp":
+			case "PageUp": {
+				next =
+					markValues.find((value) => value > current[index]) ?? current[index];
+				break;
+			}
+
+			case "ArrowLeft":
+			case "ArrowDown":
+			case "PageDown": {
+				next =
+					markValues.findLast((value) => value < current[index]) ??
+					current[index];
+				break;
+			}
+
+			case "Home": {
+				next = low;
+				break;
+			}
+
+			case "End": {
+				next = high;
+				break;
+			}
+
+			default: {
+				return;
+			}
+		}
+
+		event.preventDefault();
+		commit(event, index, next);
+	};
+
+	const format = (value: number, index: number): React.ReactNode =>
+		typeof valueLabelFormat === "function"
+			? valueLabelFormat(value, index)
+			: (valueLabelFormat ?? value);
+	const valueText = (value: number, index: number): string | undefined => {
+		if (getAriaValueText) {
+			return getAriaValueText(value, index);
+		}
+
+		const formatted = format(value, index);
+		return typeof formatted === "string" && formatted !== String(value)
+			? formatted
+			: undefined;
+	};
+
+	const percentage = (value: number) =>
+		max === min ? 0 : ((value - min) / (max - min)) * 100;
+	const at = (position: number): React.CSSProperties =>
+		isVertical ? { bottom: `${position}%` } : { left: `${position}%` };
+	const first = values[0];
+	const last = values.at(-1)!;
+	const start = isRange || track === "inverted" ? percentage(first) : 0;
+	const end = isRange
+		? percentage(last)
+		: track === "inverted"
+			? 100
+			: percentage(first);
+	const isInTrack = (value: number) => {
+		if (track === false) {
+			return false;
+		}
+
+		if (isRange) {
+			return value >= first && value <= last;
+		}
+
+		return track === "inverted" ? value >= first : value <= first;
+	};
+
+	const hasLabels = marks.some(
+		(mark) =>
+			mark.label !== undefined && mark.label !== null && mark.label !== "",
+	);
+	const continuousStep = (max - min) / 10_000;
+	const largeStep = shiftStep ?? (step === null ? (max - min) / 10 : step * 10);
+	return (
+		<BaseSlider.Root
+			ref={handleRef}
+			render={<span />}
+			{...rest}
+			value={isRange ? values : first}
+			min={min}
+			max={max}
+			step={step ?? continuousStep}
+			largeStep={largeStep}
+			orientation={orientation}
+			disabled={disabled}
+			name={name}
+			thumbCollisionBehavior="none"
+			className={cx(
+				"gl-slider",
+				isVertical ? "gl-slider-vertical" : "gl-slider-horizontal",
+				disabled && "gl-slider-disabled",
+				hasLabels && "gl-slider-labelled",
+				valueLabelDisplay === "on" && "gl-slider-label-on",
+				valueLabelDisplay === "auto" && "gl-slider-label-auto",
+				className,
+			)}
+			onKeyDownCapture={rememberReactEvent}
+			onPointerDownCapture={rememberReactEvent}
+			onPointerMoveCapture={rememberReactEvent}
+			onPointerUpCapture={rememberReactEvent}
+			onValueChange={(next, details) => {
+				const nextValues = Array.isArray(next) ? [...next] : [next];
+				const index = details.activeThumbIndex;
+				const [low, high] = bounds(currentRef.current, index);
+				nextValues[index] = clamp(snap(nextValues[index]), low, high);
+				if (nextValues[index] === currentRef.current[index]) {
+					details.cancel();
+					return;
+				}
+
+				currentRef.current = nextValues;
+				setState(output(nextValues));
+				onChange?.(
+					documentedEvent(details.event, rootRef.current ?? undefined),
+					output(nextValues),
+					index,
+				);
+			}}
+			onValueCommitted={(_next, details) => {
+				onChangeCommitted?.(
+					documentedEvent(details.event, rootRef.current ?? undefined),
+					output(currentRef.current),
+				);
+			}}
+		>
+			<BaseSlider.Control render={<span />} className="gl-slider-control">
+				<span className="gl-slider-rail" />
+				{track === false ? null : (
+					<span
+						className="gl-slider-track"
+						style={
+							isVertical
+								? { bottom: `${start}%`, height: `${end - start}%` }
+								: { left: `${start}%`, width: `${end - start}%` }
+						}
+					/>
+				)}
+				{marks.map((mark) => {
+					const position = percentage(clamp(mark.value, min, max));
+					const active = isInTrack(mark.value) ? "" : undefined;
+					return (
+						<React.Fragment key={mark.value}>
+							<span
+								className="gl-slider-mark"
+								style={at(position)}
+								data-active={active}
+							/>
+							{mark.label !== undefined &&
+							mark.label !== null &&
+							mark.label !== "" ? (
+								<span
+									aria-hidden="true"
+									className="gl-slider-mark-label"
+									style={at(position)}
+									data-active={active}
+									data-edge={
+										position <= 0
+											? "start"
+											: position >= 100
+												? "end"
+												: undefined
+									}
+								>
+									{mark.label}
+								</span>
+							) : null}
+						</React.Fragment>
+					);
+				})}
+				{values.map((value, index) => {
+					const [low, high] = bounds(values, index);
+					return (
+						<BaseSlider.Thumb
+							// A thumb's identity is its position in the range, including when values coincide.
+							// eslint-disable-next-line @eslint-react/no-array-index-key
+							key={index}
+							index={index}
+							render={(props, thumb) => (
+								<span
+									{...props}
+									data-active={
+										thumb.dragging && thumb.activeThumbIndex === index
+											? ""
+											: undefined
+									}
+								/>
+							)}
+							inputRef={(element) => {
+								if (!element) {
+									return;
+								}
+
+								element.setAttribute("aria-valuemin", String(low));
+								element.setAttribute("aria-valuemax", String(high));
+								const text = valueText(value, index);
+								element.toggleAttribute("aria-valuetext", text !== undefined);
+								if (text !== undefined) {
+									element.setAttribute("aria-valuetext", text);
+								}
+							}}
+							className="gl-slider-thumb"
+							style={{
+								...at(percentage(value)),
+								transform: "none",
+								...(isVertical && { top: "auto" }),
+							}}
+							aria-valuetext={valueText(value, index)}
+							aria-disabled={disabled || undefined}
+							aria-label={getAriaLabel ? getAriaLabel(index) : ariaLabel}
+							aria-labelledby={getAriaLabel ? undefined : ariaLabelledby}
+							aria-describedby={ariaDescribedby}
+							onKeyDown={(event) => {
+								onMarkKeyDown(event, index);
+							}}
+						>
+							{valueLabelDisplay === "off" ? null : (
+								<span className="gl-slider-value" aria-hidden="true">
+									{format(value, index)}
+								</span>
+							)}
+						</BaseSlider.Thumb>
+					);
+				})}
+			</BaseSlider.Control>
+		</BaseSlider.Root>
+	);
+}

@@ -57,7 +57,12 @@ layout, not anchoring.
 */
 import type { Popover } from "@base-ui/react/popover";
 import * as React from "react";
-import { useIsoLayoutEffect } from "./hooks.js";
+import { useEventCallback, useIsoLayoutEffect } from "./hooks.js";
+import {
+	containingBlock,
+	positionFixed,
+	type PositionResult,
+} from "./position.js";
 
 export type Side = "top" | "bottom" | "left" | "right";
 export type Align = "start" | "center" | "end";
@@ -211,6 +216,71 @@ export function toPositionerProps({ placement, offset = 8 }: PositionOptions) {
 		},
 		positionMethod: "fixed",
 	} as const satisfies Partial<PositionerProps>;
+}
+
+/**
+Base UI clips to the viewport even inside a fixed containing block. The reference places and
+sizes those popups within the block, including stages below the fold.
+*/
+export function useContainingBlockPositioner(
+	isOpen: boolean,
+	anchor: ResolvedAnchor,
+	{ placement, offset = 8 }: PositionOptions,
+) {
+	const [element, setElement] = React.useState<HTMLDivElement | null>(null);
+	const [position, setPosition] = React.useState<PositionResult | null>(null);
+	const update = useEventCallback(() => {
+		if (!isOpen || !element || !anchor || !containingBlock(element)) {
+			setPosition(null);
+			return;
+		}
+
+		const next = positionFixed(anchor.getBoundingClientRect(), element, {
+			placement,
+			offset,
+		});
+		setPosition((previous) =>
+			previous?.x === next.x &&
+			previous.y === next.y &&
+			previous.placement === next.placement &&
+			previous.maxHeight === next.maxHeight &&
+			previous.origin === next.origin
+				? previous
+				: next,
+		);
+	});
+	useIsoLayoutEffect(() => {
+		update();
+	});
+	React.useEffect(() => {
+		if (!isOpen || !element) {
+			return;
+		}
+
+		window.addEventListener("scroll", update, { capture: true });
+		window.addEventListener("resize", update);
+		const observer = new ResizeObserver(update);
+		observer.observe(element);
+		if (anchor instanceof Element) {
+			observer.observe(anchor);
+		}
+
+		return () => {
+			window.removeEventListener("scroll", update, true);
+			window.removeEventListener("resize", update);
+			observer.disconnect();
+		};
+	}, [isOpen, element, anchor, update]);
+	const style: React.CSSProperties | undefined = position
+		? {
+				left: position.x,
+				top: position.y,
+				transform: "none",
+				["--gl-transform-origin" as string]: position.origin,
+				["--gl-available-height" as string]: `${Math.floor(position.maxHeight)}px`,
+			}
+		: undefined;
+	return { setElement, style };
 }
 
 /**

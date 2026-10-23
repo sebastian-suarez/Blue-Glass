@@ -1,0 +1,168 @@
+/* Select: reference styles, copied from the design system's bundle.css. */
+/* Also styled by ../Autocomplete/styles.css: gl-option-end */
+/* Also styled by ../List/styles.css: gl-option */
+/* Also styled by ../Menu/styles.css: gl-option, gl-option-end, gl-option-icon, gl-option-secondary */
+/* Also styled by ../TextField/styles.css: gl-field-control, gl-field-input */
+/* Also styled by ../TransferList/styles.css: gl-option, gl-option-end */
+/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-icon, gl-option-secondary, gl-option-text */
+
+@layer gl-components {
+	/* Select — an addition matching MUI's Select. The trigger is the TextField pill (gl-field-control); the list is
+   .gl-listbox in a Popover (the .project-selector material); chips are the site's .chip. */
+	.gl-select-trigger {
+		padding-right: var(--space-md);
+		cursor: pointer;
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-select-trigger:focus-visible {
+		border-color: var(--color-ink);
+		outline: 3px solid var(--focus);
+		outline-offset: 2px;
+	}
+	.gl-field:not(.gl-field-error) .gl-select-trigger[aria-expanded="true"] {
+		border-color: var(--color-ink);
+	}
+
+	/* The value. Every label sits in one grid cell (only the current one visible), so the width stays put. */
+	.gl-select-value {
+		display: grid;
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.gl-select-value > * {
+		grid-area: 1 / 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.gl-select-sizer {
+		height: 0;
+		visibility: hidden;
+	}
+	.gl-select-placeholder {
+		color: var(--color-muted);
+	}
+
+	.gl-select-icon {
+		display: inline-flex;
+		flex: none;
+		margin-left: auto;
+		color: var(--color-muted);
+		transition: transform var(--duration-state) var(--ease-out-quint);
+	}
+	.gl-select-icon > .gl-icon {
+		width: 16px;
+		height: 16px;
+	}
+	.gl-select-trigger[aria-expanded="true"] .gl-select-icon {
+		transform: rotate(180deg);
+	}
+
+	.gl-field-disabled .gl-select-trigger {
+		cursor: not-allowed;
+	}
+	.gl-field-readonly .gl-select-trigger {
+		cursor: default;
+	}
+
+	/* multiple: the site's chips inside the pill, inset so their ends sit concentric with it (23px - 15px). The
+   radius is half the control height: identical to the pill on one line, a 23px corner once the chips wrap. */
+	.gl-select-multiple .gl-select-trigger {
+		padding-top: 7px;
+		padding-bottom: 7px;
+		padding-left: 7px;
+		border-radius: calc(var(--size-control) / 2);
+	}
+	.gl-select-multiple .gl-select-placeholder {
+		padding-left: 13px;
+	}
+	.gl-select-chips {
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
+		gap: var(--space-2xs);
+		min-width: 0;
+	}
+	/* .chip */
+	.gl-select-chip {
+		max-width: 100%;
+		overflow: hidden;
+		padding: 5px 11px;
+		border: 1px solid rgba(88, 108, 143, 0.16);
+		border-radius: var(--radius-pill);
+		background: var(--glass-control);
+		color: var(--ink-soft);
+		font-size: 12px;
+		line-height: 1.5;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.gl-field-sm.gl-select-multiple .gl-select-trigger {
+		padding-top: 2px;
+		padding-bottom: 2px;
+		padding-left: 2px;
+		border-radius: 18px;
+	}
+	.gl-field-sm.gl-select-multiple .gl-select-placeholder {
+		padding-left: 13px;
+	}
+
+	.gl-select-listbox .gl-option-icon > .gl-icon {
+		width: 16px;
+		height: 16px;
+	}
+	/* The list: rows are gl-option; the check on the chosen row is ink. */
+	.gl-select-listbox .gl-option-end {
+		color: var(--color-ink);
+	}
+
+	/* native: a real <select> filling the pill, the chevron drawn over it. */
+	.gl-select-native-control {
+		padding: 0;
+		cursor: pointer;
+	}
+	.gl-select-native {
+		min-height: calc(var(--size-control) - 2px);
+		padding: 0 46px 0 20px;
+		border-radius: inherit;
+		cursor: pointer;
+	}
+	.gl-select-native[data-empty] {
+		color: var(--color-muted);
+	}
+	.gl-select-native option {
+		color: var(--color-ink);
+	}
+	.gl-select-native-control .gl-select-icon {
+		position: absolute;
+		top: 50%;
+		right: var(--space-md);
+		margin-top: -8px;
+		pointer-events: none;
+	}
+	.gl-field-sm .gl-select-native {
+		min-height: 34px;
+		padding: 0 40px 0 var(--space-md);
+	}
+	.gl-field-sm .gl-select-native-control .gl-select-icon {
+		right: 14px;
+	}
+	.gl-select-native-multiple .gl-select-native-control {
+		border-radius: var(--radius-well);
+	}
+	.gl-select-native-multiple .gl-select-native {
+		padding: var(--space-xs) 12px;
+	}
+	.gl-field-disabled .gl-select-native {
+		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.gl-select-icon {
+			transition: none;
+		}
+	}
+}

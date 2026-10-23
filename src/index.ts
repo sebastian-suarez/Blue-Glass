@@ -11,11 +11,28 @@ export {
 	splitPlacement,
 	computePosition,
 } from "./components/Popper/index.js";
+export {
+	type VirtualElement,
+	type AnchorEl,
+	type PopperChildProps,
+	type PopperProps,
+	Popper,
+} from "./components/Popper/index.js";
+export * from "./components/Autocomplete/index.js";
 export { Button, type ButtonProps } from "./components/Button/index.js";
 export {
 	ButtonGroup,
 	type ButtonGroupProps,
 } from "./components/ButtonGroup/index.js";
+export * from "./components/Checkbox/index.js";
+export * from "./components/Fab/index.js";
+export * from "./components/RadioGroup/index.js";
+export * from "./components/Rating/index.js";
+export * from "./components/Select/index.js";
+export * from "./components/Slider/index.js";
+export * from "./components/Switch/index.js";
+export * from "./components/TextField/index.js";
+export * from "./components/TransferList/index.js";
 export {
 	type ToggleButtonProps,
 	ToggleButton,
@@ -60,7 +77,6 @@ export {
 	type TypographyProps,
 	type TypographyVariant,
 } from "./components/Typography/index.js";
-export { type BackdropProps, Backdrop } from "./components/Backdrop/index.js";
 export {
 	type AlertSeverity,
 	type AlertProps,
@@ -68,6 +84,7 @@ export {
 	type AlertTitleProps,
 	AlertTitle,
 } from "./components/Alert/index.js";
+export { type BackdropProps, Backdrop } from "./components/Backdrop/index.js";
 export {
 	type DialogScroll,
 	type DialogProps,
@@ -128,6 +145,7 @@ export {
 	type MenuProps,
 	Menu,
 } from "./components/Menu/index.js";
+export * from "./components/SpeedDial/index.js";
 export {
 	type TabValue,
 	type TabsProps,
@@ -153,13 +171,6 @@ export {
 } from "./components/Modal/index.js";
 export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
 export { type PopoverProps, Popover } from "./components/Popover/index.js";
-export {
-	type VirtualElement,
-	type AnchorEl,
-	type PopperChildProps,
-	type PopperProps,
-	Popper,
-} from "./components/Popper/index.js";
 export { type PortalProps, Portal } from "./components/Portal/index.js";
 export {
 	type TextareaAutosizeProps,

@@ -1,0 +1,202 @@
+/* Checkbox: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+	/* Checkbox — a native checkbox in a radius-code box: a 1.5px dg-edge border (3:1) on glass-control.
+   Checked and mixed fill with color-ink and an on-ink mark, the primary button's pair (.btn-primary). */
+	.gl-checkbox {
+		--gl-checkbox-size: 20px;
+		--gl-checkbox-line: 20px;
+		--gl-checkbox-gap: 10px;
+		--gl-checkbox-pad: 6px;
+		display: inline-flex;
+		flex-direction: column;
+		max-width: 100%;
+		vertical-align: top;
+		color: var(--color-ink);
+	}
+	.gl-checkbox-sm {
+		--gl-checkbox-size: 16px;
+		--gl-checkbox-line: 18px;
+		--gl-checkbox-gap: var(--space-xs);
+		--gl-checkbox-pad: 4px;
+	}
+	/* The whole row is the label, so the tap target is the row (32px tall at md), not the 20px box. */
+	.gl-checkbox-row {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--gl-checkbox-gap);
+		padding-block: var(--gl-checkbox-pad);
+		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.gl-checkbox-control {
+		position: relative;
+		flex: none;
+		display: inline-flex;
+		width: var(--gl-checkbox-size);
+		height: var(--gl-checkbox-size);
+		margin-block: calc((var(--gl-checkbox-line) - var(--gl-checkbox-size)) / 2);
+	}
+	/* The real input lies over the drawn box, transparent: it takes clicks, focus and screen-reader touch. */
+	.gl-checkbox-input {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		outline: 0;
+		cursor: inherit;
+	}
+	.gl-checkbox-box {
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
+		border: 1.5px solid var(--dg-edge);
+		border-radius: var(--radius-code);
+		background: var(--glass-control);
+		color: var(--on-ink);
+		transition:
+			background-color var(--duration-state) ease,
+			border-color var(--duration-state) ease,
+			transform var(--duration-press) var(--ease-out-quint);
+	}
+	.gl-checkbox-mark {
+		grid-area: 1 / 1;
+		width: 16px;
+		height: 16px;
+		stroke-width: 2.25;
+		opacity: 0;
+		transform: scale(0.85);
+		transition:
+			opacity var(--duration-state) ease,
+			transform var(--duration-state) var(--ease-out-quint);
+	}
+	.gl-checkbox-sm .gl-checkbox-mark {
+		width: 13px;
+		height: 13px;
+		stroke-width: 2.5;
+	}
+	/* radius-code scaled to the 16px box, so the small box never reads as a radio. */
+	.gl-checkbox-sm .gl-checkbox-box {
+		border-radius: calc(var(--radius-code) - 1px);
+	}
+
+	.gl-checkbox-input[data-checked] > .gl-checkbox-box,
+	.gl-checkbox-input[data-indeterminate] > .gl-checkbox-box {
+		border-color: var(--color-ink);
+		background: var(--color-ink);
+	}
+	.gl-checkbox-input[data-checked]:not([data-indeterminate])
+		> .gl-checkbox-box
+		.gl-checkbox-check,
+	.gl-checkbox-input[data-indeterminate] > .gl-checkbox-box .gl-checkbox-dash {
+		opacity: 1;
+		transform: none;
+	}
+	.gl-checkbox-input:focus-visible > .gl-checkbox-box {
+		outline: 3px solid var(--focus);
+		outline-offset: 2px;
+	}
+
+	.gl-checkbox-label {
+		min-width: 0;
+		font-size: 14px;
+		line-height: var(--gl-checkbox-line);
+	}
+	.gl-checkbox-sm .gl-checkbox-label {
+		font-size: 13px;
+	}
+	.gl-checkbox-asterisk {
+		color: var(--color-muted);
+	}
+	/* Pulled up to its own label and spaced from the next row, so each hint groups with its option. */
+	.gl-checkbox-helper {
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		margin-top: calc(1px - var(--gl-checkbox-pad));
+		padding-bottom: 4px;
+		padding-inline-start: calc(
+			var(--gl-checkbox-size) + var(--gl-checkbox-gap)
+		);
+		font-size: 12px;
+		line-height: 1.5;
+		color: var(--color-muted);
+	}
+	.gl-checkbox-helper-icon {
+		width: 14px;
+		height: 14px;
+		margin-top: 2px;
+	}
+
+	/* error: the border and the message turn danger; the message carries the error icon. */
+	.gl-checkbox-error .gl-checkbox-box {
+		border-color: var(--danger);
+	}
+	.gl-checkbox-error .gl-checkbox-input[data-checked] > .gl-checkbox-box,
+	.gl-checkbox-error .gl-checkbox-input[data-indeterminate] > .gl-checkbox-box {
+		border-color: var(--danger);
+		background: var(--danger);
+	}
+	.gl-checkbox-error .gl-checkbox-helper,
+	.gl-checkbox-error .gl-checkbox-asterisk {
+		color: var(--danger);
+	}
+
+	.gl-checkbox-disabled {
+		opacity: 0.5;
+	}
+	.gl-checkbox-disabled .gl-checkbox-row {
+		cursor: not-allowed;
+	}
+
+	/* Press: 0.98 is sub-pixel on a 20px box, so the box takes 0.92 to be felt. */
+	.gl-checkbox:not(.gl-checkbox-disabled)
+		.gl-checkbox-row:active
+		.gl-checkbox-box {
+		transform: scale(0.92);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-checkbox:not(.gl-checkbox-disabled)
+			.gl-checkbox-row:hover
+			.gl-checkbox-box {
+			background: var(--glass-raised);
+		}
+		.gl-checkbox:not(.gl-checkbox-disabled):not(.gl-checkbox-error)
+			.gl-checkbox-row:hover
+			.gl-checkbox-box {
+			border-color: var(--color-muted);
+		}
+		.gl-checkbox:not(.gl-checkbox-disabled)
+			.gl-checkbox-row:hover
+			.gl-checkbox-input:is([data-checked], [data-indeterminate])
+			> .gl-checkbox-box {
+			border-color: var(--ink-hover);
+			background: var(--ink-hover);
+		}
+		.gl-checkbox-error:not(.gl-checkbox-disabled)
+			.gl-checkbox-row:hover
+			.gl-checkbox-input:is([data-checked], [data-indeterminate])
+			> .gl-checkbox-box {
+			border-color: var(--danger-hover);
+			background: var(--danger-hover);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.gl-checkbox-box,
+		.gl-checkbox-mark {
+			transition: none;
+		}
+		.gl-checkbox-mark {
+			transform: none;
+		}
+		.gl-checkbox:not(.gl-checkbox-disabled)
+			.gl-checkbox-row:active
+			.gl-checkbox-box {
+			transform: none;
+		}
+	}
+}

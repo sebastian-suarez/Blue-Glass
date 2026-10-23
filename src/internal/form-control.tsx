@@ -181,6 +181,11 @@ export function CheckboxControl({
 	const handleInputRef = useForkRef(inputRef, ref);
 	const { input, span, shouldAutoFocus } = splitAttributes(attributes);
 	const spanRef = useAutoFocus(shouldAutoFocus);
+	useIsoLayoutEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.readOnly = input.readOnly === true;
+		}
+	}, [input.readOnly]);
 	return (
 		<BaseCheckbox.Root
 			{...span}
@@ -192,12 +197,15 @@ export function CheckboxControl({
 			inputRef={handleInputRef}
 			onCheckedChange={(isChecked, details) => {
 				const element = inputRef.current;
-				if (element) {
-					onChange?.(
-						createChangeEvent(element, details.event, details.cancel),
-						isChecked,
-					);
+				if (!element) {
+					return;
 				}
+
+				onChange?.(
+					createChangeEvent(element, details.event, details.cancel),
+					isChecked,
+				);
+				element.indeterminate = indeterminate === true;
 			}}
 		>
 			{children}
@@ -222,6 +230,11 @@ export function SwitchControl({
 	const handleInputRef = useForkRef(inputRef, ref);
 	const { input, span, shouldAutoFocus } = splitAttributes(attributes);
 	const spanRef = useAutoFocus(shouldAutoFocus);
+	useIsoLayoutEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.readOnly = input.readOnly === true;
+		}
+	}, [input.readOnly]);
 	return (
 		<BaseSwitch.Root
 			{...span}
@@ -406,6 +419,7 @@ export function RadioControl({
 	const radio = (
 		<BaseRadio.Root
 			{...span}
+			{...(input.disabled === true ? { tabIndex: -1 } : {})}
 			ref={spanRef}
 			value={value}
 			id={input.id}

@@ -1,0 +1,154 @@
+/* SpeedDial: reference styles, copied from the design system's bundle.css. */
+
+@layer gl-components {
+	/* SpeedDial — the Fab (.btn-primary as a circle) whose plus turns into a close, fanning out
+   sm glass Fabs (.btn-glass) with ink label pills (the chip's 12px and 5px 11px, on color-ink). */
+	.gl-speed-dial {
+		position: relative;
+		z-index: var(--z-fab);
+		display: flex;
+		align-items: center;
+		pointer-events: none;
+	}
+	.gl-speed-dial-up {
+		flex-direction: column-reverse;
+	}
+	.gl-speed-dial-down {
+		flex-direction: column;
+	}
+	.gl-speed-dial-left {
+		flex-direction: row-reverse;
+	}
+	.gl-speed-dial-right {
+		flex-direction: row;
+	}
+	.gl-speed-dial-fab {
+		pointer-events: auto;
+	}
+
+	/* The actions stay in the layout while hidden; only an open dial takes presses there. */
+	.gl-speed-dial-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-sm);
+		pointer-events: none;
+	}
+	.gl-speed-dial[data-open] .gl-speed-dial-actions {
+		pointer-events: auto;
+	}
+	.gl-speed-dial-up .gl-speed-dial-actions {
+		flex-direction: column-reverse;
+		padding-bottom: var(--space-sm);
+	}
+	.gl-speed-dial-down .gl-speed-dial-actions {
+		flex-direction: column;
+		padding-top: var(--space-sm);
+	}
+	.gl-speed-dial-left .gl-speed-dial-actions {
+		flex-direction: row-reverse;
+		padding-right: var(--space-sm);
+	}
+	.gl-speed-dial-right .gl-speed-dial-actions {
+		flex-direction: row;
+		padding-left: var(--space-sm);
+	}
+
+	.gl-speed-dial-action {
+		position: relative;
+		display: inline-flex;
+		flex: none;
+	}
+	/* The 36px action keeps a 44px target. */
+	.gl-speed-dial-action .gl-fab::after {
+		content: "";
+		position: absolute;
+		inset: -5px;
+		border-radius: inherit;
+	}
+
+	/* Label pill: on color-ink, static with tooltipOpen, else on hover and focus. */
+	.gl-speed-dial-label {
+		position: absolute;
+		padding: 5px 11px;
+		border-radius: var(--radius-pill);
+		background: var(--color-ink);
+		color: var(--on-ink);
+		font-size: 12px;
+		font-weight: 500;
+		line-height: 1.5;
+		white-space: nowrap;
+		box-shadow: var(--shadow-primary);
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity var(--duration-hover) ease;
+	}
+	.gl-speed-dial-action[data-placement="left"] .gl-speed-dial-label {
+		right: calc(100% + 12px);
+		top: 50%;
+		translate: 0 -50%;
+	}
+	.gl-speed-dial-action[data-placement="right"] .gl-speed-dial-label {
+		left: calc(100% + 12px);
+		top: 50%;
+		translate: 0 -50%;
+	}
+	.gl-speed-dial-action[data-placement="top"] .gl-speed-dial-label {
+		bottom: calc(100% + 10px);
+		left: 50%;
+		translate: -50% 0;
+	}
+	.gl-speed-dial-action[data-placement="bottom"] .gl-speed-dial-label {
+		top: calc(100% + 10px);
+		left: 50%;
+		translate: -50% 0;
+	}
+	.gl-speed-dial-action[data-tooltip-open] .gl-speed-dial-label,
+	.gl-speed-dial-action:focus-within .gl-speed-dial-label {
+		opacity: 1;
+	}
+
+	/* The trigger's icon: the plus turns 45° into a close; with openIcon the two cross-fade. */
+	.gl-speed-dial-icon {
+		display: inline-grid;
+		place-items: center;
+	}
+	.gl-speed-dial-icon > span {
+		grid-area: 1 / 1;
+		display: inline-flex;
+		transition:
+			transform var(--duration-surface) var(--ease-out-quint),
+			opacity var(--duration-hover) ease;
+	}
+	.gl-speed-dial-icon-open .gl-speed-dial-icon-closed {
+		transform: rotate(45deg);
+	}
+	.gl-speed-dial-icon-swap .gl-speed-dial-icon-opened {
+		opacity: 0;
+		transform: rotate(-45deg);
+	}
+	.gl-speed-dial-icon-swap.gl-speed-dial-icon-open .gl-speed-dial-icon-closed {
+		opacity: 0;
+	}
+	.gl-speed-dial-icon-swap.gl-speed-dial-icon-open .gl-speed-dial-icon-opened {
+		opacity: 1;
+		transform: none;
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.gl-speed-dial-action:hover .gl-speed-dial-label {
+			opacity: 1;
+		}
+	}
+	/* Reduced motion: the close appears without turning; the actions only fade (Zoom), with no stagger. */
+	@media (prefers-reduced-motion: reduce) {
+		.gl-speed-dial-icon > span,
+		.gl-speed-dial-label {
+			transition: none;
+		}
+		.gl-speed-dial-icon-swap .gl-speed-dial-icon-opened,
+		.gl-speed-dial-icon-swap.gl-speed-dial-icon-open
+			.gl-speed-dial-icon-closed {
+			transform: none;
+		}
+	}
+}
