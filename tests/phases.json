@@ -1,6 +1,6 @@
 {
 	"$comment": "Which reference modules each phase ports (docs/package-plan.md). Every gate reads its scope from here: the modules of every phase up to `current`, their exports and types, and the previews whose components all exist by then. Phase 5 covers all 66.",
-	"current": 2,
+	"current": 3,
 	"phases": {
 		"1": [
 			"Icon",

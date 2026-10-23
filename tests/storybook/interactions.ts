@@ -30,7 +30,12 @@ Stateful Defaults without an entry, since no step could be checked on the refere
   take Escape and every outside press; nothing inside the Default's popover closes it.
 - Tooltip: the preview holds the Default's tooltip open with no handlers, so on the reference
   nothing a reader does closes it; the story adds the wiring.
-The Controls check still proves their `open` acts.
+- TextField and Slider (phase 3): a step is one action, a key goes to the element that has
+  focus, and nothing has focus at load, so no single step changes their `value`: a click on the
+  field or the thumb doesn't move it, and a key before a click goes nowhere.
+- Rating (phase 3): its radios are visually hidden under the stars' hit labels, so a press by
+  role never lands on the reference, and a key needs focus first.
+The Controls check still proves their `open` and `value` act.
 */
 export const interactions: Record<string, Interaction> = {
 	// Phase 1.
@@ -260,6 +265,133 @@ export const interactions: Record<string, Interaction> = {
 				hides: [
 					'internal:text="Published to S3. CloudFront picks it up in about a minute."s',
 				],
+			},
+		],
+	},
+	// Phase 3. The form controls list their state; the lists and the dial list `open`.
+	"inputs-checkbox--default": {
+		arg: "checked",
+		steps: [
+			{
+				action: {
+					click: role("checkbox", "Email me when a new release ships"),
+				},
+				arg: false,
+				shows: [
+					role(
+						"checkbox",
+						"Email me when a new release ships",
+						"[checked=false]",
+					),
+				],
+			},
+			{
+				action: {
+					click: role("checkbox", "Email me when a new release ships"),
+				},
+				arg: true,
+				shows: [
+					role(
+						"checkbox",
+						"Email me when a new release ships",
+						"[checked=true]",
+					),
+				],
+			},
+		],
+	},
+	"inputs-switch--default": {
+		arg: "checked",
+		steps: [
+			{
+				action: { click: role("switch", "Remote only") },
+				arg: false,
+				shows: [role("switch", "Remote only", "[checked=false]")],
+			},
+			{
+				action: { click: role("switch", "Remote only") },
+				arg: true,
+				shows: [role("switch", "Remote only", "[checked=true]")],
+			},
+		],
+	},
+	"inputs-radiogroup--default": {
+		arg: "value",
+		steps: [
+			{
+				action: { click: role("radio", "Rust") },
+				arg: "rust",
+				shows: [role("radio", "Rust", "[checked=true]")],
+			},
+			{
+				action: { click: role("radio", "React and Next.js") },
+				arg: "react",
+				shows: [role("radio", "React and Next.js", "[checked=true]")],
+			},
+		],
+	},
+	// The Default's list opens in place on load, the only layer open, so Escape closes it.
+	"inputs-select--default": {
+		arg: "open",
+		steps: [
+			{
+				action: { press: "Escape" },
+				arg: false,
+				hides: ["internal:role=listbox"],
+			},
+			{
+				action: { click: role("combobox", "Primary stack") },
+				arg: true,
+				shows: [role("listbox", "Primary stack")],
+			},
+			{
+				action: { press: "Escape" },
+				arg: false,
+				hides: ["internal:role=listbox"],
+			},
+		],
+	},
+	// The Default's list opens in place on load with "a" typed and no focus; choosing a row closes
+	// it, a press on the input opens it again and leaves focus there for Escape.
+	"inputs-autocomplete--default": {
+		arg: "open",
+		steps: [
+			{
+				action: { click: role("option", "PayPal") },
+				arg: false,
+				hides: ["internal:role=listbox"],
+			},
+			{
+				action: { click: role("combobox", "Employer") },
+				arg: true,
+				shows: ["internal:role=listbox"],
+			},
+			{
+				action: { press: "Escape" },
+				arg: false,
+				hides: ["internal:role=listbox"],
+			},
+		],
+	},
+	// The Default's dial is open on load. A press on its trigger toggles it; the pointer then rests
+	// on the trigger, so no hover opens it in between, and Escape reaches the focused trigger.
+	"navigation-speeddial--default": {
+		arg: "open",
+		steps: [
+			{
+				action: { click: role("button", "Contact and share") },
+				arg: false,
+				hides: [role("menuitem", "Email me")],
+			},
+			{
+				action: { click: role("button", "Contact and share") },
+				arg: true,
+				shows: [role("menuitem", "Email me")],
+			},
+			{
+				action: { press: "Escape" },
+				arg: false,
+				hides: [role("menuitem", "Email me")],
 			},
 		],
 	},

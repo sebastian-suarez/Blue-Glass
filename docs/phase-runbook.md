@@ -22,7 +22,7 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 
 1. This file.
 2. `docs/package-plan.md` (revision 3): the decisions, the Base UI mapping, the suite and the phases.
-3. `docs/porting.md`: the brief both attempts get.
+3. `docs/porting.md`: the brief the attempt gets, with the phase's own `docs/phase-N-brief.md`.
 4. `docs/deviations.md`, `docs/reference-defects.md` and `tests/README.md`.
 5. The previous phase's review log, and the notes for this phase below.
 
@@ -39,13 +39,11 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
    - Layout: stories whose layout changes with the viewport go in `tests/ssr/layout.json`.
    - API: waivers in `tests/api/allowlist.json` only for deviations already in `docs/deviations.md`.
    - With nothing ported yet, the behaviour, parity, server-HTML, layout and API gates must fail on the phase's modules. Check that, then commit "Open phase N".
-3. **Two attempts** from that commit, with the same brief: `docs/porting.md` and the phase's modules. Neither may touch the suite or add dependencies.
-   - `phase-N-opus`: Opus subagents at max, each in its own worktree, merged by the session.
-   - `phase-N-codex`: Codex (GPT-6 Astra), through the codex plugin.
-4. **Choose.** Run the "Done means" list on each attempt yourself; an attempt's own "done" doesn't count.
-   - Keep the one that passes. If both pass, keep Opus's, since phases 1–5 are migrations.
-   - If neither passes, each gets one more attempt. If both fail again, stop and ask.
-   - Never splice the two. Record the outcome in the review log.
+3. **One attempt** from that commit (your call, 23 Oct 2026, under your routing rules: code goes to Codex once; phases 1 and 2 ran two rival attempts, Opus's and Codex's): Codex, GPT-6.1 Sol at max through `codex exec`, in worktree `phase-N-codex` on its own branch, with the brief `docs/phase-N-brief.md` and `docs/porting.md`. Before dispatch the brief gets one review: Astra attacks it with the task and Fable reviews it alone. The attempt may not touch the suite or add dependencies, and doesn't commit: the session commits its worktree.
+   - The worktree needs `npm ci`, `npm run fonts` and `npm run reference` before Codex starts, since its sandbox has no network.
+4. **Judge.** Run the "Done means" list on the attempt yourself; its own "done" doesn't count.
+   - If it fails, Codex gets one more attempt, resuming from its draft with the failing lines. If that fails too, stop and ask.
+   - Never write a rival port in the session. Record the outcome in the review log.
 5. **Review**, logged in `docs/reviews/phase-N.md` in phase 0's format.
    - Verify first: the whole "Done means" list.
    - Fable at xhigh sees only the phase's diff, specs included. `/codex:adversarial-review` sees the task too.

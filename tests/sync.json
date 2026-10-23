@@ -264,7 +264,8 @@
 				"components/Popper/api.d.ts": "0946a77755dfe9c9",
 				"components/Popper/styles.css": "60a7db2c2b93ce15",
 				"components/Popper/preview.html": "8f6974200e1bb75f",
-				"components/Popper/reference.tsx": "c9b3bef191a97583"
+				"components/Popper/reference.tsx": "c9b3bef191a97583",
+				"shared/position.ts": "4c4c7c03d373ccff"
 			}
 		},
 		"ClickAwayListener": {
@@ -373,7 +374,8 @@
 				"components/Tooltip/api.d.ts": "3082170536d58a98",
 				"components/Tooltip/styles.css": "f9b90572781835e3",
 				"components/Tooltip/preview.html": "db80f7f47f4e6020",
-				"components/Tooltip/reference.tsx": "f7fb5d5d691295e4"
+				"components/Tooltip/reference.tsx": "f7fb5d5d691295e4",
+				"shared/position.ts": "4c4c7c03d373ccff"
 			}
 		},
 		"Snackbar": {
@@ -392,7 +394,8 @@
 				"components/Popover/api.d.ts": "12bcbc39d025d30f",
 				"components/Popover/styles.css": "c2aaa1cf1dce764d",
 				"components/Popover/preview.html": "6f700bddd5555275",
-				"components/Popover/reference.tsx": "a695189b9826c0ca"
+				"components/Popover/reference.tsx": "a695189b9826c0ca",
+				"shared/position.ts": "4c4c7c03d373ccff"
 			}
 		},
 		"Menu": {

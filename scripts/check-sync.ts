@@ -43,8 +43,10 @@ const componentFiles = [
 ];
 
 /**
-The shared helpers a component's reference imports by their underscored names, such as Box's
-`./_surfaces-layout-system`: a change to one is a change to every component built on it.
+The shared helpers a component's reference imports: by their underscored names, such as Box's
+`./_surfaces-layout-system`, or as `../internal/<name>` for the ones `shared/` keeps without an
+underscore, such as Popper's `position`. A change to one is a change to every component built on
+it. The helpers every component imports (cx, dom, hooks) are tracked once, as shared files.
 */
 function sharedHelpersOf(name: string): string[] {
 	const source = fs.readFileSync(
@@ -53,8 +55,11 @@ function sharedHelpersOf(name: string): string[] {
 	);
 	const helpers = new Set(
 		source
-			.matchAll(/from\s+["'][^"']*\/(?<helper>_[\w\-]+)["']/gv)
-			.map((match) => match.groups?.helper ?? ""),
+			.matchAll(
+				/from\s+["'](?:\.\/(?<sibling>_[\w\-]+)|\.\.\/internal\/(?<internal>[\w\-]+))["']/gv,
+			)
+			.map((match) => match.groups?.sibling ?? match.groups?.internal ?? "")
+			.filter((helper) => !sharedFiles.includes(`shared/${helper}.ts`)),
 	);
 	return [...helpers].flatMap((helper) =>
 		["ts", "tsx"]
