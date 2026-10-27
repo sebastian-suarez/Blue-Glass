@@ -332,12 +332,12 @@ export function SpeedDial({
 		typeof window !== "undefined" &&
 		Boolean(window.matchMedia) &&
 		window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-	const handlePointerEnter = (event2: React.PointerEvent<HTMLDivElement>) => {
-		onPointerEnter?.(event2);
+	const handlePointerEnter = (event: React.PointerEvent<HTMLDivElement>) => {
+		onPointerEnter?.(event);
 		if (
 			!openOnHover ||
 			hidden ||
-			event2.pointerType !== "mouse" ||
+			event.pointerType !== "mouse" ||
 			!isHoverable()
 		) {
 			return;
@@ -345,28 +345,28 @@ export function SpeedDial({
 
 		clearTimeout(closeTimerRef.current);
 		if (!isOpen) {
-			doOpen(event2, "mouseEnter");
+			doOpen(event, "mouseEnter");
 		}
 	};
 
-	const handlePointerLeave = (event3: React.PointerEvent<HTMLDivElement>) => {
-		onPointerLeave?.(event3);
+	const handlePointerLeave = (event: React.PointerEvent<HTMLDivElement>) => {
+		onPointerLeave?.(event);
 		if (
-			event3.pointerType !== "mouse" ||
+			event.pointerType !== "mouse" ||
 			openedByRef.current?.reason !== "mouseEnter"
 		) {
 			return;
 		}
 
-		const native = event3.nativeEvent;
+		const native = event.nativeEvent;
 		closeTimerRef.current = setTimeout(() => {
 			doClose(native, "mouseLeave");
 		}, HOVER_CLOSE_DELAY);
 	};
 
-	const handleBlur = (event4: React.FocusEvent<HTMLDivElement>) => {
-		onBlur?.(event4);
-		const to = event4.relatedTarget as Node | null;
+	const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+		onBlur?.(event);
+		const to = event.relatedTarget as Node | null;
 		if (
 			!isOpen ||
 			pressingRef.current ||
@@ -376,27 +376,27 @@ export function SpeedDial({
 			return;
 		}
 
-		doClose(event4, "blur");
+		doClose(event, "blur");
 	};
 
-	const handleFabClick = (event5: React.MouseEvent<HTMLButtonElement>) => {
-		FabProps?.onClick?.(event5);
-		if (event5.defaultPrevented) {
+	const handleFabClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		FabProps?.onClick?.(event);
+		if (event.defaultPrevented) {
 			return;
 		}
 
 		if (!isOpen) {
-			doOpen(event5, "toggle");
+			doOpen(event, "toggle");
 			return;
 		}
 
 		const by = openedByRef.current;
-		if (by?.reason === "mouseEnter" && event5.timeStamp - by.at < PIN_WINDOW) {
-			openedByRef.current = { reason: "toggle", at: event5.timeStamp }; // The click that met a hover-open: keep it open
+		if (by?.reason === "mouseEnter" && event.timeStamp - by.at < PIN_WINDOW) {
+			openedByRef.current = { reason: "toggle", at: event.timeStamp }; // The click that met a hover-open: keep it open
 			return;
 		}
 
-		doClose(event5, "toggle");
+		doClose(event, "toggle");
 	};
 
 	// Preserve child order and keys when assigning the reference's stagger delays.
@@ -432,8 +432,8 @@ export function SpeedDial({
 				onPointerEnter={handlePointerEnter}
 				onPointerLeave={handlePointerLeave}
 				onBlur={handleBlur}
-				onPointerDownCapture={(event6: React.PointerEvent<HTMLDivElement>) => {
-					onPointerDownCapture?.(event6);
+				onPointerDownCapture={(event: React.PointerEvent<HTMLDivElement>) => {
+					onPointerDownCapture?.(event);
 					pressingRef.current = true;
 				}}
 				onPointerUpCapture={(event) => {
@@ -570,11 +570,11 @@ export function SpeedDialAction({
 					aria-labelledby={labelId}
 					disabled={disabled}
 					{...FabProps}
-					onClick={(event7: React.MouseEvent<HTMLButtonElement>) => {
-						onClick?.(event7);
-						FabProps?.onClick?.(event7);
-						if (!event7.defaultPrevented) {
-							ctx?.close(event7, "actionClick");
+					onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+						onClick?.(event);
+						FabProps?.onClick?.(event);
+						if (!event.defaultPrevented) {
+							ctx?.close(event, "actionClick");
 						}
 					}}
 				>

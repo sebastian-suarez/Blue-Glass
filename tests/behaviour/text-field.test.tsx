@@ -1230,3 +1230,19 @@ describe("InputAdornment", () => {
 		expect(budget).toHaveAccessibleDescription(/ms/v);
 	});
 });
+
+describe("TextField: aria-invalid follows error alone", () => {
+	test("Enter in an email field holding an address the browser rejects sets no aria-invalid without error", async () => {
+		render(<TextField label="Email" type="email" defaultValue="sebas@" />);
+		const email = input("Email");
+		email.focus();
+		await userEvent.keyboard("{Enter}");
+		await new Promise((resolve) => {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(resolve);
+			});
+		});
+		expect(email.validity.valid).toBe(false);
+		expect(email).not.toHaveAttribute("aria-invalid");
+	});
+});

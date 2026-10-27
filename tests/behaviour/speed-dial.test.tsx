@@ -1490,6 +1490,10 @@ describe("SpeedDial: the icon and the motion", () => {
 			}
 		}
 
+		const leastSpread = (times.length - 1) * 40;
+		expect(must(times.at(-1)) - times[0]).toBeGreaterThanOrEqual(
+			leastSpread - 30,
+		);
 		await expectOpen();
 	});
 
@@ -1516,6 +1520,10 @@ describe("SpeedDial: the icon and the motion", () => {
 			}
 		}
 
+		const leastSpread = (times.length - 1) * 25;
+		expect(must(times.at(-1)) - times[0]).toBeGreaterThanOrEqual(
+			leastSpread - 30,
+		);
 		await expectClosed();
 	});
 

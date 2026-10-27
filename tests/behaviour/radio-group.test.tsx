@@ -1188,3 +1188,18 @@ describe("Radio outside a RadioGroup", () => {
 		]);
 	});
 });
+
+describe("RadioGroup: readOnly", () => {
+	test("readOnly reaches the input and, as on a native radio, doesn't stop a press: it checks and onChange reports it", async () => {
+		const onChange = vi.fn<OnGroupChange>();
+		render(
+			<RadioGroup label="Preferred stack" onChange={onChange}>
+				<Radio readOnly value="rust" label="Rust" />
+				<Radio readOnly value="node" label="Node.js" />
+			</RadioGroup>,
+		);
+		await userEvent.click(radio("Rust"));
+		await expect.element(radio("Rust")).toBeChecked();
+		expect(onChange).toHaveBeenCalledTimes(1);
+	});
+});

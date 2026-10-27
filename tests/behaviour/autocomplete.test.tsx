@@ -604,7 +604,7 @@ describe("Autocomplete: the field", () => {
 	// FieldBaseProps: required "marks the control required". The reference drops it from the input
 	// once there's a value (reference.tsx, line 531), so a filled field stops saying it's required.
 	referenceDefectTest(
-		"required keeps the input marked required once there's a value, with multiple too",
+		"required keeps the input marked required (aria-required) once there's a value, with multiple too",
 		() => {
 			render(
 				<>
@@ -1489,6 +1489,61 @@ describe("Autocomplete: keyboard", () => {
 				["Backend lead", "selectOption"],
 			]);
 		});
+	});
+
+	test("with freeSolo, a press on a row chooses it, as Enter does", async () => {
+		const onChange = vi.fn<OnChange>();
+		render(
+			<Autocomplete
+				freeSolo
+				label="Role"
+				options={roles}
+				onChange={onChange}
+			/>,
+		);
+		const input = combobox("Role");
+		input.focus();
+		await userEvent.keyboard("arch");
+		await expectListShown();
+		await userEvent.click(option("Software architect"));
+		const [, value, reason] = await onlyCall(onChange);
+		expect(value).toBe("Software architect");
+		expect(reason).toBe("selectOption");
+		await expect.element(input).toHaveValue("Software architect");
+		await expectListGone();
+	});
+
+	test("the matched part of a label is marked once, with an emoji before it too", async () => {
+		render(
+			<Autocomplete
+				label="Project"
+				options={["🚀 Rocket", "Rocket science"]}
+			/>,
+		);
+		const input = combobox("Project");
+		input.focus();
+		await userEvent.keyboard("Rocket");
+		await expectListShown();
+		const row = option("🚀 Rocket");
+		expect(row.textContent).toBe("🚀 Rocket");
+		expect(row.querySelector(".gl-autocomplete-match")?.textContent).toBe(
+			"Rocket",
+		);
+	});
+
+	test("with chips the pill has no role of its own, and a press on a chip's text focuses the input without opening the list", async () => {
+		render(<Stack defaultValue={[nodeJs]} />);
+		const input = combobox("Stack");
+		const shell = input.closest<HTMLElement>(".gl-field-control");
+		if (!shell) {
+			throw new TypeError("no pill around the input");
+		}
+
+		expect(shell).not.toHaveAttribute("role");
+		await userEvent.click(within(shell).getByText("Node.js"));
+		await frames();
+		expect(document.activeElement).toBe(input);
+		expect(screen.queryByRole("listbox")).toBeNull();
 	});
 
 	test("Escape closes the list and leaves the text; without clearOnEscape, Escape on the closed list clears nothing", async () => {
@@ -2470,5 +2525,29 @@ describe("Autocomplete: inside a dialog", () => {
 		await userEvent.keyboard("{Escape}");
 		await expect.poll(() => onClose.mock.calls.length).toBe(1);
 		expect(onClose.mock.calls[0]?.[1]).toBe("escapeKeyDown");
+	});
+
+	test("with a chosen value and the list closed, Escape reaches the dialog: a single value and a chip alike", async () => {
+		const onClose = vi.fn<NonNullable<DialogProps["onClose"]>>();
+		render(
+			<Dialog open onClose={onClose}>
+				<DialogTitle>Edit a role</DialogTitle>
+				<DialogContent>
+					<Employer disablePortal defaultValue="PayPal" />
+					<Stack disablePortal defaultValue={[nodeJs]} />
+				</DialogContent>
+			</Dialog>,
+		);
+		const dialog = await screen.findByRole("dialog", { name: "Edit a role" });
+		within(dialog).getByRole("combobox", { name: "Employer" }).focus();
+		await frames();
+		expect(within(dialog).queryByRole("listbox")).toBeNull();
+		await userEvent.keyboard("{Escape}");
+		await expect.poll(() => onClose.mock.calls.length).toBe(1);
+		within(dialog).getByRole("combobox", { name: "Stack" }).focus();
+		await frames();
+		expect(within(dialog).queryByRole("listbox")).toBeNull();
+		await userEvent.keyboard("{Escape}");
+		await expect.poll(() => onClose.mock.calls.length).toBe(2);
 	});
 });

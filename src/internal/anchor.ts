@@ -57,10 +57,10 @@ layout, not anchoring.
 */
 import type { Popover } from "@base-ui/react/popover";
 import * as React from "react";
-import { useEventCallback, useIsoLayoutEffect } from "./hooks.js";
+import { useIsoLayoutEffect } from "./hooks.js";
 import {
-	containingBlock,
-	positionFixed,
+	containingBlockElement,
+	computePosition,
 	type PositionResult,
 } from "./position.js";
 
@@ -229,48 +229,88 @@ export function useContainingBlockPositioner(
 ) {
 	const [element, setElement] = React.useState<HTMLDivElement | null>(null);
 	const [position, setPosition] = React.useState<PositionResult | null>(null);
-	const update = useEventCallback(() => {
-		if (!isOpen || !element || !anchor || !containingBlock(element)) {
+	useIsoLayoutEffect(() => {
+		if (!isOpen || !element || !anchor) {
 			setPosition(null);
 			return;
 		}
 
-		const next = positionFixed(anchor.getBoundingClientRect(), element, {
-			placement,
-			offset,
-		});
-		setPosition((previous) =>
-			previous?.x === next.x &&
-			previous.y === next.y &&
-			previous.placement === next.placement &&
-			previous.maxHeight === next.maxHeight &&
-			previous.origin === next.origin
-				? previous
-				: next,
-		);
-	});
-	useIsoLayoutEffect(() => {
-		update();
-	});
-	React.useEffect(() => {
-		if (!isOpen || !element) {
-			return;
+		let block = containingBlockElement(element);
+		const update = () => {
+			if (!block) {
+				setPosition(null);
+				return;
+			}
+
+			const rect = block.getBoundingClientRect();
+			const anchorRect = anchor.getBoundingClientRect();
+			const next = computePosition(
+				new DOMRect(
+					anchorRect.left - rect.left - block.clientLeft,
+					anchorRect.top - rect.top - block.clientTop,
+					anchorRect.width,
+					anchorRect.height,
+				),
+				{ width: element.offsetWidth, height: element.offsetHeight },
+				{
+					placement,
+					offset,
+					viewport: { width: block.clientWidth, height: block.clientHeight },
+				},
+			);
+			setPosition((previous) =>
+				previous?.x === next.x &&
+				previous.y === next.y &&
+				previous.placement === next.placement &&
+				previous.maxHeight === next.maxHeight &&
+				previous.origin === next.origin
+					? previous
+					: next,
+			);
+		};
+
+		const refresh = () => {
+			const nextBlock = containingBlockElement(element);
+			if (nextBlock !== block) {
+				if (block) {
+					observer.unobserve(block);
+				}
+
+				block = nextBlock;
+				if (block) {
+					observer.observe(block);
+				}
+			}
+
+			update();
+		};
+
+		let frame = 0;
+		const onScroll = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(update);
+		};
+
+		window.addEventListener("scroll", onScroll, { capture: true });
+		window.addEventListener("resize", refresh);
+		const observer = new ResizeObserver(refresh);
+		observer.observe(element);
+		if (block) {
+			observer.observe(block);
 		}
 
-		window.addEventListener("scroll", update, { capture: true });
-		window.addEventListener("resize", update);
-		const observer = new ResizeObserver(update);
-		observer.observe(element);
 		if (anchor instanceof Element) {
 			observer.observe(anchor);
 		}
 
+		update();
 		return () => {
-			window.removeEventListener("scroll", update, true);
-			window.removeEventListener("resize", update);
+			cancelAnimationFrame(frame);
+			window.removeEventListener("scroll", onScroll, true);
+			window.removeEventListener("resize", refresh);
 			observer.disconnect();
 		};
-	}, [isOpen, element, anchor, update]);
+	}, [isOpen, element, anchor, placement, offset]);
 	const style: React.CSSProperties | undefined = position
 		? {
 				left: position.x,

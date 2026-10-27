@@ -148,6 +148,13 @@ export function Slider({
 	const rootRef = React.useRef<HTMLSpanElement | null>(null);
 	const handleRef = useForkRef(rootRef, ref);
 	const currentRef = React.useRef(values);
+	const interactionRef = React.useRef<React.SyntheticEvent | null>(null);
+
+	const rememberInteraction = (event: React.SyntheticEvent) => {
+		rememberReactEvent(event);
+		interactionRef.current = event;
+	};
+
 	useIsoLayoutEffect(() => {
 		currentRef.current = values;
 	});
@@ -340,10 +347,22 @@ export function Slider({
 				valueLabelDisplay === "auto" && "gl-slider-label-auto",
 				className,
 			)}
-			onKeyDownCapture={rememberReactEvent}
-			onPointerDownCapture={rememberReactEvent}
-			onPointerMoveCapture={rememberReactEvent}
-			onPointerUpCapture={rememberReactEvent}
+			onKeyDownCapture={(event) => {
+				rest.onKeyDownCapture?.(event);
+				rememberInteraction(event);
+			}}
+			onPointerDownCapture={(event) => {
+				rest.onPointerDownCapture?.(event);
+				rememberInteraction(event);
+			}}
+			onPointerMoveCapture={(event) => {
+				rest.onPointerMoveCapture?.(event);
+				rememberInteraction(event);
+			}}
+			onPointerUpCapture={(event) => {
+				rest.onPointerUpCapture?.(event);
+				rememberInteraction(event);
+			}}
 			onValueChange={(next, details) => {
 				const nextValues = Array.isArray(next) ? [...next] : [next];
 				const index = details.activeThumbIndex;
@@ -357,7 +376,8 @@ export function Slider({
 				currentRef.current = nextValues;
 				setState(output(nextValues));
 				onChange?.(
-					documentedEvent(details.event, rootRef.current ?? undefined),
+					interactionRef.current ??
+						documentedEvent(details.event, rootRef.current ?? undefined),
 					output(nextValues),
 					index,
 				);
@@ -421,6 +441,9 @@ export function Slider({
 							// eslint-disable-next-line @eslint-react/no-array-index-key
 							key={index}
 							index={index}
+							getAriaValueText={(_formatted, thumbValue, thumbIndex) =>
+								valueText(thumbValue, thumbIndex)!
+							}
 							render={(props, thumb) => (
 								<span
 									{...props}
@@ -438,11 +461,6 @@ export function Slider({
 
 								element.setAttribute("aria-valuemin", String(low));
 								element.setAttribute("aria-valuemax", String(high));
-								const text = valueText(value, index);
-								element.toggleAttribute("aria-valuetext", text !== undefined);
-								if (text !== undefined) {
-									element.setAttribute("aria-valuetext", text);
-								}
 							}}
 							className="gl-slider-thumb"
 							style={{
@@ -450,7 +468,6 @@ export function Slider({
 								transform: "none",
 								...(isVertical && { top: "auto" }),
 							}}
-							aria-valuetext={valueText(value, index)}
 							aria-disabled={disabled || undefined}
 							aria-label={getAriaLabel ? getAriaLabel(index) : ariaLabel}
 							aria-labelledby={getAriaLabel ? undefined : ariaLabelledby}

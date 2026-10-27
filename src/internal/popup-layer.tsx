@@ -79,6 +79,7 @@ export type PopupLayerOptions = {
 	disableRestoreFocus: boolean | undefined;
 	disableEnforceFocus: boolean | undefined;
 	disableScrollLock: boolean | undefined;
+	pageIsolation?: "aria-hidden" | "inert";
 	/**
 	Reports a press on the backdrop: the documented backdropClick.
 	*/
@@ -158,6 +159,7 @@ export type PopupLayer = {
 	The surface's onFocus: marks focus in its React tree as inside the layer.
 	*/
 	markInside: (event: React.FocusEvent) => void;
+	restoreFocus: (element: HTMLElement) => void;
 	/**
 	The surface's onKeyDown: keeps Tab inside while focus is enforced.
 	*/
@@ -216,8 +218,20 @@ function useFocusGuard(
 	layer: Layer,
 	surfaceRef: React.RefObject<HTMLDivElement | null>,
 	getReturnTarget: (surface: HTMLDivElement) => HTMLElement,
-): (event: React.FocusEvent) => void {
+): {
+	markInside: (event: React.FocusEvent) => void;
+	restoreFocus: (element: HTMLElement) => void;
+} {
 	const [insideEvents] = React.useState(() => new WeakSet<Event>());
+	const restoringRef = React.useRef(false);
+	const restoreFocus = useEventCallback((element: HTMLElement) => {
+		restoringRef.current = true;
+		try {
+			element.focus({ preventScroll: true });
+		} finally {
+			restoringRef.current = false;
+		}
+	});
 	const returnFocus = useEventCallback((surface: HTMLDivElement) => {
 		getReturnTarget(surface).focus({ preventScroll: true });
 	});
@@ -232,6 +246,7 @@ function useFocusGuard(
 			if (
 				!root ||
 				!surface ||
+				restoringRef.current ||
 				!isTopLayer(layer) ||
 				insideEvents.has(event) ||
 				isInside(root, event.target)
@@ -247,8 +262,11 @@ function useFocusGuard(
 			document.removeEventListener("focusin", handleFocusIn);
 		};
 	}, [isActive, layer, surfaceRef, insideEvents, returnFocus]);
-	return (event) => {
-		insideEvents.add(event.nativeEvent);
+	return {
+		markInside(event) {
+			insideEvents.add(event.nativeEvent);
+		},
+		restoreFocus,
 	};
 }
 
@@ -301,8 +319,12 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 	const openerRef = useStackEntry(open, layer);
 	useScrollLock(open && behaviour.shouldLockScroll);
 	useRestoreFocus(open, behaviour.shouldRestoreFocus, openerRef);
-	useHidePage(open && behaviour.shouldEnforceFocus && root !== null, layer);
-	const markInside = useFocusGuard(
+	useHidePage(
+		open && behaviour.shouldEnforceFocus && root !== null,
+		layer,
+		options.pageIsolation,
+	);
+	const { markInside, restoreFocus } = useFocusGuard(
 		open && behaviour.shouldEnforceFocus,
 		layer,
 		surfaceRef,
@@ -396,6 +418,7 @@ export function usePopupLayer(options: PopupLayerOptions): PopupLayer {
 			? { ...anchorWidthStyle, ...surfaceBase }
 			: surfaceBase,
 		markInside,
+		restoreFocus,
 		trapTab,
 	};
 }

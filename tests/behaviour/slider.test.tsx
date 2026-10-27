@@ -1710,3 +1710,53 @@ describe("Slider: forms", () => {
 		expect(data.keys().toArray()).toEqual([]);
 	});
 });
+
+describe("Slider: the events its callbacks get", () => {
+	test("onChange gets the React event of the key that moved the thumb: its nativeEvent is that key event, and its target sits in the slider", async () => {
+		const seen: Array<{ nativeEvent: Event; target: EventTarget | null }> = [];
+		const keydowns: KeyboardEvent[] = [];
+		const onKeydown = (event: KeyboardEvent) => {
+			keydowns.push(event);
+		};
+
+		document.addEventListener("keydown", onKeydown, { capture: true });
+		try {
+			render(
+				<Around>
+					<Stage
+						defaultValue={20}
+						onChange={(event) => {
+							seen.push({
+								nativeEvent: event.nativeEvent,
+								target: event.target,
+							});
+						}}
+					/>
+				</Around>,
+			);
+			await tabInto();
+			await userEvent.keyboard("{ArrowRight}");
+			await vi.waitFor(() => {
+				expect(seen).toHaveLength(1);
+			});
+			expect(seen[0].nativeEvent).toBe(keydowns.at(-1));
+			expect(rootOf().contains(seen[0].target as Node)).toBe(true);
+		} finally {
+			document.removeEventListener("keydown", onKeydown, { capture: true });
+		}
+	});
+
+	test("a consumer's capture handlers on the root still run: onKeyDownCapture sees the key, and the thumb still moves", async () => {
+		const onKeyDownCapture =
+			vi.fn<React.KeyboardEventHandler<HTMLSpanElement>>();
+		render(
+			<Around>
+				<Stage defaultValue={20} onKeyDownCapture={onKeyDownCapture} />
+			</Around>,
+		);
+		const volume = await tabInto();
+		await userEvent.keyboard("{ArrowRight}");
+		await expect.element(volume).toHaveAttribute("aria-valuenow", "21");
+		expect(onKeyDownCapture).toHaveBeenCalledTimes(1);
+	});
+});

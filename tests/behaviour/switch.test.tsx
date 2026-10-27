@@ -737,3 +737,13 @@ describe("Switch: keyboard", () => {
 		expect(calls[0]?.target).toBe(ref.current);
 	});
 });
+
+describe("Switch: readOnly", () => {
+	test("readOnly reaches the input and, as on a native checkbox, doesn't stop a press: it toggles and onChange reports it", async () => {
+		const onChange = vi.fn<OnChange>();
+		render(<Switch readOnly label="Remote only" onChange={onChange} />);
+		await userEvent.click(control("Remote only"));
+		await expect.element(control("Remote only")).toBeChecked();
+		expect(onChange).toHaveBeenCalledTimes(1);
+	});
+});

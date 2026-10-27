@@ -56,7 +56,6 @@ type HiddenInputProps = {
 	form?: string;
 	id?: string;
 	disabled?: boolean;
-	readOnly?: boolean;
 };
 
 /**
@@ -67,6 +66,7 @@ function splitAttributes(attributes: InputAttributes): {
 	input: HiddenInputProps;
 	span: SpanProps;
 	shouldAutoFocus: boolean;
+	readOnly: boolean;
 } {
 	const {
 		name,
@@ -87,10 +87,10 @@ function splitAttributes(attributes: InputAttributes): {
 			form,
 			id,
 			disabled,
-			readOnly,
 		},
 		span,
 		shouldAutoFocus: autoFocus === true,
+		readOnly: readOnly === true,
 	};
 }
 
@@ -179,13 +179,14 @@ export function CheckboxControl({
 }: CheckboxControlProps) {
 	const inputRef = React.useRef<HTMLInputElement | null>(null);
 	const handleInputRef = useForkRef(inputRef, ref);
-	const { input, span, shouldAutoFocus } = splitAttributes(attributes);
+	const { input, span, shouldAutoFocus, readOnly } =
+		splitAttributes(attributes);
 	const spanRef = useAutoFocus(shouldAutoFocus);
 	useIsoLayoutEffect(() => {
 		if (inputRef.current) {
-			inputRef.current.readOnly = input.readOnly === true;
+			inputRef.current.readOnly = readOnly;
 		}
-	}, [input.readOnly]);
+	}, [readOnly]);
 	return (
 		<BaseCheckbox.Root
 			{...span}
@@ -228,13 +229,14 @@ export function SwitchControl({
 }: SwitchControlProps) {
 	const inputRef = React.useRef<HTMLInputElement | null>(null);
 	const handleInputRef = useForkRef(inputRef, ref);
-	const { input, span, shouldAutoFocus } = splitAttributes(attributes);
+	const { input, span, shouldAutoFocus, readOnly } =
+		splitAttributes(attributes);
 	const spanRef = useAutoFocus(shouldAutoFocus);
 	useIsoLayoutEffect(() => {
 		if (inputRef.current) {
-			inputRef.current.readOnly = input.readOnly === true;
+			inputRef.current.readOnly = readOnly;
 		}
-	}, [input.readOnly]);
+	}, [readOnly]);
 	return (
 		<BaseSwitch.Root
 			{...span}
@@ -413,8 +415,14 @@ export function RadioControl({
 		() => registry?.register(value, entry),
 		[registry, value, entry],
 	);
-	const { input, span, shouldAutoFocus } = splitAttributes(attributes);
+	const { input, span, shouldAutoFocus, readOnly } =
+		splitAttributes(attributes);
 	const spanRef = useAutoFocus(shouldAutoFocus);
+	useIsoLayoutEffect(() => {
+		if (inputRef.current) {
+			inputRef.current.readOnly = readOnly;
+		}
+	}, [readOnly]);
 
 	const radio = (
 		<BaseRadio.Root
@@ -424,7 +432,6 @@ export function RadioControl({
 			value={value}
 			id={input.id}
 			disabled={input.disabled}
-			readOnly={input.readOnly}
 			required={input.required}
 			inputRef={handleInputRef}
 		>

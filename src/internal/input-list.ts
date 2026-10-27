@@ -29,7 +29,7 @@ export function matchRange(
 	let offset = 0;
 	for (const character of text) {
 		const part = fold(character);
-		for (const _character of part) {
+		for (let remaining = part.length; remaining > 0; remaining--) {
 			starts.push(offset);
 			ends.push(offset + character.length);
 		}

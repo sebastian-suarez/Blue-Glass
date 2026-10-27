@@ -1,38 +1,56 @@
 // Blue Glass: the public API. Each phase adds the modules it ports (tests/phases.json),
 // and tests/api checks the exports against design-system/source/index.d.ts.
 export {
-	type Side,
-	type Align,
-	type Placement,
-	type PositionOptions,
-	type PositionResult,
-	containingBlock,
-	positionFixed,
-	splitPlacement,
-	computePosition,
-} from "./components/Popper/index.js";
-export {
-	type VirtualElement,
-	type AnchorEl,
-	type PopperChildProps,
-	type PopperProps,
-	Popper,
-} from "./components/Popper/index.js";
-export * from "./components/Autocomplete/index.js";
+	type AutocompleteOption,
+	type AutocompleteChangeReason,
+	type AutocompleteCloseReason,
+	type AutocompleteInputChangeReason,
+	type AutocompleteProps,
+	Autocomplete,
+} from "./components/Autocomplete/index.js";
 export { Button, type ButtonProps } from "./components/Button/index.js";
 export {
 	ButtonGroup,
 	type ButtonGroupProps,
 } from "./components/ButtonGroup/index.js";
-export * from "./components/Checkbox/index.js";
-export * from "./components/Fab/index.js";
-export * from "./components/RadioGroup/index.js";
-export * from "./components/Rating/index.js";
-export * from "./components/Select/index.js";
-export * from "./components/Slider/index.js";
-export * from "./components/Switch/index.js";
-export * from "./components/TextField/index.js";
-export * from "./components/TransferList/index.js";
+export { type CheckboxProps, Checkbox } from "./components/Checkbox/index.js";
+export { type FabProps, Fab } from "./components/Fab/index.js";
+export {
+	type RadioProps,
+	Radio,
+	type RadioGroupProps,
+	RadioGroup,
+} from "./components/RadioGroup/index.js";
+export { type RatingProps, Rating } from "./components/Rating/index.js";
+export {
+	type SelectValue,
+	type SelectCloseReason,
+	type SelectOption,
+	type OptionProps,
+	Option,
+	type SelectProps,
+	Select,
+} from "./components/Select/index.js";
+export {
+	type SliderMark,
+	type SliderProps,
+	Slider,
+} from "./components/Slider/index.js";
+export { type SwitchProps, Switch } from "./components/Switch/index.js";
+export {
+	type FieldBaseProps,
+	type InputAdornmentProps,
+	InputAdornment,
+	type TextFieldProps,
+	TextField,
+} from "./components/TextField/index.js";
+export {
+	type TransferListItem,
+	type TransferListValue,
+	type TransferListSelection,
+	type TransferListProps,
+	TransferList,
+} from "./components/TransferList/index.js";
 export {
 	type ToggleButtonProps,
 	ToggleButton,
@@ -145,7 +163,17 @@ export {
 	type MenuProps,
 	Menu,
 } from "./components/Menu/index.js";
-export * from "./components/SpeedDial/index.js";
+export {
+	type SpeedDialDirection,
+	type SpeedDialOpenReason,
+	type SpeedDialCloseReason,
+	type SpeedDialProps,
+	SpeedDial,
+	type SpeedDialActionProps,
+	SpeedDialAction,
+	type SpeedDialIconProps,
+	SpeedDialIcon,
+} from "./components/SpeedDial/index.js";
 export {
 	type TabValue,
 	type TabsProps,
@@ -171,6 +199,24 @@ export {
 } from "./components/Modal/index.js";
 export { type NoSsrProps, NoSsr } from "./components/NoSsr/index.js";
 export { type PopoverProps, Popover } from "./components/Popover/index.js";
+export {
+	type Side,
+	type Align,
+	type Placement,
+	type PositionOptions,
+	type PositionResult,
+	containingBlock,
+	positionFixed,
+	splitPlacement,
+	computePosition,
+} from "./components/Popper/index.js";
+export {
+	type VirtualElement,
+	type AnchorEl,
+	type PopperChildProps,
+	type PopperProps,
+	Popper,
+} from "./components/Popper/index.js";
 export { type PortalProps, Portal } from "./components/Portal/index.js";
 export {
 	type TextareaAutosizeProps,

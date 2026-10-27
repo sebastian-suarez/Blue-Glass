@@ -220,7 +220,7 @@ export type Layer = {
 const openLayers: Layer[] = [];
 
 // The open layers that hide the rest of the page themselves: in place, with focus enforced.
-const pageHiders = new WeakSet<Layer>();
+const pageHiders = new WeakMap<Layer, "aria-hidden" | "inert">();
 
 export function isTopLayer(layer: Layer): boolean {
 	return openLayers.at(-1) === layer;
@@ -288,7 +288,7 @@ function focusEdge(content: HTMLElement | null, edge: "first" | "last"): void {
 }
 
 // The elements this module hid, so it only ever un-hides its own.
-const hiddenHere = new Set<Element>();
+const hiddenHere = new Map<Element, "aria-hidden" | "inert">();
 
 function shouldStayExposed(element: Element): boolean {
 	return (
@@ -328,13 +328,29 @@ function syncHiddenPage(): void {
 		(layer) => pageHiders.has(layer) && layer.rootRef.current !== null,
 	);
 	const root = index === -1 ? undefined : openLayers[index]?.rootRef.current;
+	const attribute =
+		index === -1 ? "aria-hidden" : pageHiders.get(openLayers[index])!;
 	const wanted = new Set<Element>();
 	if (root) {
 		const above = openLayers
 			.slice(index + 1)
 			.map((layer) => layer.rootRef.current)
 			.filter((element) => element !== null);
-		for (const element of siblingsAlongPath(root)) {
+		const candidates =
+			attribute === "inert"
+				? [...root.ownerDocument.body.children].filter(
+						(element) =>
+							element !== root &&
+							!element.contains(root) &&
+							!shouldStayExposed(element) &&
+							!(
+								(element instanceof HTMLElement ||
+									element instanceof SVGElement) &&
+								"glLive" in element.dataset
+							),
+					)
+				: siblingsAlongPath(root);
+		for (const element of candidates) {
 			if (
 				above.every((other) => element !== other && !element.contains(other))
 			) {
@@ -343,25 +359,27 @@ function syncHiddenPage(): void {
 		}
 	}
 
-	for (const element of hiddenHere) {
-		if (wanted.has(element)) {
+	for (const [element, previousAttribute] of hiddenHere) {
+		if (previousAttribute === attribute && wanted.has(element)) {
 			continue;
 		}
 
 		hiddenHere.delete(element);
-		element.removeAttribute("aria-hidden");
+		element.removeAttribute(previousAttribute);
 	}
 
 	for (const element of wanted) {
 		if (
 			hiddenHere.has(element) ||
-			element.getAttribute("aria-hidden") === "true"
+			(attribute === "inert"
+				? element.hasAttribute(attribute)
+				: element.getAttribute(attribute) === "true")
 		) {
 			continue;
 		}
 
-		element.setAttribute("aria-hidden", "true");
-		hiddenHere.add(element);
+		element.setAttribute(attribute, attribute === "inert" ? "" : "true");
+		hiddenHere.set(element, attribute);
 	}
 }
 
@@ -664,19 +682,23 @@ does it on the portal path). The stack decides what that hides (syncHiddenPage).
 Menu's layers use it through the portal too, where their Base UI roots don't hide the page; their
 root mounts after they open, so they pass `isActive` again once it has.
 */
-export function useHidePage(isActive: boolean, layer: Layer): void {
+export function useHidePage(
+	isActive: boolean,
+	layer: Layer,
+	attribute: "aria-hidden" | "inert" = "aria-hidden",
+): void {
 	useIsoLayoutEffect(() => {
 		if (!isActive) {
 			return undefined;
 		}
 
-		pageHiders.add(layer);
+		pageHiders.set(layer, attribute);
 		syncHiddenPage();
 		return () => {
 			pageHiders.delete(layer);
 			syncHiddenPage();
 		};
-	}, [isActive, layer]);
+	}, [isActive, layer, attribute]);
 }
 
 // Escape events a layer has handled. With the React root on document itself (hydrateRoot on the

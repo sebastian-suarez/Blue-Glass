@@ -92,13 +92,6 @@
 		outline: 3px solid var(--focus);
 		outline-offset: 2px;
 	}
-	@supports not selector(:has(*)) {
-		.gl-rating-input:focus-visible + .gl-rating-hit {
-			outline: 3px solid var(--focus);
-			outline-offset: -2px;
-			border-radius: var(--radius-code);
-		}
-	}
 
 	.gl-rating-label {
 		min-width: 0;

@@ -90,18 +90,28 @@ coordinates, or null for the viewport.
 export function containingBlock(
 	element: Element | null,
 ): { x: number; y: number; width: number; height: number } | null {
+	const block = containingBlockElement(element);
+	if (!block) {
+		return null;
+	}
+
+	const rect = block.getBoundingClientRect();
+	return {
+		x: rect.left + block.clientLeft,
+		y: rect.top + block.clientTop,
+		width: block.clientWidth,
+		height: block.clientHeight,
+	};
+}
+
+export function containingBlockElement(
+	element: Element | null,
+): Element | null {
 	const root = element?.ownerDocument.documentElement;
 	let node = element?.parentElement ?? null;
 	while (node !== null && node !== root) {
 		if (isFixedContainingBlock(ownerWindow(node).getComputedStyle(node))) {
-			// The padding box, which fixed descendants are placed in.
-			const rect = node.getBoundingClientRect();
-			return {
-				x: rect.left + node.clientLeft,
-				y: rect.top + node.clientTop,
-				width: node.clientWidth,
-				height: node.clientHeight,
-			};
+			return node;
 		}
 
 		node = node.parentElement;

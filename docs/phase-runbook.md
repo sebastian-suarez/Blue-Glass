@@ -98,6 +98,7 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
   - Checkbox, Radio and Switch follow deviations 1 to 6. Deviation 6 (a Radio outside a RadioGroup) is the gap to watch.
   - Select can build on Popover's and Menu's layer (`src/internal/popup-layer.tsx`) and place with `toWholePixelOffsets` (`src/internal/anchor.ts`) to land on the reference's pixels.
   - Open from phase 2's review (`docs/reviews/phase-2.md`): the iOS 26 Safari backdrops (your call), an open Dialog's name in the server HTML, the Storybook gate's toolbar and scope checks, and `check:sync`'s `position.ts`.
+  - TransferList departs from the plan's mapping: its two listboxes keep their selection in React state, since Base UI's CheckboxGroup has no listbox and no public setter (the attempt's report, 23 Oct 2026). The API is unchanged, so `docs/deviations.md` has no entry.
 - **Phase 5 and release:**
   - The packed `package.json` still carries `"prepare": "husky"`. Strip it before publishing.
   - The `dist` source maps point to `src`, which isn't shipped. Ship it or drop the maps.

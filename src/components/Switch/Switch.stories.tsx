@@ -78,10 +78,7 @@ function PreviewU() {
 					key={i.id}
 					style={{
 						padding: "10px 0",
-						borderTop:
-							d !== 0 && !Number.isNaN(d)
-								? "1px solid var(--color-line)"
-								: undefined,
+						borderTop: d === 0 ? undefined : "1px solid var(--color-line)",
 					}}
 				>
 					<Switch

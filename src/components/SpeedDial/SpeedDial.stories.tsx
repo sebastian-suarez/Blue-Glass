@@ -111,7 +111,7 @@ function PreviewF({
 
 function PreviewU() {
 	const [isExampleState2, setIsExampleState2] = React.useState(false);
-	const value1Ref = React.useRef(0);
+	const lastScrollRef = React.useRef(0);
 	return (
 		<Stage height={380}>
 			<div
@@ -123,12 +123,12 @@ function PreviewU() {
 				}}
 				onScroll={(a) => {
 					const s = a.currentTarget.scrollTop;
-					if (Math.abs(s - value1Ref.current) < 8) {
+					if (Math.abs(s - lastScrollRef.current) < 8) {
 						return;
 					}
 
-					setIsExampleState2(s > value1Ref.current && s > 40);
-					value1Ref.current = s;
+					setIsExampleState2(s > lastScrollRef.current && s > 40);
+					lastScrollRef.current = s;
 				}}
 			>
 				<Paper
@@ -224,9 +224,7 @@ export const Default: Story = {
 		ariaLabel: "Contact and share",
 		onOpen: fn<() => void>(),
 		onClose: fn<() => void>(),
-		onChange: fn<() => void>(),
 	},
-	argTypes: {},
 	parameters: {
 		controls: { disable: false, include: ["open", "ariaLabel"] },
 		docs: {

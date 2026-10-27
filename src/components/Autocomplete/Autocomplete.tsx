@@ -307,9 +307,9 @@ export function Autocomplete<T = AutocompleteOption>({
 	const extra = (inputProps ?? {}) as Record<string, unknown> & {
 		className?: string;
 		ref?: React.Ref<HTMLInputElement>;
-		onKeyDown?: (event2: React.KeyboardEvent<HTMLInputElement>) => void;
-		onFocus?: (event3: React.FocusEvent<HTMLInputElement>) => void;
-		onBlur?: (event4: React.FocusEvent<HTMLInputElement>) => void;
+		onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+		onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+		onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 	};
 	const getLabel = (o: T | string | null): string =>
 		o === null || o === undefined
@@ -375,9 +375,9 @@ export function Autocomplete<T = AutocompleteOption>({
 	const anchor = useBaseAnchor(control);
 	const [host, setHost] = React.useState<HTMLElement | null>(null);
 	const [hasExited, setHasExited] = React.useState(!open);
-	const value1Ref = React.useRef<HTMLInputElement | null>(null);
-	const handleInputRef = useForkRef(value1Ref, inputRef, extra.ref);
-	const value2Ref = React.useRef({ x: -1, y: -1 });
+	const inputElementRef = React.useRef<HTMLInputElement | null>(null);
+	const handleInputRef = useForkRef(inputElementRef, inputRef, extra.ref);
+	const lastPointerRef = React.useRef({ x: -1, y: -1 });
 	const isShowingSelection =
 		!multiple &&
 		single !== null &&
@@ -435,7 +435,7 @@ export function Autocomplete<T = AutocompleteOption>({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isPopupOpen, activeIdx]);
 	const setInput = (
-		event5: React.SyntheticEvent | null,
+		event: React.SyntheticEvent | null,
 		text: string,
 		reason: AutocompleteInputChangeReason,
 	) => {
@@ -444,33 +444,33 @@ export function Autocomplete<T = AutocompleteOption>({
 		}
 
 		setInputState(text);
-		onInputChange?.(event5, text, reason);
+		onInputChange?.(event, text, reason);
 	};
 
 	const setValue = (
-		event6: React.SyntheticEvent,
+		event: React.SyntheticEvent,
 		next: T | string | Array<T | string> | null,
 		reason: AutocompleteChangeReason,
 	) => {
 		setValueState(next);
-		onChange?.(event6, next, reason);
+		onChange?.(event, next, reason);
 	};
 
 	const selectedIndexIn = (list: T[]) =>
 		!multiple && single !== null && single !== undefined
 			? list.findIndex((o) => isEq(o, single))
 			: -1;
-	const openPopup = (event7: React.SyntheticEvent) => {
+	const openPopup = (event: React.SyntheticEvent) => {
 		if (open || disabled || readOnly) {
 			return;
 		}
 
 		setOpenState(true);
-		onOpen?.(event7);
+		onOpen?.(event);
 	};
 
 	const closePopup = (
-		event8: React.SyntheticEvent,
+		event: React.SyntheticEvent,
 		reason: AutocompleteCloseReason,
 	) => {
 		setActive(-1);
@@ -479,10 +479,10 @@ export function Autocomplete<T = AutocompleteOption>({
 		}
 
 		setOpenState(false);
-		onClose?.(event8, reason);
+		onClose?.(event, reason);
 	};
 
-	const selectOption = (event9: React.SyntheticEvent, option: T | string) => {
+	const selectOption = (event: React.SyntheticEvent, option: T | string) => {
 		if (readOnly || isDisabled(option)) {
 			return;
 		}
@@ -490,27 +490,27 @@ export function Autocomplete<T = AutocompleteOption>({
 		if (multiple) {
 			const isHas = values.some((v) => isEq(option, v));
 			setValue(
-				event9,
+				event,
 				isHas ? values.filter((v) => !isEq(option, v)) : [...values, option],
 				isHas ? "removeOption" : "selectOption",
 			);
-			setInput(event9, "", "reset");
+			setInput(event, "", "reset");
 			setActive(filterFor("").findIndex((o) => isEq(o, option)));
 		} else {
 			if (single === null || single === undefined || !isEq(option, single)) {
-				setValue(event9, option, "selectOption");
+				setValue(event, option, "selectOption");
 			}
 
-			setInput(event9, getLabel(option), "reset");
+			setInput(event, getLabel(option), "reset");
 		}
 
 		setDirty(false);
 		if (!disableCloseOnSelect) {
-			closePopup(event9, "selectOption");
+			closePopup(event, "selectOption");
 		}
 	};
 
-	const commitText = (event10: React.SyntheticEvent) => {
+	const commitText = (event: React.SyntheticEvent) => {
 		const text = inputValue.trim();
 		if (text === "") {
 			return;
@@ -518,20 +518,20 @@ export function Autocomplete<T = AutocompleteOption>({
 
 		if (multiple) {
 			if (values.every((v) => getLabel(v) !== text)) {
-				setValue(event10, [...values, text], "createOption");
+				setValue(event, [...values, text], "createOption");
 			}
 
-			setInput(event10, "", "reset");
+			setInput(event, "", "reset");
 		} else if (
 			single === null ||
 			single === undefined ||
 			getLabel(single) !== text
 		) {
-			setValue(event10, text, "createOption");
+			setValue(event, text, "createOption");
 		}
 
 		setDirty(false);
-		closePopup(event10, "selectOption");
+		closePopup(event, "selectOption");
 	};
 
 	const focusTag = (i: number) => {
@@ -541,17 +541,17 @@ export function Autocomplete<T = AutocompleteOption>({
 		if (btn) {
 			btn.focus();
 		} else {
-			value1Ref.current?.focus();
+			inputElementRef.current?.focus();
 		}
 	};
 
 	const removeAt = (
-		event11: React.SyntheticEvent,
+		event: React.SyntheticEvent,
 		i: number,
 		refocus: "input" | "tag",
 	) => {
 		setValue(
-			event11,
+			event,
 			values.filter((_, k) => k !== i),
 			"removeOption",
 		);
@@ -560,29 +560,29 @@ export function Autocomplete<T = AutocompleteOption>({
 			if (refocus === "tag" && values.length > 1) {
 				focusTag(target);
 			} else {
-				value1Ref.current?.focus();
+				inputElementRef.current?.focus();
 			}
 		});
 	};
 
-	const clearAll = (event12: React.SyntheticEvent) => {
-		setInput(event12, "", "clear");
+	const clearAll = (event: React.SyntheticEvent) => {
+		setInput(event, "", "clear");
 		if (hasValue) {
-			setValue(event12, multiple ? [] : null, "clear");
+			setValue(event, multiple ? [] : null, "clear");
 		}
 
 		setDirty(false);
 		setActive(-1);
 	};
 
-	const onInputChangeEvent = (event13: React.ChangeEvent<HTMLInputElement>) => {
+	const onInputChangeEvent = (event: React.ChangeEvent<HTMLInputElement>) => {
 		(
 			extra.onChange as
 				((ev: React.ChangeEvent<HTMLInputElement>) => void) | undefined
-		)?.(event13);
-		const text = event13.target.value;
+		)?.(event);
+		const text = event.target.value;
 		setInputState(text);
-		onInputChange?.(event13, text, "input");
+		onInputChange?.(event, text, "input");
 		setDirty(true);
 		if (
 			!multiple &&
@@ -591,10 +591,10 @@ export function Autocomplete<T = AutocompleteOption>({
 			single !== null &&
 			single !== undefined
 		) {
-			setValue(event13, null, "clear");
+			setValue(event, null, "clear");
 		}
 
-		openPopup(event13);
+		openPopup(event);
 		if (autoHighlight) {
 			const list = filterFor(text);
 			setActive(list.findIndex((o) => !isDisabled(o)));
@@ -604,22 +604,22 @@ export function Autocomplete<T = AutocompleteOption>({
 		}
 	};
 
-	const onKeyDown = (event14: React.KeyboardEvent<HTMLInputElement>) => {
-		extra.onKeyDown?.(event14);
-		if (disabled || readOnly || event14.defaultPrevented) {
+	const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		extra.onKeyDown?.(event);
+		if (disabled || readOnly || event.defaultPrevented) {
 			return;
 		}
 
-		const k = event14.key;
+		const k = event.key;
 		switch (k) {
 			case "ArrowDown":
 			case "ArrowUp": {
-				event14.preventDefault();
-				if (event14.altKey) {
+				event.preventDefault();
+				if (event.altKey) {
 					if (k === "ArrowDown") {
-						openPopup(event14);
+						openPopup(event);
 					} else {
-						closePopup(event14, "escape");
+						closePopup(event, "escape");
 					}
 
 					return;
@@ -627,7 +627,7 @@ export function Autocomplete<T = AutocompleteOption>({
 
 				setKeyboard(true);
 				if (!open) {
-					openPopup(event14);
+					openPopup(event);
 					const sel = selectedIndexIn(filtered);
 					setActive(
 						sel >= 0
@@ -649,7 +649,7 @@ export function Autocomplete<T = AutocompleteOption>({
 					return;
 				}
 
-				event14.preventDefault();
+				event.preventDefault();
 				setKeyboard(true);
 				setActive(
 					jumpIndex(activeIdx, k === "PageDown" ? 5 : -5, n, isEnabled),
@@ -663,23 +663,23 @@ export function Autocomplete<T = AutocompleteOption>({
 					return;
 				}
 
-				event14.preventDefault();
+				event.preventDefault();
 				setKeyboard(true);
 				setActive(edgeIndex(k === "Home" ? 1 : -1, n, isEnabled));
 				return;
 			}
 
 			case "Enter": {
-				if (event14.nativeEvent.isComposing) {
+				if (event.nativeEvent.isComposing) {
 					return;
 				}
 
 				if (isPopupOpen && activeIdx >= 0) {
-					event14.preventDefault();
-					selectOption(event14, filtered[activeIdx]);
+					event.preventDefault();
+					selectOption(event, filtered[activeIdx]);
 				} else if (freeSolo && inputValue.trim() !== "") {
-					event14.preventDefault();
-					commitText(event14);
+					event.preventDefault();
+					commitText(event);
 				}
 
 				return;
@@ -687,41 +687,35 @@ export function Autocomplete<T = AutocompleteOption>({
 
 			case "Escape": {
 				if (open) {
-					event14.preventDefault();
-					event14.stopPropagation();
-					closePopup(event14, "escape");
+					event.preventDefault();
+					event.stopPropagation();
+					closePopup(event, "escape");
 				} else if (clearOnEscape && (inputValue !== "" || hasValue)) {
-					event14.preventDefault();
-					event14.stopPropagation();
-					clearAll(event14);
+					event.preventDefault();
+					event.stopPropagation();
+					clearAll(event);
 				}
 
 				return;
 			}
 
 			case "Backspace": {
-				if (
-					multiple &&
-					inputValue === "" &&
-					values.length > 0 &&
-					!Number.isNaN(values.length)
-				) {
-					removeAt(event14, values.length - 1, "input");
+				if (multiple && inputValue === "" && values.length > 0) {
+					removeAt(event, values.length - 1, "input");
 				}
 
 				return;
 			}
 
 			case "ArrowLeft": {
-				const element_ = event14.currentTarget;
+				const element_ = event.currentTarget;
 				if (
 					multiple &&
 					values.length > 0 &&
-					!Number.isNaN(values.length) &&
 					element_.selectionStart === 0 &&
 					element_.selectionEnd === 0
 				) {
-					event14.preventDefault();
+					event.preventDefault();
 					focusTag(values.length - 1);
 				}
 
@@ -730,7 +724,7 @@ export function Autocomplete<T = AutocompleteOption>({
 
 			case "Tab": {
 				if (open) {
-					closePopup(event14, "blur");
+					closePopup(event, "blur");
 				}
 
 				break;
@@ -741,12 +735,12 @@ export function Autocomplete<T = AutocompleteOption>({
 	};
 
 	const onTagKeyDown = (
-		event15: React.KeyboardEvent<HTMLButtonElement>,
+		event: React.KeyboardEvent<HTMLButtonElement>,
 		i: number,
 	) => {
-		switch (event15.key) {
+		switch (event.key) {
 			case "ArrowLeft": {
-				event15.preventDefault();
+				event.preventDefault();
 				if (i > 0) {
 					focusTag(i - 1);
 				}
@@ -755,11 +749,11 @@ export function Autocomplete<T = AutocompleteOption>({
 			}
 
 			case "ArrowRight": {
-				event15.preventDefault();
+				event.preventDefault();
 				if (i < values.length - 1) {
 					focusTag(i + 1);
 				} else {
-					value1Ref.current?.focus();
+					inputElementRef.current?.focus();
 				}
 
 				return;
@@ -767,14 +761,14 @@ export function Autocomplete<T = AutocompleteOption>({
 
 			case "Backspace":
 			case "Delete": {
-				event15.preventDefault();
-				removeAt(event15, i, "tag");
+				event.preventDefault();
+				removeAt(event, i, "tag");
 				return;
 			}
 
 			case "Escape": {
-				event15.preventDefault();
-				value1Ref.current?.focus();
+				event.preventDefault();
+				inputElementRef.current?.focus();
 				break;
 			}
 
@@ -782,13 +776,13 @@ export function Autocomplete<T = AutocompleteOption>({
 		}
 	};
 
-	const hover = (event16: React.PointerEvent, i: number) => {
-		const p = value2Ref.current;
-		if (p.x === event16.clientX && p.y === event16.clientY) {
+	const hover = (event: React.PointerEvent, i: number) => {
+		const p = lastPointerRef.current;
+		if (p.x === event.clientX && p.y === event.clientY) {
 			return;
 		}
 
-		value2Ref.current = { x: event16.clientX, y: event16.clientY };
+		lastPointerRef.current = { x: event.clientX, y: event.clientY };
 		if (!(isEnabled(i) && (i !== activeIdx || keyboard))) {
 			return;
 		}
@@ -834,10 +828,18 @@ export function Autocomplete<T = AutocompleteOption>({
 				className="gl-option"
 				data-active={i === activeIdx && keyboard ? "" : undefined}
 				data-row-index={i}
-				onPointerMove={(event17) => {
-					hover(event17, i);
+				onPointerMove={(event) => {
+					hover(event, i);
 				}}
 				onClickCapture={rememberReactEvent}
+				onClick={(event) => {
+					if (!freeSolo || multiple || isDis) {
+						return;
+					}
+
+					event.preventBaseUIHandler();
+					selectOption(event, o);
+				}}
 			>
 				{renderOption ? (
 					renderOption(o, {
@@ -940,6 +942,10 @@ export function Autocomplete<T = AutocompleteOption>({
 					: "No options"
 			: "";
 	const Control = multiple ? BaseCombobox.Chips : "div";
+	const keyedValues = values.map((chosen, index) => ({
+		value: chosen,
+		key: `${keyOf(chosen)}:${index}`,
+	}));
 	const content = (
 		<FieldShell
 			rootRef={ref}
@@ -966,21 +972,25 @@ export function Autocomplete<T = AutocompleteOption>({
 		>
 			<Control
 				ref={setControl}
+				role={undefined}
 				className="gl-field-control gl-autocomplete-control"
 				data-focused={focused && !disabled ? "" : undefined}
 				data-open={isPopupOpen ? "" : undefined}
 				data-end={endCount}
-				onMouseDown={(event18: React.MouseEvent<HTMLDivElement>) => {
-					focusFromPadding(event18, value1Ref.current, disabled);
+				onMouseDown={(event) => {
+					focusFromPadding(event, inputElementRef.current, disabled);
+					if ("preventBaseUIHandler" in event) {
+						event.preventBaseUIHandler();
+					}
 				}}
 			>
 				{start.el}
 				{multiple
-					? values.map((v, i) => {
+					? keyedValues.map(({ value: v, key }, i) => {
 							const text = getLabel(v);
 							return (
 								<BaseCombobox.Chip
-									key={keyOf(v)}
+									key={key}
 									render={<span />}
 									tabIndex={-1}
 									className="gl-autocomplete-tag"
@@ -999,15 +1009,13 @@ export function Autocomplete<T = AutocompleteOption>({
 											className="gl-autocomplete-tag-remove"
 											aria-label={`Remove ${text}`}
 											onMouseDown={prevent}
-											onClick={(
-												event19: React.MouseEvent<HTMLButtonElement>,
-											) => {
-												removeAt(event19, i, "input");
+											onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+												removeAt(event, i, "input");
 											}}
 											onKeyDown={(
-												event20: React.KeyboardEvent<HTMLButtonElement>,
+												event: React.KeyboardEvent<HTMLButtonElement>,
 											) => {
-												onTagKeyDown(event20, i);
+												onTagKeyDown(event, i);
 											}}
 										>
 											<Icon name="close" size={12} />
@@ -1060,28 +1068,29 @@ export function Autocomplete<T = AutocompleteOption>({
 						onKeyDown(event);
 						if (
 							event.defaultPrevented ||
-							(multiple && inputValue === "" && event.key === "Backspace") ||
 							event.key === "Enter" ||
+							(!isPopupOpen && event.key === "Escape") ||
+							(multiple && inputValue === "" && event.key === "Backspace") ||
 							(freeSolo && (event.key === "Home" || event.key === "End"))
 						) {
 							event.preventBaseUIHandler();
 						}
 					}}
 					onMouseDownCapture={rememberReactEvent}
-					onFocus={(event21: React.FocusEvent<HTMLInputElement>) => {
+					onFocus={(event: React.FocusEvent<HTMLInputElement>) => {
 						setFocused(true);
 						if (openOnFocus) {
-							openPopup(event21);
+							openPopup(event);
 						}
 
-						extra.onFocus?.(event21);
+						extra.onFocus?.(event);
 					}}
-					onBlur={(event22: React.FocusEvent<HTMLInputElement>) => {
+					onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
 						setFocused(false);
-						closePopup(event22, "blur");
+						closePopup(event, "blur");
 						if (!freeSolo) {
 							setInput(
-								event22,
+								event,
 								multiple || single === null || single === undefined
 									? ""
 									: getLabel(single),
@@ -1090,10 +1099,10 @@ export function Autocomplete<T = AutocompleteOption>({
 						}
 
 						setDirty(false);
-						extra.onBlur?.(event22);
+						extra.onBlur?.(event);
 					}}
 				/>
-				{endCount !== 0 && !Number.isNaN(endCount) ? (
+				{endCount > 0 ? (
 					<span className="gl-autocomplete-end">
 						{isClearable ? (
 							<button
@@ -1104,9 +1113,9 @@ export function Autocomplete<T = AutocompleteOption>({
 								title="Clear"
 								data-empty={canClear ? undefined : ""}
 								onMouseDown={prevent}
-								onClick={(event23: React.MouseEvent<HTMLButtonElement>) => {
-									clearAll(event23);
-									value1Ref.current?.focus();
+								onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+									clearAll(event);
+									inputElementRef.current?.focus();
 								}}
 							>
 								<Icon name="close" size={16} />
@@ -1121,19 +1130,19 @@ export function Autocomplete<T = AutocompleteOption>({
 								title={isPopupOpen ? "Close" : "Open"}
 								disabled={disabled}
 								onMouseDown={prevent}
-								onClick={(event24: React.MouseEvent<HTMLButtonElement>) => {
+								onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
 									if (readOnly) {
 										return;
 									}
 
 									if (open) {
-										closePopup(event24, "toggleInput");
+										closePopup(event, "toggleInput");
 									} else {
 										setKeyboard(false);
-										openPopup(event24);
+										openPopup(event);
 									}
 
-									value1Ref.current?.focus();
+									inputElementRef.current?.focus();
 								}}
 							>
 								<Icon name="chevron-down" size={16} />
@@ -1143,13 +1152,8 @@ export function Autocomplete<T = AutocompleteOption>({
 				) : null}
 			</Control>
 			{multiple && name !== undefined && name !== ""
-				? values.map((v, i) => (
-						<input
-							key={keyOf(v)}
-							type="hidden"
-							name={name}
-							value={getLabel(v)}
-						/>
+				? keyedValues.map(({ value: v, key }) => (
+						<input key={key} type="hidden" name={name} value={getLabel(v)} />
 					))
 				: null}
 			<span className="gl-sr-only" role="status" aria-live="polite">
@@ -1222,7 +1226,7 @@ export function Autocomplete<T = AutocompleteOption>({
 
 			const event = documentedEvent(
 				details.event,
-				value1Ref.current ?? undefined,
+				inputElementRef.current ?? undefined,
 			);
 			if (isNext) {
 				openPopup(event);
@@ -1240,19 +1244,8 @@ export function Autocomplete<T = AutocompleteOption>({
 				{...common}
 				value={inputValue}
 				itemToStringValue={getLabel}
-				onValueChange={(next, details) => {
+				onValueChange={(_next, details) => {
 					details.cancel();
-					if (details.reason !== "item-press") {
-						return;
-					}
-
-					const match = filtered.find((option) => getLabel(option) === next);
-					if (match !== undefined) {
-						selectOption(
-							documentedEvent(details.event, value1Ref.current ?? undefined),
-							match,
-						);
-					}
 				}}
 			>
 				{content}
@@ -1275,7 +1268,7 @@ export function Autocomplete<T = AutocompleteOption>({
 				details.cancel();
 				const event = documentedEvent(
 					details.event,
-					value1Ref.current ?? undefined,
+					inputElementRef.current ?? undefined,
 				);
 				if (multiple && Array.isArray(next)) {
 					const added = next.find((option) =>

@@ -56,7 +56,7 @@ function sharedHelpersOf(name: string): string[] {
 	const helpers = new Set(
 		source
 			.matchAll(
-				/from\s+["'](?:\.\/(?<sibling>_[\w\-]+)|\.\.\/internal\/(?<internal>[\w\-]+))["']/gv,
+				/from\s+["'](?:[^"']*\/(?<sibling>_[\w\-]+)|\.\.\/internal\/(?<internal>[\w\-]+))["']/gv,
 			)
 			.map((match) => match.groups?.sibling ?? match.groups?.internal ?? "")
 			.filter((helper) => !sharedFiles.includes(`shared/${helper}.ts`)),

@@ -229,7 +229,7 @@ export function TextField({
 		defaultValue ?? "",
 	);
 	const [focused, setFocused] = React.useState(false);
-	const value1Ref = React.useRef<HTMLInputElement | HTMLTextAreaElement | null>(
+	const innerRef = React.useRef<HTMLInputElement | HTMLTextAreaElement | null>(
 		null,
 	);
 	const extra = (inputProps ?? {}) as Record<string, unknown> & {
@@ -238,12 +238,13 @@ export function TextField({
 		onFocus?: (
 			event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
 		) => void;
+		onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 		onBlur?: (
-			event2: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+			event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
 		) => void;
 		"aria-describedby"?: string;
 	};
-	const handleRef = useForkRef(value1Ref, inputRef, extra.ref);
+	const handleRef = useForkRef(innerRef, inputRef, extra.ref);
 	const helperId = `${id}-helper`;
 	const counterId = `${id}-count`;
 	const start = renderSlot(startAdornment, "start", `${id}-start`);
@@ -288,26 +289,24 @@ export function TextField({
 			ariaDescribedby,
 			extra["aria-describedby"],
 		),
-		onChange(
-			event3: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-		) {
+		onChange(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 			(
 				extra.onChange as
 					| ((
 							ev: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
 					  ) => void)
 					| undefined
-			)?.(event3);
-			setValue(event3.target.value);
-			onChange?.(event3, event3.target.value);
+			)?.(event);
+			setValue(event.target.value);
+			onChange?.(event, event.target.value);
 		},
-		onFocus(event4: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
+		onFocus(event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
 			setFocused(true);
-			extra.onFocus?.(event4);
+			extra.onFocus?.(event);
 		},
-		onBlur(event5: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
+		onBlur(event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
 			setFocused(false);
-			extra.onBlur?.(event5);
+			extra.onBlur?.(event);
 		},
 	};
 	return (
@@ -335,8 +334,8 @@ export function TextField({
 			<div
 				className="gl-field-control"
 				data-focused={focused && !disabled ? "" : undefined}
-				onMouseDown={(event6: React.MouseEvent<HTMLDivElement>) => {
-					focusFromPadding(event6, value1Ref.current, disabled);
+				onMouseDown={(event: React.MouseEvent<HTMLDivElement>) => {
+					focusFromPadding(event, innerRef.current, disabled);
 				}}
 			>
 				{start.el}
@@ -351,7 +350,16 @@ export function TextField({
 						}
 					/>
 				) : (
-					<Input type={type} {...shared} />
+					<Input
+						type={type}
+						{...shared}
+						onKeyDown={(event) => {
+							extra.onKeyDown?.(event);
+							if (event.key === "Enter") {
+								event.preventBaseUIHandler();
+							}
+						}}
+					/>
 				)}
 				{end.el}
 			</div>

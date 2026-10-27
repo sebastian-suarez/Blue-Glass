@@ -1,5 +1,4 @@
 "use client";
-import type { BaseUIEvent } from "@base-ui/react/types";
 import { Select as BaseSelect } from "@base-ui/react/select";
 import * as React from "react";
 import { usePopupLayer } from "../../internal/popup-layer.js";
@@ -15,6 +14,7 @@ import { Grow } from "../Transitions/index.js";
 import { cx } from "../../internal/cx.js";
 import {
 	useControlled,
+	useEventCallback,
 	useForkRef,
 	useId,
 	usePrevious,
@@ -399,7 +399,7 @@ export function Select({
 	const [nativeFocus, setNativeFocus] = React.useState(false);
 	const triggerRef = React.useRef<HTMLDivElement | null>(null);
 	const listRef = React.useRef<HTMLUListElement | null>(null);
-	const value1Ref = React.useRef({ x: -1, y: -1 });
+	const lastPointerRef = React.useRef({ x: -1, y: -1 });
 	const handleTriggerRef = useForkRef<HTMLDivElement>(triggerRef, setAnchor);
 	const typeahead = useTypeahead();
 	const start = renderSlot(startAdornment, "start", `${id}-start`);
@@ -430,24 +430,24 @@ export function Select({
 	};
 
 	const closeMenu = (
-		event2: React.SyntheticEvent | KeyboardEvent,
+		event: React.SyntheticEvent | KeyboardEvent,
 		reason: SelectCloseReason,
 	) => {
 		if (reason === "escapeKeyDown") {
-			const nativeEvent = "nativeEvent" in event2 ? event2.nativeEvent : event2;
+			const nativeEvent = "nativeEvent" in event ? event.nativeEvent : event;
 			if (reportedEscapes.has(nativeEvent)) {
 				return;
 			}
 
 			reportedEscapes.add(nativeEvent);
-			popoverProps?.onClose?.(event2, reason);
+			popoverProps?.onClose?.(event, reason);
 		}
 
 		setOpen(false);
-		onClose?.(event2, reason);
+		onClose?.(event, reason);
 	};
 
-	const choose = (event3: React.SyntheticEvent, i: number) => {
+	const choose = (event: React.SyntheticEvent, i: number) => {
 		if (readOnly || i < 0 || i >= rows.length) {
 			return;
 		}
@@ -469,15 +469,15 @@ export function Select({
 				(a, b) => (order.get(a) ?? 1e9) - (order.get(b) ?? 1e9),
 			);
 			setValue(next);
-			onChange?.(event3, next);
+			onChange?.(event, next);
 			setActive(i);
 		} else {
 			if (!isSelected(row.value)) {
 				setValue(row.value);
-				onChange?.(event3, row.value);
+				onChange?.(event, row.value);
 			}
 
-			closeMenu(event3, "select");
+			closeMenu(event, "select");
 		}
 	};
 
@@ -518,49 +518,49 @@ export function Select({
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open, active]);
-	const onTriggerKeyDown = (event4: React.KeyboardEvent<HTMLDivElement>) => {
+	const onTriggerKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
 		if (disabled || readOnly) {
 			return;
 		}
 
-		const k = event4.key;
+		const k = event.key;
 		if (["ArrowDown", "ArrowUp", "Enter", " "].includes(k)) {
-			event4.preventDefault();
-			openMenu(event4, undefined, true);
+			event.preventDefault();
+			openMenu(event, undefined, true);
 		} else if (k === "Home" || k === "End") {
-			event4.preventDefault();
+			event.preventDefault();
 			openMenu(
-				event4,
+				event,
 				edgeIndex(k === "Home" ? 1 : -1, rows.length, isEnabled),
 				true,
 			);
-		} else if (isPrintableKey(event4)) {
-			event4.preventDefault();
-			openMenu(event4, typeahead(k, texts, selectedIndex, isEnabled), true);
+		} else if (isPrintableKey(event)) {
+			event.preventDefault();
+			openMenu(event, typeahead(k, texts, selectedIndex, isEnabled), true);
 		}
 	};
 
-	const onListKeyDown = (event5: React.KeyboardEvent<HTMLUListElement>) => {
-		rememberReactEvent(event5);
-		const target = (event5.target as HTMLElement).closest<HTMLElement>(
+	const onListKeyDown = (event: React.KeyboardEvent<HTMLUListElement>) => {
+		rememberReactEvent(event);
+		const target = (event.target as HTMLElement).closest<HTMLElement>(
 			"[data-row-index]",
 		);
 		const focusedIndex = target ? Number(target.dataset.rowIndex) : active;
 		const n = rows.length;
 		let next: number | null = null;
-		switch (event5.key) {
+		switch (event.key) {
 			case "ArrowDown": {
 				next = stepIndex(focusedIndex, 1, n, isEnabled);
 				break;
 			}
 
 			case "ArrowUp": {
-				if (event5.altKey) {
-					event5.preventDefault();
+				if (event.altKey) {
+					event.preventDefault();
 					if (!multiple && focusedIndex >= 0) {
-						choose(event5, focusedIndex);
+						choose(event, focusedIndex);
 					} else {
-						closeMenu(event5, "select");
+						closeMenu(event, "select");
 					}
 
 					return;
@@ -597,15 +597,15 @@ export function Select({
 			}
 
 			case "Tab": {
-				event5.preventDefault();
-				closeMenu(event5, "tabKeyDown");
+				event.preventDefault();
+				closeMenu(event, "tabKeyDown");
 				return;
 			}
 
 			default: {
-				if (isPrintableKey(event5)) {
-					event5.preventDefault();
-					const i = typeahead(event5.key, texts, focusedIndex, isEnabled);
+				if (isPrintableKey(event)) {
+					event.preventDefault();
+					const i = typeahead(event.key, texts, focusedIndex, isEnabled);
 					if (i >= 0) {
 						next = i;
 					} else {
@@ -619,7 +619,7 @@ export function Select({
 			return;
 		}
 
-		event5.preventDefault();
+		event.preventDefault();
 		setKeyboard(true);
 		if (next < 0) {
 			return;
@@ -652,6 +652,7 @@ export function Select({
 		variant,
 	};
 	const isHydrating = useIsHydrating();
+	const [wasHydrating] = React.useState(isHydrating);
 	const [hasOpened, setHasOpened] = React.useState(false);
 	const layer = usePopupLayer({
 		open: open && !native,
@@ -664,7 +665,8 @@ export function Select({
 		container: popoverProps?.container,
 		disableAutoFocus: true,
 		disableRestoreFocus: popoverProps?.disableRestoreFocus,
-		disableEnforceFocus: popoverProps?.disableEnforceFocus ?? !hasOpened,
+		disableEnforceFocus: popoverProps?.disableEnforceFocus,
+		pageIsolation: "inert",
 		disableScrollLock: popoverProps?.disableScrollLock,
 		onBackdropClick(event) {
 			popoverProps?.onClose?.(event, "backdropClick");
@@ -682,9 +684,14 @@ export function Select({
 			placement: popoverProps?.placement ?? "bottom-start",
 			offset: popoverProps?.offset ?? 8,
 		});
+	const { restoreFocus } = layer;
 	const preserveInitialFocus = React.useCallback(
 		(surfaceElement: HTMLDivElement | null) => {
-			if (!surfaceElement || hasOpened) {
+			if (
+				!surfaceElement ||
+				hasOpened ||
+				(!popoverProps?.disablePortal && !popoverProps?.disableEnforceFocus)
+			) {
 				return;
 			}
 
@@ -707,7 +714,7 @@ export function Select({
 						previous instanceof HTMLElement &&
 						previous !== ownerDocument.body
 					) {
-						previous.focus({ preventScroll: true });
+						restoreFocus(previous);
 					} else {
 						activeElement.blur();
 					}
@@ -717,37 +724,41 @@ export function Select({
 				cancelAnimationFrame(frame);
 			};
 		},
-		[hasOpened],
+		[
+			hasOpened,
+			popoverProps?.disablePortal,
+			popoverProps?.disableEnforceFocus,
+			restoreFocus,
+		],
 	);
 	const handleSurfaceRef = useForkRef(layer.surfaceRef, preserveInitialFocus);
+	const onDocumentKeyDown = useEventCallback((event: KeyboardEvent) => {
+		if (
+			event.key !== "Escape" ||
+			!layer.isReporting() ||
+			event.defaultPrevented
+		) {
+			return;
+		}
+
+		event.preventDefault();
+		event.stopPropagation();
+		const wrapped = documentedEvent(
+			event,
+			layer.surfaceRef.current ?? undefined,
+		);
+		closeMenu(wrapped, "escapeKeyDown");
+	});
 	React.useEffect(() => {
 		if (!open || native) {
 			return;
 		}
 
-		const listener = (event: KeyboardEvent) => {
-			if (
-				event.key !== "Escape" ||
-				!layer.isReporting() ||
-				event.defaultPrevented
-			) {
-				return;
-			}
-
-			event.preventDefault();
-			event.stopPropagation();
-			const wrapped = documentedEvent(
-				event,
-				layer.surfaceRef.current ?? undefined,
-			);
-			closeMenu(wrapped, "escapeKeyDown");
-		};
-
-		document.addEventListener("keydown", listener);
+		document.addEventListener("keydown", onDocumentKeyDown);
 		return () => {
-			document.removeEventListener("keydown", listener);
+			document.removeEventListener("keydown", onDocumentKeyDown);
 		};
-	});
+	}, [open, native, onDocumentKeyDown]);
 	if (native) {
 		const stringValue = multiple
 			? values.map(String)
@@ -788,12 +799,12 @@ export function Select({
 						onBlur={() => {
 							setNativeFocus(false);
 						}}
-						onChange={(event6: React.ChangeEvent<HTMLSelectElement>) => {
+						onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
 							if (readOnly) {
 								return;
 							}
 
-							const element_ = event6.target;
+							const element_ = event.target;
 							const find = (s: string) =>
 								rows.find((r) => String(r.value) === s);
 							const next = multiple
@@ -804,7 +815,7 @@ export function Select({
 									? null
 									: (find(element_.value)?.value ?? element_.value);
 							setValue(next);
-							onChange?.(event6, next);
+							onChange?.(event, next);
 						}}
 					>
 						{!multiple && (placeholder !== undefined || stringValue === "") ? (
@@ -921,24 +932,14 @@ export function Select({
 							: ariaLabel
 					}
 					aria-multiselectable={multiple || undefined}
-					aria-activedescendant={
-						active >= 0 && active < rows.length ? optionId(active) : undefined
-					}
 					onClickCapture={rememberReactEvent}
-					onKeyDown={(
-						event: BaseUIEvent<React.KeyboardEvent<HTMLUListElement>>,
-					) => {
-						onListKeyDown(event);
-						if (event.defaultPrevented) {
-							event.preventBaseUIHandler?.();
-						}
-					}}
+					onKeyDown={onListKeyDown}
 				>
 					{rows.map((r, i) => {
 						const own = (r.element?.props ?? {}) as {
-							onClick?: (event7: React.MouseEvent<HTMLLIElement>) => void;
+							onClick?: (event: React.MouseEvent<HTMLLIElement>) => void;
 							onPointerMove?: (
-								event8: React.PointerEvent<HTMLLIElement>,
+								event: React.PointerEvent<HTMLLIElement>,
 							) => void;
 						};
 						const injected = {
@@ -948,18 +949,18 @@ export function Select({
 							selected: isSelected(r.value),
 							disabled: r.disabled,
 							"data-active": i === active && keyboard ? "" : undefined,
-							onClick(event9: React.MouseEvent<HTMLLIElement>) {
-								own.onClick?.(event9);
-								rememberReactEvent(event9);
+							onClick(event: React.MouseEvent<HTMLLIElement>) {
+								own.onClick?.(event);
+								rememberReactEvent(event);
 							},
-							onPointerMove(event10: React.PointerEvent<HTMLLIElement>) {
-								own.onPointerMove?.(event10);
-								const p = value1Ref.current;
-								if (p.x === event10.clientX && p.y === event10.clientY) {
+							onPointerMove(event: React.PointerEvent<HTMLLIElement>) {
+								own.onPointerMove?.(event);
+								const p = lastPointerRef.current;
+								if (p.x === event.clientX && p.y === event.clientY) {
 									return;
 								}
 
-								value1Ref.current = { x: event10.clientX, y: event10.clientY };
+								lastPointerRef.current = { x: event.clientX, y: event.clientY };
 								if (r.disabled || (i === active && !keyboard)) {
 									return;
 								}
@@ -1001,7 +1002,12 @@ export function Select({
 				"gl-select-popover",
 				popoverProps?.className,
 			)}
-			style={{ ...layer.surfaceStyle, ...popoverProps?.style }}
+			style={{
+				...layer.surfaceStyle,
+				maxHeight:
+					"min(max(var(--gl-available-height, var(--available-height)), 80px), 480px)",
+				...popoverProps?.style,
+			}}
 			onFocus={(event) => {
 				popoverSurfaceProps.onFocus?.(event);
 				layer.markInside(event);
@@ -1033,6 +1039,7 @@ export function Select({
 				>
 					<Grow
 						{...layer.transitionProps}
+						appear={!wasHydrating || hasOpened}
 						timeout={popoverProps?.transitionDuration}
 					>
 						{surface(true)}
@@ -1118,7 +1125,6 @@ export function Select({
 					role="combobox"
 					tabIndex={disabled ? -1 : 0}
 					className="gl-field-control gl-select-trigger"
-					data-focused={undefined}
 					aria-haspopup="listbox"
 					aria-expanded={open}
 					aria-controls={open ? listboxId : undefined}

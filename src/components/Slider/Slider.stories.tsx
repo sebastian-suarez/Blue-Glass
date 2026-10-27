@@ -345,9 +345,7 @@ export const Variants: Story = {
 						max={500}
 						step={10}
 						getAriaLabel={(t) =>
-							t !== 0 && !Number.isNaN(t)
-								? "Slowest acceptable"
-								: "Fastest expected"
+							t === 0 ? "Fastest expected" : "Slowest acceptable"
 						}
 					/>
 					<Caption>range</Caption>

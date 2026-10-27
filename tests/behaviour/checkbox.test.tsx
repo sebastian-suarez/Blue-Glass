@@ -897,3 +897,13 @@ describe("Checkbox: forms", () => {
 		expect(entries(form)).toEqual([["digest", "on"]]);
 	});
 });
+
+describe("Checkbox: readOnly", () => {
+	test("readOnly reaches the input and, as on a native checkbox, doesn't stop a press: it toggles and onChange reports it", async () => {
+		const onChange = vi.fn<OnChange>();
+		render(<Checkbox readOnly label="Ping me" onChange={onChange} />);
+		await userEvent.click(checkbox("Ping me"));
+		await expect.element(checkbox("Ping me")).toBeChecked();
+		expect(onChange).toHaveBeenCalledTimes(1);
+	});
+});

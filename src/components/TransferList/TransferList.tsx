@@ -143,12 +143,11 @@ function Pane({
 	const [active, setActive] = React.useState(-1);
 	const [focused, setFocused] = React.useState(false);
 	const [keyboard, setKeyboard] = React.useState(false);
-	const value1Ref = React.useRef(false);
+	const pressingRef = React.useRef(false);
 	const typeahead = useTypeahead();
 	const n = items.length;
 	const isEnabled = (i: number) => i >= 0 && i < n && !isItemDisabled(items[i]);
-	const activeIdx =
-		active < n ? active : n !== 0 && !Number.isNaN(n) ? n - 1 : -1;
+	const activeIdx = active < n ? active : n === 0 ? -1 : n - 1;
 	const titleId = `${id}-${side}-title`;
 	const countId = `${id}-${side}-count`;
 	const optionId = (i: number) => `${id}-${side}-item-${i}`;
@@ -281,7 +280,7 @@ function Pane({
 					onFocus={() => {
 						setFocused(true);
 						// Reached by Tab (not a press): show the active row's ring straight away.
-						setKeyboard(!value1Ref.current);
+						setKeyboard(!pressingRef.current);
 						if (active < 0 || active >= n) {
 							setActive(edgeIndex(1, n, isEnabled));
 						}
@@ -290,14 +289,14 @@ function Pane({
 						setFocused(false);
 					}}
 					onPointerDown={() => {
-						value1Ref.current = true;
+						pressingRef.current = true;
 						setKeyboard(false);
 					}}
 					onPointerUp={() => {
-						value1Ref.current = false;
+						pressingRef.current = false;
 					}}
 					onPointerCancel={() => {
-						value1Ref.current = false;
+						pressingRef.current = false;
 					}}
 				>
 					{items.map((item, i) => {
@@ -420,7 +419,7 @@ export function TransferList({
 		changeSelection({ ...selected, [side]: list });
 	};
 
-	const move = (event2: React.SyntheticEvent, from: Side, isAll: boolean) => {
+	const move = (event: React.SyntheticEvent, from: Side, isAll: boolean) => {
 		if (disabled) {
 			return;
 		}
@@ -441,7 +440,7 @@ export function TransferList({
 			[to]: [...value[to], ...moving],
 		};
 		setValue(next);
-		onChange?.(event2, next);
+		onChange?.(event, next);
 		changeSelection({
 			...selected,
 			[from]: selected[from].filter((v) => !keys.has(v)),
@@ -469,8 +468,8 @@ export function TransferList({
 			className="gl-transfer-list-button"
 			title={label}
 			disabled={!isMovable(from, isAll)}
-			onClick={(event3: React.MouseEvent<HTMLButtonElement>) => {
-				move(event3, from, isAll);
+			onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+				move(event, from, isAll);
 			}}
 		>
 			<Icon name={icon} size={16} />

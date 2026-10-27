@@ -2223,3 +2223,101 @@ describe("Select: native", () => {
 		expect(texts(nativeSelect("Language"))).toEqual(["Node.js", "Rust"]);
 	});
 });
+
+describe("Select: open at mount, and inside a containing block", () => {
+	test("an in-place list inside a short containing block is capped to the block's room, as the reference's popover is", async () => {
+		render(
+			<div
+				data-testid="stage"
+				style={{
+					height: 300,
+					padding: 8,
+					transform: "translateZ(0)",
+					overflow: "visible",
+				}}
+			>
+				<Select
+					defaultOpen
+					label="Hour"
+					options={hours}
+					defaultValue="00:00"
+					PopoverProps={{
+						disablePortal: true,
+						disableScrollLock: true,
+						disableEnforceFocus: true,
+					}}
+				/>
+			</div>,
+		);
+		const list = await vi.waitFor(() => listbox());
+		const surface = must(list.closest<HTMLElement>(".gl-popover"));
+		await expect
+			.poll(() => box(surface).height, { timeout: 2000 })
+			.toBeGreaterThanOrEqual(80);
+		await frames(8);
+		const stage = box(screen.getByTestId("stage"));
+		expect(box(surface).top).toBeGreaterThanOrEqual(
+			box(trigger("Hour")).bottom,
+		);
+		expect(box(surface).bottom).toBeLessThanOrEqual(stage.bottom + 1);
+	});
+
+	test("defaultOpen through the portal enforces focus as an interactive open does: the page is hidden from assistive tech, and Tab stays in the layer", async () => {
+		render(
+			<Around>
+				<StackSelect defaultOpen defaultValue="TypeScript" />
+			</Around>,
+		);
+		const list = await vi.waitFor(() => listbox());
+		await new Promise((resolve) => {
+			setTimeout(resolve, 300);
+		});
+		const before = screen.getByText("Before");
+		const isKeptFromAssistiveTech = (element: Element): boolean => {
+			for (
+				let node: Element | null = element;
+				node;
+				node = node.parentElement
+			) {
+				if (
+					node.getAttribute("aria-hidden") === "true" ||
+					node.hasAttribute("inert")
+				) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		expect(isKeptFromAssistiveTech(before)).toBe(true);
+		await userEvent.keyboard("{Tab}");
+		await frames();
+		expect(document.activeElement).not.toBe(before);
+		expect(list.isConnected).toBe(true);
+	});
+
+	referenceDefectTest(
+		"required with a name on the glass select: the form is invalid while nothing is chosen, and valid once a slot is",
+		async () => {
+			render(
+				<form aria-label="Booking">
+					<Select
+						required
+						label="Slot"
+						name="slot"
+						placeholder="Choose a slot"
+						options={slots}
+					/>
+				</form>,
+			);
+			const form = screen.getByRole<HTMLFormElement>("form", {
+				name: "Booking",
+			});
+			expect(form.checkValidity()).toBe(false);
+			await openByPress(trigger("Slot"));
+			await userEvent.click(row("Wednesday, 10:00"));
+			await expect.poll(() => form.checkValidity()).toBe(true);
+		},
+	);
+});

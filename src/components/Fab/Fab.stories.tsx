@@ -43,10 +43,10 @@ const z = (a = 0): React.CSSProperties => ({
 	zIndex: "var(--z-fab)",
 });
 function PreviewG() {
-	const value1Ref = React.useRef<HTMLDivElement | null>(null);
+	const scrollerRef = React.useRef<HTMLDivElement | null>(null);
 	const [isExampleState1, setIsExampleState1] = React.useState(false);
 	React.useEffect(() => {
-		const r = value1Ref.current;
+		const r = scrollerRef.current;
 		if (!r) {
 			return;
 		}
@@ -56,13 +56,16 @@ function PreviewG() {
 	}, []);
 	const s = () => {
 		const isR = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		value1Ref.current?.scrollTo({ top: 0, behavior: isR ? "auto" : "smooth" });
+		scrollerRef.current?.scrollTo({
+			top: 0,
+			behavior: isR ? "auto" : "smooth",
+		});
 	};
 
 	return (
 		<Stage height={380}>
 			<div
-				ref={value1Ref}
+				ref={scrollerRef}
 				role="region"
 				aria-label="Client work"
 				// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex -- The scroll area needs keyboard access.

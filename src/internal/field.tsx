@@ -106,7 +106,14 @@ export function FieldShell({
 					id={p.labelId}
 					htmlFor={p.htmlFor}
 					className="gl-field-label"
-					onClick={p.onLabelClick}
+					onClick={(event) => {
+						if (!p.onLabelClick) {
+							return;
+						}
+
+						p.onLabelClick();
+						event.preventBaseUIHandler();
+					}}
 				>
 					{p.label}
 					{p.required === true ? (

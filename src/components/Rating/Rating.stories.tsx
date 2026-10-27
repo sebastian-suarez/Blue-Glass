@@ -42,9 +42,7 @@ function PreviewB() {
 				size="lg"
 				value={exampleState1}
 				aria-labelledby="rate-question"
-				label={
-					d !== null && d !== 0 && !Number.isNaN(d) ? q[d] : "Not rated yet"
-				}
+				label={d !== null && d !== 0 ? q[d] : "Not rated yet"}
 				onChange={(u, s) => {
 					setExampleState1(s);
 				}}
