@@ -10,8 +10,8 @@ How to run one phase of `docs/package-plan.md` in a fresh session. One phase per
 | 1. Site set (26)                                       | Done 22 Oct 2026, two review rounds | `432ca83`                | `docs/reviews/phase-1.md`   |
 | Storybook controls and viewports (between 1 and 2)     | Done 22 Oct 2026, two review rounds | `b11d4fd`                | `docs/reviews/storybook.md` |
 | 2. Overlays and feedback (17)                          | Done 22 Oct 2026, one review round  | `1879bb1`                | `docs/reviews/phase-2.md`   |
-| 3. Inputs (11)                                         | Next, waiting for your go           |                          |                             |
-| 4. Navigation and layout (7)                           |                                     |                          |                             |
+| 3. Inputs (11)                                         | Done 26 Oct 2026, two review rounds | `994392d`                | `docs/reviews/phase-3.md`   |
+| 4. Navigation and layout (7)                           | Next, waiting for your go           |                          |                             |
 | 5. Charts (5), then README, CHANGELOG, release dry run |                                     |                          |                             |
 
 Each session updates its row as its last commit.
@@ -81,6 +81,14 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
 - **Run the gates in a quiet window.** While agents also run gates, the parity self-test and the Storybook gate time out on harness steps, not on the port.
 - **Base UI's portals render nothing on the server.** A popup that must be in the server HTML needs its own in-place path, as `ModalLayer` has. Popover and Menu have none (deviation 10).
 
+## Traps found in phase 3
+
+- **The second vendor's workspace-write sandbox can't bind a localhost port or start Chromium on macOS,** so an attempt inside it can only report on the static checks. Its run with the failing lines went without a sandbox, and the session judges outside one either way.
+- **A commit interrupted inside the pre-commit hook leaves lint-staged's backup in the shared stash.** Compare its tree with the index before committing again; nothing was lost on 23 Oct 2026.
+- **The push guard (routing v3, 24 Oct 2026) blocks a push when any unpushed commit adds a `.md` line that names a model.** Review logs name routes, roles and wrapper paths; the named logs live under `~/.cache/routing/`.
+- **The reference places its popups after every render.** A positioner that subscribes to resize and scroll still needs a layout effect with no dependency list, or a render that moves the trigger leaves the popup behind (round 2's #2).
+- **Browser specs swallow `console.log`.** A throwaway probe reports through a failing assertion instead.
+
 ## Notes for each phase
 
 - **Phase 1:**
@@ -99,9 +107,15 @@ Say "Run phase N, following docs/phase-runbook.md". The session reads, in order:
   - Select can build on Popover's and Menu's layer (`src/internal/popup-layer.tsx`) and place with `toWholePixelOffsets` (`src/internal/anchor.ts`) to land on the reference's pixels.
   - Open from phase 2's review (`docs/reviews/phase-2.md`): the iOS 26 Safari backdrops (your call), an open Dialog's name in the server HTML, the Storybook gate's toolbar and scope checks, and `check:sync`'s `position.ts`.
   - TransferList departs from the plan's mapping: its two listboxes keep their selection in React state, since Base UI's CheckboxGroup has no listbox and no public setter (the attempt's report, 23 Oct 2026). The API is unchanged, so `docs/deviations.md` has no entry.
+- **Phase 4:**
+  - Routing v3 (24 Oct 2026) names what steps 3 and 5 name by model. The attempt is the `coding.feature` writer through `~/.claude/scripts/codex-run.sh` (prepare its worktree first: no network). The reviewers come from `~/.claude/scripts/route.sh reviewers coding.feature 2`: the task reviewer is a subagent with the task, and the artifact reviewer runs through `~/.claude/scripts/astra-review.sh --route coding.feature --base A --head B` with the diff and the test output only. Whether the `/spec` skill's flow replaces step 2 for a phase whose suite the runbook already opens is yours to decide when phase 4 starts.
+  - `check:sync` now records `../layout/_name` imports again (Masonry's), and `../internal/name` ones.
+  - Left from phase 3's reviews (`docs/reviews/phase-3.md`): the read-only specs don't assert `readOnly` on the input; Slider's `interactionRef` never clears; Select skips its zoom for a controlled open on a hydrated page; after a Tab from a Select open at mount, focus rests on `body`, not on a sentinel as in the reference.
+  - Storybook's interface and the docs pages' prose use Storybook's own font, Nunito Sans; the stories render in Satoshi. A manager and docs theme would change that, if you want it.
 - **Phase 5 and release:**
   - The packed `package.json` still carries `"prepare": "husky"`. Strip it before publishing.
   - The `dist` source maps point to `src`, which isn't shipped. Ship it or drop the maps.
   - The package stays `private: true` until you pick a registry. The CI workflow isn't pushed.
   - The README tells consumers to get Satoshi from Fontshare and self-host it, with its `@font-face` (the variable file, weights 300 to 900). Its licence forbids shipping the files, and `check:package` fails a tarball that holds one.
   - Mermaid's reference sets its diagrams in a hardcoded system stack (`Mermaid/reference.tsx`, line 8). Decide whether the port follows `--font-sans` and Satoshi.
+  - `check:sync` still misses a shared helper's own imports and the CSS helpers (phase 3's round 1).
