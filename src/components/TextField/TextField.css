@@ -1,11 +1,4 @@
-/* TextField: reference styles, copied from the design system's bundle.css. */
-/* Also styled by ../../foundation.css: gl-sr-only */
-/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
-
 @layer gl-components {
-	/* TextField — an addition: the site has no form fields. Built in its language: the .btn pill (size-control,
-   radius-pill), the .chip's glass-control fill, a dg-edge border (3:1, the diagram edge), the .education h3
-   label (13px/600). Shared by Select and Autocomplete (gl-field-*). */
 	.gl-field {
 		display: inline-flex;
 		flex-direction: column;
@@ -18,8 +11,6 @@
 		display: flex;
 		width: 100%;
 	}
-
-	/* Label: text-label, always visible, above the control. */
 	.gl-field-label {
 		align-self: flex-start;
 		margin: 0 0 var(--space-xs);
@@ -31,8 +22,6 @@
 	.gl-field-asterisk {
 		margin-left: 3px;
 	}
-
-	/* The pill. */
 	.gl-field-control {
 		position: relative;
 		display: flex;
@@ -52,13 +41,11 @@
 			background var(--duration-hover) ease,
 			border-color var(--duration-hover) ease;
 	}
-	/* filled: the inset well (.project-figure) as a pill; the edge darkens on hover and focus. */
 	.gl-field-filled .gl-field-control {
 		background: var(--glass-inset);
 		border-color: var(--glass-edge);
 		box-shadow: var(--shadow-inset);
 	}
-	/* Focus: ink edge plus the focus ring at the dense offset. Error keeps its danger edge. */
 	.gl-field-control[data-focused] {
 		border-color: var(--color-ink);
 		outline: 3px solid var(--focus);
@@ -82,7 +69,6 @@
 		font: inherit;
 		letter-spacing: inherit;
 		text-overflow: ellipsis;
-		/* The pill draws the focus ring (data-focused). */
 		outline: none;
 		-webkit-appearance: none;
 		appearance: none;
@@ -107,8 +93,6 @@
 	.gl-field-input::-webkit-search-cancel-button {
 		-webkit-appearance: none;
 	}
-
-	/* Adornments: icons at 16px in color-muted, units in 14px. */
 	.gl-field-adornment {
 		display: inline-flex;
 		flex: none;
@@ -123,8 +107,6 @@
 		width: 16px;
 		height: 16px;
 	}
-
-	/* Multiline: the well radius, text from the top, aligned with single-line text. */
 	.gl-field-multiline .gl-field-control {
 		align-items: flex-start;
 		padding: 12px 20px;
@@ -138,8 +120,6 @@
 	.gl-field-multiline .gl-field-adornment {
 		min-height: 24px;
 	}
-
-	/* sm: the 36px pill, like .gl-button-sm. */
 	.gl-field-sm .gl-field-control {
 		min-height: 36px;
 		padding: 0 var(--space-md);
@@ -152,8 +132,6 @@
 	.gl-field-sm.gl-field-multiline .gl-field-adornment {
 		min-height: 22px;
 	}
-
-	/* Helper, error and counter: one line under the control. */
 	.gl-field-footer {
 		display: flex;
 		align-items: flex-start;
@@ -182,15 +160,11 @@
 		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 	}
-
-	/* Read-only: an inset well with a dashed edge (still 3:1), no hover. */
 	.gl-field-readonly .gl-field-control {
 		background: var(--glass-inset);
 		border-style: dashed;
 		cursor: default;
 	}
-
-	/* Disabled. */
 	.gl-field-disabled {
 		opacity: 0.5;
 	}

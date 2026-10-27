@@ -1,14 +1,4 @@
-/* TransferList: reference styles, copied from the design system's bundle.css. */
-/* Also styled by ../Autocomplete/styles.css: gl-option-end */
-/* Also styled by ../List/styles.css: gl-option */
-/* Also styled by ../Menu/styles.css: gl-option, gl-option-end, gl-option-secondary */
-/* Also styled by ../Select/styles.css: gl-listbox, gl-option-end */
-/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-secondary, gl-option-text, gl-sr-only */
-/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
-
 @layer gl-components {
-	/* TransferList — an addition matching MUI's transfer list. Two inset wells (.project-figure, Paper inset) whose
-   rows are the side selector's tabs (.project-tab, via gl-option), and a column of glass pills (.btn-glass). */
 	.gl-transfer-list {
 		container-type: inline-size;
 		min-width: 0;
@@ -92,8 +82,6 @@
 	.gl-transfer-list-disabled .gl-option {
 		cursor: not-allowed;
 	}
-
-	/* Narrow: the wells stack, the buttons line up between them and point down and up. */
 	@container (max-width: 480px) {
 		.gl-transfer-list-grid {
 			grid-template-columns: minmax(0, 1fr);

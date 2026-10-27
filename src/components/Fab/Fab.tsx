@@ -8,49 +8,19 @@ export type FabProps = Omit<
 	React.ButtonHTMLAttributes<HTMLButtonElement>,
 	"type"
 > & {
-	/**
-Primary: the ink circle (.btn-primary), the default. glass: the frosted circle (.btn-glass) for a second floating action.
-*/
 	variant?: "primary" | "glass";
-	/**
-Sm 36px, md 46px (the site's control height, default), lg 56px.
-*/
 	size?: "sm" | "md" | "lg";
-	/**
-A pill with an icon and a visible label instead of a circle (MUI's variant="extended").
-*/
 	extended?: boolean;
-	/**
-Accessible name. Required when the Fab shows only an icon; an extended Fab is named by its label.
-*/
 	"aria-label"?: string;
-	/**
-Render an <a> instead of a <BaseButton>, e.g. "Back to top" with href="#top".
-*/
 	href?: string;
-	/**
-Link target, with href.
-*/
 	target?: string;
-	/**
-Link rel, with href.
-*/
 	rel?: string;
-	/**
-Button type. Default "button".
-*/
 	type?: "button" | "submit" | "reset";
-	/**
-The icon, or the icon then the label when extended.
-*/
 	children?: React.ReactNode;
 };
 const OWN_TRANSITION =
 	"background-color var(--duration-hover) ease, box-shadow var(--duration-hover) ease, " +
 	"color var(--duration-hover) ease, scale var(--duration-press) var(--ease-out-quint)";
-/**
-The floating action button: the site's ink or glass pill cut as a circle for a screen's one action, extended with a label, and safe inside Zoom.
-*/
 export function Fab({
 	ref,
 	variant = "primary",

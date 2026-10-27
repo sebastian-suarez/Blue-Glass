@@ -1,8 +1,4 @@
-/* Checkbox: reference styles, copied from the design system's bundle.css. */
-
 @layer gl-components {
-	/* Checkbox — a native checkbox in a radius-code box: a 1.5px dg-edge border (3:1) on glass-control.
-   Checked and mixed fill with color-ink and an on-ink mark, the primary button's pair (.btn-primary). */
 	.gl-checkbox {
 		--gl-checkbox-size: 20px;
 		--gl-checkbox-line: 20px;
@@ -20,7 +16,6 @@
 		--gl-checkbox-gap: var(--space-xs);
 		--gl-checkbox-pad: 4px;
 	}
-	/* The whole row is the label, so the tap target is the row (32px tall at md), not the 20px box. */
 	.gl-checkbox-row {
 		display: flex;
 		align-items: flex-start;
@@ -37,7 +32,6 @@
 		height: var(--gl-checkbox-size);
 		margin-block: calc((var(--gl-checkbox-line) - var(--gl-checkbox-size)) / 2);
 	}
-	/* The real input lies over the drawn box, transparent: it takes clicks, focus and screen-reader touch. */
 	.gl-checkbox-input {
 		position: absolute;
 		inset: 0;
@@ -78,7 +72,6 @@
 		height: 13px;
 		stroke-width: 2.5;
 	}
-	/* radius-code scaled to the 16px box, so the small box never reads as a radio. */
 	.gl-checkbox-sm .gl-checkbox-box {
 		border-radius: calc(var(--radius-code) - 1px);
 	}
@@ -111,7 +104,6 @@
 	.gl-checkbox-asterisk {
 		color: var(--color-muted);
 	}
-	/* Pulled up to its own label and spaced from the next row, so each hint groups with its option. */
 	.gl-checkbox-helper {
 		display: flex;
 		align-items: flex-start;
@@ -130,8 +122,6 @@
 		height: 14px;
 		margin-top: 2px;
 	}
-
-	/* error: the border and the message turn danger; the message carries the error icon. */
 	.gl-checkbox-error .gl-checkbox-box {
 		border-color: var(--danger);
 	}
@@ -151,8 +141,6 @@
 	.gl-checkbox-disabled .gl-checkbox-row {
 		cursor: not-allowed;
 	}
-
-	/* Press: 0.98 is sub-pixel on a 20px box, so the box takes 0.92 to be felt. */
 	.gl-checkbox:not(.gl-checkbox-disabled)
 		.gl-checkbox-row:active
 		.gl-checkbox-box {

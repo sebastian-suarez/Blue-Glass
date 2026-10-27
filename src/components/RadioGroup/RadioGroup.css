@@ -1,8 +1,4 @@
-/* RadioGroup: reference styles, copied from the design system's bundle.css. */
-
 @layer gl-components {
-	/* RadioGroup and Radio — native radios drawn as circles: a 1.5px dg-edge outline (3:1) on glass-control;
-   chosen = a color-ink ring around an ink dot. The group label is text-label (13px, 600). */
 	.gl-radio-group {
 		display: flex;
 		flex-direction: column;
@@ -47,7 +43,6 @@
 	.gl-radio-group-error .gl-radio-group-asterisk {
 		color: var(--danger);
 	}
-	/* A disabled group dims once, not once per option on top of it. */
 	.gl-radio-group-disabled {
 		opacity: 0.5;
 	}
@@ -74,7 +69,6 @@
 		--gl-radio-gap: var(--space-xs);
 		--gl-radio-pad: 4px;
 	}
-	/* The whole row is the label: a 32px target at md. */
 	.gl-radio-row {
 		display: flex;
 		align-items: flex-start;
@@ -91,7 +85,6 @@
 		height: var(--gl-radio-size);
 		margin-block: calc((var(--gl-radio-line) - var(--gl-radio-size)) / 2);
 	}
-	/* The real input lies over the circle, transparent: it keeps native arrow keys, focus and touch. */
 	.gl-radio-input {
 		outline: 0;
 		position: absolute;
@@ -147,7 +140,6 @@
 	.gl-radio-sm .gl-radio-label {
 		font-size: 13px;
 	}
-	/* Pulled up to its own label and spaced from the next option, so each hint groups with its option. */
 	.gl-radio-helper {
 		margin-top: calc(1px - var(--gl-radio-pad));
 		padding-inline-start: calc(var(--gl-radio-size) + var(--gl-radio-gap));
@@ -171,8 +163,6 @@
 	.gl-radio-disabled .gl-radio-row {
 		cursor: not-allowed;
 	}
-
-	/* Press: 0.98 is sub-pixel on a 20px circle, so the circle takes 0.92 to be felt. */
 	.gl-radio:not(.gl-radio-disabled) .gl-radio-row:active .gl-radio-circle {
 		transform: scale(0.92);
 	}
@@ -194,7 +184,6 @@
 			border-color: var(--ink-hover);
 		}
 	}
-	/* Forced colours paint every background Canvas, which would erase the dot: draw it in a system colour. */
 	@media (forced-colors: active) {
 		.gl-radio-circle::after {
 			background: CanvasText;

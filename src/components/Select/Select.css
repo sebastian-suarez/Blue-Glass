@@ -1,14 +1,4 @@
-/* Select: reference styles, copied from the design system's bundle.css. */
-/* Also styled by ../Autocomplete/styles.css: gl-option-end */
-/* Also styled by ../List/styles.css: gl-option */
-/* Also styled by ../Menu/styles.css: gl-option, gl-option-end, gl-option-icon, gl-option-secondary */
-/* Also styled by ../TextField/styles.css: gl-field-control, gl-field-input */
-/* Also styled by ../TransferList/styles.css: gl-option, gl-option-end */
-/* Also styled by ../../foundation.css: gl-listbox, gl-option, gl-option-end, gl-option-icon, gl-option-secondary, gl-option-text */
-
 @layer gl-components {
-	/* Select — an addition matching MUI's Select. The trigger is the TextField pill (gl-field-control); the list is
-   .gl-listbox in a Popover (the .project-selector material); chips are the site's .chip. */
 	.gl-select-trigger {
 		padding-right: var(--space-md);
 		cursor: pointer;
@@ -24,8 +14,6 @@
 	.gl-field:not(.gl-field-error) .gl-select-trigger[aria-expanded="true"] {
 		border-color: var(--color-ink);
 	}
-
-	/* The value. Every label sits in one grid cell (only the current one visible), so the width stays put. */
 	.gl-select-value {
 		display: grid;
 		flex: 1 1 auto;
@@ -67,9 +55,6 @@
 	.gl-field-readonly .gl-select-trigger {
 		cursor: default;
 	}
-
-	/* multiple: the site's chips inside the pill, inset so their ends sit concentric with it (23px - 15px). The
-   radius is half the control height: identical to the pill on one line, a 23px corner once the chips wrap. */
 	.gl-select-multiple .gl-select-trigger {
 		padding-top: 7px;
 		padding-bottom: 7px;
@@ -86,7 +71,6 @@
 		gap: var(--space-2xs);
 		min-width: 0;
 	}
-	/* .chip */
 	.gl-select-chip {
 		max-width: 100%;
 		overflow: hidden;
@@ -114,12 +98,9 @@
 		width: 16px;
 		height: 16px;
 	}
-	/* The list: rows are gl-option; the check on the chosen row is ink. */
 	.gl-select-listbox .gl-option-end {
 		color: var(--color-ink);
 	}
-
-	/* native: a real <select> filling the pill, the chevron drawn over it. */
 	.gl-select-native-control {
 		padding: 0;
 		cursor: pointer;

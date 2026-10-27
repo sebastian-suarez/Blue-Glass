@@ -1,9 +1,6 @@
 "use client";
 import * as React from "react";
 
-/**
-Shared list navigation and matching, ported from the reference's input-list helpers.
-*/
 export function fold(text: string): string {
 	return text
 		.normalize("NFD")
@@ -11,9 +8,6 @@ export function fold(text: string): string {
 		.toLowerCase();
 }
 
-/**
-The matching range in the original text, before case and accent folding.
-*/
 export function matchRange(
 	text: string,
 	query: string,
@@ -120,9 +114,6 @@ export function isPrintableKey(event: {
 	);
 }
 
-/**
-A 500ms APG typeahead buffer; repeating one letter cycles its matches.
-*/
 export function useTypeahead(timeout = 500) {
 	const searchRef = React.useRef<{
 		text: string;
@@ -185,15 +176,11 @@ export function useTypeahead(timeout = 500) {
 }
 
 function pixels(value: string): number {
-	// Computed lengths include px; Number() cannot parse their unit.
 	// eslint-disable-next-line unicorn/prefer-number-coercion
 	const parsed = Number.parseFloat(value);
 	return Number.isFinite(parsed) ? parsed : 0;
 }
 
-/**
-Scroll only the nearest scrolling ancestor, keeping the page still.
-*/
 export function scrollIntoViewNearest(
 	element: Element | null | undefined,
 ): void {

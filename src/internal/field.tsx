@@ -6,31 +6,16 @@ import { cx } from "./cx.js";
 
 export type FieldShellProps = {
 	rootRef?: React.Ref<HTMLDivElement>;
-	/**
-The component's own root class, e.g. "gl-select".
-*/
 	kind: string;
 	className?: string;
 	style?: React.CSSProperties;
-	/**
-Remaining props for the root element.
-*/
 	rootProps?: Record<string, unknown>;
 	label?: React.ReactNode;
 	labelId: string;
-	/**
-The control's id when it is a labelable element (input, textarea, select).
-*/
 	htmlFor?: string;
-	/**
-For controls that a <label> can't point at (a combobox div): what a label press does.
-*/
 	onLabelClick?: () => void;
 	helperText?: React.ReactNode;
 	helperId: string;
-	/**
-The character counter, already rendered.
-*/
 	counter?: React.ReactNode;
 	error?: boolean;
 	required?: boolean;
@@ -40,9 +25,6 @@ The character counter, already rendered.
 	size?: "sm" | "md";
 	variant?: "outlined" | "filled";
 	multiline?: boolean;
-	/**
-Extra modifier classes on the root.
-*/
 	modifiers?: string | false;
 	children?: React.ReactNode;
 };
@@ -55,9 +37,6 @@ export function hasContent(node: React.ReactNode): boolean {
 		node !== ""
 	);
 }
-/**
-Space-separated ids, skipping empties; undefined when none.
-*/
 
 export function idList(
 	...ids: Array<string | false | null | undefined>
@@ -65,9 +44,6 @@ export function idList(
 	const s = ids.filter(Boolean).join(" ");
 	return s === "" ? undefined : s;
 }
-/**
-Label above, control, then one footer line: helper (or error) on the left, counter on the right.
-*/
 
 export function FieldShell({
 	rootRef,
@@ -148,11 +124,6 @@ export function FieldShell({
 function isText(node: React.ReactNode): boolean {
 	return typeof node === "string" || typeof node === "number";
 }
-/**
-Put a start or end node inside the pill. An InputAdornment passes through
-(given an id if it has none); anything else is wrapped in the same slot.
-`text` is true for a unit such as "ms", which then joins aria-describedby.
-*/
 
 export function renderSlot(
 	node: React.ReactNode,
@@ -204,9 +175,6 @@ export function renderSlot(
 		text: isText(node),
 	};
 }
-/**
-Pressing the pill's padding focuses its input, like pressing the input itself.
-*/
 
 export function focusFromPadding(
 	event: React.MouseEvent<HTMLElement>,

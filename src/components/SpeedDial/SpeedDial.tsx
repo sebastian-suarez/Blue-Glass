@@ -44,9 +44,6 @@ const OPEN_STAGGER = 40;
 const CLOSE_STAGGER = 25;
 const HOVER_CLOSE_DELAY = 160;
 const PIN_WINDOW = 400;
-/**
-`on`, switched after `delay` ms (immediately when delay is 0).
-*/
 function useIsStaggered(isOn: boolean, delay: number): boolean {
 	const isHydrating = useIsHydrating();
 	const [shown, setShown] = React.useState(
@@ -75,57 +72,21 @@ export type SpeedDialProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"hidden" | "children"
 > & {
-	/**
-Accessible name of the trigger, such as "Contact and share". Required: the trigger is icon-only.
-*/
 	ariaLabel: string;
-	/**
-Open (controlled).
-*/
 	open?: boolean;
-	/**
-Open at first (uncontrolled).
-*/
 	defaultOpen?: boolean;
-	/**
-Called when it asks to open, with the reason: toggle, mouseEnter or keyboard.
-*/
 	onOpen?: (event: React.SyntheticEvent, reason: SpeedDialOpenReason) => void;
-	/**
-Called when it asks to close, with the reason: toggle, blur, mouseLeave, escapeKeyDown or actionClick.
-*/
 	onClose?: (
 		event: React.SyntheticEvent | Event,
 		reason: SpeedDialCloseReason,
 	) => void;
-	/**
-The way the actions fan out from the trigger. Default up.
-*/
 	direction?: SpeedDialDirection;
-	/**
-Zoom the whole dial out, closing it; for example while the reader scrolls down.
-*/
 	hidden?: boolean;
-	/**
-The trigger's icon. Default a SpeedDialIcon: a plus that turns 45° into a close.
-*/
 	icon?: React.ReactNode;
-	/**
-Also open on hover with a fine pointer, not only on click. Default true.
-*/
 	openOnHover?: boolean;
-	/**
-Props for the trigger Fab, e.g. size. It stays the ink circle.
-*/
 	FabProps?: Partial<FabProps>;
-	/**
-SpeedDialActions, the one nearest the trigger first.
-*/
 	children?: React.ReactNode;
 };
-/**
-A floating action button that fans out up to five related actions, each a small glass Fab with a label pill.
-*/
 export function SpeedDial({
 	ref,
 	...props
@@ -207,7 +168,6 @@ export function SpeedDial({
 			}
 
 			openedByRef.current = null;
-			// Focus on an action would be lost as it hides: hand it back to the trigger.
 			if (actionsRef.current?.contains(document.activeElement) === true) {
 				fabRef.current?.focus({ preventScroll: true });
 			}
@@ -222,7 +182,6 @@ export function SpeedDial({
 		},
 		[],
 	);
-	// A press outside closes it (Safari never focuses buttons, so blur alone isn't enough).
 	React.useEffect(() => {
 		if (!isOpen) {
 			return;
@@ -245,7 +204,6 @@ export function SpeedDial({
 			document.removeEventListener("pointerup", onUp);
 		};
 	}, [isOpen, doClose]);
-	// Keyboard opening focuses the first action as soon as it is visible.
 	React.useEffect(() => {
 		if (!isOpen || focusIndex === null) {
 			return;
@@ -320,7 +278,7 @@ export function SpeedDial({
 			actions[target].focus();
 			if (document.activeElement !== actions[target]) {
 				setFocusIndex(target);
-			} // Still zooming in
+			}
 		} else if (i > 0) {
 			actions[i - 1].focus();
 		} else if (i === 0) {
@@ -392,14 +350,13 @@ export function SpeedDial({
 
 		const by = openedByRef.current;
 		if (by?.reason === "mouseEnter" && event.timeStamp - by.at < PIN_WINDOW) {
-			openedByRef.current = { reason: "toggle", at: event.timeStamp }; // The click that met a hover-open: keep it open
+			openedByRef.current = { reason: "toggle", at: event.timeStamp };
 			return;
 		}
 
 		doClose(event, "toggle");
 	};
 
-	// Preserve child order and keys when assigning the reference's stagger delays.
 	// eslint-disable-next-line @eslint-react/no-children-to-array
 	const items = React.Children.toArray(children).filter((child) =>
 		React.isValidElement<SpeedDialActionProps>(child),
@@ -485,42 +442,15 @@ export type SpeedDialActionProps = Omit<
 	React.HTMLAttributes<HTMLSpanElement>,
 	"onClick"
 > & {
-	/**
-The action's icon.
-*/
 	icon: React.ReactNode;
-	/**
-The action's name: shown in its label pill, and the button's accessible name.
-*/
 	tooltipTitle: React.ReactNode;
-	/**
-Keep the label pill shown while the dial is open (touch screens have no hover). Otherwise it shows on hover and focus.
-*/
 	tooltipOpen?: boolean;
-	/**
-Side the label sits on. Default left for up and down dials, top for left and right ones.
-*/
 	tooltipPlacement?: "left" | "right" | "top" | "bottom";
-	/**
-Can't be chosen; skipped by the arrow keys.
-*/
 	disabled?: boolean;
-	/**
-Called on click, Enter or Space. The dial then closes, unless you call event.preventDefault().
-*/
 	onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-	/**
-Entry delay in ms. SpeedDial sets it to stagger the actions; leave it unset.
-*/
 	delay?: number;
-	/**
-Props for the action's glass Fab.
-*/
 	FabProps?: Partial<FabProps>;
 };
-/**
-One action of a SpeedDial: a small glass Fab with an ink label pill.
-*/
 export function SpeedDialAction({
 	ref,
 	...props
@@ -586,22 +516,10 @@ export function SpeedDialAction({
 }
 
 export type SpeedDialIconProps = React.HTMLAttributes<HTMLSpanElement> & {
-	/**
-The closed icon. Default a plus, which turns 45° into a close as the dial opens.
-*/
 	icon?: React.ReactNode;
-	/**
-An icon to cross-fade to when open, instead of turning the plus.
-*/
 	openIcon?: React.ReactNode;
-	/**
-Override the dial's open state.
-*/
 	open?: boolean;
 };
-/**
-The trigger's icon: a plus that turns 45° into a close, or a cross-fade to openIcon.
-*/
 export function SpeedDialIcon({
 	ref,
 	icon,

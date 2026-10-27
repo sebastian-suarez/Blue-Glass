@@ -1,10 +1,4 @@
-/* Rating: reference styles, copied from the design system's bundle.css. */
-/* Also styled by ../../foundation.css: gl-sr-only */
-/* Also styled by ../../shared/charts-chrome.css: gl-sr-only */
-
 @layer gl-components {
-	/* Rating — the star glyph (Icon "star"): filled stars in color-blue (a mark, 3.7:1 on the canvas),
-   empty stars as a dg-edge outline (3:1). Partial stars clip the filled glyph over the outline. */
 	.gl-rating {
 		--gl-rating-size: 24px;
 		--gl-rating-h: var(--size-control-sm);
@@ -29,7 +23,6 @@
 		flex: none;
 		border-radius: var(--radius-code);
 	}
-	/* Each star is a full-height slot with no gaps between, so every point of the row picks a value. */
 	.gl-rating-star {
 		position: relative;
 		display: inline-flex;
@@ -62,8 +55,6 @@
 	[dir="rtl"] .gl-rating-fill {
 		clip-path: inset(0 0 0 calc(100% - var(--gl-rating-fill, 100%)));
 	}
-
-	/* The hit area for one step: the whole slot, or its half at precision 0.5. */
 	.gl-rating-hit {
 		position: absolute;
 		inset-block: 0;
@@ -82,8 +73,6 @@
 	.gl-rating-readonly .gl-rating-stars {
 		cursor: default;
 	}
-
-	/* Focus: the ring sits on the focused star; on "No rating", around the whole row. */
 	.gl-rating-star:has(.gl-rating-input:focus-visible) .gl-rating-icon {
 		outline: 3px solid var(--focus);
 		outline-offset: 2px;
@@ -105,8 +94,6 @@
 	.gl-rating-lg .gl-rating-label {
 		font-size: 15px;
 	}
-
-	/* The star under the mouse lifts a little; a press settles it. */
 	.gl-rating-star-hover .gl-rating-icon {
 		transform: scale(1.1);
 	}

@@ -1,10 +1,4 @@
-/* Slider: reference styles, copied from the design system's bundle.css. */
-
 @layer gl-components {
-	/* Slider — an addition matching MUI's Slider. A 4px pill track: color-line rail, color-blue fill (the diagram
-   accent, marks only); a white thumb with the dg-edge edge and shadow-raised (.project-tab[aria-pressed=true]);
-   the value label is an ink pill like .btn-primary. The band around the track is 32px for a mouse and 44px
-   (the size-control tap target, near enough) for touch. */
 	.gl-slider {
 		position: relative;
 		display: inline-block;
@@ -74,7 +68,6 @@
 		inset: 0;
 		display: block;
 	}
-	/* Marks: dg-edge dots on the rail, glass-edge dots on the fill. */
 	.gl-slider-mark {
 		position: absolute;
 		width: 4px;
@@ -110,7 +103,6 @@
 		top: calc(50% + 14px);
 		transform: translateX(-50%);
 	}
-	/* The end labels align to the track's ends instead of hanging past them. */
 	.gl-slider-horizontal .gl-slider-mark-label[data-edge="start"] {
 		transform: none;
 	}
@@ -121,8 +113,6 @@
 		left: calc(50% + 18px);
 		transform: translateY(50%);
 	}
-
-	/* The thumb. */
 	.gl-slider-thumb {
 		position: absolute;
 		display: block;
@@ -166,7 +156,6 @@
 			bottom var(--duration-state) var(--ease-out-quint),
 			height var(--duration-state) var(--ease-out-quint);
 	}
-	/* While dragging the thumb follows the pointer exactly. */
 	.gl-slider[data-dragging] .gl-slider-thumb {
 		transition:
 			border-color var(--duration-hover) ease,
@@ -175,8 +164,6 @@
 	.gl-slider[data-dragging] .gl-slider-track {
 		transition: none;
 	}
-
-	/* Value label: the ink pill above the thumb (left of it when vertical). */
 	.gl-slider-value {
 		position: absolute;
 		bottom: calc(100% + 8px);
@@ -263,7 +250,6 @@
 			transform: translateY(-50%);
 		}
 	}
-	/* Forced colours drop backgrounds: keep the rail and the fill as system colours. */
 	@media (forced-colors: active) {
 		.gl-slider-track {
 			background: Highlight;

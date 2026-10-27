@@ -1,8 +1,4 @@
-/* SpeedDial: reference styles, copied from the design system's bundle.css. */
-
 @layer gl-components {
-	/* SpeedDial — the Fab (.btn-primary as a circle) whose plus turns into a close, fanning out
-   sm glass Fabs (.btn-glass) with ink label pills (the chip's 12px and 5px 11px, on color-ink). */
 	.gl-speed-dial {
 		position: relative;
 		z-index: var(--z-fab);
@@ -25,8 +21,6 @@
 	.gl-speed-dial-fab {
 		pointer-events: auto;
 	}
-
-	/* The actions stay in the layout while hidden; only an open dial takes presses there. */
 	.gl-speed-dial-actions {
 		display: flex;
 		align-items: center;
@@ -58,15 +52,12 @@
 		display: inline-flex;
 		flex: none;
 	}
-	/* The 36px action keeps a 44px target. */
 	.gl-speed-dial-action .gl-fab::after {
 		content: "";
 		position: absolute;
 		inset: -5px;
 		border-radius: inherit;
 	}
-
-	/* Label pill: on color-ink, static with tooltipOpen, else on hover and focus. */
 	.gl-speed-dial-label {
 		position: absolute;
 		padding: 5px 11px;
@@ -106,8 +97,6 @@
 	.gl-speed-dial-action:focus-within .gl-speed-dial-label {
 		opacity: 1;
 	}
-
-	/* The trigger's icon: the plus turns 45° into a close; with openIcon the two cross-fade. */
 	.gl-speed-dial-icon {
 		display: inline-grid;
 		place-items: center;
@@ -139,7 +128,6 @@
 			opacity: 1;
 		}
 	}
-	/* Reduced motion: the close appears without turning; the actions only fade (Zoom), with no stagger. */
 	@media (prefers-reduced-motion: reduce) {
 		.gl-speed-dial-icon > span,
 		.gl-speed-dial-label {

@@ -13,9 +13,6 @@ import {
 	useTypeahead,
 } from "../../internal/input-list.js";
 
-/**
-One item: a string, or an object with a value (its identity) and a label.
-*/
 export type TransferListItem =
 	| string
 	| {
@@ -25,76 +22,28 @@ export type TransferListItem =
 			disabled?: boolean;
 	  };
 export type TransferListValue = {
-	/**
-Items in the first list.
-*/
 	left: TransferListItem[];
-	/**
-Items in the second list.
-*/
 	right: TransferListItem[];
 };
 export type TransferListSelection = {
-	/**
-Values selected in the first list.
-*/
 	left: string[];
-	/**
-Values selected in the second list.
-*/
 	right: string[];
 };
 export type TransferListProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"onChange" | "defaultValue"
 > & {
-	/**
-Both lists (controlled).
-*/
 	value?: TransferListValue;
-	/**
-Both lists at the start (uncontrolled).
-*/
 	defaultValue?: TransferListValue;
-	/**
-Called with both lists after every move.
-*/
 	onChange?: (event: React.SyntheticEvent, value: TransferListValue) => void;
-	/**
-Selected values in each list (controlled).
-*/
 	selected?: TransferListSelection;
-	/**
-Selected values at the start (uncontrolled).
-*/
 	defaultSelected?: Partial<TransferListSelection>;
-	/**
-Called when the selection in either list changes.
-*/
 	onSelectionChange?: (selection: TransferListSelection) => void;
-	/**
-Heading of the first list. Default "Choices".
-*/
 	leftTitle?: React.ReactNode;
-	/**
-Heading of the second list. Default "Chosen".
-*/
 	rightTitle?: React.ReactNode;
-	/**
-Show the move-all buttons. Default true.
-*/
 	showMoveAll?: boolean;
-	/**
-Height of each list in px; longer lists scroll. Default 232 (five rows).
-*/
 	listHeight?: number;
-	/**
-Shown in an empty list. Default "No items".
-*/
 	emptyText?: React.ReactNode;
-	/**
-Dims everything and blocks changes.
-*/
 	disabled?: boolean;
 };
 type Side = "left" | "right";
@@ -279,7 +228,6 @@ function Pane({
 					onKeyDown={onKeyDown}
 					onFocus={() => {
 						setFocused(true);
-						// Reached by Tab (not a press): show the active row's ring straight away.
 						setKeyboard(!pressingRef.current);
 						if (active < 0 || active >= n) {
 							setActive(edgeIndex(1, n, isEnabled));
@@ -348,10 +296,6 @@ function Pane({
 		</Paper>
 	);
 }
-/**
-Two inset wells of selectable rows with a column of glass buttons between them:
-select rows on one side, then move them (or everything) to the other.
-*/
 
 export function TransferList({
 	ref,
