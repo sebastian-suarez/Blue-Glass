@@ -8,7 +8,6 @@ afterEach(() => {
 	cleanup();
 });
 
-// A 1×1 PNG that loads, and bytes that aren't an image, so the photo fails without a network.
 const photo =
 	"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 const broken = "data:image/png;base64,AAAA";
@@ -36,9 +35,6 @@ function size(element: Element): [number, number] {
 	return [Math.round(box.width), Math.round(box.height)];
 }
 
-/**
-The colour a token resolves to, read from a probe element styled with it.
-*/
 function resolvedColour(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.color = `var(${token})`;
@@ -48,9 +44,6 @@ function resolvedColour(token: string): string {
 	return color;
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with what a component shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -58,9 +51,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-Whether the element shows on screen: not hidden or transparent, and with a size.
-*/
 function isShown(element: Element): boolean {
 	const box = element.getBoundingClientRect();
 	return (
@@ -73,10 +63,6 @@ function isShown(element: Element): boolean {
 	);
 }
 
-/**
-Waits for the photo to load: the image named by alt is an <img> showing the source, decoded and
-visible.
-*/
 async function loadedPhoto(name: string, source: string) {
 	return vi.waitFor(
 		() => {
@@ -95,26 +81,16 @@ async function loadedPhoto(name: string, source: string) {
 	);
 }
 
-/**
-Checks that no photo shows. A failed one may stay in the document, hidden; one still exposed to
-assistive tech would also make the avatar's role query find two images.
-*/
 function expectNoPhotoShown() {
 	for (const image of document.querySelectorAll("img")) {
 		expect(isShown(image)).toBe(false);
 	}
 }
 
-/**
-The first people as lettered avatars, the children of a group.
-*/
 function avatars(count: number) {
 	return people.slice(0, count).map((name) => <Avatar key={name} alt={name} />);
 }
 
-/**
-Checks that a group shows the first people, in reading order, and none of the rest.
-*/
 function expectShown(element: HTMLElement, count: number) {
 	const shown = people
 		.slice(0, count)
@@ -372,7 +348,6 @@ describe("AvatarGroup", () => {
 	});
 
 	test('the "+N" is read as "N more"', () => {
-		// A link takes its name from its content, so its name is what the group reads as.
 		render(
 			<a href="#reviewers">
 				<AvatarGroup max={3}>{avatars(5)}</AvatarGroup>
@@ -455,7 +430,6 @@ describe("AvatarGroup", () => {
 				</div>
 			</>,
 		);
-		// As the README says: on a glass panel, set the variable to the panel's colour.
 		panel.current?.style.setProperty("--gl-avatar-ring", "rgb(10, 20, 30)");
 		const canvas = resolvedColour("--color-canvas");
 		for (const item of within(group("On the canvas")).getAllByRole("img")) {
@@ -478,7 +452,6 @@ describe("AvatarGroup", () => {
 			</AvatarGroup>,
 		);
 		const [first, second] = within(group("Reviewers")).getAllByRole("img");
-		// 2px inside an avatar's right edge lies in its overlap with the next: what's drawn there is on top.
 		const topOver = (element: Element) => {
 			const box = element.getBoundingClientRect();
 			return document.elementFromPoint(

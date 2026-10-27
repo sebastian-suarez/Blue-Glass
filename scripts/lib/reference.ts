@@ -1,22 +1,11 @@
-/**
-Facts read from the exported reference in design-system/: module categories, exports,
-the stylesheet's section order and what each preview uses. Every script and gate that
-needs them reads them here, so there's one interpretation of the reference.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export type Preview = {
-	/**
-	"components/Button" or "sections/Hero".
-	*/
 	id: string;
 	kind: "component" | "section";
 	name: string;
-	/**
-	Absolute path of its preview.html.
-	*/
 	file: string;
 };
 
@@ -32,9 +21,6 @@ const byName = (a: string, b: string) => a.localeCompare(b);
 const read = (relative: string) =>
 	fs.readFileSync(path.join(designSystem, relative), "utf8");
 
-/**
-Component folder names in design-system/components, sorted.
-*/
 export function componentNames(): string[] {
 	return fs
 		.readdirSync(path.join(designSystem, "components"))
@@ -44,16 +30,10 @@ export function componentNames(): string[] {
 		.toSorted(byName);
 }
 
-/**
-Section folder names in design-system/sections, sorted.
-*/
 export function sectionNames(): string[] {
 	return fs.readdirSync(path.join(designSystem, "sections")).toSorted(byName);
 }
 
-/**
-Each component folder's original module path, from its api.d.ts header ("// inputs/Button").
-*/
 export function modulePaths(): Map<string, string> {
 	const map = new Map<string, string>();
 	for (const name of componentNames()) {
@@ -70,11 +50,6 @@ export function modulePaths(): Map<string, string> {
 	return map;
 }
 
-/**
-The public surface in source/index.d.ts, grouped by original module path. Values are
-`export declare const|function`; types are `export interface|type`. The lines before the
-first header belong to internal/position.
-*/
 export function exportsByModule(): Map<string, Surface> {
 	const sections = new Map<string, Surface>();
 	let current = "internal/position";
@@ -105,9 +80,6 @@ export function exportsByModule(): Map<string, Surface> {
 	return sections;
 }
 
-/**
-The component folder that owns each original module path. internal/position is Popper's public API.
-*/
 export function ownerOfModule(): Map<string, string> {
 	const owners = new Map<string, string>([["internal/position", "Popper"]]);
 	for (const [folder, modulePath] of modulePaths()) {
@@ -117,14 +89,9 @@ export function ownerOfModule(): Map<string, string> {
 	return owners;
 }
 
-// The reference doesn't change while a process runs, and the gates ask for these thousands of
-// times (each scope reads all 71 previews), so they're computed once.
 let valueOwnersCache: ReadonlyMap<string, string> | undefined;
 const previewUsesCache = new Map<string, readonly string[]>();
 
-/**
-The component folder that owns each exported value.
-*/
 export function valueOwners(): ReadonlyMap<string, string> {
 	valueOwnersCache ??= computeValueOwners();
 	return valueOwnersCache;
@@ -164,13 +131,9 @@ function sectionKey(heading: string): string {
 		: (/^(?<word>[A-Za-z]+)/v.exec(h)?.groups?.word ?? "unknown");
 }
 
-/**
-The comment heading a bundle.css section: the first comment from two lines before its layer rule to three after.
-*/
 function headingAt(lines: string[], index: number): string {
 	const end = Math.min(lines.length, index + 4);
 	for (let line = Math.max(0, index - 2); line < end; line++) {
-		// Headings can contain "*" themselves (".text-*", ".gl-dg-*"), so read up to "*/" or the line's end.
 		const comment = /^\s*\/\*(?<text>.+?)(?:\*\/|$)/v.exec(lines[line]);
 		if (comment?.groups) {
 			return comment.groups.text;
@@ -180,11 +143,6 @@ function headingAt(lines: string[], index: number): string {
 	return "";
 }
 
-/**
-Section keys of source/bundle.css in cascade order, split the way
-design-system/tools/build_reference.py splits it: a section starts at each line beginning
-with a layer rule, and the comment around it names the section.
-*/
 export function cssSectionOrder(): string[] {
 	const lines = read("source/bundle.css").split("\n");
 	const order: string[] = [];
@@ -202,9 +160,6 @@ export function cssSectionOrder(): string[] {
 	return order;
 }
 
-/**
-Every preview: the 66 component previews, then the 5 section previews.
-*/
 export function previews(): Preview[] {
 	const entry = (kind: Preview["kind"], name: string): Preview => {
 		const folder = kind === "component" ? "components" : "sections";
@@ -222,9 +177,6 @@ export function previews(): Preview[] {
 	];
 }
 
-/**
-The inline script of a preview page.
-*/
 export function previewScript(file: string): string {
 	const script = /<script>(?<body>[\s\S]*?)<\/script>/v.exec(
 		fs.readFileSync(file, "utf8"),
@@ -236,10 +188,6 @@ export function previewScript(file: string): string {
 	return script;
 }
 
-/**
-Exported values a preview's script reads. The scripts are minified, so this matches
-`x.Name` for every exported Name; a false positive only makes a preview wait longer.
-*/
 export function previewUses(file: string): string[] {
 	const cached = previewUsesCache.get(file);
 	if (cached !== undefined) {

@@ -1,7 +1,3 @@
-// Behaviour specs for Fab, from design-system/components/Fab/README.md and api.d.ts. Fab is a
-// plain React port, so the specs find it by role and name, and read its looks through the tokens
-// the README names, resolved on a probe element. A press runs through Chromium's own mouse input
-// (CDP), so :active holds while the button stays down.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -9,17 +5,10 @@ import { cdp, userEvent } from "vitest/browser";
 import "#ui/styles.css";
 import { Fab, type FabProps, Icon, Zoom } from "#ui";
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
 
-/**
-Parks the pointer in the page's bottom-left corner, clear of every Fab below: one rendered under
-a resting pointer would be hovered without a move.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -38,7 +27,6 @@ beforeEach(async () => {
 
 afterEach(() => {
 	cleanup();
-	// Link Fabs follow hash hrefs; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
@@ -70,9 +58,6 @@ function dimensions(element: Element): [number, number] {
 	return [Math.round(width), Math.round(height)];
 }
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -80,10 +65,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-What a token resolves to, read from a probe element styled with it. A blur token goes through
-blur(), as backdrop-filter takes it.
-*/
 function resolved(
 	property:
 		| "backgroundColor"
@@ -105,17 +86,11 @@ function resolved(
 	return value;
 }
 
-/**
-The alpha of a computed colour: rgb() is opaque, rgba() carries its own.
-*/
 function alphaOf(color: string): number {
 	const channels = color.match(/[\d.]+/gv) ?? [];
 	return channels.length === 4 ? Number(channels[3]) : 1;
 }
 
-/**
-The first text node holding the text, wherever the port wraps it.
-*/
 function textNode(element: Element, text: string): Node {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -127,9 +102,6 @@ function textNode(element: Element, text: string): Node {
 	throw new Error(`No text "${text}" in the element`);
 }
 
-/**
-The element's transitions, each property with its duration as computed ("0.16s").
-*/
 function transitionsOf(element: Element): Map<string, string> {
 	const style = getComputedStyle(element);
 	const properties = style.transitionProperty.split(", ");
@@ -142,9 +114,6 @@ function transitionsOf(element: Element): Map<string, string> {
 	);
 }
 
-/**
-A point in the test page's own coordinates, in the coordinates Chromium's input takes.
-*/
 function inputPoint(element: Element): { x: number; y: number } {
 	const frame = window.frameElement;
 	const offset = frame ? box(frame) : { left: 0, top: 0 };
@@ -160,9 +129,6 @@ function inputPoint(element: Element): { x: number; y: number } {
 	};
 }
 
-/**
-Holds the mouse button down on the element while `whilePressed` runs, then lets go.
-*/
 async function press(
 	element: Element,
 	whilePressed: () => Promise<void>,
@@ -194,9 +160,6 @@ function Around({ children }: { readonly children: React.ReactNode }) {
 	);
 }
 
-/**
-Waits until a Fab inside Zoom has entered: shown, opaque and unscaled.
-*/
 async function entered(fab: HTMLElement): Promise<void> {
 	await expect
 		.poll(() => {
@@ -566,7 +529,6 @@ describe("Fab: disabled", () => {
 		expect(onClick).not.toHaveBeenCalled();
 	});
 
-	// An <a> has no disabled attribute; the reference marks it aria-disabled and drops the href.
 	test("a disabled link Fab is aria-disabled, and neither follows its href nor calls onClick", async () => {
 		const onClick = vi.fn<() => void>();
 		render(
@@ -636,7 +598,6 @@ describe("Fab: inside Zoom", () => {
 			</>,
 		);
 		const alone = transitionsOf(button("Alone"));
-		// Its own: the fill, shadow and colour over duration-hover, the press over duration-press.
 		const hover = resolved("transitionDuration", "--duration-hover");
 		const pressDuration = resolved("transitionDuration", "--duration-press");
 		expect(alone.get("background-color")).toBe(hover);

@@ -1,6 +1,3 @@
-// Behaviour specs for Tabs, Tab and TabPanel, from design-system/components/Tabs/README.md and
-// api.d.ts. They run at the default test viewport (414px wide), where the side variant is a row
-// of tabs, except its Up and Down keys, which run at a desktop width.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -44,9 +41,6 @@ type SectionsProps = React.ComponentProps<typeof Tabs> & {
 
 const none: readonly string[] = [];
 
-/**
-The preview's default tabs: four tabs, then a panel for each.
-*/
 function Sections({ disabledTabs = none, ...props }: Readonly<SectionsProps>) {
 	return (
 		<Tabs aria-label="Sections" {...props}>
@@ -77,9 +71,6 @@ const employers = [
 	"Gorilla Logic",
 ];
 
-/**
-The preview's scrolling row: seven pill tabs in a box too narrow for them.
-*/
 function Employers(props: Readonly<TabsProps>) {
 	return (
 		<div style={{ width: 240 }}>
@@ -92,9 +83,6 @@ function Employers(props: Readonly<TabsProps>) {
 	);
 }
 
-/**
-The default tabs with value and onChange kept in a parent's state.
-*/
 function ControlledSections() {
 	const [value, setValue] = React.useState<TabValue | false>("work");
 	return (
@@ -120,9 +108,6 @@ function textOf(value: string): string {
 	return section.text;
 }
 
-/**
-A tab's disabled state, whether it's the native attribute or aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		(element instanceof HTMLButtonElement && element.disabled) ||
@@ -130,9 +115,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Waits until `name` is the one selected tab and its panel the one panel shown.
-*/
 async function expectChosen(name: string): Promise<void> {
 	await vi.waitFor(() => {
 		const chosen = screen.getAllByRole("tab", { selected: true });
@@ -144,18 +126,12 @@ async function expectChosen(name: string): Promise<void> {
 	});
 }
 
-/**
-Presses `key` and waits for focus and the selection to land on the tab named `name`.
-*/
 async function press(key: string, name: string): Promise<void> {
 	await userEvent.keyboard(key);
 	await expect.element(tab(name)).toHaveFocus();
 	await expectChosen(name);
 }
 
-/**
-Puts focus on a button before the tabs, so Tab enters the tab list the way a reader does.
-*/
 function focusBefore(): HTMLElement {
 	const before = screen.getByRole("button", { name: "Before" });
 	before.focus();
@@ -164,9 +140,6 @@ function focusBefore(): HTMLElement {
 
 const looks = ["underline", "pill", "side"] as const;
 
-/**
-Checks that the root carries the look's class from styles.css, and no other look's.
-*/
 function expectLook(root: HTMLElement | null, look: string) {
 	for (const name of looks) {
 		if (name === look) {
@@ -177,9 +150,6 @@ function expectLook(root: HTMLElement | null, look: string) {
 	}
 }
 
-/**
-Whether `later` comes after `earlier` in document order.
-*/
 function isBefore(earlier: Node, later: Node): boolean {
 	const range = document.createRange();
 	range.setStartBefore(earlier);
@@ -187,9 +157,6 @@ function isBefore(earlier: Node, later: Node): boolean {
 	return range.comparePoint(later, 0) === 1;
 }
 
-/**
-The element an id names, if it's in the document.
-*/
 function byId(id: string | null): HTMLElement | null {
 	return id === null || id === ""
 		? null
@@ -209,9 +176,6 @@ function scrollingRow(element: HTMLElement): HTMLElement {
 	throw new Error("the tab isn't in a scrolling row");
 }
 
-/**
-Whether the tab lies inside the visible part of the row that scrolls it.
-*/
 function isInView(element: HTMLElement): boolean {
 	const row = scrollingRow(element).getBoundingClientRect();
 	const box = element.getBoundingClientRect();
@@ -493,7 +457,6 @@ describe("Tabs", () => {
 		);
 		expect(isDisabled(tab("Projects"))).toBe(true);
 		expect(isDisabled(tab("Work"))).toBe(false);
-		// Forced: Playwright won't press an element that says it's disabled.
 		await userEvent.click(tab("Projects"), { force: true });
 		await expectChosen("Work");
 		expect(onChange).not.toHaveBeenCalled();
@@ -708,7 +671,6 @@ describe("Tabs", () => {
 		});
 		expect(isInView(tab("Gorilla Logic"))).toBe(false);
 		rerender(<Employers value="Gorilla Logic" />);
-		// The row may scroll smoothly.
 		await vi.waitFor(
 			() => {
 				expect(isInView(tab("Gorilla Logic"))).toBe(true);
@@ -846,7 +808,6 @@ describe("Tabs keyboard", () => {
 	});
 
 	describe("the side variant at a desktop width", () => {
-		// Above 700px the side selector is a column beside its panels, so its keys run up and down.
 		beforeEach(async () => {
 			await page.viewport(1280, 900);
 		});
@@ -895,7 +856,6 @@ describe("Tabs keyboard", () => {
 		await userEvent.keyboard(" ");
 		await userEvent.keyboard("{Enter}");
 		expect(tab("Projects").getAttribute("aria-selected")).toBe("false");
-		// Without the handler Space selects, as a click on the button does.
 		tab("Contact").focus();
 		await userEvent.keyboard(" ");
 		await expect

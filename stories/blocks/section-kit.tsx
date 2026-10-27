@@ -1,25 +1,14 @@
-/**
-What the five section previews (design-system/sections/<Name>/preview.html) share, ported
-exactly: the page each section brings instead of the frame, the site's content column and the
-site owner's details. Section stories set `parameters.frame: false` and render `SectionPage`.
-*/
 import type { CSSProperties, ReactNode } from "react";
 import {
 	LightField,
 	type LightFieldProps,
 } from "../../src/components/LightField/index.ts";
 
-/**
-The site's content column: `--size-wrap` wide, or 90% of a narrower window, centred.
-*/
 export const wrap: CSSProperties = {
 	width: "min(var(--size-wrap), 90%)",
 	marginInline: "auto",
 };
 
-/**
-The site owner, as the previews name him.
-*/
 export const profile = {
 	name: "Sebastian Suarez",
 	role: "Backend lead and architect",
@@ -28,10 +17,6 @@ export const profile = {
 	fullName: "Sebastian Suarez Valencia",
 } as const;
 
-/**
-A section's page: the canvas with its own LightField behind, the preview's note at the top,
-then the section.
-*/
 export function SectionPage({
 	field = "top",
 	note,

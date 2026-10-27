@@ -1,8 +1,3 @@
-// Behaviour specs for Popover, from design-system/components/Popover/README.md and api.d.ts, with
-// the Modal README for the transparent modal layer it sits on and the flags it passes through
-// (focus in and kept in, Escape, outside presses, scroll lock, the page hidden from assistive
-// tech: docs/deviations.md entry 7). Placement is checked by geometry against the anchor, at the
-// default 414 × 896 test viewport.
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, type Mock, test, vi } from "vitest";
@@ -13,7 +8,6 @@ import { type Placement, Popover, type PopoverProps } from "#ui";
 
 afterEach(async () => {
 	cleanup();
-	// Every layer is gone: the page scrolls and is exposed to assistive tech again.
 	await expect.poll(() => isScrollLocked()).toBe(false);
 	await expect
 		.poll(
@@ -28,34 +22,18 @@ type Box = { left: number; top: number; width: number; height: number };
 
 const shareName = "Share this project";
 
-/**
-The middle of the viewport, with room for the popover on every side.
-*/
 const middle: Box = { left: 157, top: 430, width: 100, height: 36 };
 
 type SharePageProps = Omit<PopoverProps, "open" | "anchorEl" | "onClose"> & {
 	readonly onClose?: OnClose;
-	/**
-	Whether the parent sets open to false when onClose asks, as the README's usage does.
-	*/
 	readonly closes?: boolean;
-	/**
-	Where the anchor sits, fixed in the viewport.
-	*/
 	readonly at?: Box;
-	/**
-	What a press on the page's After button does.
-	*/
 	readonly onAfter?: () => void;
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
 const shareButtonAt = { left: 150, top: 240, width: 100, height: 36 };
 
-/**
-The README's usage on a page: text and a button before the anchor, one after it, and a
-controlled Popover anchored to the Share button, named with role and aria-label.
-*/
 function SharePage({
 	onClose,
 	closes = true,
@@ -116,14 +94,10 @@ function ShareActions({ isMarked = false }: { readonly isMarked?: boolean }) {
 	);
 }
 
-/**
-Opens the popover from its anchor, as a person does, and waits until it shows.
-*/
 async function openPopover(): Promise<{
 	anchor: HTMLElement;
 	surface: HTMLElement;
 }> {
-	// Found before opening: once open, the page may be hidden from assistive tech.
 	const anchor = screen.getByRole("button", { name: "Share" });
 	await userEvent.click(anchor);
 	const surface = await vi.waitFor(() =>
@@ -142,16 +116,10 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-The DOM event behind a callback's event, whether it came wrapped or native.
-*/
 function nativeOf(event: React.SyntheticEvent | Event): Event {
 	return event instanceof Event ? event : event.nativeEvent;
 }
 
-/**
-What onClose got on its only call.
-*/
 function onlyClose(
 	onClose: Mock<OnClose>,
 ): [React.SyntheticEvent | KeyboardEvent, string] {
@@ -164,9 +132,6 @@ function onlyClose(
 	return [event, reason];
 }
 
-/**
-Whether the page can't scroll: what a scroll lock sets on the viewport's scroller.
-*/
 function isScrollLocked(): boolean {
 	return [document.documentElement, document.body].some((element) =>
 		/^(?:hidden|clip)$/v.test(getComputedStyle(element).overflowY),
@@ -177,9 +142,6 @@ function isHiddenFromAssistiveTech(element: Element): boolean {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
 
-/**
-A few rendering frames: long enough for anything an opening popover does to focus.
-*/
 async function frames(count = 3): Promise<void> {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -189,14 +151,8 @@ async function frames(count = 3): Promise<void> {
 	}
 }
 
-// Rounding and subpixel layout, not a misplacement.
 const tolerance = 1.5;
 
-/**
-How the surface misses the placement against the anchor: on the side, the gap away from it;
-along the side, its start or end edge lined up with the anchor's, or its centre with the
-anchor's. Empty when it sits right.
-*/
 function misplacement(
 	anchor: { getBoundingClientRect(): DOMRect },
 	surface: Element,
@@ -273,7 +229,6 @@ const placements = [
 	"right-end",
 ] as const satisfies readonly Placement[];
 
-// A fixed-size surface, small enough to fit on any side of the middle anchor.
 const card: React.CSSProperties = { width: 120, height: 64 };
 
 describe("the surface", () => {
@@ -507,8 +462,6 @@ describe("closing", () => {
 		});
 		const [event, reason] = onlyClose(onClose);
 		expect(reason).toBe("escapeKeyDown");
-		// The documented union takes the native event or a SyntheticEvent around it, which the
-		// Base UI ports pass (src/internal/events.ts).
 		const native = nativeOf(event);
 		expect(native).toBeInstanceOf(KeyboardEvent);
 		expect((native as KeyboardEvent).key).toBe("Escape");
@@ -522,7 +475,6 @@ describe("closing", () => {
 		render(<SharePage onClose={onClose} onAfter={onAfter} />);
 		const after = button("After");
 		const { anchor } = await openPopover();
-		// Force: the transparent layer over the page takes the press, as it should.
 		await userEvent.click(after, { force: true });
 		await vi.waitFor(() => {
 			expect(onClose).toHaveBeenCalled();
@@ -655,7 +607,6 @@ describe("focus", () => {
 			act(() => {
 				after.focus();
 			});
-			// Nothing pulls it back, then or a few frames later.
 			await frames();
 			expect(after).toHaveFocus();
 			expect(isHiddenFromAssistiveTech(after)).toBe(false);

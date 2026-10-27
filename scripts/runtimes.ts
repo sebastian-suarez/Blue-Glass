@@ -1,17 +1,3 @@
-/**
-Builds the browser runtimes the preview pages run on, into .cache/runtimes/:
-
-- react.js: React 19 in production, as the globals the previews expect (window.React and
-  window.ReactDOM, which also carries createRoot and hydrateRoot), plus the JSX runtime.
-- reference.js and package.js: window.BlueGlass, from the reassembled reference
-  (npm run reference) and from src/, with React mapped to those globals so both share one
-  React. The only difference between the two pages is the component code.
-- reference.node.mjs: the reference for Node, for server rendering (the package's own
-  build in dist/ serves that purpose for the package).
-- reference.css and package.css: the two stylesheets.
-
-Usage: node scripts/runtimes.ts [--only reference|package]
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -28,19 +14,14 @@ const globals: Record<string, string> = {
 	"react-dom/client": "window.ReactDOM",
 	"react/jsx-runtime": "window.ReactJSXRuntime",
 	"react/jsx-dev-runtime": "window.ReactJSXRuntime",
-	// Storybook's renderer imports it lazily for act(), which the story checks never call.
 	"react-dom/test-utils": "{}",
 };
 
-// The filters run in Go's regexp engine inside esbuild, which rejects JavaScript flags.
 // eslint-disable-next-line require-unicode-regexp
 const reactEntryPoint = /^react(?:-dom)?(?:\/.*)?$/;
 // eslint-disable-next-line require-unicode-regexp
 const anyPath = /.*/;
 
-/**
-Resolves React's entry points to the globals react.js sets.
-*/
 export const reactGlobals: Plugin = {
 	name: "react-globals",
 	setup(builder) {
@@ -68,7 +49,6 @@ const shared = {
 	jsx: "automatic" as const,
 	define: { "process.env.NODE_ENV": '"production"' },
 	logLevel: "warning" as const,
-	// The root tsconfig is for Node; the bundles only need esbuild's defaults.
 	tsconfigRaw: { compilerOptions: { jsx: "react-jsx" as const } },
 };
 
@@ -107,7 +87,6 @@ async function buildBlueGlass(
 		format: "iife",
 		globalName: "BlueGlass",
 		plugins: [reactGlobals],
-		// Mermaid is loaded at runtime: the reference fetches a script, the package imports it.
 		external: ["mermaid"],
 	});
 }

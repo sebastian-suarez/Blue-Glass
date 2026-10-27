@@ -1,9 +1,3 @@
-/*
-Proof against real Base UI components in Chromium: each interaction the reference has makes
-Base UI report a reason that maps to the documented one, a React event our own handler saw is
-passed on as is, and everything else arrives wrapped around the native event. A warning from
-an unknown reason fails any test.
-*/
 import { Combobox } from "@base-ui/react/combobox";
 import { Dialog } from "@base-ui/react/dialog";
 import { Drawer } from "@base-ui/react/drawer";
@@ -27,14 +21,8 @@ import {
 } from "./events.js";
 
 type Report = {
-	/**
-	The Base UI callback that reported: an open change, a value change or a text change.
-	*/
 	callback: "open" | "value" | "input";
 	reason: string;
-	/**
-	The documented reason Base UI's maps to.
-	*/
 	documented: string | undefined;
 	event: React.SyntheticEvent;
 	native: Event;
@@ -47,7 +35,6 @@ beforeEach(() => {
 	reports = [];
 	const warn = vi.spyOn(console, "warn");
 	cleanups.push(() => {
-		// Every reason Base UI reported was in a table.
 		expect(warn).not.toHaveBeenCalled();
 		warn.mockRestore();
 	});
@@ -75,10 +62,6 @@ function report(
 	});
 }
 
-/**
-An onOpenChange that reports each close and closes only for a documented reason, as the
-ports will.
-*/
 function closeWith<Reason extends string>(
 	map: (reason: Reason) => string | undefined,
 	setOpen: (isOpen: boolean) => void,
@@ -97,9 +80,6 @@ function closeWith<Reason extends string>(
 	};
 }
 
-/**
-What a callback reported: [Base UI's reason, the documented one].
-*/
 function reported(
 	callback: Report["callback"],
 ): Array<[string, string | undefined]> {
@@ -155,10 +135,6 @@ function byText(text: string): HTMLElement {
 	return element;
 }
 
-/**
-A press on the page outside every popup. `force` presses whatever is at that point, such as
-a modal popup's internal backdrop, as a person would.
-*/
 async function pressOutside(): Promise<void> {
 	await userEvent.click(document.body, {
 		force: true,
@@ -166,9 +142,6 @@ async function pressOutside(): Promise<void> {
 	});
 }
 
-/**
-Where the popups anchor, away from the corner pressOutside uses.
-*/
 function Anchor({ ref }: { ref: React.Ref<HTMLButtonElement> }) {
 	return (
 		<button
@@ -268,9 +241,6 @@ describe("Dialog → ModalCloseReason", () => {
 });
 
 describe("Menu → MenuCloseReason", () => {
-	/**
-	The React event our own onClick on the item received.
-	*/
 	let clicked: React.MouseEvent | undefined;
 
 	function Case() {
@@ -308,7 +278,6 @@ describe("Menu → MenuCloseReason", () => {
 		await userEvent.click(byText("Copy link"));
 		const close = await waitForClose();
 		expect(reported("open")).toEqual([["item-press", "itemClick"]]);
-		// The very event React handed our onClick, not a wrapper around the same native event.
 		expect(clicked).toBeDefined();
 		expect(close.event).toBe(clicked);
 		expect(close.event.nativeEvent).toBe(close.native);
@@ -366,8 +335,6 @@ describe("Menu → MenuCloseReason", () => {
 	});
 
 	test("anchored with no trigger, Base UI lets Tab move focus out and stays open", async () => {
-		// So the Menu port closes on Tab itself, as the reference's MenuList does, with the real
-		// React KeyboardEvent from its own handler.
 		await mount(<Case />);
 		await userEvent.keyboard("{ArrowDown}");
 		expect(document.activeElement).toBe(byText("Copy link"));
@@ -535,9 +502,6 @@ describe("Combobox → the Autocomplete reasons", () => {
 					);
 				}}
 				onInputValueChange={(next, details) => {
-					// Base UI repeats a text it already set (a clear sets the text, then the value,
-					// which sets the text again); the reference reports a text once, so the port
-					// skips repeats, as here.
 					if (next === textRef.current) {
 						return;
 					}
@@ -623,7 +587,6 @@ describe("Combobox → the Autocomplete reasons", () => {
 			expect(reported("value")).toEqual([["input-clear", "clear"]]);
 		});
 		expect(reported("input")).toEqual([["input-change", "input"]]);
-		// Typing never closes the reference's popup: the close Base UI asks for maps to nothing.
 		expect(
 			reported("open").every(([, documented]) => documented === undefined),
 		).toBe(true);

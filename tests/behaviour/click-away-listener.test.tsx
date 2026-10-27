@@ -1,6 +1,3 @@
-// Behaviour specs for ClickAwayListener, from design-system/components/ClickAwayListener/README.md
-// and api.d.ts: a press outside its one child calls onClickAway with the DOM event that counts.
-// Vitest's userEvent has no touch, so the touch specs dispatch TouchEvents on the page.
 import { act, cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { createPortal } from "react-dom";
@@ -15,9 +12,6 @@ afterEach(() => {
 
 type OnClickAway = ClickAwayListenerProps["onClickAway"];
 
-/**
-A button outside, and the listener around a panel with a button and some text inside.
-*/
 function Panel(props: Omit<ClickAwayListenerProps, "children">) {
 	return (
 		<>
@@ -36,9 +30,6 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-A touch on the page, as a finger's touchstart or touchend reaches it.
-*/
 function touch(target: Element, type: "touchstart" | "touchend"): void {
 	act(() => {
 		target.dispatchEvent(
@@ -47,9 +38,6 @@ function touch(target: Element, type: "touchstart" | "touchend"): void {
 	});
 }
 
-/**
-The event onClickAway got on its only call.
-*/
 function onlyEvent(onClickAway: Mock<OnClickAway>) {
 	expect(onClickAway).toHaveBeenCalledTimes(1);
 	const [event] = onClickAway.mock.calls[0] ?? [];
@@ -77,7 +65,6 @@ describe("the mouse", () => {
 		await userEvent.click(button("Inside"));
 		await userEvent.click(screen.getByText("Press outside to close."));
 		expect(onClickAway).not.toHaveBeenCalled();
-		// It was listening all along: a press outside still counts.
 		await userEvent.click(button("Outside"));
 		expect(onClickAway).toHaveBeenCalledTimes(1);
 	});
@@ -139,7 +126,6 @@ describe("the mouse", () => {
 		render(<Panel mouseEvent={false} onClickAway={onClickAway} />);
 		await userEvent.click(button("Outside"));
 		expect(onClickAway).not.toHaveBeenCalled();
-		// Touch still counts, so the listener is there.
 		touch(button("Outside"), "touchend");
 		expect(onClickAway).toHaveBeenCalledTimes(1);
 	});
@@ -149,8 +135,6 @@ describe("touch", () => {
 	test("touchEvent onTouchEnd, the default, counts a touch that ends outside, not one that starts there or lands inside", async () => {
 		const onClickAway = vi.fn<OnClickAway>();
 		render(<Panel mouseEvent={false} onClickAway={onClickAway} />);
-		// Listening starts a tick after mounting; a real press lets it pass, and shows the mouse is
-		// ignored.
 		await userEvent.click(button("Outside"));
 		touch(button("Outside"), "touchstart");
 		touch(button("Inside"), "touchend");
@@ -183,7 +167,6 @@ describe("touch", () => {
 	test("touchEvent={false} ignores touch", async () => {
 		const onClickAway = vi.fn<OnClickAway>();
 		render(<Panel touchEvent={false} onClickAway={onClickAway} />);
-		// The mouse still counts, so the listener is there.
 		await userEvent.click(button("Outside"));
 		expect(onClickAway).toHaveBeenCalledTimes(1);
 		touch(button("Outside"), "touchstart");
@@ -208,7 +191,6 @@ describe("the notes", () => {
 						Show the panel
 					</button>
 					{isShown ? (
-						// With onClick, the very click that mounts it would reach it without the tick.
 						<ClickAwayListener mouseEvent="onClick" onClickAway={onClickAway}>
 							<div role="group" aria-label="Panel">
 								Panel
@@ -223,7 +205,6 @@ describe("the notes", () => {
 		await userEvent.click(button("Show the panel"));
 		expect(screen.getByRole("group", { name: "Panel" })).toBeInTheDocument();
 		expect(onClickAway).not.toHaveBeenCalled();
-		// The next press outside counts.
 		await userEvent.click(button("Show the panel"));
 		expect(onClickAway).toHaveBeenCalledTimes(1);
 	});

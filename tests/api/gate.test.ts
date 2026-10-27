@@ -1,9 +1,3 @@
-/**
-Proves the API gate while nothing is in scope: the checks for phase 5 compile against the
-documented types themselves, and each fixture in tests/api/fixtures, a copy of the documented
-API with a planted break, fails exactly the checks that cover the break, with a message that
-names it. The export check gets the same treatment.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, expect, test } from "vitest";
@@ -26,13 +20,7 @@ const full = scope(5);
 const none: Allowlist = { exports: new Map(), checks: new Map() };
 
 type Expectation = {
-	/**
-	Exactly the ids that must fail: a list, or a test that picks them from every check's id.
-	*/
 	failing: string[] | ((id: string) => boolean);
-	/**
-	What the report must say.
-	*/
 	says: string[];
 };
 
@@ -54,7 +42,6 @@ const mutations: Record<string, Expectation> = {
 		],
 	},
 	callback: {
-		// ToggleButton#jsx passes: JSX compares the method bivariantly.
 		failing: [
 			"CheckboxProps.onChange",
 			"Checkbox#props",
@@ -115,9 +102,6 @@ const mutations: Record<string, Expectation> = {
 		],
 	},
 	generic: {
-		// The props whose types use the parameter, and every check of Autocomplete's
-		// instantiations but one: JSX that leaves the type argument to inference, with the
-		// default option type, still compiles.
 		failing: (id) =>
 			[
 				"AutocompleteProps.options",
@@ -154,10 +138,6 @@ const mutations: Record<string, Expectation> = {
 	},
 };
 
-/**
-A copy of the documented API that lists its exports, minus `without`. A star export can't
-leave a name out, so this one is written here instead of kept in tests/api/fixtures.
-*/
 function writeExplicitCopy(name: string, without: string[]): string {
 	const file = path.join(out, `${name}.d.ts`);
 	const from = JSON.stringify(
@@ -181,9 +161,6 @@ function writeExplicitCopy(name: string, without: string[]): string {
 	return file;
 }
 
-/**
-Compiles the generated checks with "#api/package" pointing at `packageFile`.
-*/
 async function compileAgainst(name: string, packageFile: string) {
 	const tsconfig = path.join(out, `${name}.tsconfig.json`);
 	const config = {
@@ -224,7 +201,6 @@ test("the phase 5 checks cover the whole documented API and pass on it", () => {
 	const { ids, failures, errors } = results.documented;
 	expect(errors).toEqual([]);
 	expect(failures).toEqual([]);
-	// One subject per documented type and value: the generics have one per instantiation.
 	const subjects = new Set(ids.map((id) => /^[^#.<]+/v.exec(id)?.[0]));
 	expect(subjects.size).toBe(full.types.size + full.values.size);
 });
@@ -292,7 +268,6 @@ test("the export check catches placeholders, type-only values and undocumented n
 	const exported = {
 		values: new Set([...values, "internalHelper"]),
 		types: new Set([...full.types, "Chip"]),
-		// Button is a placeholder: exported, but undefined.
 		runtime: Object.fromEntries(
 			[...values, "internalHelper"].map((name) => [
 				name,

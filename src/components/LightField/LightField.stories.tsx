@@ -10,7 +10,6 @@ const meta = {
 	component: LightField,
 	parameters: {
 		docs: { page: componentDocs(readme) },
-		// The previews draw a field behind the frame; this one shows fields of its own.
 		frame: { field: false },
 	},
 } satisfies Meta<typeof LightField>;
@@ -19,10 +18,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-One placement in a bordered box. The site's placements are drawn for a page, so they show at
-36% scale; compact fills the box as it is.
-*/
 function Placement({
 	variant,
 	label,

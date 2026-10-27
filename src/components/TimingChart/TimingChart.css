@@ -1,9 +1,4 @@
-/* TimingChart: ported from design-system/components/TimingChart/styles.css.
-   Also styled by ../Diagram/Diagram.css: gl-dg-label, gl-dg-text. */
-
 @layer gl-components {
-	/* TimingChart — the site's .dg-axis-line, .dg-bar-track, .dg-bar and their reveal (global.css), renamed .gl-dg-*.
-   Builds on Diagram.css (the host, labels and reveal states). */
 	.gl-dg-axis-line {
 		stroke: rgba(88, 108, 143, 0.35);
 		stroke-width: 1;
@@ -13,7 +8,6 @@
 		stroke: rgba(88, 108, 143, 0.14);
 		stroke-width: 1;
 	}
-	/* dg-bar: 2.7:1 on glass, so every bar carries its value label. */
 	.gl-dg-bar {
 		fill: var(--dg-bar);
 		transform-box: fill-box;

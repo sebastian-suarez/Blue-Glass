@@ -1,22 +1,3 @@
-/**
-The delayed-hydration gate (docs/package-plan.md, acceptance suite item 2). The portfolio
-hydrates its interactive sections late, as islands, so for a while a visitor has only their
-server HTML. Each island in tests/ssr/fixtures/islands.tsx, at 390px and at 1280px:
-
-1. renders to HTML in Node, with no window or document;
-2. loads with JavaScript on but not yet hydrated, as a late island is, and must already show
-   its chosen tab or open rows and hide the rest, wire its ARIA, and give the keyboard the tab
-   stop its README documents;
-3. hydrates once those checks are done, with no error, no text moving and focus kept;
-4. then answers keys and clicks as its README documents.
-
-Usage:
-  node scripts/ssr/islands.ts                     the gate, on the package, for the phase in scope
-  node scripts/ssr/islands.ts --target reference  the same checks on the reference
-  node scripts/ssr/islands.ts --self              proves the checks on the reference: each defect
-                                                  planted in \`mutations\` must add its problem
-  --phase N                                       overrides the phase
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -39,10 +20,6 @@ type Target = "package" | "reference";
 
 type Width = keyof typeof viewports;
 
-/**
-One island's checks. `before` runs on the server HTML, `after` once it has hydrated; both
-return problems. `focus` names the element `before` leaves focused, which hydration must keep.
-*/
 type Island = {
 	phase: number;
 	before: (page: Page, width: Width) => Promise<string[]>;
@@ -62,13 +39,9 @@ const entries: Record<Target, string> = {
 	reference: path.join(root, ".cache/reference/src/index.ts"),
 };
 
-// The filter runs in Go's regexp engine inside esbuild, which rejects JavaScript flags.
 // eslint-disable-next-line require-unicode-regexp
 const uiImport = /^#ui$/;
 
-/**
-Points the fixture's "#ui" at the target, as vitest.config.ts does for the behaviour specs.
-*/
 function ui(target: Target): Plugin {
 	return {
 		name: "ui",
@@ -80,10 +53,6 @@ function ui(target: Target): Plugin {
 	};
 }
 
-/**
-Bundles the fixture for Node, to render each island, and for the browser, to hydrate it later.
-Both wrap the island with Hydrated, which renders nothing and flags the end of hydration.
-*/
 async function bundle(target: Target): Promise<{ node: string }> {
 	fs.mkdirSync(work, { recursive: true });
 	const head = [
@@ -134,8 +103,6 @@ async function bundle(target: Target): Promise<{ node: string }> {
 		format: "esm",
 		external: ["react", "react-dom", "mermaid"],
 		plugins: [ui(target)],
-		// Base UI's CommonJS dependencies (use-sync-external-store) require React, which stays
-		// external; ESM output has no require of its own, so the bundle gets Node's.
 		banner: { js: nodeRequire },
 	});
 	await build({
@@ -151,15 +118,8 @@ async function bundle(target: Target): Promise<{ node: string }> {
 	return { node };
 }
 
-/**
-Whether a reader can see each text: some text node in #root with exactly these words, whose
-box isn't hidden by display, visibility or opacity, nor clipped by an ancestor's overflow to
-less than half its size (a collapsed row is often a zero-height box that clips its content).
-*/
 async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 	return page.evaluate((wanted) => {
-		// A colour's alpha, 1 when it has none: "rgba(0, 0, 0, 0)" and "color(srgb 0 0 0 / 0)" are 0, and
-		// "rgb(0, 0, 0)" is 1.
 		const alphaOf = (color: string): number => {
 			const alpha =
 				/^rgba\((?:[^,]*,){3}\s*(?<alpha>[\d.]+)\)$/v.exec(color)?.groups
@@ -167,8 +127,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 			return alpha === undefined ? 1 : Number(alpha);
 		};
 
-		// Where an element shows its content: its box when overflow clips, cut by a clip-path's
-		// inset(). Other clip-path shapes aren't measured.
 		const clipOf = (
 			element: Element,
 			style: CSSStyleDeclaration,
@@ -192,7 +150,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 			const [top = "0px", right = top, bottom = top, left = right] = inset
 				.trim()
 				.split(/\s+/v, 4);
-			// Computed insets are in px or %.
 			const length = (value: string, size: number) =>
 				value.endsWith("%")
 					? (Number(value.slice(0, -1)) / 100) * size
@@ -206,7 +163,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 		};
 
 		const isShown = (node: Text): boolean => {
-			// Text in a transparent colour is invisible, unless a background shows through it.
 			const ink =
 				node.parentElement === null
 					? undefined
@@ -223,7 +179,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 			range.selectNodeContents(node);
 			const box = range.getBoundingClientRect();
 			let { left, top, right, bottom } = box;
-			// Text wholly before the page's start, as left: -9999px puts it, can't be scrolled to.
 			if (
 				box.width === 0 ||
 				box.height === 0 ||
@@ -253,7 +208,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 					continue;
 				}
 
-				// Text cut to a sliver is unreadable: at least half of it must stay inside the clip.
 				left = Math.max(left, clip.left);
 				top = Math.max(top, clip.top);
 				right = Math.min(right, clip.right);
@@ -288,9 +242,6 @@ async function seen(page: Page, texts: string[]): Promise<boolean[]> {
 	}, texts);
 }
 
-/**
-Problems with what a reader sees: each text in `shown` must be seen, each in `hidden` not.
-*/
 async function expectSeen(
 	page: Page,
 	when: string,
@@ -310,9 +261,6 @@ async function expectSeen(
 	];
 }
 
-/**
-Waits up to 3s for a condition that a transition may delay, and returns the last problems.
-*/
 async function eventually(
 	page: Page,
 	read: () => Promise<string[]>,
@@ -334,9 +282,6 @@ async function isFocused(locator: Locator): Promise<boolean> {
 		: false;
 }
 
-/**
-Tab from the top of the page, as a keyboard user arriving at the island does.
-*/
 async function tabIn(page: Page): Promise<void> {
 	await page.evaluate(() => {
 		const active = document.activeElement as HTMLElement | null;
@@ -353,19 +298,10 @@ type TabsSpec = {
 	list: string;
 	selected: string;
 	panels: Record<string, string>;
-	/**
-	The enabled tab after the selected one, which the next arrow selects.
-	*/
 	next: string;
-	/**
-	The last enabled tab, which End selects.
-	*/
 	last: string;
 };
 
-/**
-A Tabs island (Tabs README: "What you provide" and "Keyboard").
-*/
 function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 	const tablist = (page: Page) =>
 		page.getByRole("tablist", { name: list, exact: true });
@@ -396,8 +332,6 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 				...(await selection(page, selected, "server HTML")),
 				...(await expectSeen(page, "server HTML", showing(selected))),
 			];
-			// "Each tab gets aria-controls pointing at its panel, and each panel gets
-			// aria-labelledby pointing back."
 			const wiring = await tablist(page)
 				.getByRole("tab")
 				.evaluateAll((tabs) =>
@@ -407,8 +341,7 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 						const panel =
 							panelId === null
 								? null
-								: // React's ids hold characters a selector would need escaped.
-									// eslint-disable-next-line unicorn/prefer-query-selector
+								: // eslint-disable-next-line unicorn/prefer-query-selector
 									document.getElementById(panelId);
 						if (panel?.getAttribute("role") !== "tabpanel") {
 							return [`the tab ${label} controls no tab panel`];
@@ -422,7 +355,6 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 					}),
 				);
 			problems.push(...wiring.map((problem) => `server HTML: ${problem}`));
-			// "Tab moves into the tab list, to the selected tab, and Tab again moves into the panel."
 			await tabIn(page);
 			if (!(await isFocused(tab(page, selected)))) {
 				problems.push(
@@ -430,7 +362,6 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 				);
 			}
 
-			// The panel is found from its label, so this holds apart from the wiring above.
 			await page.keyboard.press("Tab");
 			const isInPanel = await tab(page, selected).evaluate(
 				(element) =>
@@ -451,8 +382,6 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 		},
 		focus: (page) => tab(page, selected),
 		async after(page) {
-			// "Left and Right (Up and Down in side) move to the previous or next tab and select
-			// it." Right and Left also move in side, which is a row on phones.
 			await page.keyboard.press("ArrowRight");
 			const problems = await eventually(page, async () => [
 				...(await selection(page, next, "after ArrowRight")),
@@ -468,7 +397,6 @@ function tabsIsland({ list, selected, panels, next, last }: TabsSpec): Island {
 					selection(page, selected, "after ArrowLeft"),
 				)),
 			);
-			// "Home and End select the first and last tab. Disabled tabs are skipped."
 			await page.keyboard.press("End");
 			problems.push(
 				...(await eventually(page, async () => [
@@ -504,9 +432,6 @@ type Row = {
 	disabled?: boolean;
 };
 
-/**
-A career list of Accordion rows (Accordion README: "Props" and "Keyboard").
-*/
 function accordionIsland(rows: Row[]): Island {
 	const summary = (page: Page, title: string) =>
 		page
@@ -554,7 +479,6 @@ function accordionIsland(rows: Row[]): Island {
 				/* eslint-enable no-await-in-loop */
 			}
 
-			// "Tab reaches each summary or pane button."
 			await tabIn(page);
 			if (!(await isFocused(summary(page, first.title)))) {
 				problems.push(
@@ -566,12 +490,10 @@ function accordionIsland(rows: Row[]): Island {
 		},
 		focus: (page) => summary(page, first.title),
 		async after(page) {
-			// "Enter and Space open and close it."
 			await page.keyboard.press("Enter");
 			const problems = await eventually(page, async () =>
 				rowProblems(page, first, first.expanded !== true, "after Enter"),
 			);
-			// "Up and Down move between the summaries of one list."
 			await page.keyboard.press("ArrowDown");
 			if (!(await isFocused(summary(page, second.title)))) {
 				problems.push(`after ArrowDown: focus isn't on ${second.title}`);
@@ -590,9 +512,6 @@ function accordionIsland(rows: Row[]): Island {
 
 type Pane = { title: string; text: string; chips: string[]; open?: boolean };
 
-/**
-A PaneAccordion (Accordion README: "PaneAccordion" rows and "Keyboard").
-*/
 function panesIsland(panes: Pane[]): Island {
 	const button = (page: Page, title: string) =>
 		page.getByRole("button", { name: title, exact: true });
@@ -624,7 +543,6 @@ function panesIsland(panes: Pane[]): Island {
 				/* eslint-enable no-await-in-loop */
 			}
 
-			// "Tab reaches each summary or pane button."
 			await tabIn(page);
 			if (!(await isFocused(button(page, panes[0].title)))) {
 				problems.push(
@@ -637,8 +555,6 @@ function panesIsland(panes: Pane[]): Island {
 		focus: (page) => button(page, panes[0].title),
 		async after(page) {
 			const [, second, third] = panes as [Pane, Pane, Pane];
-			// "Up and Down move between the summaries of one list (Left and Right too between
-			// panes)", then "Enter and Space open and close it."
 			await page.keyboard.press("ArrowRight");
 			const problems = (await isFocused(button(page, second.title)))
 				? []
@@ -650,7 +566,6 @@ function panesIsland(panes: Pane[]): Island {
 					openProblems(page, second, "after Enter"),
 				)),
 			);
-			// "A press anywhere on a pane toggles it."
 			await button(page, third.title).click();
 			problems.push(
 				...(await eventually(page, async () =>
@@ -724,35 +639,16 @@ const islands: Record<string, Island> = {
 	/* eslint-enable @typescript-eslint/naming-convention */
 };
 
-/**
-A defect the self-test plants on the reference, and a problem the checks must then report that
-they don't report without it.
-*/
 type Mutation = {
 	name: string;
 	island: string;
 	expect: string;
-	/**
-	CSS after the stylesheet.
-	*/
 	css?: string;
-	/**
-	Rewrites the server HTML.
-	*/
 	html?: (html: string) => string;
-	/**
-	Never hydrates: the checks after hydration then meet a dead island.
-	*/
 	isInert?: boolean;
-	/**
-	Runs right after hydration, as a layout chosen in JavaScript would.
-	*/
 	afterHydration?: (page: Page) => Promise<void>;
 };
 
-/**
-Stops the arrow keys before React sees them, as an island whose keys never got wired would.
-*/
 async function dropArrowKeys(page: Page): Promise<void> {
 	await page.evaluate(() => {
 		document.addEventListener(
@@ -1068,7 +964,6 @@ async function main(): Promise<number> {
 
 	print(outcomes);
 	if (isSelfTest) {
-		// A planted defect counts as caught at a width when it adds its expected problem there.
 		const hasReported = (list: Outcome[], width: Width, expected: string) =>
 			list.some(
 				(outcome) =>

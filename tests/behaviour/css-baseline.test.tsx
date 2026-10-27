@@ -11,9 +11,6 @@ afterEach(async () => {
 	await emulateMedia([]);
 });
 
-/**
-Emulates media features through Chromium's DevTools protocol; an empty list clears them.
-*/
 async function emulateMedia(
 	features: Array<{ name: string; value: string }>,
 ): Promise<void> {
@@ -40,10 +37,6 @@ const none = ["0px", "0px", "0px", "0px"];
 const sheets = () =>
 	document.styleSheets.length + document.adoptedStyleSheets.length;
 
-/**
-Plain elements that the user agent styles, and a CssBaseline that comes and goes beside
-them, so the same elements are measured with and without the resets.
-*/
 function Page({ baseline }: { readonly baseline: boolean }) {
 	return (
 		<div
@@ -252,7 +245,6 @@ test("the resets are added once per document and last until the last CssBaseline
 });
 
 test("the resets sit in the gl-base layer, so your unlayered CSS and the components' layer both win", () => {
-	// :where() has no specificity, so these rules win only through the cascade layers.
 	render(
 		<>
 			<style>

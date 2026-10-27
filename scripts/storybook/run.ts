@@ -1,29 +1,3 @@
-/**
-The Storybook gate (docs/storybook-gate-plan.md). The stories guard (tests/unit/stories.test.ts)
-renders each story once in Node; this gate drives the built Storybook (`npm run build-storybook`)
-in Chromium, as a reader does, and checks what only a mounted story shows:
-
-1. renders: every story and docs page in scope opens with no page or console error;
-2. panel: a Default's Controls tab lists exactly its `controls.include`, and other stories none;
-3. controls: every value the panel offers for a listed control changes the story;
-4. interactions: the steps in tests/storybook/interactions.ts, on the canvas (the panel follows
-   each step), after a change in the panel (the story follows it), and on the docs page (the
-   Default responds, and a canvas opened from there still shows the initial args);
-5. toolbar: the viewports, and each phone twin at 390px, off its docs page.
-
-A story is observed through its snapshot: the markup of body (the story and what it portals),
-the live values of its form controls and every element's box. Infinite and SVG animations are
-paused at 0 first, and a story counts as settled once its snapshot holds for 300ms.
-
-Usage:
-  node scripts/storybook/run.ts           the gate, for the phase in scope
-  node scripts/storybook/run.ts --self    plants each defect in `mutations`, each of which must
-                                          fail its own check, and replays every interaction
-                                          entry on the reference's preview page
-  node scripts/storybook/run.ts --qualify only replays the interaction entries on the reference
-  --phase N                               overrides the phase
-  --only <story ids>                      limits the stories
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -96,10 +70,6 @@ type StoryInfo = {
 	viewport: string | undefined;
 };
 
-/**
-What a step's selectors look inside first (`area`), and what holds the app (`app`): a match
-outside the app was portalled into body, and counts when nothing inside the area matches.
-*/
 type Scope = { area: string; app: string };
 
 const storybookDirectory = path.join(root, "storybook-static");
@@ -118,9 +88,6 @@ const errorMessage = (error: unknown) =>
 		? (error.message.split("\n", 1)[0] ?? "")
 		: String(error);
 
-/**
-Storybook's id for a title: lower case, with runs of other characters turned into one dash.
-*/
 function sanitize(value: string): string {
 	return value
 		.toLowerCase()
@@ -133,9 +100,6 @@ function groupOf(preview: Preview): string | undefined {
 	return /group="(?<group>[^"]+)"/v.exec(first)?.groups?.group;
 }
 
-/**
-The component preview whose Default story has this id: "feedback-dialog--default" is Dialog's.
-*/
 function previewOfStory(id: string): Preview | undefined {
 	return previews().find((preview) => {
 		const group = groupOf(preview);
@@ -164,9 +128,6 @@ function moduleOfImport(importPath: string): string | undefined {
 		?.name;
 }
 
-/**
-A docs entry's id prefix, which its stories' ids share: "inputs-button--".
-*/
 const prefixOfDocs = (docsId: string) => docsId.replace(/docs$/v, "");
 
 type Plan = {
@@ -243,9 +204,6 @@ function plan(phase: number, only: string[] | undefined): Plan {
 	};
 }
 
-/**
-Collects results for one job, and the planted defect's count of actions.
-*/
 class Log {
 	readonly results: Result[] = [];
 	fired = 0;
@@ -345,10 +303,6 @@ async function storyInfo(frame: Frame, id: string): Promise<StoryInfo> {
 	}, id);
 }
 
-/**
-The elements a selector picks in a scope: those inside its area, else those portalled out of
-the app into body.
-*/
 async function candidates(
 	frame: Frame,
 	selector: string,
@@ -361,8 +315,6 @@ async function candidates(
 	/* eslint-disable no-await-in-loop -- one element at a time, in order */
 	for (let index = 0; index < count; index++) {
 		const match = all.nth(index);
-		// An overlay can unmount between the count and this call, at the end of its exit
-		// transition, which is what a step that hides it waits for: count it as gone.
 		const where = await match
 			.evaluate(
 				(element, areas) => {
@@ -406,8 +358,6 @@ async function isShown(
 
 async function act(frame: Frame, action: Action, scope: Scope): Promise<void> {
 	if ("press" in action) {
-		// A key goes to the focused frame, which after a page load is the manager's; focusing
-		// the preview's window keeps whatever element inside it has focus.
 		await frame.evaluate(() => {
 			if (!document.hasFocus()) {
 				globalThis.focus();
@@ -451,10 +401,6 @@ function describeAction(action: Action): string {
 
 type Panel = { page: Page; arg: string };
 
-/**
-Polls until the step's outcome holds: the panel's arg (when `panel` is given) and what it shows
-and hides. Returns what still didn't hold when time ran out.
-*/
 async function outcome(
 	frame: Frame,
 	step: Pick<Step, "arg" | "shows" | "hides">,
@@ -515,7 +461,6 @@ async function checkPanel(
 		entry.exportName === "Default" && info.controls.disable === false
 			? (info.controls.include ?? []).toSorted()
 			: [];
-	// A panel that should stay empty gets a moment to fill wrongly.
 	await delay(expected.length === 0 ? 1000 : 0);
 	const start = Date.now();
 	let names: string[] = [];
@@ -677,10 +622,6 @@ function controlJob(server: Server, entry: Entry, name: string): Job {
 	};
 }
 
-/**
-Runs an entry's steps and logs one result per step. Stops at the first that fails, and says
-whether every step passed.
-*/
 async function runSteps(
 	log: Log,
 	options: {
@@ -740,10 +681,6 @@ type InteractionContext = {
 	interaction: Interaction;
 };
 
-/**
-After the panel sets the first step's value, the story follows it, and the next steps still
-sync with the panel.
-*/
 async function afterPanelChange(context: InteractionContext): Promise<void> {
 	const { worker, server, log, id, interaction } = context;
 	const [first, ...rest] = interaction.steps;
@@ -804,11 +741,6 @@ async function afterPanelChange(context: InteractionContext): Promise<void> {
 	log.fired += await firedIn(worker, frame);
 }
 
-/**
-On the docs page the Default responds and writes no args, at any step: a sequence that ends on
-the initial value can't hide a write. Then a canvas opened from there through the sidebar,
-without reloading the preview, still shows the initial value.
-*/
 async function onDocsPage(
 	context: InteractionContext,
 	docsId: string,
@@ -884,7 +816,6 @@ function interactionJob(
 		where: "canvas",
 		async run(worker, log) {
 			const context = { worker, server, log, id, interaction };
-			// On the canvas, the panel follows each step.
 			const frame = await openCanvas(worker, server, id);
 			await showControls(worker.page);
 			await runSteps(log, {
@@ -1026,9 +957,6 @@ async function runJobs(
 	};
 }
 
-/**
-Reads every story's parameters once, from a single preview.
-*/
 async function catalog(
 	worker: Worker,
 	server: Server,
@@ -1117,9 +1045,6 @@ function jobsFor(
 	return jobs;
 }
 
-/**
-Marks the reference preview's "Default" section, which the Default story renders, if it has one.
-*/
 async function hasDefaultSection(page: Page): Promise<boolean> {
 	return page.evaluate(() => {
 		const section = [...document.querySelectorAll("#root section h2")]
@@ -1130,10 +1055,6 @@ async function hasDefaultSection(page: Page): Promise<boolean> {
 	});
 }
 
-/**
-Replays each interaction entry on the reference's preview page, inside its "Default" section,
-where the other sections stand open beside it as the other stories do on the docs page.
-*/
 async function qualify(browser: Browser, server: Server): Promise<Result[]> {
 	await buildRuntimes("reference");
 	const results: Result[] = [];
@@ -1220,10 +1141,6 @@ const keyOf = (result: Result) =>
 
 const componentOf = (id: string) => id.replace(/--[^\-]+$/v, "--");
 
-/**
-A planted defect is caught when its script acted, its own check failed on its story and frame,
-nothing failed elsewhere that the clean run passed, and the control story stayed clean.
-*/
 function verdict(
 	mutation: Mutation,
 	control: string,

@@ -43,11 +43,6 @@ type Options = Callbacks & {
 	timeout?: number | { enter?: number; exit?: number };
 };
 
-/**
-The documented signature of useTransition, for a hook that drives a div. XO types "#ui" from
-src/index.ts, which exports nothing until the port, and an untyped call fails its
-unsafe-call rule. TypeScript still checks the documented hook against this.
-*/
 type UseTransition = (
 	options: Options,
 	nodeRef: React.RefObject<HTMLDivElement | null>,
@@ -58,9 +53,6 @@ const useStatus = useTransition as UseTransition;
 
 type Name = "Fade" | "Grow" | "Zoom" | "Slide";
 
-/**
-One of the four styled transitions, picked by name.
-*/
 function Motion({
 	name,
 	ref,
@@ -89,7 +81,6 @@ function Motion({
 	}
 }
 
-// The README's timing table.
 const kinds = [
 	{ name: "Fade", enter: 200, exit: 150 },
 	{ name: "Grow", enter: 200, exit: 140 },
@@ -108,10 +99,6 @@ type Call = {
 	at: number;
 };
 
-/**
-The four callbacks, each noting its name, its node, whether that node was in the document,
-and when it ran.
-*/
 function recordCallbacks() {
 	const calls: Call[] = [];
 	const note = (name: Callback) => (node: HTMLElement) => {
@@ -144,26 +131,16 @@ function recordCallbacks() {
 				{ interval: 5, timeout: 3000 },
 			);
 		},
-		/**
-		When the last call of that name ran.
-		*/
 		time(name: Callback): number {
 			return must(calls.findLast((call) => call.name === name)).at;
 		},
 	};
 }
 
-/**
-Each status once, in the order the render function saw them.
-*/
 function distinct(statuses: Status[]): Status[] {
 	return statuses.filter((status, index) => status !== statuses[index - 1]);
 }
 
-/**
-The distinct durations, in whole ms, of the animations running on `root` and inside it,
-once there are some. Polls often: an exit can be short.
-*/
 async function runningDurations(root: Element): Promise<number[]> {
 	return vi.waitFor(
 		() => {
@@ -179,10 +156,6 @@ async function runningDurations(root: Element): Promise<number[]> {
 	);
 }
 
-/**
-Waits until nothing animates on `root` or inside it. A status timer can end a moment before
-its CSS transition does, and a transition turned around midway runs shorter.
-*/
 async function atRest(root: Element): Promise<void> {
 	await vi.waitFor(
 		() => {
@@ -266,7 +239,6 @@ describe("Transition, the state machine they share", () => {
 		rerender(view(true));
 		await recorder.until("entered");
 
-		// The render that takes the new `in` may still show entered.
 		expect(
 			distinct(statuses).filter(
 				(status, index) => index > 0 || status !== "entered",
@@ -315,12 +287,10 @@ describe("Transition, the state machine they share", () => {
 		);
 		const { container, rerender } = render(view(true));
 		const child = screen.getByText("Toast");
-		// Shown first, as on a page: a transition needs a style to start from.
 		expect(getComputedStyle(child).opacity).toBe("1");
 		recorder.clear();
 
 		rerender(view(false));
-		// Still there, fading out.
 		expect(child.isConnected).toBe(true);
 		expect(await runningDurations(container)).toEqual([60]);
 		await vi.waitFor(() => {
@@ -833,7 +803,6 @@ describe("under reduced motion", () => {
 		);
 		const { rerender } = render(view(false));
 		const root = must(ref.current);
-		// Whether anything animated on the way to the height.
 		const hasAnimatedTo = async (height: number) => {
 			let hasAnimated = false;
 			await vi.waitFor(

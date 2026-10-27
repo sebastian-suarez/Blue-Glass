@@ -25,15 +25,10 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
-*/
 function boldLine(text: string): Exclude<DiagramNodeLine, string> {
 	return { text, bold: true };
 }
 
-// The preview picks these with useMediaQuery(media.tablet). Here CSS picks them under the same
-// query, so the server HTML lays out as the hydrated page does.
 const styles = `
 .own-projects {
 	grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -53,7 +48,6 @@ const styles = `
 }
 `;
 
-// The preview's datasets.
 const milestones: DiagramData = {
 	id: "milestones",
 	width: 760,
@@ -315,8 +309,6 @@ export const Default: Story = {
 	),
 };
 
-// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

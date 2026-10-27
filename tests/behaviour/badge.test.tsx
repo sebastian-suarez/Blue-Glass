@@ -16,11 +16,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-The text a screen reader reads inside an element, in document order: what is aria-hidden or not
-displayed is left out, and an element with an aria-label reads as its label. Text runs are
-joined with spaces, so it checks the words and their order, not the spacing between them.
-*/
 function spoken(element: Element): string {
 	const parts: string[] = [];
 	const walk = (node: Node) => {
@@ -59,10 +54,6 @@ function spoken(element: Element): string {
 	return parts.join(" ").replaceAll(/\s+/gv, " ").trim();
 }
 
-/**
-Whether the element shows on screen: not hidden or transparent, and bigger than the pixel a
-visually hidden text is clipped to.
-*/
 function isShown(element: Element): boolean {
 	const box = element.getBoundingClientRect();
 	return (
@@ -75,9 +66,6 @@ function isShown(element: Element): boolean {
 	);
 }
 
-/**
-Read by screen readers but not seen: a box of a pixel or less, as gl-sr-only clips it.
-*/
 function isVisuallyHidden(element: Element): boolean {
 	const box = element.getBoundingClientRect();
 	return (
@@ -87,9 +75,6 @@ function isVisuallyHidden(element: Element): boolean {
 	);
 }
 
-/**
-Whether any element showing this exact text is on screen.
-*/
 function isTextShown(text: string): boolean {
 	return screen.queryAllByText(text).some((element) => isShown(element));
 }
@@ -107,10 +92,6 @@ async function nextFrame(): Promise<void> {
 	});
 }
 
-/**
-The duration and easing of the animations a change starts on the element or inside it, once
-there are some.
-*/
 async function startedTimings(
 	element: Element,
 ): Promise<Array<{ duration: number; easing: string }>> {
@@ -141,9 +122,6 @@ async function atRest(element: Element): Promise<void> {
 	);
 }
 
-/**
-A 40px square to sit the badge on, like the preview's icon tiles.
-*/
 function Tile({ ref }: { readonly ref?: React.Ref<HTMLSpanElement> }) {
 	return (
 		<span
@@ -340,7 +318,6 @@ describe("Badge", () => {
 		expect(isTextShown("3")).toBe(false);
 		expect(isTextShown("4")).toBe(false);
 		expect(spoken(must(mail))).toBe("Mail");
-		// While hidden the button keeps its own name.
 		expect(screen.getByRole("button", { name: "Messages" })).toBeVisible();
 
 		rerender(view(false));
@@ -365,14 +342,12 @@ describe("Badge", () => {
 		const root = must(ref.current);
 		const pill = screen.getByText("3");
 		const shownWidth = pill.getBoundingClientRect().width;
-		// Let the page draw it first: a change before that would start no transition.
 		await nextFrame();
 		await nextFrame();
 
 		rerender(view(true));
 		const out = await startedTimings(root);
 		expect(out.map((timing) => timing.duration)).toContain(140);
-		// Read the end of the fade at once, whatever happens to the pill after it.
 		for (const animation of root.getAnimations({ subtree: true })) {
 			animation.finish();
 		}
@@ -425,7 +400,6 @@ describe("Badge", () => {
 		}
 
 		expect(screen.queryByText("7")).toBeNull();
-		// The dot has no text to find it by, so find the 8px box the badge draws.
 		const dots = [...must(dotRef.current).querySelectorAll("*")].filter(
 			(element) => {
 				const box = element.getBoundingClientRect();

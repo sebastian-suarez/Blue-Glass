@@ -1,9 +1,3 @@
-/**
-Pixel comparison for the parity gate. Two screenshots are compared region by region (the
-preview's sections, then the whole page), so a small defect in one section isn't diluted by a
-tall page. Anti-aliased pixels don't count, and the per-pixel colour threshold absorbs the
-sub-pixel noise two identical renders can still show.
-*/
 import { Buffer } from "node:buffer";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
@@ -12,9 +6,6 @@ import type { Region } from "./capture.ts";
 export type RegionDiff = {
 	label: string;
 
-	/**
-	Pixels that differ, not counting anti-aliasing.
-	*/
 	pixels: number;
 	area: number;
 };
@@ -24,20 +15,11 @@ export type ImageDiff = {
 	candidate: { width: number; height: number };
 	regions: RegionDiff[];
 
-	/**
-	The whole-page diff image: differing pixels in red over a faded reference.
-	*/
 	image: Buffer;
 };
 
-/**
-The colour distance under which two pixels count as equal, on pixelmatch's 0–1 scale. 0.02 tells
-neighbouring tokens apart (ink from ink-hover, danger from danger-hover), which pixelmatch's
-default 0.1 doesn't, and still ignores one-step rounding noise.
-*/
 export const pixelThreshold = 0.02;
 
-// The option names are pixelmatch's.
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const matchOptions = { threshold: pixelThreshold, includeAA: false };
 
@@ -53,10 +35,6 @@ function crop(image: PNG, box: Region, width: number, height: number): Buffer {
 	return out;
 }
 
-/**
-Compares two PNG screenshots in each region, clipped to the area both images share. A size
-difference is reported separately by the caller.
-*/
 export function diffImages(
 	referencePng: Buffer,
 	candidatePng: Buffer,

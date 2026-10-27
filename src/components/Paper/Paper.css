@@ -1,7 +1,4 @@
-/* Blue Glass — Paper, ported from design-system/components/Paper/styles.css. */
-
 @layer gl-components {
-	/* Paper — the site's .glass-panel and its inset wells (.project-figure, .notfound-figure) */
 	.gl-paper {
 		position: relative;
 		isolation: isolate;
@@ -12,7 +9,6 @@
 		--gl-blur: var(--blur-panel);
 		border: 1px solid rgba(255, 255, 255, 0.95);
 	}
-	/* The diagonal sheen across the glass (.glass-panel::before). */
 	.gl-paper-glass::before {
 		content: "";
 		position: absolute;

@@ -23,9 +23,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The preview's stand-in photo: a figure on two of the site's rings, as an SVG data URL.
-*/
 function portrait(ground: string, upper: string, lower: string, tilt = -28) {
 	return `data:image/svg+xml,${encodeURIComponent(
 		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><rect width="80" height="80" fill="${ground}"/><ellipse cx="60" cy="24" rx="34" ry="20" fill="none" stroke="${upper}" stroke-width="12" transform="rotate(${tilt} 60 24)"/><ellipse cx="10" cy="70" rx="36" ry="22" fill="none" stroke="${lower}" stroke-width="12" transform="rotate(26 10 70)"/><circle cx="40" cy="33" r="13" fill="#f4f8fc"/><path d="M15 80c3-17 13-25 25-25s22 8 25 25z" fill="#f4f8fc"/></svg>`,
@@ -46,9 +43,6 @@ const employers = [
 	"Limber Health",
 ];
 
-/**
-The Example's card: the header identity, and the employers, each avatar named by its tooltip.
-*/
 function Identity() {
 	return (
 		<Paper style={{ padding: 24, display: "grid", gap: 20, maxWidth: 560 }}>

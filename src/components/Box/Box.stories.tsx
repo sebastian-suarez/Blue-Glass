@@ -22,7 +22,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The preview's inset well, the plate inside it, and the employer strip's pill.
 const well: CSSProperties = {
 	background: "var(--glass-inset)",
 	border: "1px solid var(--glass-edge)",

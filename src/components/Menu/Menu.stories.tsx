@@ -21,10 +21,6 @@ const meta = {
 	component: Menu,
 	parameters: {
 		docs: { page: componentDocs(readme) },
-		// Base UI keeps focus guards around an open menu: spans, aria-hidden and tabbable on purpose,
-		// that hand focus on the moment they get it. axe's aria-hidden-focus rule allows that only to
-		// an element with an onfocus property, which React's delegated onFocus never sets, so it
-		// reports them. The rule still checks every other aria-hidden element.
 		a11y: {
 			config: {
 				rules: [
@@ -40,14 +36,10 @@ const meta = {
 
 export default meta;
 
-// Every story anchors its own menu, so none takes the required open or anchorEl.
 type Story = StoryObj<Partial<MenuProps>>;
 
 const repository = "https://github.com/sebastian-suarez/VSebCode";
 
-/**
-A project's actions, as both of the preview's menus hold them. onPick reports what a choice did.
-*/
 function ProjectActions({
 	onPick,
 }: {
@@ -90,10 +82,6 @@ function ProjectActions({
 	);
 }
 
-/**
-The Default section's stage: the button that toggles the menu, and the menu open in place under
-it, leaving focus and the page's scroll alone.
-*/
 function StagedMenu({
 	open = false,
 	onToggle,
@@ -132,10 +120,6 @@ function StagedMenu({
 	);
 }
 
-/**
-Default's stage: the args drive the menu, the button toggles open, and a choice, a press
-outside, Escape or Tab sets it back to false.
-*/
 function StagedMenuWithArgs(
 	args: Partial<MenuProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -172,9 +156,6 @@ const projects = [
 	{ name: "Clean Architecture template", stack: "TypeScript · DDD · MCP" },
 ];
 
-/**
-A standalone list that keeps the current project, as a project switcher.
-*/
 function ProjectSwitcher() {
 	const [current, setCurrent] = React.useState("VSebCode");
 	return (
@@ -258,10 +239,6 @@ const tagStyle: React.CSSProperties = {
 	color: "var(--ink-soft)",
 };
 
-/**
-The Example: a project card whose Actions button opens the menu through the portal; a choice
-reports in the status line.
-*/
 function ProjectCard() {
 	const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 	const [isOpen, setIsOpen] = React.useState(false);

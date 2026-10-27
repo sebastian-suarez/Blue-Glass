@@ -1,12 +1,3 @@
-/**
-Compiles the API gate's checks with TypeScript 7 and names the ones that fail, by the
-`// @check <id> — <what it checks>` comment that ends each generated line.
-
-Usage: node scripts/api/compile.ts. It compiles tests/api/tsconfig.json (the checks in
-tests/api/generated against dist/index.d.ts), lets the checks tests/api/allowlist.json waives
-fail, and exits 1 on any other failure, on a compiler error outside the checks, or on a
-waiver whose check now passes.
-*/
 import { execFile } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -18,22 +9,13 @@ import { generatedDirectory } from "./generate.ts";
 export type Failure = {
 	id: string;
 	description: string;
-	/**
-	The file and line, relative to the repository.
-	*/
 	location: string;
 	message: string;
 };
 
 export type Compiled = {
-	/**
-	Ids of every check compiled, failing or not.
-	*/
 	ids: string[];
 	failures: Failure[];
-	/**
-	Compiler errors that no check owns, such as a broken declaration file or tsconfig.
-	*/
 	errors: string[];
 };
 
@@ -47,7 +29,6 @@ async function runTsc(tsconfig: string): Promise<string> {
 			["--noEmit", "--pretty", "false", "-p", tsconfig],
 			{ cwd: root, maxBuffer: 256 * 1024 * 1024 },
 			(error, stdout, stderr) => {
-				// The compiler exits with 1 or 2 when it reports errors; they're in stdout either way.
 				if (error !== null && typeof error.code !== "number") {
 					reject(new Error(`Can't run ${tsc}`, { cause: error }));
 					return;
@@ -78,7 +59,6 @@ function parse(output: string): Diagnostic[] {
 		} else if (global?.groups) {
 			diagnostics.push({ text: [global.groups.text] });
 		} else if (line.trim() !== "") {
-			// An elaboration of the previous diagnostic, or output tsc doesn't format as one.
 			const last = diagnostics.at(-1);
 			if (last === undefined) {
 				diagnostics.push({ text: [line] });
@@ -104,10 +84,6 @@ function checkIds(directory: string): string[] {
 		);
 }
 
-/**
-Compiles `tsconfig`, whose checks are in `directory`, and sorts the errors into failed
-checks and errors no check owns.
-*/
 export async function compile({
 	tsconfig = path.join(root, "tests/api/tsconfig.json"),
 	directory = generatedDirectory,
@@ -155,20 +131,11 @@ export async function compile({
 }
 
 export type Verdict = {
-	/**
-	Failures no waiver covers.
-	*/
 	failures: Failure[];
 	waived: Array<{ id: string; reason: string }>;
-	/**
-	Waivers whose checks were compiled and passed: they must go, so the list stays true.
-	*/
 	stale: string[];
 };
 
-/**
-Applies the waivers of tests/api/allowlist.json to a compile.
-*/
 export function judge(compiled: Compiled, allowlist: Allowlist): Verdict {
 	const failing = new Set(compiled.failures.map((failure) => failure.id));
 	return {
@@ -187,9 +154,6 @@ export function judge(compiled: Compiled, allowlist: Allowlist): Verdict {
 	};
 }
 
-/**
-The subject of a check id: "ButtonProps" for "ButtonProps.href" or "ButtonProps#keys".
-*/
 const subjectOf = (id: string) => /^[^#.]+/v.exec(id)?.[0] ?? id;
 
 const indent = (text: string, depth: number) =>
@@ -199,10 +163,6 @@ const indent = (text: string, depth: number) =>
 		.map((line) => `${" ".repeat(depth)}${line}`)
 		.join("\n");
 
-/**
-The failures as a report: one entry per subject and error, so a missing export, which
-breaks every check of its subject the same way, reads as one problem.
-*/
 export function formatFailures(failures: Failure[]): string {
 	const entries = new Map<string, Failure[]>();
 	for (const failure of failures) {

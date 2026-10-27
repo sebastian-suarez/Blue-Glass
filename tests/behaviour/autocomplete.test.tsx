@@ -1,11 +1,3 @@
-// Behaviour specs for Autocomplete, from design-system/components/Autocomplete/README.md and
-// api.d.ts, with the field props it shares with TextField (FieldBaseProps, in TextField's api.d.ts
-// and README). The port runs on Base UI's Combobox and Autocomplete, whose DOM differs from the
-// reference's, so everything is found by role and name: the input is a combobox named by its
-// label, the popup list a listbox of options, a run of options under one heading a group named by
-// it, and a chip is found by its remove button ("Remove <label>"). The highlighted row is the one
-// the input's aria-activedescendant names. A callback's event is a React event or one shaped like
-// it (src/internal/events.ts), so it's checked through its native event.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import {
@@ -35,10 +27,6 @@ import {
 	InputAdornment,
 } from "#ui";
 
-/**
-Parks the pointer in the bottom right corner, clear of every field and list below: a row that
-opens under a resting pointer can take the highlight, and a pill under it shows its Clear button.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -100,7 +88,6 @@ const zones: Zone[] = [
 
 const cities = ["Medellín", "Berlin", "Bogotá", "Montréal", "Lisbon"];
 
-// Fifteen rows, for the keys that move five.
 const technologies = [
 	"Astro",
 	"AWS",
@@ -143,9 +130,6 @@ function Around({ children }: { readonly children: React.ReactNode }) {
 	);
 }
 
-/**
-A spot on the page away from every field, to press outside one.
-*/
 function Elsewhere() {
 	return (
 		<p style={{ position: "fixed", left: 0, bottom: 0, margin: 0, padding: 8 }}>
@@ -171,18 +155,12 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-The row named by this label, alone or followed by its secondary line.
-*/
 function option(label: string): HTMLElement {
 	return screen.getByRole("option", {
 		name: (name) => name === label || name.startsWith(`${label} `),
 	});
 }
 
-/**
-The rows' texts, in order.
-*/
 function rows(): string[] {
 	return screen
 		.queryAllByRole("option")
@@ -196,12 +174,6 @@ function selectedRows(): string[] {
 		.map((element) => element.textContent ?? "");
 }
 
-/**
-The row the input's aria-activedescendant names: the highlighted one, or null.
-*/
-/**
-The element with an id, through a selector, as the lint rules prefer.
-*/
 function byId(id: string): HTMLElement | null {
 	return document.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
 }
@@ -220,10 +192,6 @@ async function expectHighlighted(
 	});
 }
 
-/**
-Presses each key in turn and waits for the highlight to land on the row named next to it, with
-focus still in the input.
-*/
 async function walk(
 	steps: ReadonlyArray<readonly [key: string, label: string]>,
 	input: HTMLInputElement = combobox(),
@@ -241,16 +209,10 @@ async function expectListShown(): Promise<HTMLElement> {
 	return vi.waitFor(() => screen.getByRole("listbox"));
 }
 
-/**
-Waits until the list has left, its closing animation included.
-*/
 async function expectListGone(): Promise<void> {
 	await expect.poll(() => screen.queryByRole("listbox")).toBeNull();
 }
 
-/**
-A few rendering frames. Only for checks that something does not happen.
-*/
 async function frames(count = 4): Promise<void> {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -268,9 +230,6 @@ function height(element: Element): number {
 	return Math.round(box(element).height);
 }
 
-/**
-The field's pill: the box around the input that also holds its Open button.
-*/
 function pill(input: HTMLElement = combobox()): HTMLElement {
 	for (
 		let element = input.parentElement;
@@ -296,9 +255,6 @@ type TokenProperty =
 	| "outlineColor"
 	| "width";
 
-/**
-What a token resolves to for a property, read from a probe element styled with it.
-*/
 function resolvedToken(property: TokenProperty, token: string): string {
 	const probe = document.createElement("div");
 	probe.style[property] = `var(${token})`;
@@ -308,9 +264,6 @@ function resolvedToken(property: TokenProperty, token: string): string {
 	return value;
 }
 
-/**
-The drawn elements whose own text is `text`, leaving out a 1px visually hidden copy.
-*/
 function shownText(text: string): HTMLElement[] {
 	return screen.queryAllByText(text).filter((element) => {
 		const { width, height: tall } = box(element);
@@ -326,9 +279,6 @@ async function expectShownText(text: string): Promise<void> {
 	await expect.poll(() => shownText(text).length).toBe(1);
 }
 
-/**
-The texts set in weight 600 inside an element, each taken at its outermost bold element.
-*/
 function boldTextIn(element: Element): string[] {
 	return [...element.querySelectorAll("*")]
 		.filter(
@@ -341,9 +291,6 @@ function boldTextIn(element: Element): string[] {
 		.filter((text) => text !== "");
 }
 
-/**
-Whether the elements come in this order in the document.
-*/
 function isInOrder(...elements: Element[]): boolean {
 	const all = [...document.querySelectorAll("*")];
 	const positions = elements.map((element) => all.indexOf(element));
@@ -356,9 +303,6 @@ function removeButtons(): HTMLElement[] {
 	return screen.queryAllByRole("button", { name: /^Remove /v });
 }
 
-/**
-A chip: the element around its remove button that holds its label.
-*/
 function chip(label: string): HTMLElement {
 	const remove = button(`Remove ${label}`);
 	for (
@@ -374,9 +318,6 @@ function chip(label: string): HTMLElement {
 	throw new Error(`No chip holds "${label}"`);
 }
 
-/**
-Waits until the chips are these, in this order.
-*/
 async function expectChips(labels: readonly string[]): Promise<void> {
 	await vi.waitFor(() => {
 		const buttons = removeButtons();
@@ -393,10 +334,6 @@ async function expectChipFocused(label: string): Promise<void> {
 		.toBe(true);
 }
 
-/**
-Checks a documented callback's event: a React event, or one shaped like it, around a native
-event of this class. Returns the native event.
-*/
 function expectReactEvent(
 	event: unknown,
 	type: new (...arguments_: never[]) => Event,
@@ -417,18 +354,12 @@ function expectTyping(event: unknown): void {
 	expect(expectReactEvent(event, Event).type).toBe("input");
 }
 
-/**
-For a text reset, which api.d.ts allows to come with no event.
-*/
 function expectReactEventOrNull(event: unknown): void {
 	if (event !== null) {
 		expectReactEvent(event, Event);
 	}
 }
 
-/**
-Waits for a mock's call, then checks it was the only one and returns its arguments.
-*/
 async function onlyCall<F extends (...arguments_: never[]) => unknown>(
 	mock: Mock<F>,
 ): Promise<Parameters<F>> {
@@ -455,9 +386,6 @@ function closes(onClose: Mock<OnClose>): AutocompleteCloseReason[] {
 	return onClose.mock.calls.map(([, reason]) => reason);
 }
 
-/**
-The element the input's aria-describedby names that holds this text: its helper line.
-*/
 function helperOf(input: HTMLElement, text: string): HTMLElement {
 	const helper = (input.getAttribute("aria-describedby") ?? "")
 		.split(" ")
@@ -503,7 +431,6 @@ describe("Autocomplete: the field", () => {
 		expect(root).toHaveAttribute("title", "Where you work");
 	});
 
-	// TextField's README: the label "is a real <label for>".
 	test("the label sits above the pill in 13px at weight 600, and a press on it focuses the input", async () => {
 		render(<Employer />);
 		const label = screen.getByText("Employer");
@@ -515,8 +442,6 @@ describe("Autocomplete: the field", () => {
 		await expect.element(input).toHaveFocus();
 	});
 
-	// FieldBaseProps: "Always give one, or an aria-label". The reference gives aria-label and
-	// aria-labelledby to the input, and names its list after it too.
 	test("without a label, aria-label names the input and its list, and aria-labelledby names them from elsewhere", async () => {
 		render(
 			<>
@@ -586,7 +511,6 @@ describe("Autocomplete: the field", () => {
 		expect(getComputedStyle(helperOf(other, "Optional.")).color).not.toBe(
 			danger,
 		);
-		// The only icon outside the pill is the error's.
 		const iconsOutside = (root: HTMLElement | null, field: HTMLElement) =>
 			[...(root?.querySelectorAll("svg") ?? [])].filter(
 				(svg) => !pill(field).contains(svg),
@@ -601,8 +525,6 @@ describe("Autocomplete: the field", () => {
 		expect(screen.getByText("Employer")).toHaveTextContent("Employer*");
 	});
 
-	// FieldBaseProps: required "marks the control required". The reference drops it from the input
-	// once there's a value (reference.tsx, line 531), so a filled field stops saying it's required.
 	referenceDefectTest(
 		"required keeps the input marked required (aria-required) once there's a value, with multiple too",
 		() => {
@@ -733,8 +655,6 @@ describe("Autocomplete: the field", () => {
 			.toBe(resolvedToken("borderTopColor", "--color-ink"));
 	});
 
-	// TextField's README: "The focus ring is the site's (focus, 3px) at a 2px offset around the
-	// whole pill", the pill Autocomplete's input sits in.
 	test("focus rings the whole pill: the 3px focus outline at a 2px offset", async () => {
 		render(
 			<Around>
@@ -952,7 +872,6 @@ describe("Autocomplete: the list", () => {
 		const tokyo = await vi.waitFor(() => option("Tokyo"));
 		expect(tokyo).toHaveAttribute("aria-disabled", "true");
 		expect(option("London")).not.toHaveAttribute("aria-disabled", "true");
-		// Playwright waits for aria-disabled elements to enable; force the press.
 		await userEvent.click(tokyo, { force: true });
 		await frames();
 		expect(onChange).not.toHaveBeenCalled();
@@ -1108,7 +1027,6 @@ describe("Autocomplete: the list", () => {
 		combobox("Stack").focus();
 		await userEvent.keyboard("t");
 		await expectListShown();
-		// The default "contains" would list PostgreSQL, Rust and React too.
 		await vi.waitFor(() => {
 			expect(rows()).toEqual(["TypeScript", "Terraform"]);
 		});
@@ -1199,8 +1117,6 @@ describe("Autocomplete: the list", () => {
 		expect(screen.queryAllByRole("option")).toHaveLength(0);
 	});
 
-	// The README promises the states; the reference also says them in a polite status region,
-	// as Base UI's Empty and Status parts do.
 	test("the empty and loading states are announced in a status region", async () => {
 		const statuses = () =>
 			screen.queryAllByRole("status").map((element) => element.textContent);
@@ -1241,8 +1157,6 @@ describe("Autocomplete: the list", () => {
 		expect(inPlace.current?.contains(near)).toBe(true);
 	});
 
-	// The README names the material (gl-popover: glass, blur-selector, radius-well) and Popper,
-	// whose gap is 8px; the reference opens the list at the pill's start, as wide as the pill.
 	test("the list floats 8px under the pill on the popover material: its left edge on the pill's, as wide as the pill, a glass fill blurred by blur-selector, with radius-well corners", async () => {
 		render(
 			<div style={{ padding: 24, width: 320 }}>
@@ -1283,7 +1197,6 @@ describe("Autocomplete: the list", () => {
 		);
 	});
 
-	// The reference keeps a freeSolo popup closed when nothing matches and nothing is loading.
 	test("with freeSolo the options are only suggestions: text that matches none shows no popup, and there's no Open button", async () => {
 		render(<Autocomplete freeSolo label="Role" options={roles} />);
 		const input = combobox("Role");
@@ -1300,8 +1213,6 @@ describe("Autocomplete: the list", () => {
 		await expect.poll(() => shownText("No options").length).toBe(0);
 	});
 
-	// Where the docs are silent, the reference's: a pristine input showing the chosen label
-	// filters nothing.
 	test("with a choice made, the list shows every option, the chosen one selected, until the text is edited", async () => {
 		render(<Employer defaultValue="PayPal" />);
 		const input = combobox();
@@ -1349,7 +1260,6 @@ describe("Autocomplete: keyboard", () => {
 		await expectHighlighted("Gorilla Logic");
 	});
 
-	// Where the docs are silent, the reference's: Down opens on the chosen row.
 	test("with a choice made, Down opens the list on the chosen row", async () => {
 		render(<Employer defaultValue="Globant" />);
 		combobox().focus();
@@ -1376,7 +1286,6 @@ describe("Autocomplete: keyboard", () => {
 		await expect.element(input).not.toHaveAttribute("aria-activedescendant");
 	});
 
-	// The README says they move five; at the ends the reference stops on the first or last row.
 	test("Page Down and Page Up move five rows, and stop at the last and first", async () => {
 		render(<Autocomplete label="Technology" options={technologies} />);
 		const input = combobox("Technology");
@@ -1421,7 +1330,6 @@ describe("Autocomplete: keyboard", () => {
 		expect(highlighted(input)).toBeNull();
 	});
 
-	// The reference prevents Enter's default when it chooses, so the form isn't submitted.
 	test("Enter chooses the highlighted row: onChange gets the Enter key, the option and selectOption, the text becomes its label, the list closes, and the form isn't submitted", async () => {
 		const onChange = vi.fn<OnChange>();
 		const onSubmit = vi.fn((event: React.SubmitEvent) => {
@@ -1765,7 +1673,6 @@ describe("Autocomplete: choosing", () => {
 		expectReactEvent(events[4], MouseEvent);
 	});
 
-	// Where the docs are silent, the reference's: without freeSolo only a listed value stays.
 	test("without freeSolo, text that chose nothing goes when focus leaves: the field shows its value's label again, or nothing, as a reset", async () => {
 		const onChange = vi.fn<OnChange>();
 		const onInputChange = vi.fn<OnInputChange>();
@@ -1820,7 +1727,6 @@ describe("Autocomplete: choosing", () => {
 		expect(onChange).not.toHaveBeenCalled();
 	});
 
-	// The reference shows Clear while the field has focus (or the pointer) and something to clear.
 	test("the Clear button shows while the field has focus and something to clear", async () => {
 		render(
 			<Around>
@@ -1860,7 +1766,6 @@ describe("Autocomplete: choosing", () => {
 		await expect.element(input).toHaveFocus();
 	});
 
-	// Where the docs are silent, the reference's: an emptied text clears a single value.
 	test("emptying the text clears a chosen value: onChange gets null and clear", async () => {
 		const onChange = vi.fn<OnChange>();
 		render(<Employer defaultValue="PayPal" onChange={onChange} />);
@@ -1870,8 +1775,6 @@ describe("Autocomplete: choosing", () => {
 		expect([value, reason]).toEqual([null, "clear"]);
 	});
 
-	// The doc in api.d.ts says it hides the Clear button; the reference also keeps the value when
-	// the text is emptied, and puts its label back when focus leaves.
 	test("disableClearable leaves out the Clear button, and emptying the text keeps the value", async () => {
 		const onChange = vi.fn<OnChange>();
 		render(
@@ -1892,7 +1795,6 @@ describe("Autocomplete: choosing", () => {
 		expect(onChange).not.toHaveBeenCalled();
 	});
 
-	// The reference's popup button, named Open or Close, which freeSolo leaves out.
 	test("defaultOpen starts with the list open; the popup button reads Close and closes it, with toggleInput, then reads Open and opens it, and focus goes to the input", async () => {
 		const onOpen = vi.fn<OnOpen>();
 		const onClose = vi.fn<OnClose>();
@@ -1940,7 +1842,6 @@ describe("Autocomplete: choosing", () => {
 		await expectListGone();
 	});
 
-	// A press on the input opens the list too, as in the reference.
 	test.each<
 		[
 			string,
@@ -2211,7 +2112,6 @@ describe("Autocomplete: multiple", () => {
 		]);
 	});
 
-	// The reference marks the list multiselectable, as Base UI's does with multiple.
 	test("the list is aria-multiselectable, and every chosen row is selected", async () => {
 		render(<Stack defaultValue={[nodeJs, aws]} />);
 		await userEvent.click(combobox("Stack"));
@@ -2259,7 +2159,6 @@ describe("Autocomplete: multiple", () => {
 		}
 	});
 
-	// Right from the last chip back to the input is the reference's.
 	test("Left at the start of the input moves to the last chip; Left and Right move between the chips, and Right from the last goes back to the input", async () => {
 		render(<Stack defaultValue={[nodeJs, typeScript, aws]} />);
 		const input = combobox("Stack");
@@ -2283,7 +2182,6 @@ describe("Autocomplete: multiple", () => {
 		await expect.element(input).toHaveFocus();
 	});
 
-	// The README says Backspace or Delete removes one; where focus goes next is the reference's.
 	test("Backspace or Delete on a chip removes it, and focus moves to the chip before it, or to the input once none are left", async () => {
 		const onChange = vi.fn<OnChange>();
 		render(
@@ -2346,8 +2244,6 @@ describe("Autocomplete: multiple", () => {
 		expect(reason).toBe("createOption");
 	});
 
-	// The reference drops the placeholder once there are chips; the docs call it the hint in the
-	// empty input.
 	test("the placeholder shows only while there are no chips", async () => {
 		render(<Stack placeholder="Add a technology" defaultValue={[nodeJs]} />);
 		const input = combobox("Stack");
@@ -2493,7 +2389,6 @@ describe("Autocomplete: forms", () => {
 describe("Autocomplete: inside a dialog", () => {
 	afterEach(async () => {
 		cleanup();
-		// The dialog's scroll lock and hidden page are gone with it.
 		await vi.waitFor(() => {
 			expect(document.body.style.overflow).toBe("");
 			expect(
@@ -2502,7 +2397,6 @@ describe("Autocomplete: inside a dialog", () => {
 		});
 	});
 
-	// The README: "disablePortal inside a dialog".
 	test("with disablePortal the list opens inside the dialog, and Escape closes the list first, then the dialog", async () => {
 		const onClose = vi.fn<NonNullable<DialogProps["onClose"]>>();
 		render(

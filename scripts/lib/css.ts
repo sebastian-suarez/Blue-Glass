@@ -1,7 +1,3 @@
-/**
-The stylesheet's rules: src/styles/index.css imports, checked against the reference
-bundle's cascade order, and inlined into one file.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import { cssSectionOrder, root } from "./reference.ts";
@@ -10,9 +6,6 @@ const components = path.join(root, "src/components");
 export const entry = path.join(root, "src/styles/index.css");
 const importLine = /^@import\s+"(?<specifier>[^"]+)";\s*$/gmv;
 
-/**
-The section key an imported file stands for, as cssSectionOrder() names them.
-*/
 function sectionOf(file: string): string {
 	const relative = path.relative(root, file).split(path.sep).join("/");
 	const fixed: Record<string, string> = {
@@ -41,9 +34,6 @@ function importsOf(file: string): string[] {
 		.toArray();
 }
 
-/**
-Component folders in src/components that have a stylesheet of their own.
-*/
 function componentsWithStyles(): string[] {
 	if (!fs.existsSync(components)) {
 		return [];
@@ -56,10 +46,6 @@ function componentsWithStyles(): string[] {
 		);
 }
 
-/**
-Checks index.css: tokens.css then foundation.css first, sections in the reference bundle's
-order, and every component stylesheet imported. Returns the imported section keys.
-*/
 export function checkOrder(): string[] {
 	const imported = importsOf(entry).map((file) => {
 		if (!fs.existsSync(file)) {
@@ -102,9 +88,6 @@ export function checkOrder(): string[] {
 	return imported;
 }
 
-/**
-A stylesheet with its import lines replaced by the files they name, recursively.
-*/
 export function inline(file: string, seen = new Set<string>()): string {
 	return fs
 		.readFileSync(file, "utf8")

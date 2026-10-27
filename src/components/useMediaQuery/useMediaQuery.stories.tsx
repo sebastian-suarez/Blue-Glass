@@ -6,7 +6,6 @@ import { Row } from "../../../stories/blocks/preview-kit.js";
 import { Paper } from "../Paper/index.js";
 import { media, useMediaQuery } from "./index.js";
 
-// A hook, so the docs page has no props table.
 const meta = {
 	title: "Utils/useMediaQuery",
 	parameters: { docs: { page: componentDocs(readme) } },
@@ -18,16 +17,11 @@ type Story = StoryObj<typeof meta>;
 
 type MediaName = keyof typeof media;
 
-// Storybook's docgen attaches __docgenInfo to exported objects, so keep only the queries.
 const names = Object.keys(media).filter(
 	(name): name is MediaName =>
 		typeof (media as Record<string, unknown>)[name] === "string",
 );
 
-/**
-One query's live answer: ink while it matches, glass while it doesn't, and in words for screen
-readers.
-*/
 function MediaFlag({ name }: { readonly name: MediaName }) {
 	const isMatching = useMediaQuery(media[name]);
 	return (
@@ -61,9 +55,6 @@ function MediaFlag({ name }: { readonly name: MediaName }) {
 	);
 }
 
-/**
-The hero grid (global.css): two columns from 900px, one below.
-*/
 function HeroGrid() {
 	const isOneColumn = useMediaQuery(media.tablet);
 	return (

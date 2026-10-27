@@ -1,9 +1,4 @@
-/* Diagram: ported from design-system/components/Diagram/styles.css.
-   Also styled by ../TimingChart/TimingChart.css: gl-dg-label, gl-dg-wrap, gl-js. */
-
 @layer gl-components {
-	/* Diagram — the site's .dg-* rules (global.css "Diagram: one SVG per diagram"), renamed .gl-dg-*.
-   Colours are the site's exact values: the region tints, box fill and hairlines are its rgba() literals. */
 	.gl-dg-wrap {
 		display: flex;
 		flex-direction: column;
@@ -15,11 +10,6 @@
 		overflow-x: auto;
 		border-radius: var(--radius-control);
 	}
-	/* The hint shows while the host overflows, under its floor (width × minScale). Until the client
-   measures, CSS decides, so the server HTML lays out as the hydrated page does. The floor differs
-   per figure and a container query takes no var(), so the hint is a container sized
-   (host + 1px) × 64 / floor: the host is under its floor exactly when the hint is under 64px.
-   Its text undoes the scale. */
 	.gl-dg-hint {
 		container: gl-dg-hint / inline-size;
 		width: min(100%, (100% + 1px) * 64 / var(--gl-dg-floor));
@@ -31,7 +21,6 @@
 	.gl-dg-hint-text {
 		display: none;
 		width: calc(100% * var(--gl-dg-floor) / 64 - 1px);
-		/* The reference's 8px gap between the host and the hint. */
 		margin-top: 8px;
 	}
 	@container gl-dg-hint (width < 64px) {
@@ -39,7 +28,6 @@
 			display: block;
 		}
 	}
-	/* Once the client has measured, the measure decides, so the hint changes with the tab stop. */
 	.gl-dg-host[data-scrollable] + .gl-dg-hint > .gl-dg-hint-text {
 		display: block;
 	}
@@ -54,7 +42,6 @@
 		overflow: visible;
 		font-family: var(--font-sans);
 	}
-	/* .dg-region, .dg-region-panel, .dg-region-ring, .dg-region-ring-inner */
 	.gl-dg-region {
 		stroke-width: 1;
 		vector-effect: non-scaling-stroke;
@@ -71,7 +58,6 @@
 		fill: rgba(142, 184, 232, 0.22);
 		stroke: rgba(88, 108, 143, 0.3);
 	}
-	/* .dg-box and the node tones */
 	.gl-dg-box {
 		fill: rgba(255, 255, 255, 0.92);
 		stroke: rgba(88, 108, 143, 0.32);
@@ -93,7 +79,6 @@
 	.gl-dg-node-accent-fill .gl-dg-text {
 		fill: var(--on-ink);
 	}
-	/* .dg-edge, .dg-edge-draw, .dg-head and the accent tone */
 	.gl-dg-edge {
 		fill: none;
 		stroke: var(--dg-edge);
@@ -114,7 +99,6 @@
 	.gl-dg-tone-accent .gl-dg-head {
 		fill: var(--color-blue);
 	}
-	/* The cross end (Mermaid's --x) is two strokes, not a fill. */
 	.gl-dg-head-cross {
 		fill: none;
 		stroke: var(--dg-edge);
@@ -124,22 +108,18 @@
 	.gl-dg-tone-accent .gl-dg-head-cross {
 		stroke: var(--color-blue);
 	}
-	/* .dg-label */
 	.gl-dg-label {
 		fill: var(--color-muted);
 	}
 	.gl-dg-label-accent {
 		fill: var(--color-blue-deep);
 	}
-	/* .dg-pulse */
 	.gl-dg-pulse {
 		fill: #fff;
 		stroke: var(--color-blue);
 		stroke-width: 2.5;
 		filter: drop-shadow(0 0 6px rgba(77, 124, 201, 0.7));
 	}
-
-	/* Entrance (the site's diagram-reveal), staggered by --i. Transitions exist only when motion is welcome. */
 	@media (prefers-reduced-motion: no-preference) {
 		.gl-dg-region {
 			transition: opacity 600ms ease;
@@ -166,9 +146,6 @@
 			transition: opacity 400ms ease 1500ms;
 		}
 	}
-
-	/* Hidden entrance states: screen only, so print never catches a diagram mid-entrance.
-   `armed` is set by the component; `gl-js` on <html> is the site's `.js` pre-state for server-rendered pages. */
 	@media screen and (prefers-reduced-motion: no-preference) {
 		:is(
 				.gl-dg-wrap[data-reveal="armed"],
@@ -198,7 +175,6 @@
 			.gl-dg-edge-draw {
 			stroke-dashoffset: 1;
 		}
-		/* The failsafe: if the reveal never runs, everything lands after 2.5 s. */
 		:root.gl-js
 			.gl-dg-wrap:not([data-reveal])
 			:is(
@@ -220,8 +196,6 @@
 			}
 		}
 	}
-
-	/* SMIL ignores CSS transitions; the component pauses the pulses too. */
 	@media (prefers-reduced-motion: reduce) {
 		.gl-dg-pulses {
 			display: none;

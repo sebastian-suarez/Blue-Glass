@@ -1,8 +1,3 @@
-/*
-The scroll hint in server HTML. The reference shows "Scroll sideways" only once the client has
-measured an overflow, so a page hydrating late moves everything under an overflowing figure.
-Here CSS shows it under the floor before hydration, and hydrating keeps it where it was.
-*/
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, test } from "vitest";
@@ -95,10 +90,6 @@ function hydrate(container: HTMLElement, width: number): string[] {
 	return errors;
 }
 
-/**
-Where each text sits, read from its text node's box as the story layout gate reads it before
-and after hydration: a text that isn't drawn has an empty box.
-*/
 function positions(container: HTMLElement, texts: string[]): string[] {
 	const boxes = new Map<string, DOMRect>();
 	const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);

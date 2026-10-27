@@ -1,13 +1,3 @@
-/**
-Deterministic captures of preview pages in Chromium. Every capture uses the same viewport,
-clock and fonts, and freezes motion the same way before the screenshot:
-
-- finite CSS animations and transitions jump to their end (the state a reader settles on);
-- infinite ones (pulses, spinners, indeterminate bars) pause at their start;
-- SVG animations (the Diagram pulses) pause at time 0.
-
-Without this, two runs of the same page differ by animation phase alone.
-*/
 import type { Buffer } from "node:buffer";
 import type { Browser, BrowserContext, Page } from "playwright";
 import { waitForFonts } from "./fonts.ts";
@@ -19,9 +9,6 @@ export type Box = { x: number; y: number; width: number; height: number };
 
 export type Region = Box & { label: string };
 
-/**
-The moment every capture pretends it is, so dates rendered from "now" never drift.
-*/
 export const fixedNow = new Date("2026-10-21T12:00:00Z");
 
 export { viewports } from "./viewports.ts";
@@ -54,9 +41,6 @@ export async function newContext(
 	return context;
 }
 
-/**
-Opens a page, recording its page errors and console errors, and waits for Satoshi.
-*/
 export async function openPage(
 	context: BrowserContext,
 	url: string,
@@ -71,16 +55,12 @@ export async function openPage(
 			errors.push(`console: ${message.text().split("\n", 1)[0] ?? ""}`);
 		}
 	});
-	// Date reads the fixed moment from the first script on; timers keep running.
 	await page.clock.setFixedTime(fixedNow);
 	await page.goto(url, { waitUntil: "networkidle" });
 	await waitForFonts(page);
 	return { page, errors };
 }
 
-/**
-Freezes CSS, Web Animations and SVG animations as the module comment describes.
-*/
 export async function freeze(page: Page): Promise<void> {
 	await page.evaluate(() => {
 		for (const animation of document.getAnimations()) {
@@ -100,11 +80,6 @@ export async function freeze(page: Page): Promise<void> {
 	});
 }
 
-/**
-Waits until the page stops changing: its size and element count read the same three times in a
-row, 150ms apart, within 15s. Some previews lay out after load (Mermaid draws its diagrams
-asynchronously), and a capture taken mid-layout differs from the next one.
-*/
 async function waitForStableLayout(page: Page): Promise<void> {
 	await page.evaluate(async () => {
 		const read = () => {
@@ -112,7 +87,6 @@ async function waitForStableLayout(page: Page): Promise<void> {
 			return `${documentElement.scrollWidth}×${documentElement.scrollHeight}:${document.querySelectorAll("*").length}`;
 		};
 
-		// Counted, not timed: the page's Date is fixed (openPage), so it never reaches a deadline.
 		let last = read();
 		let unchanged = 0;
 		for (let tries = 0; unchanged < 3 && tries < 100; tries++) {
@@ -127,9 +101,6 @@ async function waitForStableLayout(page: Page): Promise<void> {
 	});
 }
 
-/**
-Waits for fonts, the network, a stable layout and two frames, then freezes motion.
-*/
 export async function settle(page: Page): Promise<void> {
 	await page.waitForLoadState("networkidle");
 	await page.evaluate(async () => {
@@ -146,9 +117,6 @@ export async function settle(page: Page): Promise<void> {
 	await freeze(page);
 }
 
-/**
-A full-page PNG of the frozen page.
-*/
 export async function screenshot(page: Page): Promise<Buffer> {
 	return page.screenshot({
 		fullPage: true,
@@ -158,10 +126,6 @@ export async function screenshot(page: Page): Promise<Buffer> {
 	});
 }
 
-/**
-The regions a preview is made of: each section the preview frame renders (its titled
-groups), in page coordinates, then the whole page.
-*/
 export async function regions(page: Page): Promise<Region[]> {
 	return page.evaluate(() => {
 		const out: Array<{
@@ -199,10 +163,6 @@ export async function regions(page: Page): Promise<Region[]> {
 
 export type TextPosition = { text: string; x: number; y: number };
 
-/**
-Where each visible text inside `scope` sits, in document order and page coordinates. The layout
-checks compare these before and after hydration.
-*/
 export async function textPositions(
 	page: Page,
 	scope = "#root",
@@ -237,10 +197,6 @@ export async function textPositions(
 	}, scope);
 }
 
-/**
-Compares text positions before and after hydration: texts that moved more than 2px, and
-whether the texts themselves changed.
-*/
 export function compareLayouts(
 	before: TextPosition[],
 	after: TextPosition[],
@@ -260,11 +216,6 @@ export function compareLayouts(
 	return { moved, changed: isChanged };
 }
 
-/**
-Every text inside `scope`, seen or not. The server-HTML gate uses it to tell text the server
-HTML hides (a visibility defect) from text it doesn't contain (a portal, or content the client
-measures).
-*/
 export async function allTexts(page: Page, scope = "#root"): Promise<string[]> {
 	return page.evaluate((selector) => {
 		const container = document.querySelector(selector);
@@ -289,11 +240,6 @@ export async function allTexts(page: Page, scope = "#root"): Promise<string[]> {
 	}, scope);
 }
 
-/**
-The text a reader can see inside `scope`: text nodes with a non-empty box whose element and
-ancestors aren't hidden by display, visibility or opacity. The server-HTML gate compares
-this list with and without JavaScript.
-*/
 export async function visibleTexts(
 	page: Page,
 	scope = "#root",
@@ -304,8 +250,6 @@ export async function visibleTexts(
 			return [];
 		}
 
-		// A colour's alpha, 1 when it has none: "rgba(0, 0, 0, 0)" and "color(srgb 0 0 0 / 0)" are 0, and
-		// "rgb(0, 0, 0)" is 1.
 		const alphaOf = (color: string): number => {
 			const alpha =
 				/^rgba\((?:[^,]*,){3}\s*(?<alpha>[\d.]+)\)$/v.exec(color)?.groups
@@ -313,8 +257,6 @@ export async function visibleTexts(
 			return alpha === undefined ? 1 : Number(alpha);
 		};
 
-		// Whether a clip-path's inset() cuts an element's whole width or height away. Computed
-		// insets are in px or %.
 		const isCutAway = (node: Element, clipPath: string): boolean => {
 			const inset = /^inset\((?<values>[^\)]*?)(?: round [^\)]*)?\)$/v.exec(
 				clipPath,
@@ -338,7 +280,6 @@ export async function visibleTexts(
 		};
 
 		const isShown = (element: Element | null): boolean => {
-			// Text in a transparent colour is invisible, unless a background shows through it.
 			const ink = element === null ? undefined : getComputedStyle(element);
 			if (
 				ink !== undefined &&

@@ -19,10 +19,6 @@ function must<T>(value: T | null | undefined): T {
 
 const links = ["Work", "Projects", "Experience", "Contact"];
 
-/**
-The site's identity strip, composed from the documented parts: the brand, the nav pill and
-the action.
-*/
 function IdentityStrip({ current }: { current?: string }) {
 	return (
 		<>
@@ -56,10 +52,6 @@ function IdentityStrip({ current }: { current?: string }) {
 	);
 }
 
-/**
-A 200px scroll container with a bar at its top and a long page under it. A transformed
-container is the containing block of a fixed bar, as in the preview's frame.
-*/
 function ScrollingPage({
 	scrollerRef,
 	barRef,

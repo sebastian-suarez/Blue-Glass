@@ -1,26 +1,3 @@
-/**
-The server-HTML gate (docs/package-plan.md, acceptance suite item 2). For every preview in
-scope it:
-
-1. renders the preview in Node with no window or document (scripts/lib/server-render.ts);
-2. loads that HTML in Chromium with JavaScript off and lists the texts the client render
-   shows inside #root that the server HTML hides or lacks: islands hydrate late, so server
-   HTML has to stand on its own;
-3. hydrates the same HTML and records every recoverable error and every page error;
-4. counts texts that move by more than 2px when the page hydrates (reported here; the story
-   layout gate, scripts/ssr/layout.ts, fails layout shifts).
-
-What fails is in scripts/lib/ssr-rules.ts: any error, any text the server HTML hides, and any
-text it lacks that the reference's server HTML held, visible or not
-(tests/ssr/reference-baseline.json).
-
-Usage:
-  node scripts/ssr/run.ts                       the gate, on the package's build (npm run build first)
-  node scripts/ssr/run.ts --reference           the reference's qualification, every preview
-  node scripts/ssr/run.ts --reference --record  … and records the baseline
-  --only components/Tabs,sections/Hero          limits the previews
-  --phase N                                     overrides the phase
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -66,9 +43,6 @@ function argument(name: string): string | undefined {
 
 const firstLine = (text: string) => text.split("\n", 1)[0] ?? "";
 
-/**
-Text positions inside #root on a page, with JavaScript on (after settling) or off.
-*/
 async function positionsOn(
 	browser: Browser,
 	server: Server,
@@ -150,8 +124,6 @@ async function observe(
 	);
 	await hydrateContext.close();
 	const hydrationErrors = recoverable.map((error) => firstLine(error));
-	// Every error counts: React's production build reports "Minified React error #…", which a
-	// filter on the word "hydration" would miss, and a crash is a failure whatever it says.
 	const pageErrors = [
 		...client.errors.map((error) => `client render: ${error}`),
 		...hydrated.errors.map((error) => `hydrated page: ${error}`),
@@ -250,7 +222,6 @@ async function main(): Promise<number> {
 	const rules: Rules = { runtime, baseline, exceptions };
 	try {
 		for (const preview of chosen) {
-			// One preview at a time: each opens several pages, and timing must not vary.
 			// eslint-disable-next-line no-await-in-loop
 			const observation = await observe(session, preview);
 			const result = judge(preview, observation, rules);

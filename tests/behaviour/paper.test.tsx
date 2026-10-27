@@ -11,9 +11,6 @@ afterEach(async () => {
 	await emulateMedia([]);
 });
 
-/**
-Emulates media features through Chromium's DevTools protocol; an empty list clears them.
-*/
 async function emulateMedia(
 	features: Array<{ name: string; value: string }>,
 ): Promise<void> {
@@ -29,9 +26,6 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-/**
-Renders one Paper and returns its root element, through the documented ref.
-*/
 function root(props: PaperProps): HTMLElement {
 	const ref = React.createRef<HTMLElement>();
 	render(<Paper ref={ref} {...props} />);
@@ -42,9 +36,6 @@ type Variant = NonNullable<PaperProps["variant"]>;
 type Elevation = NonNullable<PaperProps["elevation"]>;
 type Radius = NonNullable<PaperProps["radius"]>;
 
-/**
-The corner radius a token resolves to, read from a probe element styled with it.
-*/
 function resolvedRadius(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderRadius = `var(${token})`;
@@ -120,8 +111,6 @@ test.each(["panel", "pane", "well", "control", "none"] as const)(
 	"radius %s rounds the root's corners with that token",
 	(radius) => {
 		const element = root({ variant: "inset", radius, children: radius });
-		// The class alone isn't the promise: preview.html never sets radius, so parity can't see it.
-		// "Under 700px, radius-panel drops to radius-panel-sm."
 		const token =
 			radius === "panel" && matchMedia("(max-width: 700px)").matches
 				? "--radius-panel-sm"

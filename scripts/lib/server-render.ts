@@ -1,10 +1,3 @@
-/**
-Server rendering of preview pages in Node. A preview's script runs in this realm (a separate
-VM realm breaks `instanceof Date` in the components) with stand-ins for `window` and
-`document`. Its createRoot(...).render(tree) call hands over the tree, which react-dom/server
-renders while the real globals stay undefined, so a component that touches the DOM during
-render throws.
-*/
 import { createRequire } from "node:module";
 import path from "node:path";
 import type * as ReactModule from "react";
@@ -19,9 +12,6 @@ export type Viewport = { width: number; height: number };
 
 export const desktop: Viewport = { width: 1280, height: 900 };
 
-/**
-One media feature, such as "(min-width: 900px)" or "(hover: hover)".
-*/
 function doesFeatureMatch(text: string, viewport: Viewport): boolean {
 	const feature = text.trim();
 	if (feature === "all" || feature === "screen") {
@@ -48,10 +38,6 @@ function doesFeatureMatch(text: string, viewport: Viewport): boolean {
 	return answers[name] ?? false;
 }
 
-/**
-Answers the media queries the previews ask, for a reader at `viewport` with a mouse and no
-preferences set: widths, heights, hover and pointer. Anything else is false.
-*/
 export function doesQueryMatch(query: string, viewport: Viewport): boolean {
 	return query
 		.replace(/^@media\s+/v, "")
@@ -71,9 +57,6 @@ export function doesQueryMatch(query: string, viewport: Viewport): boolean {
 
 export type ServerRender = { html: string } | { error: string };
 
-/**
-Renders a preview with `blueGlass` as its window.BlueGlass, for a reader at `viewport`.
-*/
 export function renderPreview(
 	preview: Preview,
 	blueGlass: Record<string, unknown>,
@@ -108,7 +91,6 @@ export function renderPreview(
 	/* eslint-enable @typescript-eslint/naming-convention */
 	const stubDocument = { getElementById: () => ({}) };
 	try {
-		// The preview scripts are the reference's own pages; running them is the point.
 		// eslint-disable-next-line no-new-func
 		const run = new Function(
 			"window",

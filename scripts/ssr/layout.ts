@@ -1,27 +1,3 @@
-/**
-The story layout gate (docs/package-plan.md, acceptance suite item 2). The portfolio renders
-its pages on the server and hydrates the interactive parts later, so a story's server HTML has
-to lay out as its hydrated page does, at a phone width and a desktop width. A layout chosen in
-JavaScript (useMediaQuery) fails here: the server can't know the viewport, so its HTML has the
-wrong layout on one of the two widths until hydration.
-
-For each story in the stories files tests/ssr/layout.json lists up to the current phase, and
-for 390px and 1280px:
-
-1. the story, with .storybook/preview.tsx's decorators, renders to HTML in Node;
-2. that HTML loads with JavaScript off, and each text's position is read;
-3. the same HTML hydrates, and the positions are read again.
-
-A story fails when a text moves by more than 2px, the texts change, hydration reports an
-error, or the page logs one.
-
-Usage:
-  node scripts/ssr/layout.ts          the gate, for the phase in scope
-  node scripts/ssr/layout.ts --self   proves it on tests/ssr/fixtures/layout.stories.tsx: the
-                                      CSS layout must pass and the useMediaQuery one must fail
-                                      at 390px
-  --phase N                           overrides the phase
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -56,10 +32,6 @@ type Outcome = {
 const work = path.join(root, ".cache/story-gate");
 const selfTest = "tests/ssr/fixtures/layout.stories.tsx";
 
-/**
-What the fixture stories must do: JsLayout picks its columns with a media query hook, so it
-must fail at the phone width; CssLayout uses CSS and must pass.
-*/
 const selfExpectation: Expectation = {
 	/* eslint-disable @typescript-eslint/naming-convention -- the keys are the fixture stories' export names */
 	JsLayout: { phone: false, desktop: true },
@@ -67,13 +39,9 @@ const selfExpectation: Expectation = {
 	/* eslint-enable @typescript-eslint/naming-convention */
 };
 
-// The filter runs in Go's regexp engine inside esbuild, which rejects JavaScript flags.
 // eslint-disable-next-line require-unicode-regexp
 const rawImport = /\?raw$/;
 
-/**
-Loads `file?raw` imports as text, as Vite does.
-*/
 const rawText: Plugin = {
 	name: "raw-text",
 	setup(builder) {
@@ -97,10 +65,6 @@ const nodeRequire =
 
 const slug = (file: string) => file.replaceAll(/\W+/gv, "-");
 
-/**
-Bundles a stories file twice: for Node, to render each story to HTML, and for the browser, to
-hydrate that HTML. Both compose the stories with the preview's decorators.
-*/
 async function bundle(
 	file: string,
 ): Promise<{ node: string; browser: string }> {
@@ -143,7 +107,6 @@ async function bundle(
 		loader: { ".css": "empty" as const },
 		logLevel: "warning" as const,
 		tsconfigRaw: { compilerOptions: { jsx: "react-jsx" as const } },
-		// Stories file paths sit outside this folder, so dependencies resolve from the root.
 		nodePaths: [path.join(root, "node_modules")],
 	};
 	const node = path.join(work, `${slug(file)}.node.mjs`);
@@ -156,8 +119,6 @@ async function bundle(
 		format: "esm",
 		external: ["react", "react-dom"],
 		plugins: [rawText],
-		// Base UI's CommonJS dependencies (use-sync-external-store) require React, which stays
-		// external; ESM output has no require of its own, so the bundle gets Node's.
 		banner: { js: nodeRequire },
 	});
 	await build({

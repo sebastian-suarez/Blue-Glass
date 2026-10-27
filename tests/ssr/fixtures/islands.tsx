@@ -1,9 +1,3 @@
-/**
-The portfolio's interactive islands, as it will ship them: rendered on the server, then hydrated
-later (Astro's client:visible). scripts/ssr/islands.ts renders each in Node, checks that its HTML
-works before hydration, hydrates it after those checks, and checks that it then behaves as the
-READMEs document. Copy follows the reference previews.
-*/
 import {
 	Accordion,
 	AccordionDetails,
@@ -14,10 +8,6 @@ import {
 	Tabs,
 } from "#ui";
 
-/**
-The client-work folio (sections/ClientWork), with the second project chosen so a server that
-falls back to the first tab shows the wrong panel.
-*/
 function ClientWork() {
 	return (
 		<Tabs variant="side" aria-label="Choose a project" defaultValue="intive">
@@ -37,9 +27,6 @@ function ClientWork() {
 	);
 }
 
-/**
-A project's underline tabs, whose last tab is disabled.
-*/
 function ProjectTabs() {
 	return (
 		<Tabs aria-label="VSebCode" defaultValue="overview">
@@ -63,9 +50,6 @@ function ProjectTabs() {
 	);
 }
 
-/**
-The career list: the first row open, the second closed, the third disabled.
-*/
 function Career() {
 	return (
 		<div className="gl-accordion-surface">
@@ -103,9 +87,6 @@ function Career() {
 	);
 }
 
-/**
-The capabilities panes, with Backend open.
-*/
 function Capabilities() {
 	return (
 		<PaneAccordion

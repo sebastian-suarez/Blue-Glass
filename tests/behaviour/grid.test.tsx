@@ -10,10 +10,6 @@ afterEach(() => {
 	cleanup();
 });
 
-// Layout here sticks to values that hold at every width: plain numbers and xs. The sm to xl
-// breakpoints are viewport media queries, which these specs don't resize, except to pin a
-// phone width where a spec says so.
-
 type Placement = { left: number; top: number; width: number };
 
 type Item = GridProps & { id: string };
@@ -26,14 +22,10 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-// Offsets are percentages of an item's own area, so layout units leave a residue of 1/64px.
 function round(value: number): number {
 	return Math.round(value * 10) / 10;
 }
 
-/**
-Where each test id sits inside the element with the "grid" test id.
-*/
 function measure(ids: string[]): Record<string, Placement> {
 	const grid = screen.getByTestId("grid").getBoundingClientRect();
 	const placements: Record<string, Placement> = {};
@@ -49,9 +41,6 @@ function measure(ids: string[]): Record<string, Placement> {
 	return placements;
 }
 
-/**
-Renders a Grid container of the given width, with items 10px tall, and measures the items.
-*/
 function layout(
 	width: number,
 	props: GridProps,
@@ -187,7 +176,6 @@ test("offset pushes an item from where it would sit, as in MUI", () => {
 });
 
 test("an offset counts the column gaps it skips", () => {
-	// 12 columns of 76px with 24px gaps.
 	expect(
 		layout(1176, { spacing: "lg" }, [
 			{ id: "a", size: 6, offset: 3 },
@@ -220,7 +208,6 @@ const rows: Item[] = [
 ];
 
 test("spacing sets the gap between rows and between columns", () => {
-	// 12 columns of 84px with 16px gaps.
 	expect(layout(1184, { spacing: "md" }, rows)).toEqual({
 		a: { left: 0, top: 0, width: 584 },
 		b: { left: 600, top: 0, width: 584 },
@@ -237,7 +224,6 @@ test("rowSpacing wins over spacing for the gap between rows", () => {
 });
 
 test("columnSpacing wins over spacing for the gap between columns", () => {
-	// 12 columns of 76px with 24px gaps.
 	expect(layout(1176, { spacing: "md", columnSpacing: "lg" }, rows)).toEqual({
 		a: { left: 0, top: 0, width: 576 },
 		b: { left: 600, top: 0, width: 576 },
@@ -274,7 +260,6 @@ test("a Grid can be a container and an item at once", () => {
 referenceDefectTest(
 	"a container that's also an item fills its row below its first size, whatever its own columns",
 	async () => {
-		// A phone width, below md.
 		await page.viewport(414, 896);
 		render(
 			<Grid container data-testid="grid" style={{ width: 400 }}>
@@ -293,7 +278,6 @@ referenceDefectTest(
 referenceDefectTest(
 	"an offset waits for the item's first size: below it the item fills its row",
 	async () => {
-		// A phone width, below md.
 		await page.viewport(414, 896);
 		render(
 			<Grid container data-testid="grid" style={{ width: 400 }}>

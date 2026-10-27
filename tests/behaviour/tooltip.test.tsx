@@ -1,8 +1,3 @@
-// Behaviour specs for Tooltip, from design-system/components/Tooltip/README.md and api.d.ts. The
-// delays are the README's timers: short ones are passed as props, a "done" is a poll after the
-// delay, and the elapsed time is taken before the action that starts it, so it can only run long.
-// Touch runs through Chromium's own touch input (CDP), so a long press sends the pointer and
-// touch events a finger does.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -23,10 +18,6 @@ import {
 
 const email = "contact@sebastiansuarez.dev";
 
-/**
-Parks the pointer at the left of the page, mid-height, clear of every trigger below: a trigger
-that appears under a resting pointer can count as hovered without a move.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -52,10 +43,6 @@ type HintedProps = Omit<TooltipProps, "title" | "children"> & {
 	readonly ref?: React.Ref<HTMLElement>;
 };
 
-/**
-The Default example: "Email me" described by the address, between a "Before" and an "After"
-button, with "Elsewhere" in a corner to move the pointer to.
-*/
 function Hinted({ title = email, ...props }: HintedProps) {
 	return (
 		<>
@@ -91,10 +78,6 @@ function box(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-/**
-Whether the element is in the document and drawn: a box, and neither display none nor
-visibility hidden on it or an ancestor.
-*/
 function isShown(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -105,9 +88,6 @@ function isShown(element: Element): boolean {
 	);
 }
 
-/**
-The drawn elements whose own text is `text`: an open tooltip's surface, wherever it renders.
-*/
 function shownWith(text: string): HTMLElement[] {
 	return screen.queryAllByText(text).filter((element) => isShown(element));
 }
@@ -126,22 +106,14 @@ async function pause(ms: number): Promise<void> {
 	});
 }
 
-// The README's hand-off: within 300ms of a tooltip closing, the next one opens at once.
 const handOff = 300;
 
-/**
-Waits out the hand-off window a tooltip closed by the previous test may have opened, so a
-hover waits for its full delay.
-*/
 async function coldStart(): Promise<void> {
 	await pause(handOff * 2);
 }
 
 type AnyEvent = React.SyntheticEvent | Event | null | undefined;
 
-/**
-The native event of a documented callback's event, which may be a React event or a native one.
-*/
 function nativeOf(event: AnyEvent): Event | undefined {
 	return event instanceof Event ? event : (event?.nativeEvent ?? undefined);
 }
@@ -149,9 +121,6 @@ function nativeOf(event: AnyEvent): Event | undefined {
 type OnOpen = NonNullable<TooltipProps["onOpen"]>;
 type OnClose = NonNullable<TooltipProps["onClose"]>;
 
-/**
-A point in the test page's own coordinates, in the coordinates Chromium's input takes.
-*/
 function inputPoint(element: Element): { x: number; y: number } {
 	const frame = window.frameElement;
 	const offset = frame ? box(frame) : { left: 0, top: 0 };
@@ -193,9 +162,6 @@ function expectNear(
 	).toBeLessThanOrEqual(tolerance);
 }
 
-/**
-Checks that `tip` sits on the placement's side of `anchor`, `gap` away, lined up as named.
-*/
 function expectPlaced(
 	tip: Element,
 	anchor: Element,
@@ -252,9 +218,6 @@ function expectPlaced(
 
 const placedAt = { left: 157, top: 420 };
 
-/**
-A tooltip held open on a trigger fixed at `at`, for reading where it lands.
-*/
 function Placed({
 	title = "Copy email",
 	at = placedAt,
@@ -355,7 +318,6 @@ describe("Tooltip: what it says and to whom", () => {
 		await vi.waitFor(() => {
 			expect(box(tooltip).width).toBeLessThanOrEqual(280.5);
 			expect(box(tooltip).width).toBeGreaterThan(200);
-			// More than one line of 12px text.
 			expect(box(tooltip).height).toBeGreaterThan(40);
 		});
 	});
@@ -367,7 +329,6 @@ describe("Tooltip: hover", () => {
 		const onOpen = vi.fn<OnOpen>();
 		const onClose = vi.fn<OnClose>();
 		render(<Hinted enterDelay={300} onOpen={onOpen} onClose={onClose} />);
-		// Taken before the hover is sent, so the elapsed time can only run long.
 		const start = performance.now();
 		await userEvent.hover(trigger());
 		await expectOpen(email, 2000);
@@ -403,7 +364,6 @@ describe("Tooltip: hover", () => {
 		render(<Hinted enterDelay={0} />);
 		await userEvent.hover(trigger());
 		await expectOpen();
-		// Up from the child's top edge into the 8px gap, then onto the tooltip above it.
 		await userEvent.hover(trigger(), {
 			position: { x: box(trigger()).width / 2, y: -4 },
 			force: true,
@@ -419,7 +379,6 @@ describe("Tooltip: hover", () => {
 		render(<Hinted disableInteractive enterDelay={0} />);
 		await userEvent.hover(trigger());
 		await expectOpen();
-		// The tooltip may let the pointer through, so move there whatever is on top.
 		await userEvent.hover(shownWith(email)[0], { force: true });
 		await expectClosed();
 	});
@@ -444,7 +403,6 @@ describe("Tooltip: hover", () => {
 		await expectClosed();
 		expect(onClose).toHaveBeenCalledTimes(1);
 		expect(nativeOf(onClose.mock.calls[0]?.[0])).toBeInstanceOf(MouseEvent);
-		// The pointer moves about on the child: still hidden.
 		await userEvent.hover(trigger(), { position: { x: 6, y: 6 } });
 		await pause(300);
 		expect(shownWith(email)).toHaveLength(0);
@@ -565,7 +523,6 @@ describe("Tooltip: keyboard", () => {
 describe("Tooltip: Escape inside a dialog", () => {
 	afterEach(async () => {
 		cleanup();
-		// The dialog's scroll lock and hidden page are gone with it.
 		await vi.waitFor(() => {
 			expect(document.body.style.overflow).toBe("");
 			expect(
@@ -593,7 +550,6 @@ describe("Tooltip: Escape inside a dialog", () => {
 		await userEvent.tab();
 		expect(button("Copy link")).toHaveFocus();
 		await expectOpen("Copies a private link");
-		// It floats at z-tooltip, above the dialog.
 		const tip = shownWith("Copies a private link")[0];
 		const { left, top, width, height } = box(tip);
 		const halfWidth = width / 2;
@@ -619,7 +575,6 @@ describe("Tooltip: touch", () => {
 		render(
 			<Hinted enterTouchDelay={400} leaveTouchDelay={800} onOpen={onOpen} />,
 		);
-		// Each time is taken before the input is sent, so the elapsed times can only run long.
 		const pressed = performance.now();
 		await touchStart(trigger());
 		await expectOpen(email, 2500);

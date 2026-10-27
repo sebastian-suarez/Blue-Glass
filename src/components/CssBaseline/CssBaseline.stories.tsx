@@ -6,8 +6,6 @@ import { Button } from "../Button/index.js";
 import { Paper } from "../Paper/index.js";
 import { CssBaseline } from "./CssBaseline.js";
 
-// The preview renders its whole page inside one CssBaseline; each story mounts its own, so
-// the resets hold while it shows.
 const meta = {
 	title: "Utils/CssBaseline",
 	component: CssBaseline,

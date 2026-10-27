@@ -1,7 +1,4 @@
-/* Blue Glass — Chip, ported from design-system/components/Chip/styles.css. */
-
 @layer gl-components {
-	/* Chip — the site's .chip, .chip-sm and .plate (global.css), plus clickable, selected and deletable states */
 	.gl-chip {
 		position: relative;
 		display: inline-flex;
@@ -10,8 +7,8 @@
 		max-width: 100%;
 		min-width: 0;
 		margin: 0;
-		padding: 5px 11px; /* .chip */
-		border: 1px solid rgba(88, 108, 143, 0.16); /* .chip */
+		padding: 5px 11px;
+		border: 1px solid rgba(88, 108, 143, 0.16);
 		border-radius: var(--radius-pill);
 		background: var(--glass-control);
 		color: var(--ink-soft);
@@ -51,8 +48,6 @@
 		--gl-avatar-scale: 0.5;
 		font-size: 9px;
 	}
-
-	/* sm: .chip-sm */
 	.gl-chip-sm {
 		padding: 4px 9px;
 		font-size: 11.5px;
@@ -69,14 +64,12 @@
 		--gl-avatar-scale: 0.45;
 		font-size: 8px;
 	}
-
-	/* plate: .plate, the employer strip's tag */
 	.gl-chip-plate {
 		padding: 7px 15px;
 		border-color: var(--glass-edge);
 		background: var(--glass-inset);
 		box-shadow: var(--shadow-plate);
-		color: #33405a; /* .plate */
+		color: #33405a;
 		font-size: 13px;
 	}
 	.gl-chip-plate.gl-chip-sm {
@@ -95,9 +88,6 @@
 		--gl-avatar-scale: 0.6;
 		font-size: 10px;
 	}
-
-	/* Tones: the *-soft grounds with status text, keeping the chip's hairline (info-soft is close to the
-   canvas); accent is the accent pane's wash (.pane-accent). */
 	.gl-chip-accent {
 		border-color: var(--glass-edge);
 		background: linear-gradient(
@@ -127,8 +117,6 @@
 		background: var(--info-soft);
 		color: var(--info);
 	}
-
-	/* Clickable: a button or link with the button's hover and press. */
 	.gl-chip-clickable {
 		cursor: pointer;
 		user-select: none;
@@ -143,16 +131,12 @@
 	.gl-chip-split:not(.gl-chip-disabled):has(> .gl-chip-action:active) {
 		transform: scale(0.98);
 	}
-
-	/* Selected: the ink fill of .btn-primary. */
 	.gl-chip-selected {
 		border-color: var(--color-ink);
 		background: var(--color-ink);
 		color: var(--on-ink);
 		box-shadow: none;
 	}
-
-	/* Focus: the base ring, offset 2px for a dense control. */
 	.gl-chip:focus-visible,
 	.gl-chip-split:has(> .gl-chip-action:focus-visible) {
 		outline: 3px solid var(--focus);
@@ -161,8 +145,6 @@
 	.gl-chip-action:focus-visible {
 		outline: none;
 	}
-
-	/* Clickable and deletable: two sibling buttons in one pill. */
 	.gl-chip.gl-chip-split {
 		gap: 0;
 		padding: 0 4px 0 0;
@@ -199,8 +181,6 @@
 	.gl-chip-plate.gl-chip-sm .gl-chip-action {
 		padding: 5px 6px 5px 11px;
 	}
-
-	/* Delete: an 18px close button with a 30px hit area. */
 	.gl-chip-deletable {
 		padding-inline-end: 4px;
 	}
@@ -262,8 +242,6 @@
 	.gl-chip-delete:not(:disabled):active {
 		transform: scale(0.98);
 	}
-
-	/* Disabled: no hover, no press. */
 	.gl-chip-disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
@@ -282,13 +260,11 @@
 			):has(> .gl-chip-action:hover) {
 			background-color: var(--glass-raised);
 		}
-		/* .plate:hover — the site lifts every plate, static ones too */
 		.gl-chip-plate:not(.gl-chip-disabled):not(.gl-chip-toned):not(
 				.gl-chip-selected
 			):hover {
 			background-color: rgba(255, 255, 255, 0.8);
 		}
-		/* Tones keep their ground under a white veil. */
 		.gl-chip-clickable.gl-chip-toned:not(.gl-chip-split):not(
 				.gl-chip-disabled
 			):not(.gl-chip-selected):hover,

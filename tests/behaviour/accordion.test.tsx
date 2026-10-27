@@ -1,7 +1,3 @@
-// Behaviour specs for Accordion, AccordionSummary, AccordionDetails and PaneAccordion, from
-// design-system/components/Accordion/README.md and api.d.ts. They run at the default test
-// viewport (414px wide), where every PaneAccordion orientation stacks its panes, except the
-// side-by-side panes' own behaviour, which runs at a desktop width.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
@@ -39,9 +35,6 @@ type RowProps = React.ComponentProps<typeof Accordion> & {
 	readonly details: string;
 };
 
-/**
-One row of the career list: a summary with the title only, and one paragraph of details.
-*/
 function Row({ summary, details, ...props }: Readonly<RowProps>) {
 	return (
 		<Accordion {...props}>
@@ -60,9 +53,6 @@ type CareerProps = {
 
 const none: readonly string[] = [];
 
-/**
-The career list: sibling rows on one surface.
-*/
 function Career({ disabled = none, open = none }: CareerProps) {
 	return (
 		<div className="gl-accordion-surface">
@@ -79,9 +69,6 @@ function Career({ disabled = none, open = none }: CareerProps) {
 	);
 }
 
-/**
-Rows controlled from a parent, one open at a time, as the README suggests.
-*/
 function SingleOpenCareer() {
 	const [open, setOpen] = React.useState<string | false>("Intive");
 	return (
@@ -135,14 +122,8 @@ const panes: Pane[] = [
 	},
 ];
 
-/**
-The ids the panes answer to: an item's own id, or else its title, slugified.
-*/
 const paneIds = ["backend", "frontend-and-mobile", "data-and-cloud", "making"];
 
-/**
-PaneAccordion with its open panes kept in a parent's state.
-*/
 function Capabilities({ onChange }: { readonly onChange?: OnPaneChange }) {
 	const [open, setOpen] = React.useState<string[]>([]);
 	return (
@@ -161,9 +142,6 @@ function button(name: string | RegExp): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-A summary's disabled state, whether it's the native attribute or aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		(element instanceof HTMLButtonElement && element.disabled) ||
@@ -171,9 +149,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Waits until the text is out of sight: hidden, or not in the document at all.
-*/
 async function expectHidden(text: string): Promise<void> {
 	await vi.waitFor(() => {
 		const element = screen.queryByText(text);
@@ -192,10 +167,6 @@ function ancestors(element: Element): Element[] {
 	return found;
 }
 
-/**
-Whether the element shows on screen: not hidden or transparent, and not clipped away by an
-ancestor that hides its overflow.
-*/
 function isShown(element: Element): boolean {
 	if (
 		!element.checkVisibility({
@@ -228,9 +199,6 @@ function isShown(element: Element): boolean {
 	return right > left && bottom > top;
 }
 
-/**
-Whether `later` comes after `earlier` in document order.
-*/
 function isBefore(earlier: Node, later: Node): boolean {
 	const range = document.createRange();
 	range.setStartBefore(earlier);
@@ -238,26 +206,17 @@ function isBefore(earlier: Node, later: Node): boolean {
 	return range.comparePoint(later, 0) === 1;
 }
 
-/**
-Puts focus on a button before the rows, so Tab reaches them the way a reader does.
-*/
 function focusBefore(): HTMLElement {
 	const before = button("Before");
 	before.focus();
 	return before;
 }
 
-/**
-Presses `key` and waits for focus to land on the button named `name`.
-*/
 async function move(key: string, name: string): Promise<void> {
 	await userEvent.keyboard(key);
 	await expect.element(button(name)).toHaveFocus();
 }
 
-/**
-The titles of the panes whose buttons say they're expanded, in order.
-*/
 function expandedPanes(): string[] {
 	return panes
 		.filter(
@@ -266,9 +225,6 @@ function expandedPanes(): string[] {
 		.map((item) => item.title);
 }
 
-/**
-The ids of the panes whose buttons say they're expanded, sorted.
-*/
 function expandedIds(): string[] {
 	return paneIds
 		.filter(
@@ -399,7 +355,6 @@ describe("Accordion", () => {
 		await expect.element(button("EPAM")).toHaveFocus();
 		await userEvent.tab();
 		await expect.element(button("Intive")).toHaveFocus();
-		// Forced: Playwright won't press an element that says it's disabled.
 		await userEvent.click(disabled, { force: true });
 		expect(onChange).not.toHaveBeenCalled();
 		expect(disabled).toHaveAttribute("aria-expanded", "false");
@@ -630,8 +585,6 @@ describe("Accordion", () => {
 				},
 				{ timeout: 5000 },
 			);
-			// Only exits after the second press count: the reference also reports a closed first
-			// render as exited.
 			const exitedBefore = exited.length;
 			await userEvent.click(button("EPAM"));
 			await vi.waitFor(
@@ -641,7 +594,6 @@ describe("Accordion", () => {
 				{ timeout: 5000 },
 			);
 			expect(pressed).toHaveLength(2);
-			// Timers never fire early, so these are lower bounds; 5 ms covers clock rounding.
 			expect(entered[0] - pressed[0]).toBeGreaterThanOrEqual(enter - 5);
 			expect(exited[exitedBefore] - pressed[1]).toBeGreaterThanOrEqual(
 				exit - 5,
@@ -923,8 +875,6 @@ describe("PaneAccordion", () => {
 	test("a press anywhere on a pane toggles it", async () => {
 		const onChange = vi.fn<OnPaneChange>();
 		render(<PaneAccordion items={panes} open={[]} onChange={onChange} />);
-		// Forced: Playwright won't click an element something covers, and the pane's tap target
-		// may cover the blurb. The click lands on whatever is on top there.
 		await userEvent.click(screen.getByText(panes[2].text), { force: true });
 		expect(onChange).toHaveBeenCalledTimes(1);
 		expect(onChange.mock.calls[0][1]).toEqual(["data-and-cloud"]);
@@ -993,8 +943,6 @@ describe("PaneAccordion keyboard", () => {
 });
 
 describe("PaneAccordion side by side, at a desktop width", () => {
-	// From 900px the panes sit side by side, closed panes keep their chips hidden, and a pane
-	// widens when it's open, hovered or focused.
 	beforeEach(async () => {
 		await page.viewport(1280, 900);
 	});
@@ -1019,7 +967,6 @@ describe("PaneAccordion side by side, at a desktop width", () => {
 				<PaneAccordion items={panes} />
 			</>,
 		);
-		// The pane: the smallest element that holds both its button and its blurb.
 		const blurb = screen.getByText(panes[2].text);
 		let pane: HTMLElement = button("Data and cloud");
 		while (!pane.contains(blurb) && pane.parentElement) {
@@ -1037,7 +984,6 @@ describe("PaneAccordion side by side, at a desktop width", () => {
 		await vi.waitFor(() => {
 			expect(isShown(screen.getByText("PostgreSQL"))).toBe(true);
 			expect(isShown(screen.getByText("IAM"))).toBe(true);
-			// Its flex-grow goes from 1 to 2.6; the other panes' content keeps the gain below 2.6x.
 			expect(pane.getBoundingClientRect().width).toBeGreaterThan(before * 1.2);
 		});
 		expect(isShown(screen.getByText("React"))).toBe(false);

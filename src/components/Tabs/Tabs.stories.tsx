@@ -70,9 +70,6 @@ const projects = [
 	},
 ];
 
-/**
-The preview's site sections: underline tabs over four panels.
-*/
 function SiteSections(props: TabsProps) {
 	return (
 		<Tabs aria-label="Sections" {...props}>
@@ -107,9 +104,6 @@ function SiteSections(props: TabsProps) {
 	);
 }
 
-/**
-The client-work folio: the side selector beside a glass panel per project.
-*/
 function ClientWork() {
 	return (
 		<Tabs variant="side" aria-label="Choose a project" defaultValue="limber">
@@ -177,9 +171,6 @@ function ClientWork() {
 	);
 }
 
-/**
-Default's tabs: the args drive them, and a click sets the value arg.
-*/
 function SiteSectionsWithArgs(
 	args: TabsProps,
 	{ viewMode }: { readonly viewMode: string },
@@ -299,8 +290,6 @@ export const Example: Story = {
 	render: () => <ClientWork />,
 };
 
-// Example at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const ExampleOnPhone: Story = {
 	...Example,
 	name: "Example on a phone",

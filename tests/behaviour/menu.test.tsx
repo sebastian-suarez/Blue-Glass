@@ -1,7 +1,3 @@
-// Behaviour specs for Menu, MenuItem and MenuList, from design-system/components/Menu/README.md
-// and api.d.ts. MenuItem has two modes (docs/package-plan.md): inside a Menu, where a port runs
-// on Base UI's Menu, and inside a standalone MenuList, so the keys and the items' props run in
-// both. The Popover specs cover the anchoring and the modal layer Menu shares with Popover.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, type Mock, test, vi } from "vitest";
@@ -18,13 +14,11 @@ import {
 
 afterEach(async () => {
 	cleanup();
-	// Link items follow hash hrefs; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
 		window.location.pathname + window.location.search,
 	);
-	// Every menu is gone: the page scrolls and is exposed to assistive tech again.
 	await expect.poll(() => isScrollLocked()).toBe(false);
 	await expect
 		.poll(
@@ -38,23 +32,13 @@ type OnClick = (event: React.MouseEvent<HTMLElement>) => void;
 
 type ProjectMenuProps = Omit<MenuProps, "open" | "anchorEl" | "onClose"> & {
 	readonly onClose?: OnClose;
-	/**
-	Whether the parent sets open to false when onClose asks, as the README's usage does.
-	*/
 	readonly closes?: boolean;
-	/**
-	Where the button sits, fixed in the viewport, and how wide it is if not its text's width.
-	*/
 	readonly at?: { left: number; top: number; width?: number };
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
 const menuButtonAt = { left: 48, top: 96 };
 
-/**
-The README's usage: a button with an id, aria-haspopup, aria-expanded and aria-controls opens a
-controlled Menu anchored to it, and onClose sets open back to false.
-*/
 function ProjectMenu({
 	onClose,
 	closes = true,
@@ -96,11 +80,7 @@ function ProjectMenu({
 	);
 }
 
-/**
-Opens the menu from its button, as a person does, and waits until it shows.
-*/
 async function openMenu(): Promise<{ button: HTMLElement; menu: HTMLElement }> {
-	// Found before opening: once open, the page may be hidden from assistive tech.
 	const button = screen.getByRole("button", { name: "Project actions" });
 	await userEvent.click(button);
 	const menu = await vi.waitFor(() =>
@@ -115,9 +95,6 @@ async function expectClosed(): Promise<void> {
 		.toBeNull();
 }
 
-/**
-A press on the page away from the button and the menu.
-*/
 async function pressOutside(): Promise<void> {
 	await userEvent.click(document.body, {
 		force: true,
@@ -125,9 +102,6 @@ async function pressOutside(): Promise<void> {
 	});
 }
 
-/**
-The menu item with this name, a plain one or a radio.
-*/
 function item(name: string | RegExp): HTMLElement {
 	return (
 		screen.queryByRole("menuitem", { name }) ??
@@ -135,9 +109,6 @@ function item(name: string | RegExp): HTMLElement {
 	);
 }
 
-/**
-Presses each key in turn and waits for focus to land on the item named next to it.
-*/
 async function walk(
 	steps: ReadonlyArray<readonly [key: string, name: string]>,
 ): Promise<void> {
@@ -155,9 +126,6 @@ function rowHeights(names: readonly string[]): number[] {
 	);
 }
 
-/**
-Whether the elements come in this order in the document.
-*/
 function isInOrder(...elements: Array<Element | undefined>): boolean {
 	const all = [...document.querySelectorAll("*")];
 	const positions = elements.map((element) =>
@@ -168,16 +136,10 @@ function isInOrder(...elements: Array<Element | undefined>): boolean {
 	);
 }
 
-/**
-The DOM event behind a callback's event, whether it came wrapped or native.
-*/
 function nativeOf(event: React.SyntheticEvent | Event): Event {
 	return event instanceof Event ? event : event.nativeEvent;
 }
 
-/**
-What onClose got on its only call.
-*/
 function onlyClose(
 	onClose: Mock<OnClose>,
 ): [React.SyntheticEvent | KeyboardEvent, MenuCloseReason] {
@@ -190,18 +152,12 @@ function onlyClose(
 	return [event, reason];
 }
 
-/**
-Whether the page can't scroll: what a scroll lock sets on the viewport's scroller.
-*/
 function isScrollLocked(): boolean {
 	return [document.documentElement, document.body].some((element) =>
 		/^(?:hidden|clip)$/v.test(getComputedStyle(element).overflowY),
 	);
 }
 
-/**
-A few rendering frames: long enough for anything an opening menu does to focus.
-*/
 async function frames(count = 3): Promise<void> {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -211,10 +167,6 @@ async function frames(count = 3): Promise<void> {
 	}
 }
 
-/**
-How the surface misses the placement against its button: the 8px gap on the side, and the
-start or end edges lined up. Empty when it sits right.
-*/
 function misplacement(
 	anchor: Element,
 	surface: Element | null,
@@ -229,7 +181,6 @@ function misplacement(
 	const [side, align] = placement.split("-", 2);
 	const problems: string[] = [];
 	const near = (what: string, actual: number, expected: number) => {
-		// Rounding and subpixel layout, not a misplacement.
 		if (Math.abs(actual - expected) > 1.5) {
 			problems.push(
 				`${what} at ${actual.toFixed(1)}, not ${expected.toFixed(1)}`,
@@ -267,9 +218,6 @@ function newClicks(): Clicks {
 	};
 }
 
-/**
-A project's actions: a separator after Share, a disabled item, and a danger one.
-*/
 function projectActions(clicks: Clicks = newClicks()): React.ReactNode {
 	return [
 		<MenuItem key="copy" onClick={clicks.copy}>
@@ -294,11 +242,6 @@ const allActions = ["Copy link", "Share", "Archive", "Delete", "Download"];
 
 type Mode = "menu" | "list";
 
-/**
-Shows items as a person meets them: in a Menu opened from its button, or in a standalone
-MenuList tabbed into from the button before it. Either way focus lands on an item. The list's
-dense and disableListWrap go to the Menu (the second through MenuListProps) or the MenuList.
-*/
 async function present(
 	mode: Mode,
 	items: React.ReactNode,
@@ -376,7 +319,6 @@ describe.each([
 	test("disableListWrap stops the arrows at the first and last item", async () => {
 		await present(mode, projectActions(), { disableListWrap: true });
 		await expect.element(item("Copy link")).toHaveFocus();
-		// Each stop is followed by a move that only lands right if the stop held.
 		await walk([
 			["{ArrowUp}", "Copy link"],
 			["{ArrowDown}", "Share"],
@@ -398,10 +340,8 @@ describe.each([
 		expect(archive).toHaveAttribute("aria-disabled", "true");
 		await userEvent.keyboard("{Enter}");
 		await userEvent.keyboard(" ");
-		// Playwright waits for aria-disabled elements to enable; force the press.
 		await userEvent.click(archive, { force: true });
 		expect(clicks.archive).not.toHaveBeenCalled();
-		// Still there, and still answering keys.
 		await walk([["{ArrowDown}", "Delete"]]);
 		expect(onClose).not.toHaveBeenCalled();
 	});
@@ -418,7 +358,6 @@ describe.each([
 	test("typing quickly matches a word", async () => {
 		await present(mode, projectActions());
 		await expect.element(item("Copy link")).toHaveFocus();
-		// "d" alone lands on Delete, as the previous spec shows; "do" goes on to Download.
 		await walk([["do", "Download"]]);
 	});
 
@@ -777,9 +716,7 @@ describe("Menu", () => {
 		await expect.poll(() => menu.contains(document.activeElement)).toBe(true);
 		const closedAt = performance.now();
 		await userEvent.keyboard("{Escape}");
-		// Well before 600ms it's still on its way out...
 		expect(menu.isConnected).toBe(true);
-		// ...and it's gone once the exit has run.
 		await expect.poll(() => menu.isConnected, { timeout: 3000 }).toBe(false);
 		expect(performance.now() - closedAt).toBeGreaterThanOrEqual(500);
 	});
@@ -884,7 +821,6 @@ describe("Menu", () => {
 				await userEvent.keyboard(how);
 			}
 
-			// Still open and answering keys.
 			await walk([["{ArrowDown}", "Share"]]);
 			expect(onClose).not.toHaveBeenCalled();
 		},
@@ -901,8 +837,6 @@ describe("Menu", () => {
 		});
 		const [event, reason] = onlyClose(onClose);
 		expect(reason).toBe("escapeKeyDown");
-		// The documented union takes the native event or a SyntheticEvent around it, which the
-		// Base UI ports pass (src/internal/events.ts).
 		const native = nativeOf(event);
 		expect(native).toBeInstanceOf(KeyboardEvent);
 		expect((native as KeyboardEvent).key).toBe("Escape");

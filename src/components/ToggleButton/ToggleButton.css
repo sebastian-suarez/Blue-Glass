@@ -1,21 +1,15 @@
-/* Blue Glass — ToggleButton, ported from design-system/components/ToggleButton/styles.css. Base
-   UI's Toggle keeps aria-pressed and the native disabled attribute, which the selectors read. */
-
 @layer gl-components {
-	/* ToggleButton — the site's segmented pill: the nav track (.identity-strip nav) holding nav-sized items
-   (.identity-strip nav a) that rise when pressed (.project-tab[aria-pressed=true]). */
 	.gl-toggle-group {
-		--gl-toggle-group-pad: 5px; /* .identity-strip nav: padding 5px */
-		--gl-toggle-group-gap: 3px; /* .identity-strip nav: gap 3px */
+		--gl-toggle-group-pad: 5px;
+		--gl-toggle-group-gap: 3px;
 		position: relative;
 		display: inline-flex;
 		align-items: stretch;
 		gap: var(--gl-toggle-group-gap);
-		/* The track hugs its buttons even where a grid or flex parent would stretch it; fullWidth opts in. */
 		width: fit-content;
 		max-width: 100%;
 		padding: var(--gl-toggle-group-pad);
-		border: 1px solid #ffffffc9; /* .identity-strip nav */
+		border: 1px solid #ffffffc9;
 		border-radius: var(--radius-pill);
 		background: var(--glass-faint);
 		box-shadow: var(--shadow-control);
@@ -28,7 +22,6 @@
 		--gl-toggle-group-pad: 4px;
 		--gl-toggle-group-gap: 2px;
 	}
-	/* vertical: the side selector's shape; radius-well = the item pill plus the 5px padding. */
 	.gl-toggle-group-vertical {
 		flex-direction: column;
 		border-radius: var(--radius-well);
@@ -41,7 +34,6 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-	/* A disabled group dims once, not once per button on top of it. */
 	.gl-toggle-group-disabled {
 		opacity: 0.5;
 	}
@@ -50,8 +42,8 @@
 	}
 
 	.gl-toggle-button {
-		--gl-toggle-h: 34px; /* 7px + 20px line + 7px: .identity-strip nav a */
-		--gl-toggle-px: 17px; /* .identity-strip nav a: padding 7px 17px */
+		--gl-toggle-h: 34px;
+		--gl-toggle-px: 17px;
 		--gl-toggle-font: 13px;
 		position: relative;
 		display: inline-flex;
@@ -60,7 +52,7 @@
 		min-height: var(--gl-toggle-h);
 		padding: 0 var(--gl-toggle-px);
 		border: 1px solid transparent;
-		border-radius: 23px; /* .identity-strip nav a */
+		border-radius: 23px;
 		background: transparent;
 		color: var(--color-ink);
 		font: inherit;
@@ -101,9 +93,6 @@
 		width: 18px;
 		height: 18px;
 	}
-
-	/* Pressed: the raised tab (.project-tab[aria-pressed=true]) plus its short ink bar
-   (.project-tab[aria-pressed=true]::after), so the state never rests on the fill alone. */
 	.gl-toggle-button[aria-pressed="true"] {
 		border-color: #fff;
 		background: var(--glass-raised);
@@ -140,15 +129,13 @@
 		opacity: 0.5;
 		cursor: not-allowed;
 	}
-
-	/* Standalone: the glass pill (.btn-glass) at control height, raised the same way when pressed. */
 	.gl-toggle-button-standalone {
 		--gl-toggle-h: var(--size-control);
 		--gl-toggle-px: var(--space-lg);
 		--gl-toggle-font: 14px;
-		border-color: #fffc; /* .btn-glass */
+		border-color: #fffc;
 		border-radius: var(--radius-pill);
-		background: rgba(255, 255, 255, 0.5); /* .btn-glass */
+		background: rgba(255, 255, 255, 0.5);
 		box-shadow: var(--shadow-control);
 		-webkit-backdrop-filter: blur(var(--blur-control));
 		backdrop-filter: blur(var(--blur-control));
@@ -174,8 +161,6 @@
 		display: flex;
 		width: 100%;
 	}
-
-	/* Phones: the site's nav tightens under 700px (.identity-strip nav a: 12px, less side padding). */
 	@media (max-width: 700px) {
 		.gl-toggle-group .gl-toggle-button-md {
 			--gl-toggle-px: var(--space-sm);
@@ -190,15 +175,14 @@
 	@media (hover: hover) and (pointer: fine) {
 		.gl-toggle-button:hover:not(:disabled) {
 			background: #fff7;
-		} /* .identity-strip nav a:hover */
+		}
 		.gl-toggle-button-standalone:hover:not(:disabled) {
 			background: rgba(255, 255, 255, 0.75);
-		} /* .btn-glass:hover */
+		}
 		.gl-toggle-button[aria-pressed="true"]:hover:not(:disabled) {
 			background: #fff;
-		} /* .project-tab[aria-pressed=true]:hover */
+		}
 	}
-	/* Forced colours flatten the raised fill and erase the bar: mark pressed with system colours instead. */
 	@media (forced-colors: active) {
 		.gl-toggle-button[aria-pressed="true"] {
 			border-color: Highlight;

@@ -26,10 +26,6 @@ const links = [
 	{ label: "Contact", href: "#contact" },
 ];
 
-/**
-The site's identity strip, composed from the documented parts: the brand, the nav pill and the
-action. Compact drops the subtitle and the action, for a dense bar.
-*/
 function IdentityStrip({
 	current,
 	isCompact = false,
@@ -75,9 +71,6 @@ function IdentityStrip({
 
 const project = { padding: 22, display: "grid", gap: 8 } as const;
 
-/**
-The page under the bar: an intro and three project panels, enough to scroll.
-*/
 function PageBody() {
 	return (
 		<div style={{ display: "grid", gap: 16, padding: "20px 5% 28px" }}>
@@ -119,10 +112,6 @@ function PageBody() {
 	);
 }
 
-/**
-A scrolling page on the canvas with its own light field, optionally scrolled on mount. Full
-bleed runs it across the frame, edge to edge.
-*/
 function ScrollingPage({
 	height,
 	initialScroll = 0,
@@ -143,7 +132,6 @@ function ScrollingPage({
 	return (
 		<div
 			ref={pageRef}
-			// The keyboard scrolls the page, so it's a named stop of its own.
 			// eslint-disable-next-line jsx-a11y-x/no-noninteractive-tabindex
 			tabIndex={0}
 			role="region"
@@ -208,10 +196,6 @@ export const Variants: Story = {
 					"Sticky and fixed bars sit on glass (blur-control) at z-app-bar. elevateOnScroll adds the shadow once the page moves.",
 			},
 		},
-		// The preview shows three bars, each with a "Main navigation" nav, and two scrolling
-		// pages, each a region named "Scrolling page", so axe's landmark-unique rule finds
-		// repeated landmarks. The reference's preview fails the same rule; this story stays
-		// faithful to it.
 		a11y: { config: { rules: [{ id: "landmark-unique", enabled: false }] } },
 	},
 	render: () => (

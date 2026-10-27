@@ -1,8 +1,3 @@
-/*
-The transitions' server HTML hydrated in Chromium, as an island gets it. Content that is `in`
-starts entered, even with `appear`, so hydrating it changes and animates nothing
-(docs/deviations.md). Transitions.server.test.ts renders the same tree in Node.
-*/
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, expect, test, vi } from "vitest";
@@ -21,15 +16,11 @@ type Callbacks = Pick<
 	"onEnter" | "onEntered" | "onExit" | "onExited"
 >;
 
-/**
-The tree Transitions.server.test.ts builds, with the callbacks a test watches.
-*/
 function ServerTree(callbacks: Callbacks) {
 	return (
 		<>
 			<Transition in {...callbacks}>
 				{(status, ref) => (
-					// A section, since the documented ref is an HTMLElement's.
 					<section ref={ref} id="transition" data-status={status}>
 						Transition
 					</section>
@@ -70,7 +61,6 @@ async function settle(ms: number): Promise<void> {
 
 test("hydrating the server HTML raises no error, changes nothing and animates nothing", async () => {
 	const html = renderToString(<ServerTree />);
-	// The bytes Node rendered.
 	await expect(html).toMatchFileSnapshot("./Transitions.server.html.txt");
 
 	const container = document.createElement("div");
@@ -86,7 +76,6 @@ test("hydrating the server HTML raises no error, changes nothing and animates no
 	];
 	expect(children).toHaveLength(6);
 	for (const element of children) {
-		// What the server sent is final: visible with JavaScript off.
 		expect(getComputedStyle(element).opacity).toBe("1");
 		expect(getComputedStyle(element).visibility).toBe("visible");
 	}
@@ -124,14 +113,12 @@ test("hydrating the server HTML raises no error, changes nothing and animates no
 		root.unmount();
 	});
 
-	// Each starts entered, so each reports onEntered on mount, on its server element.
 	await vi.waitFor(() => {
 		expect(callbacks.onEntered).toHaveBeenCalledTimes(6);
 	});
 	expect(callbacks.onEntered.mock.calls.map(([node]) => node)).toEqual(
 		expect.arrayContaining(children),
 	);
-	// Longer than the slowest enter (Collapse, 450ms), to see nothing starts late either.
 	await settle(600);
 	expect(recoverable).toEqual([]);
 	expect(consoleError).not.toHaveBeenCalled();

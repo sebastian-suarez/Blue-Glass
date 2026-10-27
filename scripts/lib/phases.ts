@@ -1,8 +1,3 @@
-/**
-The phase manifest (tests/phases.json) turned into each gate's scope: the modules ported
-up to a phase, their exported values and types, and the previews that can run because
-every component they use exists by then.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -32,9 +27,6 @@ export function readManifest(): Manifest {
 	) as Manifest;
 }
 
-/**
-The phase gates run at: BLUE_GLASS_PHASE when it's set, else the manifest's `current`.
-*/
 export function currentPhase(): number {
 	const fromEnvironment = process.env.BLUE_GLASS_PHASE;
 	return fromEnvironment === undefined
@@ -42,9 +34,6 @@ export function currentPhase(): number {
 		: Number(fromEnvironment);
 }
 
-/**
-Map of component folder to the phase that ports it.
-*/
 export function phaseOfModule(): Map<string, number> {
 	const map = new Map<string, number>();
 	for (const [phase, modules] of Object.entries(readManifest().phases)) {
@@ -65,10 +54,6 @@ export function phaseOfModule(): Map<string, number> {
 	return map;
 }
 
-/**
-A preview can run once its own component and every component its script uses exist.
-Section previews also wait for the site set.
-*/
 function canRun(
 	preview: Preview,
 	modules: Set<string>,
@@ -83,9 +68,6 @@ function canRun(
 	);
 }
 
-/**
-Everything in scope at `phase`, cumulatively.
-*/
 export function scope(phase = currentPhase()): Scope {
 	const modules = new Set(
 		phaseOfModule()

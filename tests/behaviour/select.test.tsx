@@ -1,10 +1,3 @@
-// Behaviour specs for Select and Option, from design-system/components/Select/README.md and
-// api.d.ts, with TextField's README for the field props Select shares. The package ports Select
-// onto Base UI's Select (`native` stays a <select>), whose DOM differs from the reference's, so the
-// specs find the trigger as the combobox named by its label, the list as the listbox and its rows
-// as options. The active row is the focused option (Base UI) or the one the focused listbox names
-// through aria-activedescendant (the reference); the trigger's value is the text it draws. The
-// Popover specs cover the layer the list sits on.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import {
@@ -30,10 +23,6 @@ import {
 	type SelectProps,
 } from "#ui";
 
-/**
-Parks the pointer in the bottom-right corner, clear of every trigger and list below: a row under
-a resting pointer can take the highlight.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -52,7 +41,6 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	cleanup();
-	// Every list is gone: the page scrolls and is exposed to assistive tech again.
 	await expect.poll(() => isScrollLocked()).toBe(false);
 	await expect
 		.poll(
@@ -95,9 +83,6 @@ const topics = [
 	"Hiring process",
 ];
 
-/**
-The booking example's slots, with a booked one first, in the middle and last.
-*/
 const slots: SelectOption[] = [
 	{
 		value: "mon9",
@@ -128,9 +113,6 @@ const lengths: SelectOption[] = [
 	{ value: "45", label: "45 minutes" },
 ];
 
-/**
-A day of hourly slots, "00:00" to "23:00": long enough to scroll and to page through.
-*/
 const hours = Array.from(
 	{ length: 24 },
 	(_, hour) => `${String(hour).padStart(2, "0")}:00`,
@@ -154,17 +136,10 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-Starts keyboard navigation from the plain button rendered before the Select.
-*/
 function focusBefore() {
 	button("Before").focus();
 }
 
-/**
-The trigger: a combobox named by the Select's label. Found before the list opens: once open,
-the page around it may be hidden from assistive tech.
-*/
 function trigger(name: string): HTMLElement {
 	return screen.getByRole("combobox", { name });
 }
@@ -173,9 +148,6 @@ function listbox(): HTMLElement {
 	return screen.getByRole("listbox");
 }
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
@@ -192,10 +164,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-Whether the element is drawn: a box, and neither display none nor visibility hidden on it or an
-ancestor.
-*/
 function isShown(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -208,10 +176,6 @@ function isShown(element: Element): boolean {
 
 type Piece = { text: string; element: HTMLElement };
 
-/**
-The texts drawn inside `root`, in document order, each with the element that holds it: what a
-reader sees, without the copies kept invisible or hidden from assistive tech for sizing.
-*/
 function shownPieces(root: Element): Piece[] {
 	const pieces: Piece[] = [];
 	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -245,16 +209,10 @@ function isAriaHiddenWithin(element: Element, root: Element): boolean {
 	return false;
 }
 
-/**
-What the trigger shows: the chosen row's label, the placeholder, or a chip per value.
-*/
 function shown(element: Element): string[] {
 	return shownPieces(element).map((piece) => piece.text);
 }
 
-/**
-A row's label: the first text it draws.
-*/
 function labelOf(option: Element): string {
 	return shownPieces(option)[0]?.text ?? "";
 }
@@ -269,10 +227,6 @@ function row(label: string): HTMLElement {
 	return found[0];
 }
 
-/**
-The row the keyboard is on: the focused option, or the one the focused element names through
-aria-activedescendant.
-*/
 function activeOption(): HTMLElement | undefined {
 	const focused = document.activeElement;
 	if (!(focused instanceof HTMLElement)) {
@@ -298,9 +252,6 @@ async function expectActive(label: string): Promise<void> {
 	await expect.poll(activeLabel).toBe(label);
 }
 
-/**
-Presses each key in turn and waits for the keyboard to land on the row named next to it.
-*/
 async function walk(
 	steps: ReadonlyArray<readonly [key: string, label: string]>,
 ): Promise<void> {
@@ -312,9 +263,6 @@ async function walk(
 	}
 }
 
-/**
-Opens the list with a press on the trigger, as a person does, and waits until it shows.
-*/
 async function openByPress(element: HTMLElement): Promise<HTMLElement> {
 	await userEvent.click(element);
 	return screen.findByRole("listbox");
@@ -325,9 +273,6 @@ async function expectClosed(element: HTMLElement): Promise<void> {
 	await expect.poll(() => screen.queryByRole("listbox")).toBeNull();
 }
 
-/**
-A few rendering frames: only for checks that something doesn't happen.
-*/
 async function frames(count = 4): Promise<void> {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- frames run one after another
@@ -337,9 +282,6 @@ async function frames(count = 4): Promise<void> {
 	}
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -347,18 +289,12 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether the page can't scroll: what a scroll lock sets on the viewport's scroller.
-*/
 function isScrollLocked(): boolean {
 	return [document.documentElement, document.body].some((element) =>
 		/^(?:hidden|clip)$/v.test(getComputedStyle(element).overflowY),
 	);
 }
 
-/**
-Whether the element shows inside its nearest scrolling ancestor, or the viewport.
-*/
 function isInView(element: Element): boolean {
 	let view: Element | undefined;
 	for (let node = element.parentElement; node; node = node.parentElement) {
@@ -377,9 +313,6 @@ function isInView(element: Element): boolean {
 	return inner.top >= outer.top - 1 && inner.bottom <= outer.bottom + 1;
 }
 
-/**
-Whether the element is drawn at its own size: no transition is still scaling it.
-*/
 function isSettled(element: HTMLElement): boolean {
 	const { width, height } = box(element);
 	return (
@@ -388,10 +321,6 @@ function isSettled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-The nearest box around the element, or the element itself, that draws a border: the pill of a
-native select, or the surface of the list.
-*/
 function bordered(element: Element): HTMLElement {
 	for (
 		let node: HTMLElement | null =
@@ -408,9 +337,6 @@ function bordered(element: Element): HTMLElement {
 	throw new Error("no bordered box around the element");
 }
 
-/**
-The element that labels a control: its <label for>, else the first of its aria-labelledby.
-*/
 function labelElement(control: HTMLElement): HTMLElement {
 	const labels = (control as HTMLButtonElement).labels ?? [];
 	if (labels.length > 0) {
@@ -422,9 +348,6 @@ function labelElement(control: HTMLElement): HTMLElement {
 	return must(document.querySelector<HTMLElement>(`#${CSS.escape(id)}`));
 }
 
-/**
-What a token resolves to for a CSS property, read from a probe element styled with it.
-*/
 function resolved(token: string, property = "color"): string {
 	const probe = document.createElement("div");
 	probe.style.setProperty(property, `var(${token})`);
@@ -434,9 +357,6 @@ function resolved(token: string, property = "color"): string {
 	return value;
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with an icon the Select shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -444,25 +364,16 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-The svgs inside `root` that draw that glyph.
-*/
 function glyphsIn(root: Element, markup: string): SVGSVGElement[] {
 	return [...root.querySelectorAll("svg")].filter(
 		(svg) => svg.getHTML() === markup && isShown(svg),
 	);
 }
 
-/**
-The DOM event behind a callback's event, whether it came wrapped or native.
-*/
 function nativeOf(event: React.SyntheticEvent | Event): Event {
 	return event instanceof Event ? event : event.nativeEvent;
 }
 
-/**
-A React event, or one shaped like it, around a native event of that class.
-*/
 function expectSynthetic(
 	event: unknown,
 	native: new (...args: never[]) => Event = Event,
@@ -471,9 +382,6 @@ function expectSynthetic(
 	expect((event as React.SyntheticEvent).nativeEvent).toBeInstanceOf(native);
 }
 
-/**
-What onClose got on its only call.
-*/
 function onlyClose(
 	onClose: Mock<OnClose>,
 ): [React.SyntheticEvent | KeyboardEvent, SelectCloseReason] {
@@ -486,9 +394,6 @@ function onlyClose(
 	return [event, reason];
 }
 
-/**
-The values onChange got, call by call.
-*/
 function changes(onChange: Mock<OnChange>): unknown[] {
 	return onChange.mock.calls.map(([, value]) => value as unknown);
 }
@@ -529,7 +434,6 @@ describe("Select: the field", () => {
 		expect(box(label).bottom).toBeLessThanOrEqual(box(stackTrigger).top + 0.5);
 	});
 
-	// The README is silent; the reference's label focuses the trigger, as Base UI's does.
 	test("a press on the label focuses the trigger without opening the list", async () => {
 		render(<StackSelect />);
 		const stackTrigger = trigger("Primary stack");
@@ -580,8 +484,6 @@ describe("Select: the field", () => {
 		expect(employer).not.toBe(topic);
 	});
 
-	// FieldBaseProps: "Always give one, or an aria-label". The reference names the trigger with
-	// aria-labelledby too.
 	test("without a label, aria-label names the trigger, and so does aria-labelledby", () => {
 		render(
 			<>
@@ -656,7 +558,6 @@ describe("Select: the field", () => {
 		expect(icons).toHaveLength(1);
 	});
 
-	// As on TextField: the asterisk is drawn, not read, so the name stays the label's words.
 	test("required puts an asterisk after the label's words, outside the name, and marks the trigger aria-required", () => {
 		render(
 			<Select
@@ -795,7 +696,6 @@ describe("Select: the field", () => {
 		await expectClosed(topic);
 		expect(shown(topic)).toEqual(["PostgreSQL performance"]);
 		expect(box(topic).width).toBeCloseTo(width, 0);
-		// The longest label fits whole.
 		const [value] = shownPieces(topic);
 		expect(value.element.scrollWidth).toBeLessThanOrEqual(
 			value.element.clientWidth,
@@ -871,8 +771,6 @@ describe("Select: the field", () => {
 		expect(labelElement(employer)).toBeVisible();
 	});
 
-	// The reference draws the placeholder, not renderValue, while nothing is chosen: there's no
-	// current value to render.
 	test("renderValue draws the trigger's content from the current value, the array with multiple; with nothing chosen the placeholder shows", () => {
 		const renderStack = vi.fn((value: string) => `Stack: ${value}`);
 		render(
@@ -914,7 +812,6 @@ describe("Select: with the pointer", () => {
 		expectSynthetic(onOpen.mock.calls[0]?.[0], MouseEvent);
 	});
 
-	// The README is silent; the reference names the list with the label as well.
 	test("the list is named by the label too", async () => {
 		render(<StackSelect />);
 		await openByPress(trigger("Primary stack"));
@@ -922,7 +819,6 @@ describe("Select: with the pointer", () => {
 	});
 
 	test("the list opens on Popover's radius-well surface below the trigger: 8px away, left edges lined up, at least as wide as the trigger", async () => {
-		// Clear of the viewport's edges, which Popover keeps the list off.
 		render(
 			<div style={{ padding: "24px 48px" }}>
 				<StackSelect defaultValue="Rust" />
@@ -981,8 +877,6 @@ describe("Select: with the pointer", () => {
 		expect(shown(stackTrigger)).toEqual(["Rust"]);
 	});
 
-	// The reference doesn't call onChange, "called with the new value", for the row already
-	// chosen.
 	test("a press on the chosen row closes the list without calling onChange", async () => {
 		const onChange = vi.fn<OnChange>();
 		const onClose = vi.fn<OnClose>();
@@ -1011,7 +905,6 @@ describe("Select: with the pointer", () => {
 		const stackTrigger = trigger("Primary stack");
 		const after = button("After");
 		await openByPress(stackTrigger);
-		// Force: the layer over the page takes the press, as it should.
 		await userEvent.click(after, { force: true });
 		await expectClosed(stackTrigger);
 		const [event, reason] = onlyClose(onClose);
@@ -1021,7 +914,6 @@ describe("Select: with the pointer", () => {
 		await expect.element(stackTrigger).toHaveFocus();
 	});
 
-	// The reference's list sits on a layer over the whole page, the trigger included.
 	test("a press on the trigger while the list is open closes it, as a press outside does", async () => {
 		const onClose = vi.fn<OnClose>();
 		render(<StackSelect onClose={onClose} />);
@@ -1093,8 +985,6 @@ describe("Select: keys on the trigger", () => {
 		},
 	);
 
-	// "On the chosen row": with none, the README is silent, and the reference opens on the first
-	// row it can choose.
 	test.each(openKeys)(
 		"with nothing chosen, %s opens the list on the first enabled row",
 		async (_name, key) => {
@@ -1159,9 +1049,6 @@ describe("Select: keys on the trigger", () => {
 });
 
 describe("Select: keys in the list", () => {
-	/**
-	Opens the list from the keyboard and waits for the row it opens on.
-	*/
 	async function openWithDown(label: string): Promise<void> {
 		focusBefore();
 		await userEvent.tab();
@@ -1169,7 +1056,6 @@ describe("Select: keys in the list", () => {
 		await expectActive(label);
 	}
 
-	// "Up and Down move": the README doesn't say they wrap, and in the reference they stop.
 	test("Down and Up move a row at a time, skipping disabled rows, and stop at the first and last", async () => {
 		render(
 			<Around>
@@ -1177,7 +1063,6 @@ describe("Select: keys in the list", () => {
 			</Around>,
 		);
 		await openWithDown("Wednesday, 10:00");
-		// Each stop is followed by a move that only lands right if the stop held.
 		await walk([
 			["{ArrowDown}", "Thursday, 09:30"],
 			["{ArrowDown}", "Friday, 11:00"],
@@ -1210,7 +1095,6 @@ describe("Select: keys in the list", () => {
 			</Around>,
 		);
 		await openWithDown("00:00");
-		// The list grows in; where a row sits is read once it has.
 		await expect.poll(() => isSettled(bordered(listbox()))).toBe(true);
 		for (const [key, label] of [
 			["{PageDown}", "10:00"],
@@ -1276,7 +1160,6 @@ describe("Select: keys in the list", () => {
 			</Around>,
 		);
 		await openWithDown("Node.js");
-		// "r" alone lands on React; "ru" goes on to Rust.
 		await walk([["ru", "Rust"]]);
 	});
 
@@ -1287,7 +1170,6 @@ describe("Select: keys in the list", () => {
 			</Around>,
 		);
 		await openWithDown("Thursday, 09:30");
-		// Wednesday, 15:00 is booked; Monday, 09:00 too, so "m" stays put.
 		await walk([
 			["w", "Wednesday, 10:00"],
 			["m", "Wednesday, 10:00"],
@@ -1481,8 +1363,6 @@ describe("Select: value and open", () => {
 		expect(stackTrigger).toHaveAttribute("aria-expanded", "false");
 	});
 
-	// Staged as the preview's Default, in place: an open list through a portal hides the rest of
-	// the page, which would take focus off Before for another reason.
 	test("defaultOpen starts it open without moving focus, and a press on a row still chooses", async () => {
 		const onChange = vi.fn<OnChange>();
 		function Page({ hasSelect }: { readonly hasSelect: boolean }) {
@@ -1606,7 +1486,6 @@ describe("Select: multiple", () => {
 		},
 	);
 
-	// The README is silent on the order; the reference keeps the rows' order, chips and value.
 	test("the value keeps the rows' order, whatever order they're picked in", async () => {
 		const onChange = vi.fn<OnChange>();
 		render(
@@ -1667,9 +1546,6 @@ const rowForms = [
 	["<Option> children", "children"],
 ] as const;
 
-/**
-The same rows as Select's options prop or as <Option> children.
-*/
 function rowsAs(
 	form: (typeof rowForms)[number][1],
 	entries: readonly SelectOption[],
@@ -1780,7 +1656,6 @@ describe.each(rowForms)("Select: rows as %s", (_name, form) => {
 			"aria-disabled",
 			"true",
 		);
-		// Playwright waits for aria-disabled elements to enable; force the press.
 		await userEvent.click(booked, { force: true });
 		await frames();
 		expect(onChange).not.toHaveBeenCalled();
@@ -2071,7 +1946,6 @@ describe("Select: native", () => {
 		]);
 	});
 
-	// A required select can't go back to the empty placeholder in the reference.
 	test("placeholder is a first option, in color-muted while nothing is chosen, and when required it can't be chosen", async () => {
 		render(
 			<>

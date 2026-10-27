@@ -1,11 +1,4 @@
-/* Blue Glass — Snackbar, ported from design-system/components/Snackbar/styles.css. */
-
 @layer gl-components {
-	/* Snackbar — an addition, matching MUI's Snackbar. The surface is the primary button's ground
-	   (.btn-primary: color-ink, on-ink text, shadow-primary) cut to the monogram tile's radius
-	   (radius-tile, .signature). It slides in from the edge it sits on and leaves the same way. */
-
-	/* The root is a fixed strip along one edge that never catches presses itself. */
 	.gl-snackbar {
 		position: fixed;
 		z-index: var(--z-snackbar);
@@ -27,8 +20,6 @@
 	.gl-snackbar-right {
 		justify-content: flex-end;
 	}
-
-	/* The slot slides. Its padding is the gap to the edge, so a slide of 100% clears the screen. */
 	.gl-snackbar-slot {
 		display: flex;
 		min-width: 0;
@@ -72,12 +63,10 @@
 		margin-block: -6px;
 		margin-left: auto;
 	}
-	/* A text button on the dark ground: on-ink, a little heavier so it reads as the action. */
 	.gl-snackbar-surface .gl-snackbar-action .gl-button {
 		color: var(--on-ink);
 		font-weight: 500;
 	}
-	/* The focus colour vanishes on ink; on this ground the ring is on-ink. */
 	.gl-snackbar-surface :focus-visible {
 		outline-color: var(--on-ink);
 		outline-offset: 2px;
@@ -105,8 +94,6 @@
 	.gl-snackbar-close:active {
 		transform: scale(0.98);
 	}
-
-	/* A hosted Alert floats like the surface: same width limits, and a lift for its light plate. */
 	.gl-snackbar-slot > .gl-alert {
 		min-width: 288px;
 		max-width: 560px;
@@ -121,8 +108,6 @@
 			background: rgba(255, 255, 255, 0.14);
 		}
 	}
-
-	/* Phones: full width inside the 16px gutter. */
 	@media (max-width: 700px) {
 		.gl-snackbar {
 			left: var(--space-md);

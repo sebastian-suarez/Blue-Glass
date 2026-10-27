@@ -15,7 +15,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The page the frame stands in for, and the content a Container holds in it.
 const page: CSSProperties = {
 	borderRadius: "var(--radius-control)",
 	border: "1px solid var(--color-line)",
@@ -34,16 +33,12 @@ const content: CSSProperties = {
 	color: "var(--ink-soft)",
 };
 
-// What each cap's width resolves to, as the content names it.
 const caps = {
 	wrap: "size-wrap",
 	header: "size-header",
 	prose: "62ch",
 } as const;
 
-/**
-A Container in the stand-in page, its content naming the cap.
-*/
 function Column({
 	label,
 	note,

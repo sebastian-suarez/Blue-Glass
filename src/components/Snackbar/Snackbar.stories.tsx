@@ -30,14 +30,10 @@ const meta = {
 
 export default meta;
 
-// Only Default renders through its args, and every story brings its own snackbars.
 type Story = StoryObj<Partial<SnackbarProps>>;
 
 const published = "Published to S3. CloudFront picks it up in about a minute.";
 
-/**
-The preview's handler: close for every reason but a press elsewhere on the page.
-*/
 function closeUnlessClickaway(close: () => void) {
 	return (_event: unknown, reason: SnackbarCloseReason) => {
 		if (reason !== "clickaway") {
@@ -46,10 +42,6 @@ function closeUnlessClickaway(close: () => void) {
 	};
 }
 
-/**
-The stage's button that brings a closed snackbar back, at the top, or at the bottom when the
-snackbar takes the top edge.
-*/
 function ShowAgain({
 	onClick,
 	isAtBottom = false,
@@ -72,9 +64,6 @@ function ShowAgain({
 	);
 }
 
-/**
-A message with the busy ring before it.
-*/
 function Busy({ children }: { readonly children: React.ReactNode }) {
 	return (
 		<span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
@@ -84,10 +73,6 @@ function Busy({ children }: { readonly children: React.ReactNode }) {
 	);
 }
 
-/**
-Default's stage: the args drive the snackbar, held in place at the stage's bottom edge. Its close
-button and Escape set open back to false, as Show again sets it to true.
-*/
 function DefaultWithArgs(
 	args: Partial<SnackbarProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -129,9 +114,6 @@ function DefaultWithArgs(
 	);
 }
 
-/**
-Variants' first stage: a hosted Alert in the top right corner.
-*/
 function TopRight() {
 	const [isOpen, setIsOpen] = React.useState(true);
 	const close = () => {
@@ -167,9 +149,6 @@ function TopRight() {
 	);
 }
 
-/**
-Variants' second stage: a busy message in the bottom left corner.
-*/
 function BottomLeft() {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
@@ -194,11 +173,6 @@ function BottomLeft() {
 
 type PublishState = "idle" | "publishing" | "published" | "failed";
 
-/**
-The Example: publishing shows a busy snackbar for 1.6s, then the result through the portal at the
-bottom of the frame. Success hides itself after 6 seconds; the error stays until Retry or its
-close button.
-*/
 function Publish() {
 	const [state, setState] = React.useState<PublishState>("idle");
 	const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -321,7 +295,6 @@ export const Default: Story = {
 	render: DefaultWithArgs,
 };
 
-// At 700px and below the snackbar spans the stage inside a 16px gutter.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

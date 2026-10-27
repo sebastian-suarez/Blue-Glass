@@ -20,7 +20,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The site's plate pill, and a layer card for the column.
 const plate: CSSProperties = {
 	fontSize: 13,
 	lineHeight: 1.6,

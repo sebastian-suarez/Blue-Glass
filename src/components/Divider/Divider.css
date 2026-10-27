@@ -1,5 +1,4 @@
 @layer gl-components {
-	/* Divider — the site's 1px color-line hairline (.employer-strip, .career-row, .project-outcome, .site-footer) */
 	.gl-divider {
 		flex-shrink: 0;
 		margin: 0;
@@ -10,7 +9,6 @@
 		height: 0;
 		border-top-width: 1px;
 	}
-	/* Vertical: one text line tall, centred on it, unless it's a flex item. */
 	.gl-divider-vertical {
 		display: inline-block;
 		width: 0;
@@ -23,8 +21,6 @@
 		height: auto;
 		align-self: stretch;
 	}
-
-	/* inset lines up with list text after an 18px icon (13px padding + 18px + 11px gap). */
 	.gl-divider-horizontal.gl-divider-inset {
 		margin-inline-start: var(--gl-divider-inset, 42px);
 	}
@@ -34,8 +30,6 @@
 	.gl-divider-vertical.gl-divider-middle {
 		margin-block: var(--space-xs);
 	}
-
-	/* With a label: two hairlines around 12px muted text, or one after it. */
 	.gl-divider-labelled {
 		display: flex;
 		align-items: center;

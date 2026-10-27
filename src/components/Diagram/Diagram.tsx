@@ -1,41 +1,16 @@
 "use client";
-/**
-Diagram and DiagramHost, ported from design-system/components/Diagram/reference.tsx.
-
-DiagramHost is the shell every figure shares (TimingChart, and Mermaid's drawings): one SVG that
-scales with its host, a scroll floor with its hint, and the entrance reveal. Diagram draws a
-DiagramData inside it with the marks below, which Mermaid reuses so both share one drawing.
-
-The server HTML is the finished figure. The entrance arms itself only on the client: rendered
-armed once the client can play it, so no style pass catches it shown and fades it out first.
-Until the client measures the host's overflow, CSS decides whether the scroll hint shows
-(Diagram.css), so the server HTML already lays out as the hydrated page does. Once measured,
-the measure drives the hint and the host's tab stop together, as in the reference.
-*/
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
 import { useForkRef, useId, useIsoLayoutEffect } from "../../internal/hooks.js";
 
-/**
-Edge and label tone: muted ink, or the accent blue that carries the travelling pulse.
-*/
 export type DiagramTone = "muted" | "accent";
 
-/**
-Node tone: default glass box, accent outline, or accent fill with white text.
-*/
 export type DiagramNodeTone = "default" | "accent" | "accent-fill";
 
 export type DiagramShape = "rect" | "circle";
 
-/**
-Region looks: a tinted glass panel, or the two rings of the architecture diagram.
-*/
 export type DiagramRegionTone = "panel" | "ring" | "ring-inner";
 
-/**
-A plain string is a regular line; an object can be bold.
-*/
 export type DiagramNodeLine =
 	| string
 	| {
@@ -43,9 +18,6 @@ export type DiagramNodeLine =
 			bold?: boolean;
 	  };
 
-/**
-Background panel or ring.
-*/
 export type DiagramRegion = {
 	shape?: DiagramShape;
 	x: number;
@@ -56,9 +28,6 @@ export type DiagramRegion = {
 	tone: DiagramRegionTone;
 };
 
-/**
-A labelled box (or disc). Lines are explicit: SVG text does not wrap.
-*/
 export type DiagramNode = {
 	shape?: DiagramShape;
 	x: number;
@@ -69,9 +38,6 @@ export type DiagramNode = {
 	tone?: DiagramNodeTone;
 };
 
-/**
-A polyline. Arrowhead on the last point unless `arrow` is false. Accent edges carry the pulse.
-*/
 export type DiagramEdge = {
 	points: Array<[number, number]>;
 	arrow?: boolean;
@@ -79,9 +45,6 @@ export type DiagramEdge = {
 	tone?: DiagramTone;
 };
 
-/**
-Free text, placed by its top-left. With `align: 'middle'` the text centres inside `w`.
-*/
 export type DiagramLabel = {
 	x: number;
 	y: number;
@@ -92,22 +55,10 @@ export type DiagramLabel = {
 };
 
 export type DiagramData = {
-	/**
-	Names the dataset; namespaces the SVG ids together with React's id.
-	*/
 	id: string;
-	/**
-	The coordinate space (viewBox) every position is written in.
-	*/
 	width: number;
 	height: number;
-	/**
-	Accessible name for the whole diagram.
-	*/
 	label: string;
-	/**
-	One or two sentences spelling out the relationships the arrows encode.
-	*/
 	description: string;
 	regions?: DiagramRegion[];
 	nodes: DiagramNode[];
@@ -115,38 +66,15 @@ export type DiagramData = {
 	labels?: DiagramLabel[];
 };
 
-/*
-The marks below are exported for Mermaid, which draws its layout with them. They're internal:
-src/index.ts leaves them out, as the reference's index.d.ts does.
-*/
-
-/**
-Node text: 15px on a 20px line.
-*/
 export const DG_NODE_FONT = 15;
 export const DG_NODE_LINE = 20;
-/**
-Label text: 13px on a 16px line.
-*/
 export const DG_LABEL_FONT = 13;
 export const DG_LABEL_LINE = 16;
-/**
-The baseline sits this fraction of the font size below the line's vertical centre.
-*/
 const baselineShift = 0.36;
-/**
-Arrowhead half-size in diagram units (the old 5-unit marker at stroke width 2).
-*/
 const head = 4;
 
-/**
-What an edge end carries: the arrowhead, a dot, a cross, or nothing.
-*/
 export type DgEnd = "arrow" | "circle" | "cross" | "none";
 
-/**
-A run of node text. A line is one or more runs, so part of a line can be bold.
-*/
 export type DgRun = {
 	text: string;
 	bold?: boolean;
@@ -154,9 +82,6 @@ export type DgRun = {
 
 type Point = [number, number];
 
-/**
-The reveal's stagger index, `--i` in Diagram.css.
-*/
 export function dgOrder(index: number): React.CSSProperties {
 	const style: React.CSSProperties & { "--i": number } = { "--i": index };
 	return style;
@@ -170,9 +95,6 @@ function toRuns(line: DiagramNodeLine): DgRun[] {
 	];
 }
 
-/**
-The baseline of line `index` of `count` lines centred on `centreY`.
-*/
 function baseline(
 	centreY: number,
 	index: number,
@@ -188,9 +110,6 @@ function baseline(
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
 
-/**
-An SVG path through the points.
-*/
 export function dgPath(points: Point[]): string {
 	return points
 		.map(
@@ -199,10 +118,6 @@ export function dgPath(points: Point[]): string {
 		.join(" ");
 }
 
-/**
-The mark at `end`, facing away from `previous`: a triangle whose tip is `head` past the end, or a
-dot or a cross centred on it.
-*/
 function endMark(
 	kind: DgEnd,
 	end: Point,
@@ -227,13 +142,11 @@ function endMark(
 	}
 
 	const distance = Math.hypot(endX - previous[0], endY - previous[1]);
-	// A zero-length edge still gets a direction to draw its mark along.
 	const length = distance > 0 ? distance : 1;
 	const unitX = (endX - previous[0]) / length;
 	const unitY = (endY - previous[1]) / length;
 	if (kind === "cross") {
 		const arm = head * 0.85;
-		// Each stroke runs from the end point minus its offset to the end point plus it.
 		const firstX = arm * (unitX - unitY);
 		const firstY = arm * (unitY + unitX);
 		const secondX = arm * (unitX + unitY);
@@ -267,9 +180,6 @@ function endMark(
 	);
 }
 
-/**
-A background panel or ring.
-*/
 export function DgRegion({
 	region,
 	i,
@@ -305,9 +215,6 @@ export function DgRegion({
 	);
 }
 
-/**
-Props of DgEdge: a polyline plus what each end carries.
-*/
 export type DgEdgeProps = {
 	readonly points: Point[];
 	readonly dashed?: boolean;
@@ -318,9 +225,6 @@ export type DgEdgeProps = {
 	readonly children?: React.ReactNode;
 };
 
-/**
-An edge: the line, then its end marks. Extra marks (sequence numbers) ride in `children`.
-*/
 export function DgEdge({
 	points,
 	dashed,
@@ -330,7 +234,6 @@ export function DgEdge({
 	i,
 	children,
 }: DgEdgeProps) {
-	// Solid edges draw in through a normalised dash; dashed ones keep their pattern and fade.
 	const kind = dashed ? "gl-dg-edge-dashed" : "gl-dg-edge-draw";
 	const count = points.length;
 	return (
@@ -354,9 +257,6 @@ export function DgEdge({
 	);
 }
 
-/**
-A dot that runs along an accent edge, rests, and runs again. Hidden under reduced motion.
-*/
 export function DgPulse({ points }: { readonly points: Point[] }) {
 	return (
 		<circle className="gl-dg-pulse" r={4.5} cx={0} cy={0}>
@@ -379,28 +279,16 @@ export function DgPulse({ points }: { readonly points: Point[] }) {
 	);
 }
 
-/**
-Props of DgNode: a box, disc or caller-drawn outline, with centred lines of text.
-*/
 export type DgNodeProps = {
 	readonly x: number;
 	readonly y: number;
 	readonly w: number;
 	readonly h: number;
-	/**
-	`rect` is the 10-unit box; `outline` draws `outline` instead (each element gets gl-dg-box).
-	*/
 	readonly shape?: DiagramShape | "outline";
 	readonly outline?: React.ReactNode;
-	/**
-	Corner radius of a rect. Default 10.
-	*/
 	readonly radius?: number;
 	readonly lines: DgRun[][];
 	readonly tone?: DiagramNodeTone;
-	/**
-	The centre of the text, when it isn't the box's (a cylinder's label sits below its lid).
-	*/
 	readonly textX?: number;
 	readonly textY?: number;
 	readonly i: number;
@@ -436,9 +324,6 @@ function NodeShape({
 	);
 }
 
-/**
-A glass node.
-*/
 export function DgNode({
 	x,
 	y,
@@ -481,7 +366,6 @@ export function DgNode({
 					{lines.map((runs, index) =>
 						runs.length === 1 ? (
 							<tspan
-								// Lines are positional: the data gives them no other identity.
 								// eslint-disable-next-line @eslint-react/no-array-index-key
 								key={index}
 								x={centreX}
@@ -508,9 +392,6 @@ export function DgNode({
 	);
 }
 
-/**
-Free text, placed by its top-left (or centred in `w`).
-*/
 export function DgLabel({
 	label,
 	i,
@@ -521,7 +402,6 @@ export function DgLabel({
 	const isMiddle = label.align === "middle";
 	const halfWidth = (label.w ?? 0) / 2;
 	const x = isMiddle ? label.x + halfWidth : label.x;
-	// Labels are placed by their top-left, like the comp's text blocks.
 	const halfLine = DG_LABEL_LINE / 2;
 	const centreY = label.y + halfLine;
 	const baselineOffset = DG_LABEL_FONT * baselineShift;
@@ -536,7 +416,6 @@ export function DgLabel({
 				const lineOffset = index * DG_LABEL_LINE;
 				return (
 					<tspan
-						// Lines are positional: the data gives them no other identity.
 						// eslint-disable-next-line @eslint-react/no-array-index-key
 						key={index}
 						x={x}
@@ -558,10 +437,6 @@ function isAutomated(): boolean {
 	return typeof navigator !== "undefined" && navigator.webdriver;
 }
 
-/**
-Whether this reader gets the entrance: a browser with IntersectionObserver, motion welcome, and
-not automated, so screenshots and visual tests never catch an entrance half-way.
-*/
 function isEntranceOn(): boolean {
 	return (
 		typeof window !== "undefined" &&
@@ -576,11 +451,6 @@ function isEntranceOnServer(): boolean {
 	return false;
 }
 
-/**
-The site's diagram-reveal.ts, as an effect. The states on `.gl-dg-wrap[data-reveal]`: none (no
-JavaScript yet: shown, or hidden with a 2.5s failsafe when <html> has `gl-js`), `armed` (hidden,
-waiting to scroll in) and `in` (shown). Pulses run only while the figure is on screen.
-*/
 function useDiagramReveal(
 	wrapRef: React.RefObject<HTMLDivElement | null>,
 	isEnabled: boolean,
@@ -603,7 +473,6 @@ function useDiagramReveal(
 
 		const svg = wrap.querySelector("svg");
 		const run = (isRunning: boolean) => {
-			// Not every DOM has SMIL (jsdom doesn't).
 			if (!svg || typeof svg.pauseAnimations !== "function") {
 				return;
 			}
@@ -650,10 +519,6 @@ function useDiagramReveal(
 	}, [isEnabled]);
 }
 
-/**
-The site's scrollable-hosts.ts: whether the host overflows its width, or null before the first
-measure. A host renders keyboard-scrollable (tabindex 0) and keeps that only while it overflows.
-*/
 function useHostOverflow(
 	hostRef: React.RefObject<HTMLDivElement | null>,
 	isActive: boolean,
@@ -698,57 +563,19 @@ export type DiagramHostProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"children"
 > & {
-	/**
-	Id for the root element; also the base of the description's id.
-	*/
 	id?: string;
-	/**
-	Class names for the root element, merged with the component's own.
-	*/
 	className?: string;
-	/**
-	Inline styles for the root element.
-	*/
 	style?: React.CSSProperties;
-	/**
-	Accessible name for the whole figure (role group: the text inside stays readable).
-	*/
 	label: string;
-	/**
-	One or two sentences spelling out the relationships the marks encode; becomes the SVG's desc.
-	*/
 	description: string;
-	/**
-	Width of the coordinate space (the viewBox).
-	*/
 	width: number;
-	/**
-	Height of the coordinate space (the viewBox).
-	*/
 	height: number;
-	/**
-	Floor for the scale: below `width × minScale` px the host scrolls sideways instead. 0 = pure
-	scaling.
-	*/
 	minScale?: number;
-	/**
-	Play the entrance when the figure scrolls into view. Default true.
-	*/
 	reveal?: boolean;
-	/**
-	Text under a host that overflows.
-	*/
 	scrollHint?: React.ReactNode;
-	/**
-	SVG content, in the viewBox's coordinates.
-	*/
 	children?: React.ReactNode;
 };
 
-/**
-The shell every diagram and chart from the site shares: one SVG that scales with its host, a
-scroll floor for phones with its hint, and the entrance reveal.
-*/
 export function DiagramHost({
 	ref,
 	label,
@@ -768,15 +595,10 @@ export function DiagramHost({
 	const handleRef = useForkRef<HTMLDivElement>(wrapRef, ref);
 	const baseId = useId(id);
 	const descriptionId = `${baseId}-desc`;
-	// Below the floor the host scrolls, so it must be reachable and named for keyboard users.
 	const isScrollable = minScale > 0;
 	const floor = Math.round(width * minScale);
-	// Arm the entrance before anything measures: the overflow check forces a style pass, and a node
-	// first styled as shown would fade out to its armed state instead of in.
 	useDiagramReveal(wrapRef, reveal);
 	const overflows = useHostOverflow(hostRef, isScrollable);
-	// Rendered armed (not armed by an effect), so no style pass in the same commit, such as another
-	// figure measuring its overflow, can catch this one shown and fade it out before it fades in.
 	const isArmed =
 		React.useSyncExternalStore(
 			subscribeToNothing,
@@ -788,11 +610,9 @@ export function DiagramHost({
 		"aria-label": label,
 		"aria-describedby": descriptionId,
 	};
-	// The hint's width scales with the floor (Diagram.css), never by zero.
 	const hintStyle: React.CSSProperties & { "--gl-dg-floor": number } = {
 		"--gl-dg-floor": Math.max(1, floor),
 	};
-	// One unit of padding keeps the 1px strokes of boxes on the viewBox edge from being clipped.
 	const viewBox = `-1 -1 ${width + 2} ${height + 2}`;
 	return (
 		<div
@@ -835,39 +655,14 @@ export type DiagramProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"children"
 > & {
-	/**
-	Class names for the root element, merged with the component's own.
-	*/
 	className?: string;
-	/**
-	Inline styles for the root element.
-	*/
 	style?: React.CSSProperties;
-	/**
-	Regions, edges, nodes and labels in the data's own coordinate space, plus its label and
-	description.
-	*/
 	data: DiagramData;
-	/**
-	Floor for the scale: below `width × minScale` px the host scrolls sideways (the site uses
-	0.58–0.6). 0 = pure scaling.
-	*/
 	minScale?: number;
-	/**
-	Play the entrance when the diagram scrolls into view. Default true.
-	*/
 	reveal?: boolean;
-	/**
-	Run a pulse along every accent edge while the diagram is on screen. Default true; never under
-	reduced motion.
-	*/
 	pulses?: boolean;
 };
 
-/**
-The site's data-driven diagram: regions, edges with arrowheads, glass nodes, labels and travelling
-pulses.
-*/
 export function Diagram({
 	ref,
 	data,

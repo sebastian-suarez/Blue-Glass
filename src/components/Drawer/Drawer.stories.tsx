@@ -25,11 +25,8 @@ const meta = {
 
 export default meta;
 
-// Only Default renders through its args.
 type Story = StoryObj<Partial<DrawerProps>>;
 
-// As in the preview: each temporary drawer open in place over its stage, leaving focus and the
-// page's scroll alone.
 const inPlace = {
 	disablePortal: true,
 	disableScrollLock: true,
@@ -46,10 +43,6 @@ const sections: ReadonlyArray<{ label: string; icon: IconName }> = [
 	{ label: "Contact", icon: "mail" },
 ];
 
-/**
-The site's navigation, as the drawer holds it: the sections as .gl-option rows pulled out by
-12px so their labels line up with the title, then the résumé link.
-*/
 function SiteLinks({ onPick }: { readonly onPick?: () => void }) {
 	const [current, setCurrent] = React.useState("Work");
 	return (
@@ -104,10 +97,6 @@ type SiteMenuProps = Omit<Partial<DrawerProps>, "children"> & {
 	readonly onOpen: () => void;
 };
 
-/**
-The Default's stage: the site's header strip with its Menu button, and the menu open in place
-over the stage.
-*/
 function SiteMenu({ open = false, onOpen, ...drawer }: SiteMenuProps) {
 	return (
 		<Stage height={440}>
@@ -143,10 +132,6 @@ function SiteMenu({ open = false, onOpen, ...drawer }: SiteMenuProps) {
 	);
 }
 
-/**
-Default's stage: the args drive the drawer, Escape, the scrim and Close set open back to false,
-and Menu sets it to true.
-*/
 function SiteMenuWithArgs(
 	args: Partial<DrawerProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -179,9 +164,6 @@ function SiteMenuWithArgs(
 
 const repository = "https://github.com/sebastian-suarez/VSebCode";
 
-/**
-Right · flush: the project's details, flush to the right edge.
-*/
 function ProjectDetails() {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
@@ -244,9 +226,6 @@ function ProjectDetails() {
 	);
 }
 
-/**
-Bottom · sheet with grab handle: sharing a project, dragged down to close.
-*/
 function ShareSheet() {
 	const [isOpen, setIsOpen] = React.useState(true);
 	const [isCopied, setIsCopied] = React.useState(false);
@@ -318,10 +297,6 @@ const chapters = [
 	"Infrastructure as code",
 ];
 
-/**
-`persistent`: the contents beside the article, pushing it aside. As in the preview it starts closed
-on phones, and narrower there; the README swaps drawers on phones with useMediaQuery too.
-*/
 function Contents() {
 	const isPhone = useMediaQuery(media.phone);
 	const [isOpen, setIsOpen] = React.useState(!isPhone);
@@ -401,9 +376,6 @@ function Contents() {
 
 const resume = ["Summary", "Experience", "Education", "Skills"];
 
-/**
-`permanent`: the résumé's sections, beside the page on wide screens and above it on phones.
-*/
 function ResumeSections() {
 	const isPhone = useMediaQuery(media.phone);
 	return (
@@ -461,9 +433,6 @@ function ResumeSections() {
 	);
 }
 
-/**
-The site's menu over the whole frame, through the portal: picking a section closes it.
-*/
 function FullFrameMenu() {
 	const [isOpen, setIsOpen] = React.useState(false);
 	const close = () => {

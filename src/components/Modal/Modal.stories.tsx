@@ -20,11 +20,8 @@ const meta = {
 
 export default meta;
 
-// Only Default renders through its args, and every story brings its own content, so none takes
-// the required open or children.
 type Story = StoryObj<Partial<ModalProps>>;
 
-// As in the preview: the content centred over the layer, taking the pointer only on its surface.
 const centred: React.CSSProperties = {
 	position: "absolute",
 	inset: 0,
@@ -48,11 +45,6 @@ type LayerProps = Omit<Partial<ModalProps>, "children"> & {
 	readonly onDismiss: () => void;
 };
 
-/**
-One of the preview's cards: a button that opens the modal, and the modal open in place over the
-card, leaving focus and the page's scroll alone. Its Close button dismisses it, as Escape and a
-press outside do through onClose.
-*/
 function Layer({
 	label,
 	open = false,
@@ -98,9 +90,6 @@ function Layer({
 	);
 }
 
-/**
-A card that keeps its own open state, as each of the preview's does.
-*/
 function OwnLayer(
 	props: Omit<LayerProps, "open" | "onOpen" | "onDismiss" | "onClose">,
 ) {
@@ -122,10 +111,6 @@ function OwnLayer(
 	);
 }
 
-/**
-Default's card: the args drive the modal, and Escape, a press on the backdrop or Close set open
-back to false, as Open sets it to true.
-*/
 function LayerWithArgs(
 	args: Partial<ModalProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -160,9 +145,6 @@ function LayerWithArgs(
 	);
 }
 
-/**
-The Example: a modal over the whole frame, through the portal, and a second one it opens on top.
-*/
 function FullFrame() {
 	const [isOpen, setIsOpen] = React.useState(false);
 	const [isNestedOpen, setIsNestedOpen] = React.useState(false);

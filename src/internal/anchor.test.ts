@@ -93,9 +93,6 @@ describe("useBaseAnchor on the server", () => {
 		},
 	};
 
-	/**
-	Server-renders the hook and returns what it gave Base UI.
-	*/
 	function serverAnchor(anchor: AnchorEl): string {
 		// eslint-disable-next-line @typescript-eslint/naming-convention -- A component, in a Node test that can't hold JSX.
 		function Probe() {
@@ -112,7 +109,6 @@ describe("useBaseAnchor on the server", () => {
 
 	test("never calls a function anchor or measures anything while rendering", () => {
 		const anchor = vi.fn<() => VirtualElement>(() => virtual);
-		// No anchor until the browser has committed and asked the function.
 		expect(serverAnchor(anchor)).toBe("<output>none</output>");
 		expect(anchor).not.toHaveBeenCalled();
 	});

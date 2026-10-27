@@ -7,7 +7,6 @@ import { Button, ButtonGroup, type ButtonGroupProps } from "#ui";
 
 afterEach(() => {
 	cleanup();
-	// The keyboard tests follow a hash href; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
@@ -15,9 +14,6 @@ afterEach(() => {
 	);
 });
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -41,9 +37,6 @@ function height(element: Element): number {
 	return Math.round(box(element).height);
 }
 
-/**
-The border radius a token resolves to, read from a probe element styled with it.
-*/
 function resolvedRadius(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderRadius = `var(${token})`;

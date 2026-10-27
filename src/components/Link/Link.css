@@ -1,15 +1,10 @@
-/* Blue Glass — Link, ported from design-system/components/Link/styles.css. */
-
 @layer gl-components {
-	/* Link — the site's prose links (.hiw-asof a, .resume-page a) and "go" links (.replink, .figure-link, .contact-links a) */
 	.gl-link {
-		/* Shapes the focus ring. */
 		border-radius: var(--radius-code);
 		text-decoration: none;
 		cursor: pointer;
 		-webkit-tap-highlight-color: transparent;
 	}
-	/* component="button": drop the button chrome first, so the modifiers below win on order. */
 	.gl-link-button {
 		margin: 0;
 		padding: 0;
@@ -35,14 +30,11 @@
 	.gl-link-color-inherit {
 		color: inherit;
 	}
-
-	/* always: .hiw-asof a (color-link, underline, 3px offset) */
 	.gl-link-underline-always {
 		text-decoration: underline;
 		text-underline-offset: 3px;
 		transition: text-decoration-thickness var(--duration-hover) ease;
 	}
-	/* hover: .replink / .figure-link (13px, icon gap 8px, size-control-sm tap target) */
 	.gl-link-underline-hover {
 		display: inline-flex;
 		align-items: center;
@@ -54,15 +46,10 @@
 	.gl-link-underline-hover:active {
 		transform: scale(0.98);
 	}
-
-	/* Prose links sit between lines of text: a tighter ring than the base 5px offset. */
 	.gl-link-underline-always:focus-visible,
 	.gl-link-underline-none:focus-visible {
 		outline-offset: 2px;
 	}
-
-	/* The arrow: 14px in a "go" link (.replink .icon), about 1em inside prose. nowrap plus the word joiner
-   before the svg keep it on the line of the link's last word (Chrome breaks before an svg otherwise). */
 	.gl-link-icon {
 		display: inline-flex;
 		align-items: center;

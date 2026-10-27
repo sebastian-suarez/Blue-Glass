@@ -20,9 +20,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-The preview's 40px icon tile for a badge to sit on.
-*/
 function IconTile({ icon = "bell" }: { readonly icon?: IconName }) {
 	return (
 		<Paper
@@ -41,9 +38,6 @@ function IconTile({ icon = "bell" }: { readonly icon?: IconName }) {
 	);
 }
 
-/**
-The preview's invisible toggle: the button hides the pill and brings it back.
-*/
 function HideToggle() {
 	const [isHidden, setIsHidden] = useState(false);
 	return (
@@ -64,10 +58,6 @@ function HideToggle() {
 	);
 }
 
-/**
-The preview's review queue: each review takes one off the count, which scales out at zero, and
-a hidden status says so.
-*/
 function ReviewQueue() {
 	const [waiting, setWaiting] = useState(3);
 	return (

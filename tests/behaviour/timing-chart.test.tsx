@@ -1,7 +1,4 @@
-// Behaviour specs for TimingChart, from design-system/components/TimingChart (README.md and
-// api.d.ts). It's built on DiagramHost, whose shared behaviour diagram.test.tsx covers in depth.
 import { cleanup, render, screen, within } from "@testing-library/react";
-// Type-only: the provider's types are what give the DevTools session its typed send().
 import type { CDPSession } from "@vitest/browser-playwright";
 import * as React from "react";
 import { renderToString } from "react-dom/server";
@@ -10,7 +7,6 @@ import { cdp, userEvent } from "vitest/browser";
 import "#ui/styles.css";
 import { TimingChart, type TimingChartProps, type TimingData } from "#ui";
 
-// The site's PDF timing: about 6 s before, 10–20 ms after.
 const pdf: TimingData = {
 	id: "pdf-timing",
 	label: "PDF generation time, before and after the rework",
@@ -29,7 +25,6 @@ const pdf: TimingData = {
 	],
 };
 
-// Four rows, with values off the ticks.
 const builds: TimingData = {
 	id: "build-times",
 	label: "Build time per stage",
@@ -45,7 +40,6 @@ const builds: TimingData = {
 	],
 };
 
-// A value far below the 2-unit minimum bar: 0.1 of 100 is 0.6 units of the 600-unit axis.
 const hairline: TimingData = {
 	id: "cache-hit",
 	label: "Response time, cold and cached",
@@ -85,17 +79,10 @@ afterEach(async () => {
 	});
 });
 
-/**
-The test page's DevTools session, which emulates media features for this page only.
-*/
 function devTools(): CDPSession {
 	return cdp();
 }
 
-/**
-Plays a reader's browser. The Diagram README names navigator.webdriver as what tells automated
-browsers apart, and those skip the entrance.
-*/
 function pretendNotAutomated() {
 	Object.defineProperty(navigator, "webdriver", {
 		configurable: true,
@@ -111,10 +98,6 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-/**
-Whether the element is drawn at all: no ancestor has display none. (Chromium's checkVisibility
-calls SVG children of a hidden group visible.)
-*/
 function isRendered(element: Element): boolean {
 	for (
 		let node: Element | null = element;
@@ -129,10 +112,6 @@ function isRendered(element: Element): boolean {
 	return true;
 }
 
-/**
-Whether a sighted reader sees the element: drawn, not visibility-hidden, and with no ancestor at
-opacity 0.
-*/
 function isShown(element: Element): boolean {
 	if (
 		!isRendered(element) ||
@@ -172,9 +151,6 @@ function name(element: Element): string {
 		: `<${element.tagName.toLowerCase()}> "${text}"`;
 }
 
-/**
-A shape a transform has squashed to nothing, such as a bar still at scaleX(0).
-*/
 function isCollapsed(element: SVGGraphicsElement): boolean {
 	const box = element.getBBox();
 	const rect = element.getBoundingClientRect();
@@ -183,10 +159,6 @@ function isCollapsed(element: SVGGraphicsElement): boolean {
 	);
 }
 
-/**
-What keeps a chart from being fully drawn and at rest: running animations, and drawn parts that
-are faded, hidden or squashed. Empty once the chart is finished.
-*/
 function unfinished(root: Element): string[] {
 	const problems: string[] = [];
 	const running = runningAnimations(root);
@@ -195,7 +167,6 @@ function unfinished(root: Element): string[] {
 	}
 
 	for (const element of [root, ...root.querySelectorAll("*")]) {
-		// Parts that aren't drawn at all, such as the hint while the host fits.
 		if (!isRendered(element)) {
 			continue;
 		}
@@ -217,9 +188,6 @@ function unfinished(root: Element): string[] {
 	return problems;
 }
 
-/**
-The chart's outermost SVG, whose viewBox is the chart's coordinate space.
-*/
 function figureOf(root: Element): SVGSVGElement {
 	const svg = root.querySelector("svg");
 	if (!svg) {
@@ -229,9 +197,6 @@ function figureOf(root: Element): SVGSVGElement {
 	return svg;
 }
 
-/**
-An element's box in the chart's own coordinates.
-*/
 function boxOf(element: Element, svg: SVGSVGElement) {
 	const matrix = svg.getScreenCTM()?.inverse();
 	if (!matrix) {
@@ -288,9 +253,6 @@ async function tabFromBefore(): Promise<Element | null> {
 	return document.activeElement;
 }
 
-/**
-Each tick's centre, in chart units, by its value.
-*/
 function tickCentres(
 	data: TimingData,
 	svg: SVGSVGElement,
@@ -518,8 +480,6 @@ describe("TimingChart: scale and scrolling", () => {
 		);
 
 		expect(await tabFromBefore()).toBe(group);
-		// Chromium's Tab reaches any scroller on its own; browsers that don't need the host's own
-		// tab stop.
 		expect(group.tabIndex).toBe(0);
 		await userEvent.keyboard("{ArrowRight}");
 		await expect.poll(() => group.scrollLeft).toBeGreaterThan(0);

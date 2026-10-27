@@ -1,19 +1,4 @@
 "use client";
-/**
-Dialog and its parts, ported from design-system/components/Dialog/reference.tsx onto the
-modal-flags adapter, `ModalLayer` in src/internal/modal.tsx, as Modal is: Base UI's Dialog through
-the portal, and in place (`disablePortal`) the layer's own elements, so an open dialog shows in the
-server HTML. Deviations 7 and 8 (docs/deviations.md) apply, as for Modal.
-
-As in the reference, a Transition keeps the layer mounted through the exit while Grow runs on the
-surface itself (opacity on an ancestor would cut the glass off from what it blurs), and the
-centring layer around the surface takes every press outside it: one that starts and ends there
-reports `backdropClick`, with or without a scrim. While focus is kept in, that press leaves focus
-where it was, as a press on Modal's backdrop does.
-
-DialogTitle and DialogContentText register their ids with the dialog once mounted, and the
-surface's aria-labelledby and aria-describedby point at them.
-*/
 import * as React from "react";
 import { cx } from "../../internal/cx.js";
 import type { ModalCloseReason } from "../../internal/events.js";
@@ -35,117 +20,45 @@ export type DialogProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"children" | "onClose"
 > & {
-	/**
-	Show the dialog.
-	*/
 	open: boolean;
-	/**
-	Called with the reason (backdropClick or escapeKeyDown); you decide whether to close.
-	*/
 	onClose?: (
 		event: React.SyntheticEvent | KeyboardEvent,
 		reason: ModalCloseReason,
 	) => void;
-	/**
-	Width cap: xs 444px, sm 600px, md 900px, or false for none. Default sm.
-	*/
 	maxWidth?: "xs" | "sm" | "md" | false;
-	/**
-	Take the whole maxWidth (less the side margins) instead of fitting the content.
-	*/
 	fullWidth?: boolean;
-	/**
-	Fill the viewport with square corners. "phone" does it only at 700px and below.
-	*/
 	fullScreen?: boolean | "phone";
-	/**
-	`paper`: the content scrolls between a fixed title and actions, fading at its edges (default). `body`: the whole dialog scrolls in its layer.
-	*/
 	scroll?: DialogScroll;
-	/**
-	Grow timing in ms, or { enter, exit }. Default 200 in, 140 out.
-	*/
 	transitionDuration?: number | { enter?: number; exit?: number };
-	/**
-	Extra props for the glass surface, the element with role="dialog".
-	*/
 	PaperProps?: Partial<PaperProps>;
-	/**
-	Stay in the DOM while closed.
-	*/
 	keepMounted?: boolean;
-	/**
-	No scrim: the page stays undimmed (a press outside still closes).
-	*/
 	hideBackdrop?: boolean;
-	/**
-	Props for the scrim (Backdrop).
-	*/
 	BackdropProps?: Partial<BackdropProps>;
-	/**
-	Escape does nothing. Keep it on unless leaving would lose work.
-	*/
 	disableEscapeKeyDown?: boolean;
-	/**
-	Don't move focus into the dialog on open.
-	*/
 	disableAutoFocus?: boolean;
-	/**
-	Let focus leave the dialog while it's open.
-	*/
 	disableEnforceFocus?: boolean;
-	/**
-	Don't return focus to the opener on close.
-	*/
 	disableRestoreFocus?: boolean;
-	/**
-	Leave the page scrollable underneath.
-	*/
 	disableScrollLock?: boolean;
-	/**
-	Render in place (inside a showcase Stage) instead of in document.body.
-	*/
 	disablePortal?: boolean;
-	/**
-	Where the portal mounts. Default document.body.
-	*/
 	container?: Element | (() => Element | null) | null;
-	/**
-	DialogTitle, DialogContent and DialogActions.
-	*/
 	children?: React.ReactNode;
 };
 
 export type DialogTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
-	/**
-	The dialog's name: a question or a verb phrase ("Delete the RS50 bridge draft?").
-	*/
 	children?: React.ReactNode;
 };
 
 export type DialogContentProps = React.HTMLAttributes<HTMLDivElement> & {
-	/**
-	Hairlines (color-line) above and below, for long content between the title and the actions.
-	*/
 	dividers?: boolean;
-	/**
-	Body copy (DialogContentText), fields, lists.
-	*/
 	children?: React.ReactNode;
 };
 
 export type DialogContentTextProps =
 	React.HTMLAttributes<HTMLParagraphElement> & {
-		/**
-		One or two sentences: what happens, and what stays as it is.
-		*/
 		children?: React.ReactNode;
 	};
 
 export type DialogActionsProps = React.HTMLAttributes<HTMLDivElement> & {
-	/**
-	Buttons, the primary one last.
-	*/
 	children?: React.ReactNode;
 };
 
@@ -161,9 +74,6 @@ const DialogContext = React.createContext<DialogContextValue | undefined>(
 	undefined,
 );
 
-/**
-Adds an id to a list while its part is mounted, and removes it after.
-*/
 function register(setIds: React.Dispatch<React.SetStateAction<Ids>>) {
 	return (id: string) => {
 		setIds((ids) => (ids.includes(id) ? ids : [...ids, id]));
@@ -178,10 +88,6 @@ const screens = {
 	phone: "fullscreen-phone",
 } as const;
 
-/**
-Whether a press lands on the element's own scrollbar (with scroll="body", the layer scrolls),
-which belongs to the browser.
-*/
 function isOnScrollbar(element: HTMLElement, event: React.MouseEvent): boolean {
 	const box = element.getBoundingClientRect();
 	const x = event.clientX - box.left - element.clientLeft;
@@ -191,11 +97,6 @@ function isOnScrollbar(element: HTMLElement, event: React.MouseEvent): boolean {
 	);
 }
 
-/**
-A modal task on a glass panel: Modal underneath (scrim, focus kept in, Escape, scroll lock, the
-rest of the page hidden from assistive tech), Grow from the centre, title and description wired
-to the surface's aria-labelledby and aria-describedby.
-*/
 export function Dialog({
 	ref,
 	...props
@@ -239,7 +140,6 @@ export function Dialog({
 		[scroll],
 	);
 
-	// A press that starts and ends on the layer around the surface is a press on the scrim.
 	const pressedRef = React.useRef(false);
 	const timeout = {
 		enter: getTimeout(transitionDuration, "enter", durations.grow.enter),
@@ -341,9 +241,6 @@ export function Dialog({
 	);
 }
 
-/**
-The dialog's name in text-title-sm, wired to the surface's aria-labelledby.
-*/
 export function DialogTitle({
 	id: idProp,
 	className,
@@ -368,10 +265,6 @@ export function DialogTitle({
 
 type Edges = { top: boolean; bottom: boolean };
 
-/**
-The dialog's body, which with scroll="paper" scrolls on its own and fades at whichever edge has
-more.
-*/
 export function DialogContent({
 	dividers = false,
 	className,
@@ -407,8 +300,6 @@ export function DialogContent({
 	useIsoLayoutEffect(() => {
 		measure();
 	});
-	// Measure again when the box or anything in it changes size: a textarea growing, an image
-	// loading. It runs after every render, so children added since are observed too.
 	React.useEffect(() => {
 		const element = nodeRef.current;
 		if (!element || !isScrolling || typeof ResizeObserver === "undefined") {
@@ -452,9 +343,6 @@ export function DialogContent({
 	);
 }
 
-/**
-Body copy in color-muted (text-body-sm), wired to the surface's aria-describedby.
-*/
 export function DialogContentText({
 	id: idProp,
 	className,
@@ -477,9 +365,6 @@ export function DialogContentText({
 	);
 }
 
-/**
-The button row: right-aligned, space-sm apart, the primary action last.
-*/
 export function DialogActions({
 	className,
 	children,

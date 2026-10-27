@@ -8,9 +8,6 @@ import { defineConfig } from "vitest/config";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-// Behaviour tests import the components from "#ui" and the stylesheet from "#ui/styles.css".
-// The package project points them at src; the reference project at the reassembled reference
-// (npm run reference), so the same specs run on both.
 const targets = {
 	package: {
 		ui: path.join(root, "src/index.ts"),
@@ -22,9 +19,6 @@ const targets = {
 	},
 };
 
-// Every Base UI entry point and React, bundled before the first test. When Vite meets an entry
-// point mid-run it bundles again, and the test that hit it fails with "Invalid hook call"
-// because it gets a second copy of React.
 const baseUiExports = (
 	JSON.parse(
 		fs.readFileSync(
@@ -53,7 +47,6 @@ const optimizeDeps = {
 	],
 };
 
-// A fresh object per project: Vitest names each browser instance after its project.
 const chromium = () => ({
 	enabled: true,
 	provider: playwright(),
@@ -75,7 +68,6 @@ function behaviour(target: keyof typeof targets) {
 		test: {
 			name: `behaviour:${target}`,
 			include: ["tests/behaviour/**/*.test.tsx"],
-			// The specs measure text in Satoshi, the system's typeface.
 			setupFiles: ["tests/behaviour/setup-fonts.ts"],
 			browser: chromium(),
 		},
@@ -84,8 +76,6 @@ function behaviour(target: keyof typeof targets) {
 
 export default defineConfig({
 	test: {
-		// The stories guard imports every stories file through import.meta.glob, and the file cache
-		// kept an old list, so a new stories file went unchecked.
 		fsModuleCache: false,
 		projects: [
 			{
@@ -100,7 +90,6 @@ export default defineConfig({
 				},
 			},
 			{
-				// Package-only tests that need a real browser: internals and adapters.
 				plugins: [react()],
 				optimizeDeps,
 				test: {
@@ -112,9 +101,6 @@ export default defineConfig({
 			behaviour("package"),
 			behaviour("reference"),
 			{
-				// Renders every story from .storybook/main.ts's globs, then runs axe on it; the
-				// preview's a11y.test is "error", so a violation fails the story. The plugin
-				// resolves configDir against the working directory, so it gets an absolute path.
 				plugins: [storybookTest({ configDir: path.join(root, ".storybook") })],
 				optimizeDeps,
 				test: {

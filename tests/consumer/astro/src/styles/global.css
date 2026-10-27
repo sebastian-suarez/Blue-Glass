@@ -1,6 +1,3 @@
-/* Blue Glass next to Tailwind 4, the documented way: declare the layer order before any
-   import, so Tailwind's preflight sits under Blue Glass's base layer and Tailwind's
-   utilities win over everything, then import Tailwind and the package's stylesheet. */
 @layer theme, base, gl-fallback, gl-base, components, gl-components, utilities;
 
 @import "tailwindcss";

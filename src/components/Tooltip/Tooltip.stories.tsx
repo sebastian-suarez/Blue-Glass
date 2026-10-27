@@ -25,7 +25,6 @@ const meta = {
 
 export default meta;
 
-// Every story brings its own child, and only Default renders through its args.
 type Story = StoryObj<Partial<TooltipProps>>;
 
 const placements: Placement[] = [
@@ -43,7 +42,6 @@ const placements: Placement[] = [
 	"right-end",
 ];
 
-// The preview's stage contents: one specimen in the middle.
 const centred: React.CSSProperties = {
 	height: "100%",
 	display: "grid",
@@ -56,10 +54,6 @@ const cell = (area: string): React.CSSProperties => ({
 	placeItems: "center",
 });
 
-/**
-Default's stage: the args drive the tooltip, held in place over its button. Hovering, focusing or
-a long press asks to open and sets open to true; leaving, blur, a press or Escape sets it back.
-*/
 function DefaultWithArgs(
 	args: Partial<TooltipProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -100,9 +94,6 @@ function DefaultWithArgs(
 	);
 }
 
-/**
-The four placements with the arrow, each on an icon-only button that takes the title as its name.
-*/
 function Placements() {
 	return (
 		<Stage height={300}>
@@ -176,10 +167,6 @@ function Placements() {
 	);
 }
 
-/**
-The Example's toolbar: icon-only buttons named by their tooltips, a link described by a longer
-one with the arrow, and a disabled button whose span wrapper takes the pointer for it.
-*/
 function Toolbar() {
 	return (
 		<Paper

@@ -1,5 +1,3 @@
-// Fixtures for the story layout gate's self-test (scripts/ssr/layout.ts --self): the same two
-// columns, laid out in JavaScript and in CSS. Storybook doesn't load this folder.
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
 
@@ -22,10 +20,6 @@ function subscribe(callback: () => void): () => void {
 	};
 }
 
-/**
-The pattern the gate exists to catch: the server can't know the width, so it guesses wide, and
-a phone shows the wrong layout until hydration.
-*/
 function useIsWide(): boolean {
 	return React.useSyncExternalStore(
 		subscribe,

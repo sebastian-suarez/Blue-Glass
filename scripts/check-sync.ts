@@ -1,13 +1,3 @@
-/**
-Finds what the package must re-port after design-system/ is regenerated. tests/sync.json
-records a hash of every reference file a ported module came from, at the time it was
-ported; this script recomputes them and lists what changed.
-
-Usage:
-  node scripts/check-sync.ts                  lists changes; exits 1 when there are any
-  node scripts/check-sync.ts --record Button  records Button's current reference files
-  node scripts/check-sync.ts --record-shared  records the shared files the foundation copies
-*/
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -20,9 +10,6 @@ type Manifest = { shared: Entry; components: Record<string, Entry> };
 
 const manifestFile = path.join(root, "tests/sync.json");
 
-/**
-The reference files the foundation copies or generates from.
-*/
 const sharedFiles = [
 	"foundation.css",
 	"tokens/tokens.json",
@@ -42,12 +29,6 @@ const componentFiles = [
 	"reference.tsx",
 ];
 
-/**
-The shared helpers a component's reference imports: by their underscored names, such as Box's
-`./_surfaces-layout-system`, or as `../internal/<name>` for the ones `shared/` keeps without an
-underscore, such as Popper's `position`. A change to one is a change to every component built on
-it. The helpers every component imports (cx, dom, hooks) are tracked once, as shared files.
-*/
 function sharedHelpersOf(name: string): string[] {
 	const source = fs.readFileSync(
 		path.join(designSystem, `components/${name}/reference.tsx`),
@@ -127,7 +108,6 @@ if (recordAt !== -1) {
 			changes(entry).map((file) => `${name}: ${file}`),
 		),
 	];
-	// A module the phase has ported but never recorded would go unwatched.
 	const unrecorded = [...scope().modules].filter(
 		(name) => manifest.components[name] === undefined,
 	);

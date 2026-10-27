@@ -28,10 +28,6 @@ const employers = [
 
 const links = ["Work", "Projects", "Experience", "Contact"];
 
-/**
-The identity strip, from AppBar's part classes: monogram and name, the pill nav, then the
-résumé action.
-*/
 function IdentityStrip() {
 	return (
 		<>
@@ -112,8 +108,6 @@ export const Default: Story = {
 	),
 };
 
-// Default at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const DefaultOnPhone: Story = {
 	...Default,
 	name: "Default on a phone",

@@ -1,23 +1,10 @@
-/**
-The Storybook manager's Controls panel, read and set through its widgets as a reader would,
-for the Storybook gate (run.ts).
-*/
 import { setTimeout as delay } from "node:timers/promises";
 import type { Page } from "playwright";
 
-/**
-A check that failed for a reason the gate states, as opposed to a crash.
-*/
 export class GateError extends Error {}
 
-/**
-How long a poll waits for the panel or the story before it gives up.
-*/
 export const pollFor = 5000;
 
-/**
-A control's widgets in the panel. Arg names are identifiers, so they need no escaping.
-*/
 const controlSelector = (name: string, suffix = "") =>
 	`[id="control-${name}${suffix}"]`;
 
@@ -76,7 +63,6 @@ export async function widgetOf(
 			const select = element as HTMLSelectElement;
 			return {
 				kind: "select",
-				// Storybook 10's select starts with an empty choice, "Choose option...".
 				options: [...select.options]
 					.filter(
 						(option) =>
@@ -104,9 +90,6 @@ export async function widgetOf(
 	}, name);
 }
 
-/**
-Sets a control through its widget in the panel, as a reader would.
-*/
 export async function setWidget(
 	page: Page,
 	name: string,
@@ -136,7 +119,6 @@ export async function setWidget(
 		case "checkbox": {
 			const box = page.locator(controlSelector(name));
 			if ((await box.isChecked()) !== value) {
-				// The toggle's input is styled out of sight, so click it in the page.
 				await box.evaluate((node) => {
 					(node as HTMLInputElement).click();
 				});
@@ -165,10 +147,6 @@ export function currentOf(widget: Widget | undefined): string | undefined {
 		: String(widget.current);
 }
 
-/**
-The values a reader can set besides the current one: each other option, the flipped checkbox,
-a number plus one, a text with a suffix.
-*/
 export function otherValues(widget: Widget): Array<string | boolean> {
 	switch (widget.kind) {
 		case "radio":

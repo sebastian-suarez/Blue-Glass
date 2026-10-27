@@ -16,10 +16,6 @@ const meta = {
 	component: Popover,
 	parameters: {
 		docs: { page: componentDocs(readme) },
-		// Base UI keeps focus guards around an open popup: spans, aria-hidden and tabbable on purpose,
-		// that hand focus on the moment they get it. axe's aria-hidden-focus rule allows that only to
-		// an element with an onfocus property, which React's delegated onFocus never sets, so it
-		// reports them. The rule still checks every other aria-hidden element.
 		a11y: {
 			config: {
 				rules: [
@@ -35,7 +31,6 @@ const meta = {
 
 export default meta;
 
-// Every story anchors its own popover, so none takes the required open or anchorEl.
 type Story = StoryObj<Partial<PopoverProps>>;
 
 type StageProps = Omit<Partial<PopoverProps>, "placement" | "children"> & {
@@ -45,11 +40,6 @@ type StageProps = Omit<Partial<PopoverProps>, "placement" | "children"> & {
 	readonly onToggle: () => void;
 };
 
-/**
-One of the preview's stages: an anchor button that toggles the popover, and the popover open in
-place beside it, leaving focus and the page's scroll alone. A press outside or Escape closes it
-through onClose.
-*/
 function AnchoredStage({
 	placement,
 	label,
@@ -98,9 +88,6 @@ function AnchoredStage({
 	);
 }
 
-/**
-A stage that keeps its own open state, as each of the preview's does: open at first.
-*/
 function OwnStage(props: Omit<StageProps, "open" | "onToggle" | "onClose">) {
 	const [isOpen, setIsOpen] = React.useState(true);
 	return (
@@ -117,10 +104,6 @@ function OwnStage(props: Omit<StageProps, "open" | "onToggle" | "onClose">) {
 	);
 }
 
-/**
-Default's stage: the args drive the popover, the anchor toggles open, and a press outside or
-Escape sets it back to false.
-*/
 function AnchoredStageWithArgs(
 	args: Partial<PopoverProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -161,9 +144,6 @@ const codeStyle: React.CSSProperties = {
 	overflowWrap: "anywhere",
 };
 
-/**
-The Example: a share task through the portal, over the whole frame, with focus moved in.
-*/
 function SharePopover() {
 	const [anchor, setAnchor] = React.useState<HTMLElement | null>(null);
 	const [isOpen, setIsOpen] = React.useState(false);

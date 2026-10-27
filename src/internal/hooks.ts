@@ -1,18 +1,8 @@
-/**
-React helpers shared by the components, ported from design-system/shared/hooks.ts.
-*/
 import * as React from "react";
 
-/**
-The layout effect in the browser and a plain effect where there's no DOM, so server
-rendering stays quiet.
-*/
 export const useIsoLayoutEffect: typeof React.useLayoutEffect =
 	typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
 
-/**
-Assigns a value to any kind of ref.
-*/
 export function setRef<T>(
 	ref: React.Ref<T> | undefined,
 	value: T | null,
@@ -24,10 +14,6 @@ export function setRef<T>(
 	}
 }
 
-/**
-Attaches `instance` to a ref and returns what detaches it: the callback ref's own cleanup when
-it returns one (React 19), else a reset to null.
-*/
 function attach<T>(ref: React.Ref<T> | undefined, instance: T): () => void {
 	if (typeof ref === "function") {
 		const cleanup = ref(instance);
@@ -50,11 +36,6 @@ function attach<T>(ref: React.Ref<T> | undefined, instance: T): () => void {
 	return () => undefined;
 }
 
-/**
-Merges several refs into one callback ref. Its identity changes when a ref does, so React
-detaches the old ref and attaches the new one, as with MUI's useForkRef. It returns a cleanup,
-so React 19 runs each callback ref's own cleanup on detach instead of calling it with null.
-*/
 export function useForkRef<T>(
 	...refs: Array<React.Ref<T> | undefined>
 ): React.RefCallback<T> | undefined {
@@ -73,15 +54,11 @@ export function useForkRef<T>(
 				};
 			};
 		},
-		// The refs are the dependencies, however many there are.
 		// eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo
 		refs,
 	);
 }
 
-/**
-A callback whose identity never changes but always calls the latest function.
-*/
 export function useEventCallback<Arguments extends unknown[], Result>(
 	callback: (...arguments_: Arguments) => Result,
 ): (...arguments_: Arguments) => Result {
@@ -95,10 +72,6 @@ export function useEventCallback<Arguments extends unknown[], Result>(
 	);
 }
 
-/**
-Controlled-or-uncontrolled state, MUI style: the mode is fixed at mount. When controlled,
-the prop wins and the setter does nothing; the caller's onChange carries the new value.
-*/
 export function useControlled<T>(
 	controlled: T | undefined,
 	defaultValue: T,
@@ -117,10 +90,6 @@ export function useControlled<T>(
 	return [value, setValue];
 }
 
-/**
-A stable id: the caller's, or React's id prefixed "gl" and stripped to characters that need
-no escaping in a CSS selector. The reference stripped only ":", which React 19 ids don't use.
-*/
 export function useId(idOverride?: string): string {
 	const reactId = React.useId();
 	return idOverride ?? `gl${reactId.replaceAll(/[^\w-]/gu, "")}`;
@@ -147,10 +116,6 @@ function isReducedMotionPreferred(): boolean {
 	);
 }
 
-/**
-Whether to cut motion because the reader asks for reduced motion (the reference's
-usePrefersReducedMotion). It updates live, and is false on the server.
-*/
 export function useShouldReduceMotion(): boolean {
 	return React.useSyncExternalStore(
 		subscribeToReducedMotion,
@@ -159,17 +124,11 @@ export function useShouldReduceMotion(): boolean {
 	);
 }
 
-/**
-The value the previous render had, as the reference's usePrevious returns it. Its Select relies
-on that: `prevOpen === false` holds only on the render where the list opens, not on the
-re-renders after.
-*/
 export function usePrevious<T>(value: T): T | undefined {
 	const previousRef = React.useRef<T | undefined>(undefined);
 	React.useEffect(() => {
 		previousRef.current = value;
 	});
-	// Returning the last render's value during this one is the hook's whole contract.
 	// eslint-disable-next-line react-hooks/refs
 	return previousRef.current;
 }

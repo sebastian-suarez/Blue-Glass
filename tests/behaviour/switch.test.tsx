@@ -1,9 +1,3 @@
-// Behaviour specs for Switch, from design-system/components/Switch/README.md and api.d.ts. The
-// reference draws a track and a thumb under a transparent native checkbox with role="switch"; the
-// package draws Base UI's switch, a span with the role beside a hidden input (docs/deviations.md,
-// 1 to 4). So the specs find the switch by role and name, read the input through the ref, find
-// the drawn track by its place, and find the thumb, which has no role, as the element that moves
-// when the switch turns on.
 import { cleanup, render, screen } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -16,9 +10,6 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-A computed length without its px unit.
-*/
 function px(value: string): number {
 	return Number(value.replace(/px$/v, ""));
 }
@@ -32,10 +23,6 @@ type Change = {
 	checked: boolean;
 };
 
-/**
-Records what onChange saw at call time: the event's type and target, the input's checked state
-then, and the second argument.
-*/
 function recorder() {
 	const calls: Change[] = [];
 	const onChange = vi.fn<OnChange>((event, checked) => {
@@ -59,9 +46,6 @@ function button(name: string): HTMLElement {
 	return screen.getByRole("button", { name });
 }
 
-/**
-Disabled natively, or through aria-disabled.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -69,9 +53,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether focus is on the control or inside it.
-*/
 function hasFocus(element: HTMLElement): boolean {
 	return (
 		element === document.activeElement ||
@@ -88,9 +69,6 @@ function size(element: Element): [number, number] {
 	return [Math.round(width), Math.round(height)];
 }
 
-/**
-The opacity the element is drawn with: its own times every ancestor's.
-*/
 function opacityOf(element: Element): number {
 	let opacity = 1;
 	for (
@@ -104,10 +82,6 @@ function opacityOf(element: Element): number {
 	return opacity;
 }
 
-/**
-The track drawn for the switch: the element with a border that covers it exactly. The package's
-switch draws itself; the reference's transparent input lies over a drawn track.
-*/
 function drawnTrack(element: HTMLElement): HTMLElement {
 	const target = box(element);
 	const drawn = [
@@ -132,9 +106,6 @@ function drawnTrack(element: HTMLElement): HTMLElement {
 	return drawn;
 }
 
-/**
-What a CSS value, a token or a literal, resolves to for one property, read from a probe element.
-*/
 function resolved(property: string, value: string): string {
 	const probe = document.createElement("div");
 	probe.style.borderStyle = "solid";
@@ -145,10 +116,6 @@ function resolved(property: string, value: string): string {
 	return result;
 }
 
-/**
-Moves the pointer to the page's bottom-left corner, clear of everything the specs render, so no
-hover style lingers on a control from an earlier click.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -161,9 +128,6 @@ async function parkPointer(): Promise<void> {
 	}
 }
 
-/**
-Waits for every running animation and transition on the page to finish.
-*/
 async function settle(): Promise<void> {
 	await Promise.allSettled(
 		document.getAnimations().map(async (animation) => animation.finished),
@@ -176,10 +140,6 @@ async function nextFrame(): Promise<void> {
 	});
 }
 
-/**
-Turns the switch on with Space, waits for it to come to rest, and finds its thumb: the outermost
-element in the switch's root whose box moved sideways. Returns the thumb and its box while off.
-*/
 async function turnOnAndFindThumb(
 	root: Element,
 	element: HTMLElement,
@@ -216,10 +176,6 @@ async function turnOnAndFindThumb(
 
 type Timing = { duration: number; easing: string };
 
-/**
-Records the thumb's left edge, and the timing of every animation running on it, at each frame
-while the action runs and until the page comes to rest.
-*/
 async function sampleThumb(
 	thumb: HTMLElement,
 	action: () => Promise<void>,
@@ -284,8 +240,6 @@ describe("Switch: what it shows", () => {
 		expect(control("Weekly digest")).toBeChecked();
 	});
 
-	// The docs don't say; the reference's row is a <label> (reference.tsx, line 83), so a click on
-	// the label text toggles the switch, as on a native one.
 	test("a click on its label toggles it, as one on the switch does", async () => {
 		render(<Switch label="Remote only" />);
 		await userEvent.click(screen.getByText("Remote only"));
@@ -411,7 +365,6 @@ describe("Switch: what it shows", () => {
 		const halfOn = on.width / 2;
 		expect(off.left + halfOff).toBeLessThan(middle);
 		expect(on.left + halfOn).toBeGreaterThan(middle);
-		// As far from the track's start when off as from its end when on.
 		const startGap = off.left - track.left;
 		expect(startGap).toBeGreaterThan(0);
 		expect(Math.abs(track.right - on.right - startGap)).toBeLessThanOrEqual(
@@ -676,9 +629,6 @@ describe("Switch: checked and onChange", () => {
 		expect(ref.current?.checked).toBe(false);
 	});
 
-	// The reference sets its state before onChange runs (reference.tsx, lines 45 to 49): the
-	// browser puts the switch back, but React already holds it on, and the next press goes
-	// unreported.
 	referenceDefectTest(
 		"after a cancelled press, the next press is reported to onChange and can be cancelled too",
 		async () => {

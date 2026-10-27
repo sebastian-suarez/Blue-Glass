@@ -27,10 +27,6 @@ const place: React.CSSProperties = {
 	gap: 10,
 };
 
-/**
-The two places of the preview: where the Portal is written, and the container next to it, which
-the toggles choose between.
-*/
 function Places({
 	disablePortal = false,
 	onDisablePortalChange,
@@ -38,7 +34,6 @@ function Places({
 }: PortalProps & {
 	readonly onDisablePortalChange: (isPortalDisabled: boolean) => void;
 }) {
-	// The container is a ref's element, so it arrives after the first render.
 	const [target, setTarget] = React.useState<HTMLDivElement | null>(null);
 	return (
 		<div style={{ display: "grid", gap: 14 }}>
@@ -95,9 +90,6 @@ function Places({
 	);
 }
 
-/**
-Default's places: the disablePortal arg drives the Portal, and the toggles set it.
-*/
 function PlacesWithArgs(
 	args: PortalProps,
 	{ viewMode }: { readonly viewMode: string },

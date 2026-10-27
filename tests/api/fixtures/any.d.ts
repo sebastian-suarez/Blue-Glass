@@ -1,11 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention -- it redeclares documented components */
-// The documented API with any planted where assignability can't see it: Chip's label prop,
-// BadgeProps as a whole, the parameters of ToggleButton's onChange, the element of its ref,
-// the elements of PaneAccordion's items, and the element of useTransition's nodeRef. Each
-// passes every assignability check, which is why the gate looks for any, inside callbacks,
-// refs and arrays too. One control must pass: MermaidDiagram's config turns from
-// Record<string, unknown> into Record<string, any>, which weakens nothing, since unknown
-// already accepts everything.
 import type * as React from "react";
 import type * as Documented from "../../../design-system/source/index.js";
 

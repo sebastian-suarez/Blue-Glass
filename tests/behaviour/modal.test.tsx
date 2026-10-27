@@ -1,11 +1,3 @@
-// Behaviour specs for Modal, from design-system/components/Modal/README.md and api.d.ts. Two
-// entries of docs/deviations.md replace the README's wording, and the specs follow them: while
-// focus is kept in, the rest of the page is hidden from assistive tech and never made inert (7),
-// and a Modal opened inside another renders inside that one's portal (8), so no spec says where a
-// nested one renders. The specs the reference fails are declared with referenceDefectTest: its
-// inert page and Tab sentinels ignore hideBackdrop and disableEnforceFocus, a press outside drops
-// focus to body, a closed keepMounted plain child stays shown, and in place it leaves the page
-// around the modal exposed.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { createPortal } from "react-dom";
@@ -22,16 +14,11 @@ type Flags = Omit<ModalProps, "open" | "onClose" | "children">;
 afterEach(async () => {
 	cleanup();
 	window.scrollTo(0, 0);
-	// Nothing a modal does outlives it: no scroll lock, nothing hidden, nothing left in body.
 	await expect.poll(() => document.body.childElementCount).toBe(0);
 	expect(isScrollLocked()).toBe(false);
 	expect(document.querySelector('[aria-hidden="true"], [inert]')).toBeNull();
 });
 
-/**
-Waits a few frames. Only for checks that something did not happen, which no condition can wait
-for.
-*/
 async function frames(count = 5): Promise<void> {
 	for (let index = 0; index < count; index++) {
 		// eslint-disable-next-line no-await-in-loop -- one frame after another
@@ -48,24 +35,15 @@ function isScrollLocked(): boolean {
 	);
 }
 
-/**
-Whether assistive tech can't reach the element: it or an ancestor is aria-hidden, or inert.
-*/
 function isHiddenFromAssistiveTech(element: Element): boolean {
 	return element.closest('[aria-hidden="true"], [inert]') !== null;
 }
 
-/**
-The alpha of a computed colour: rgb() is opaque, rgba() carries its own.
-*/
 function alphaOf(color: string): number {
 	const channels = color.match(/[\d.]+/gv) ?? [];
 	return channels.length === 4 ? Number(channels[3]) : 1;
 }
 
-/**
-The topmost element at the element's centre: what a press there lands on.
-*/
 function elementOver(element: Element): Element | null {
 	const box = element.getBoundingClientRect();
 	const halfWidth = box.width / 2;
@@ -87,9 +65,6 @@ function token(name: string): string {
 		.trim();
 }
 
-/**
-Focus's path through `count` presses of Tab, or Shift+Tab.
-*/
 async function tabTrail(
 	count: number,
 	isShifted = false,
@@ -104,9 +79,6 @@ async function tabTrail(
 	return trail;
 }
 
-/**
-Wheels over the element, and checks the page doesn't scroll.
-*/
 async function expectScrollLocked(over: HTMLElement): Promise<void> {
 	window.scrollTo(0, 0);
 	await userEvent.wheel(over, { delta: { y: 400 } });
@@ -114,9 +86,6 @@ async function expectScrollLocked(over: HTMLElement): Promise<void> {
 	expect(window.scrollY).toBe(0);
 }
 
-/**
-Wheels over the element, and checks the page scrolls.
-*/
 async function expectScrollFree(over: HTMLElement): Promise<void> {
 	window.scrollTo(0, 0);
 	await userEvent.wheel(over, { delta: { y: 400 } });
@@ -135,10 +104,6 @@ const surfaceStyle: React.CSSProperties = {
 
 type SurfaceProps = React.ComponentProps<"div"> & { readonly label?: string };
 
-/**
-The surface the README asks for: role="dialog", aria-modal, and a name from its title. It passes
-its ref and style on, so a transition can wrap it.
-*/
 function Surface({ label = "Modal", children, style, ...rest }: SurfaceProps) {
 	const titleId = React.useId();
 	return (
@@ -163,18 +128,11 @@ function Surface({ label = "Modal", children, style, ...rest }: SurfaceProps) {
 type PageProps = {
 	readonly flags?: Flags;
 	readonly onClose?: OnClose;
-	/**
-	Whether the parent closes the modal when onClose reports. The README leaves it to the parent.
-	*/
 	readonly closesOnRequest?: boolean;
 	readonly onPagePress?: () => void;
 	readonly children?: React.ReactElement;
 };
 
-/**
-A page with an opener, a control the backdrop covers, the Modal, a control after it, and enough
-height to scroll. The parent keeps `open`.
-*/
 function Page({
 	flags,
 	onClose,
@@ -218,7 +176,6 @@ function setup(props: PageProps = {}) {
 	const onClose = vi.fn<OnClose>();
 	const onPagePress = vi.fn<() => void>();
 	render(<Page onClose={onClose} onPagePress={onPagePress} {...props} />);
-	// Read before the modal opens: hidden from assistive tech, they lose their accessible names.
 	const opener = screen.getByRole("button", { name: "Open a modal" });
 	const pageAction = screen.getByRole("button", { name: "Page action" });
 	const after = screen.getByRole("button", { name: "After" });
@@ -230,18 +187,11 @@ function setup(props: PageProps = {}) {
 		after,
 		page: [opener, pageAction, after],
 		reasons: () => onClose.mock.calls.map(([, reason]) => reason),
-		/**
-		Opens the modal with a click on the opener, as a reader would, and returns its surface.
-		*/
 		async open(): Promise<HTMLElement> {
 			await userEvent.click(opener);
 			return screen.findByRole("dialog", { name: "Modal" });
 		},
-		/**
-		A press on the page beside the content, where the backdrop covers the page control.
-		*/
 		async pressOutside(): Promise<void> {
-			// Forced: the backdrop covers the control, and the press lands on whatever is on top.
 			await userEvent.click(pageAction, { force: true });
 		},
 	};
@@ -364,8 +314,6 @@ describe("where it renders", () => {
 	});
 });
 
-// The layer renders through a portal or in place, and Base UI's port takes a separate path for
-// each, so every behaviour runs on both.
 describe.each([
 	{ where: "through the portal", disablePortal: false },
 	{ where: "in place", disablePortal: true },
@@ -446,7 +394,6 @@ describe.each([
 		await modal.pressOutside();
 		await expect.poll(modal.reasons).toEqual(["backdropClick"]);
 		const [event] = modal.onClose.mock.calls[0];
-		// React's event, wrapping the native click.
 		expect(event).not.toBeInstanceOf(Event);
 		expect(event.type).toBe("click");
 		expect((event as React.MouseEvent).nativeEvent).toBeInstanceOf(MouseEvent);
@@ -477,7 +424,6 @@ describe.each([
 		await frames();
 		expect(modal.onClose).not.toHaveBeenCalled();
 		expect(dialog).toBeVisible();
-		// A press on the backdrop still reports.
 		await modal.pressOutside();
 		await expect.poll(modal.reasons).toEqual(["backdropClick"]);
 	});
@@ -552,8 +498,6 @@ describe.each([
 		},
 	);
 
-	// Inert hides from assistive tech too, so the reference passes through the portal; in place it
-	// leaves the page around the modal exposed.
 	(disablePortal ? referenceDefectTest : test)(
 		"while focus is kept in, the rest of the page is hidden from assistive tech, until it closes",
 		async () => {
@@ -600,7 +544,6 @@ describe.each([
 			const modal = setup({ flags: { ...flags, disableEnforceFocus: true } });
 			const dialog = await modal.open();
 			await expect.element(dialog).toHaveFocus();
-			// Still so a few frames on, after any late marking.
 			await frames();
 			expect(
 				modal.page.map((element) => isHiddenFromAssistiveTech(element)),
@@ -638,7 +581,6 @@ describe.each([
 		await expect.poll(modal.reasons).toEqual(["escapeKeyDown"]);
 	});
 
-	// Through the portal, the reference's inert page takes focus off the opener.
 	(disablePortal ? test : referenceDefectTest)(
 		"disableAutoFocus: focus stays on the element that had it",
 		async () => {
@@ -688,7 +630,6 @@ describe.each([
 				</Fade>
 			),
 		});
-		// Mounted before it first opens, and not shown.
 		const surface = must(document.querySelector('[role="dialog"]'));
 		expect(surface).not.toBeVisible();
 		expect(screen.queryByRole("dialog")).toBeNull();
@@ -703,7 +644,6 @@ describe.each([
 		await expect.element(dialog).not.toBeVisible();
 		expect(dialog.isConnected).toBe(true);
 		expect(screen.queryByRole("dialog")).toBeNull();
-		// Closed, it leaves the page alone.
 		await expect
 			.poll(() =>
 				modal.page.map((element) => isHiddenFromAssistiveTech(element)),
@@ -791,7 +731,6 @@ describe.each([
 		await expect
 			.poll(() => calls.map((call) => call.name))
 			.toEqual(["enter", "entered", "exit", "exited"]);
-		// Still in the document when its exit ended, and gone after.
 		expect(calls.at(-1)?.isConnected).toBe(true);
 		await expect.element(dialog).not.toBeInTheDocument();
 		await expect.element(modal.opener).toHaveFocus();
@@ -807,10 +746,6 @@ type NestedProps = {
 	readonly onClose: (layer: Layer, reason: ModalCloseReason) => void;
 };
 
-/**
-The preview's example: a modal with a button that opens a second one, rendered inside the first
-one's content or beside it. Each parent closes its modal on onClose.
-*/
 function Nested({ placement, outerFlags, innerFlags, onClose }: NestedProps) {
 	const [isOuterOpen, setIsOuterOpen] = React.useState(false);
 	const [isInnerOpen, setIsInnerOpen] = React.useState(false);
@@ -897,9 +832,6 @@ function setupNested(props: Omit<NestedProps, "onClose">) {
 		calls,
 		opener,
 		pageAction,
-		/**
-		Opens the first modal, then the second from it, and returns both surfaces.
-		*/
 		async openBoth() {
 			await userEvent.click(opener);
 			const outer = await screen.findByRole("dialog", { name: "Modal" });

@@ -1,17 +1,9 @@
 {
-	// The API gate's compile (npm run check:api, tests/api/README.md): the checks in
-	// generated/ against the package's built declarations. It covers the whole folder, since
-	// editors and XO type each file with its nearest tsconfig. tests/api/gate.test.ts extends
-	// it to point "#api/package" at fixtures instead.
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"noEmit": true,
-		// The checks mean what they say only under strict, and with optional props that
-		// accept undefined, as most consumers compile.
 		"strict": true,
 		"exactOptionalPropertyTypes": false,
-		// Check the built declarations themselves too: with skipLibCheck, a broken .d.ts in
-		// dist/ would only show as types that quietly turned into any.
 		"skipLibCheck": false,
 		"paths": {
 			"#api/documented": ["../../design-system/source/index.d.ts"],

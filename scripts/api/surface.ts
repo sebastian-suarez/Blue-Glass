@@ -1,12 +1,3 @@
-/**
-The documented API as the TypeScript compiler sees it: what each type and value exported by
-design-system/source/index.d.ts is, so scripts/api/generate.ts writes the checks that fit it.
-Names and phases come from scripts/lib/reference.ts; this adds the shapes. It also lists what
-any entry file exports, for the export test.
-
-It reads them with the TypeScript 6 compiler API (the "typescript" package), since
-TypeScript 7's JavaScript API is still marked unstable; the checks compile with TypeScript 7.
-*/
 import path from "node:path";
 import ts from "typescript";
 import { designSystem, root } from "../lib/reference.ts";
@@ -15,23 +6,14 @@ export const documentedFile = path.join(designSystem, "source/index.d.ts");
 
 export type TypeParameter = {
 	name: string;
-	/**
-	The constraint and default as source text, with documented names written as Doc.Name.
-	*/
 	constraint: string | undefined;
 	default: string | undefined;
 };
 
 export type DocumentedType = {
 	name: string;
-	/**
-	Interfaces and object types are checked key by key; unions and the rest as a whole.
-	*/
 	isObject: boolean;
 	typeParameters: TypeParameter[];
-	/**
-	Keys declared in the documentation, as opposed to those inherited from React's types.
-	*/
 	ownKeys: string[];
 	hasInheritedKeys: boolean;
 };
@@ -46,9 +28,6 @@ export type DocumentedValue =
 	| {
 			name: string;
 			kind: "function";
-			/**
-			Calls the documentation allows: from the required parameters to all of them.
-			*/
 			arities: number[];
 	  }
 	| { name: string; kind: "constant" };
@@ -58,7 +37,6 @@ export type Surface = {
 	values: Map<string, DocumentedValue>;
 };
 
-// The compiler API's flags are bit sets.
 function hasFlag(flags: number, flag: number): boolean {
 	// eslint-disable-next-line no-bitwise -- testing one bit of a flag set
 	return (flags & flag) !== 0;
@@ -96,10 +74,6 @@ function load(file: string) {
 	return { checker, source, exports: checker.getExportsOfModule(moduleSymbol) };
 }
 
-/**
-Rewrites a type from the documentation so it compiles in a generated check: references to
-its own top-level declarations become Doc.Name.
-*/
 function qualify(
 	node: ts.TypeNode | undefined,
 	checker: ts.TypeChecker,
@@ -200,7 +174,6 @@ function readValue(
 		checker,
 		source,
 	);
-	// Components are PascalCase (GLYPHS is a constant).
 	if (/^[A-Z]/v.test(name) && /[a-z]/v.test(name)) {
 		const [props] = signature.getParameters();
 		const hasRef =
@@ -234,11 +207,6 @@ function readValue(
 	return { name, kind: "function", arities };
 }
 
-/**
-Every type and value design-system/source/index.d.ts declares, described. A .d.ts module
-also exports the helpers it doesn't mark export (Part, Selection); the documented surface is
-the subset scripts/lib/reference.ts lists.
-*/
 export function readSurface(): Surface {
 	const { checker, source, exports } = load(documentedFile);
 	const surface: Surface = { types: new Map(), values: new Map() };
@@ -268,10 +236,6 @@ function isTypeOnlyExport(node: ts.Declaration): boolean {
 	);
 }
 
-/**
-The names an entry file exports, by meaning: values exist at runtime, types only for the
-compiler. A name can be both.
-*/
 export function listExports(entry: string): {
 	values: Set<string>;
 	types: Set<string>;

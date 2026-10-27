@@ -21,18 +21,12 @@ function current<T>(ref: React.RefObject<T | null>): T {
 	return ref.current;
 }
 
-/**
-Renders one Typography and returns its root element, through the documented ref.
-*/
 function root(props: TypographyProps): HTMLElement {
 	const ref = React.createRef<HTMLElement>();
 	render(<Typography ref={ref} {...props} />);
 	return current(ref);
 }
 
-/**
-What a font-size value computes to at the current viewport, read off a probe.
-*/
 function fontSizeOf(value: string): string {
 	const probe = document.createElement("span");
 	probe.style.fontSize = value;
@@ -54,8 +48,6 @@ function textWrapStyle(element: Element): string {
 	return getComputedStyle(element).getPropertyValue("text-wrap-style");
 }
 
-// The README's Props table: h1 (display, title-xl), h2 (title-lg, title-md, heading), h3
-// (card-title, title-sm), h4 (subtitle), p (statement, lede to small), code (code), span (the rest).
 const elements: Array<[TypographyVariant, string]> = [
 	["display", "H1"],
 	["title-xl", "H1"],

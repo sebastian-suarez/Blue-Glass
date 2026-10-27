@@ -1,8 +1,3 @@
-/**
-Downloads Satoshi from Fontshare into fonts/ and checks it's the release the gates were recorded
-with (scripts/lib/fonts.ts says why the file isn't committed). Run it once per checkout, before
-the gates, Storybook or the browser tests: `npm run fonts`.
-*/
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";

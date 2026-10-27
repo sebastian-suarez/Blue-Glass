@@ -1,17 +1,13 @@
-/* Blue Glass — Card, ported from design-system/components/Card/styles.css. The glass material
-   (.gl-glass) is in foundation.css. */
-
 @layer gl-components {
-	/* Card — the site's .card.glass-panel, .card-head, .card-foot, .chips/.chip and .card-links (global.css) */
 	.gl-card {
 		--gl-card-radius: var(--radius-panel);
 		position: relative;
 		isolation: isolate;
 		display: flex;
 		flex-direction: column;
-		gap: 26px; /* .card */
+		gap: 26px;
 		min-width: 0;
-		padding: var(--space-2xl); /* .card: 40px */
+		padding: var(--space-2xl);
 		border-radius: var(--gl-card-radius);
 		color: var(--color-ink);
 		transition:
@@ -19,7 +15,6 @@
 			background-color var(--duration-hover) ease,
 			transform var(--duration-press) var(--ease-out-quint);
 	}
-	/* glass: .glass-panel — glass fill, blur-panel, a near-white edge, shadow-panel and the diagonal sheen */
 	.gl-card-glass {
 		--gl-fill: var(--glass);
 		--gl-blur: var(--blur-panel);
@@ -39,15 +34,12 @@
 		background: transparent;
 		border: 1px solid var(--color-line);
 	}
-	/* inset: a well (.project-figure) — glass-inset, glass-edge, shadow-inset, radius-well */
 	.gl-card-inset {
 		--gl-card-radius: var(--radius-well);
 		background: var(--glass-inset);
 		border: 1px solid var(--glass-edge);
 		box-shadow: var(--shadow-inset);
 	}
-
-	/* .card-head */
 	.gl-card-header {
 		display: flex;
 		align-items: flex-start;
@@ -100,8 +92,6 @@
 	.gl-card-content > * {
 		margin: 0;
 	}
-
-	/* CardMedia: an inset well, like .project-figure / .hiw-figure-inline */
 	.gl-card-media {
 		position: relative;
 		min-width: 0;
@@ -121,8 +111,6 @@
 		height: 100%;
 		object-fit: cover;
 	}
-
-	/* .card-foot */
 	.gl-card-actions {
 		display: flex;
 		flex-wrap: wrap;
@@ -130,7 +118,6 @@
 		justify-content: space-between;
 		gap: var(--space-md);
 	}
-	/* .chips */
 	.gl-card-chips {
 		display: flex;
 		flex-wrap: wrap;
@@ -142,7 +129,6 @@
 	.gl-card-chips-item {
 		display: inline-flex;
 	}
-	/* .chip */
 	.gl-card-chip {
 		font-size: 12px;
 		padding: 5px 11px;
@@ -151,7 +137,6 @@
 		border: 1px solid rgba(88, 108, 143, 0.16);
 		color: var(--ink-soft);
 	}
-	/* .card-links: above a CardActionArea's stretched hit area */
 	.gl-card-links {
 		position: relative;
 		z-index: 2;
@@ -163,13 +148,10 @@
 	.gl-card-links:only-child {
 		margin-left: auto;
 	}
-	/* .replink .icon is 14px */
 	.gl-card-links .gl-button-icon .gl-icon {
 		width: 14px;
 		height: 14px;
 	}
-
-	/* CardActionArea: a link or button whose hit area and focus ring cover the whole card */
 	.gl-card-action-area {
 		display: block;
 		width: 100%;
@@ -213,7 +195,6 @@
 	}
 
 	@media (hover: hover) and (pointer: fine) {
-		/* .card:hover */
 		.gl-card-glass:hover {
 			box-shadow: var(--shadow-panel-hover);
 		}

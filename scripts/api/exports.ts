@@ -1,27 +1,13 @@
-/**
-The export names half of the API gate (tests/api/exports.test.ts): the package exports every
-documented value and type in scope, its values are defined at runtime, and it exports
-nothing else unless tests/api/allowlist.json gives the reason.
-*/
 import { phaseOfModule, type Scope } from "../lib/phases.ts";
 import { exportsByModule, ownerOfModule } from "../lib/reference.ts";
 import { type Allowlist } from "./allowlist.ts";
 
 export type Exported = {
-	/**
-	Names with a runtime meaning, and names with a type meaning (a name can have both).
-	*/
 	values: Set<string>;
 	types: Set<string>;
-	/**
-	The imported module, to check that each value is defined. Fixtures have no runtime.
-	*/
 	runtime?: Record<string, unknown>;
 };
 
-/**
-Where each documented name comes from, for messages: "Button (phase 1)".
-*/
 function documentedNames(): Map<string, string> {
 	const owners = ownerOfModule();
 	const phases = phaseOfModule();
@@ -36,9 +22,6 @@ function documentedNames(): Map<string, string> {
 	return names;
 }
 
-/**
-Everything wrong with `exported` at `scope`, one readable line each. Empty means it passes.
-*/
 export function exportProblems(
 	scope: Scope,
 	exported: Exported,
@@ -61,7 +44,6 @@ export function exportProblems(
 		}
 	}
 
-	// A placeholder is as bad as a missing export, in scope or ahead of it.
 	const atRuntime = Object.keys(runtime ?? {});
 	for (const name of new Set([...exported.values, ...atRuntime])) {
 		if (runtime !== undefined && runtime[name] === undefined) {

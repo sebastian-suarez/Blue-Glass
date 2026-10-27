@@ -2,12 +2,6 @@
 import type * as React from "react";
 import { useIsoLayoutEffect } from "../../internal/hooks.js";
 
-/**
-The element resets the site gets from Tailwind's preflight, scoped to what the components
-assume. The stylesheet already sets the body (canvas, ink, system font, focus ring,
-selection); this adds the rest when a page has no reset of its own. src/styles/baseline.css
-ships the same rules as a file, for HTML that no client React renders.
-*/
 const css = `
 @layer gl-base {
   html { -webkit-text-size-adjust: 100%; tab-size: 4; color-scheme: light; }
@@ -25,7 +19,6 @@ const css = `
   [hidden]:where(:not([hidden="until-found"])) { display: none !important; }
 }`;
 
-// Every mounted CssBaseline shares one style element; the last to unmount removes it.
 let users = 0;
 let styleElement: HTMLStyleElement | undefined;
 
@@ -33,9 +26,6 @@ export type CssBaselineProps = {
 	children?: React.ReactNode;
 };
 
-/**
-Adds the element resets once per document while mounted; renders its children unchanged.
-*/
 export function CssBaseline({
 	children,
 }: CssBaselineProps): React.ReactElement {
@@ -45,7 +35,6 @@ export function CssBaseline({
 			styleElement = document.createElement("style");
 			styleElement.dataset.gl = "css-baseline";
 			styleElement.textContent = css;
-			// Before every other stylesheet, so gl-base is the first layer declared: the lowest.
 			document.head.prepend(styleElement);
 		}
 

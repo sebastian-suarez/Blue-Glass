@@ -31,15 +31,8 @@ const meta = {
 
 export default meta;
 
-// Only Default renders through its args, and every story brings its own content, so none takes
-// the required open.
 type Story = StoryObj<Partial<DialogProps>>;
 
-// The preview grows its stages on phones with useMediaQuery(media.phone); here CSS does, under the
-// same query, so the server HTML lays out as the hydrated page does. On phones the notes' default
-// text wraps to three rows, but TextareaAutosize's server HTML is minRows rows tall, so CSS holds
-// the field at three rows there, past the field style's inline min-height: otherwise the centred
-// surface grows as the page hydrates, and every text in it moves.
 const styles = `
 .dialog-stage-confirm {
 	height: 320px;
@@ -60,8 +53,6 @@ const styles = `
 }
 `;
 
-// As in the preview: each dialog open in place over its stage, leaving focus and the page's
-// scroll alone.
 const inPlace = {
 	disablePortal: true,
 	disableScrollLock: true,
@@ -69,7 +60,6 @@ const inPlace = {
 	disableEnforceFocus: true,
 } as const;
 
-// The form's fields: glass-control wells with the labels above them.
 const field: React.CSSProperties = {
 	width: "100%",
 	minHeight: 46,
@@ -99,9 +89,6 @@ const notes = [
 	"The 404 page has its own diagram of where the request went.",
 ];
 
-/**
-The button in a stage's corner that opens its dialog again.
-*/
 function Trigger({
 	onClick,
 	children,
@@ -123,10 +110,6 @@ type ConfirmProps = Omit<Partial<DialogProps>, "children"> & {
 	readonly onDismiss: () => void;
 };
 
-/**
-The Default's stage: the destructive confirm, whose buttons both dismiss it, as Escape and a
-press outside do through onClose.
-*/
 function Confirm({ open = false, onOpen, onDismiss, ...dialog }: ConfirmProps) {
 	return (
 		<div className="dialog-stage-confirm">
@@ -160,10 +143,6 @@ function Confirm({ open = false, onOpen, onDismiss, ...dialog }: ConfirmProps) {
 	);
 }
 
-/**
-Default's stage: the args drive the dialog, Escape, a press outside and both buttons set open
-back to false, and the trigger sets it to true.
-*/
 function ConfirmWithArgs(
 	args: Partial<DialogProps>,
 	{ viewMode }: { readonly viewMode: string },
@@ -200,10 +179,6 @@ function ConfirmWithArgs(
 	);
 }
 
-/**
-Opened by its trigger, dismissed by Escape, a press outside or its own buttons, as each of the
-preview's stages is.
-*/
 function useOpen(): {
 	readonly isOpen: boolean;
 	readonly open: () => void;
@@ -221,9 +196,6 @@ function useOpen(): {
 	};
 }
 
-/**
-`scroll="paper"`: the release notes scroll between the title and Done.
-*/
 function ReleaseNotes() {
 	const { isOpen, open, close } = useOpen();
 	return (
@@ -258,9 +230,6 @@ function ReleaseNotes() {
 	);
 }
 
-/**
-`fullScreen`: the calibration fills its stage with square corners.
-*/
 function Calibrate() {
 	const { isOpen, open, close } = useOpen();
 	return (
@@ -291,9 +260,6 @@ type PublishProps = Omit<Partial<DialogProps>, "children" | "onClose"> & {
 	readonly onClose: () => void;
 };
 
-/**
-The short form, fullWidth: labels above glass-control fields, Enter submits, Publish last.
-*/
 function Publish({ open = false, onClose, ...dialog }: PublishProps) {
 	const id = React.useId().replaceAll(/[^\w-]/gu, "");
 	return (
@@ -348,9 +314,6 @@ function Publish({ open = false, onClose, ...dialog }: PublishProps) {
 	);
 }
 
-/**
-The form open in place over its stage.
-*/
 function PublishInPlace() {
 	const { isOpen, open, close } = useOpen();
 	return (
@@ -363,9 +326,6 @@ function PublishInPlace() {
 	);
 }
 
-/**
-The same form over the whole frame, through the portal, and full screen on phones.
-*/
 function PublishFullPage() {
 	const [isOpen, setIsOpen] = React.useState(false);
 	return (
@@ -475,8 +435,6 @@ export const Example: Story = {
 	),
 };
 
-// The Example at the phone size the layout gate checks, where its stage grows and the full-page
-// form fills the screen: its axe test runs at 390px too, and the tag keeps it off the docs page.
 export const ExampleOnPhone: Story = {
 	...Example,
 	name: "Example on a phone",

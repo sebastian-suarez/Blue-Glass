@@ -1,9 +1,6 @@
 import type * as React from "react";
 import { cx } from "../../internal/cx.js";
 
-/**
-Every type token (tokens.json "type"), named without the `text-` prefix.
-*/
 export type TypographyVariant =
 	| "display"
 	| "title-xl"
@@ -44,9 +41,6 @@ export type TypographyColor =
 	| "success"
 	| "info";
 
-/**
-The element each variant renders by default.
-*/
 const elements: Record<TypographyVariant, keyof React.JSX.IntrinsicElements> = {
 	display: "h1",
 	"title-xl": "h1",
@@ -75,10 +69,6 @@ const elements: Record<TypographyVariant, keyof React.JSX.IntrinsicElements> = {
 	"diagram-label": "span",
 };
 
-/**
-The site's fluid sizes for the display group (global.css: .hero h1, .hiw-intro h1, .contact h2,
-.project-identity h3, .scrub).
-*/
 const fluidSizes: Partial<Record<TypographyVariant, string>> = {
 	display: "clamp(44px, 5.6vw, 80px)",
 	"title-xl": "clamp(40px, 5vw, 72px)",
@@ -93,45 +83,17 @@ export type TypographyProps = Omit<
 	React.HTMLAttributes<HTMLElement>,
 	"color"
 > & {
-	/**
-	The type token to set, without `text-`: display, heading, body, micro, code… Default body.
-	*/
 	variant?: TypographyVariant;
-	/**
-	Render as another element; the variant's look stays. Default from the variant (heading → h2, body → p, micro → span…).
-	*/
 	component?: React.ElementType;
-	/**
-	Text colour token. Default inherit.
-	*/
 	color?: TypographyColor;
-	/**
-	Text alignment. Default inherit.
-	*/
 	align?: "inherit" | "left" | "center" | "right" | "justify";
-	/**
-	One line, cut with an ellipsis.
-	*/
 	noWrap?: boolean;
-	/**
-	A bottom margin of half a line (0.5em). The root has no margin otherwise.
-	*/
 	gutterBottom?: boolean;
-	/**
-	Line breaking: balance (default on h1–h6, as the site), pretty (default on p) or plain wrap.
-	*/
 	textWrap?: "balance" | "pretty" | "wrap";
-	/**
-	Use the site's fluid size for the display group, e.g. display = clamp(44px, 5.6vw, 80px).
-	*/
 	fluid?: boolean;
 	children?: React.ReactNode;
 };
 
-/**
-The line breaking an element gets by default: the site balances headings and makes
-paragraphs pretty.
-*/
 function defaultWrap(tag: string): TypographyProps["textWrap"] {
 	if (headings.has(tag)) {
 		return "balance";
@@ -140,9 +102,6 @@ function defaultWrap(tag: string): TypographyProps["textWrap"] {
 	return tag === "p" ? "pretty" : undefined;
 }
 
-/**
-Text set in one of the Blue Glass type tokens, on the element that variant means.
-*/
 export function Typography({
 	variant = "body",
 	component,
@@ -158,7 +117,6 @@ export function Typography({
 	ref,
 	...rest
 }: TypographyProps & { ref?: React.Ref<HTMLElement> }) {
-	// A variant outside the union (from untyped code) falls back to a span, as in the reference.
 	const Component: React.ElementType =
 		component ??
 		(Object.hasOwn(elements, variant) ? elements[variant] : "span");

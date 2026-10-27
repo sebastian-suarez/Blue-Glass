@@ -7,7 +7,6 @@ import { Button, Icon, type ButtonProps } from "#ui";
 
 afterEach(() => {
 	cleanup();
-	// Link buttons follow hash hrefs; clear the hash so no test sees another's.
 	window.history.replaceState(
 		null,
 		"",
@@ -15,9 +14,6 @@ afterEach(() => {
 	);
 });
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -37,9 +33,6 @@ function preventSubmit(event: React.SyntheticEvent) {
 	event.preventDefault();
 }
 
-/**
-The first text node inside the element that holds the text, wherever the port wraps it.
-*/
 function textNode(element: Element, text: string): Node {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let node = walker.nextNode();
@@ -115,7 +108,6 @@ describe("element and ref", () => {
 });
 
 describe("type and onClick", () => {
-	// The README leaves the default unstated; the reference, like Base UI's Button, uses "button".
 	test("type defaults to button, so a Button doesn't submit its form", async () => {
 		const onSubmit = vi.fn(preventSubmit);
 		render(
@@ -254,7 +246,6 @@ describe("disabled", () => {
 		expect(onClick).not.toHaveBeenCalled();
 	});
 
-	// An <a> has no disabled attribute; the reference marks it aria-disabled and drops the href.
 	test("a disabled link Button is aria-disabled and neither follows its href nor calls onClick", async () => {
 		const onClick = vi.fn<() => void>();
 		render(
@@ -281,7 +272,6 @@ describe("loading", () => {
 		const element = button("Saving");
 		expect(element).toHaveAttribute("aria-busy", "true");
 		await userEvent.click(element, { force: true });
-		// A busy button keeps focus (see below), but keys mustn't press it.
 		element.focus();
 		await userEvent.keyboard("{Enter}");
 		await userEvent.keyboard(" ");

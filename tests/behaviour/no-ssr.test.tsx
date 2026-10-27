@@ -16,10 +16,6 @@ async function nextFrame(): Promise<void> {
 	});
 }
 
-/**
-A browser-only child, like the preview's: it reads window while it renders, and counts its
-renders.
-*/
 function frameWidth() {
 	const renders = { count: 0 };
 	function FrameWidth() {
@@ -30,10 +26,6 @@ function frameWidth() {
 	return { renders, FrameWidth };
 }
 
-/**
-Puts the tree's server HTML in a host on the page, ready to hydrate, and records the
-recoverable errors React reports while hydrating.
-*/
 function serverPage(tree: React.ReactElement) {
 	const host = document.createElement("div");
 	document.body.append(host);

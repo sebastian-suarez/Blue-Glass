@@ -1,13 +1,5 @@
-/**
-The scripts the Storybook gate (run.ts) runs in every frame before Storybook's own: one that
-records the preview's events and errors, and the defects its self-test plants.
-*/
 import type { Check } from "./run.ts";
 
-/**
-Runs in every frame before its scripts: records the channel's events and the page's errors,
-and lets a planted defect hook the channel as soon as Storybook creates it.
-*/
 export const recordEvents = `(() => {
 	const w = window;
 	w.__glEvents = [];
@@ -48,11 +40,6 @@ export const recordEvents = `(() => {
 	});
 })();`;
 
-/**
-A defect planted at runtime for the self-test. `script` runs in every frame after the recorder,
-with TARGET set to the story's id; it bumps window.__glFired each time it acts. With `detail`,
-the failure that catches it must match it, so the self-test proves that comparison bites.
-*/
 export type Mutation = {
 	name: string;
 	story: string;
@@ -62,9 +49,6 @@ export type Mutation = {
 	script: string;
 };
 
-// The preview's iframe starts at about:blank, whose window the browser keeps for iframe.html, so
-// the scripts below run before the preview's URL is known: each checks it when it acts, and
-// listens on the window, which outlives the first document.
 const inPreview = `if (!location.pathname.endsWith("/iframe.html")) return;`;
 const selection = `(window.__STORYBOOK_PREVIEW__ && window.__STORYBOOK_PREVIEW__.currentSelection) || {}`;
 

@@ -1,20 +1,15 @@
-/* Blue Glass — ButtonGroup, ported from design-system/components/ButtonGroup/styles.css. */
-
 @layer gl-components {
-	/* ButtonGroup — the site's pill nav (.identity-strip nav) holding Buttons, an ink pill split into
-   segments, or hairline-split text actions. Button is only overridden through .gl-button-group compounds. */
 	.gl-button-group {
-		--gl-button-group-h: 34px; /* nav item: 7px + 20px line + 7px (.identity-strip nav a) */
-		--gl-button-group-px: 17px; /* .identity-strip nav a: padding 7px 17px */
+		--gl-button-group-h: 34px;
+		--gl-button-group-px: 17px;
 		--gl-button-group-font: 13px;
-		--gl-button-group-pad: 5px; /* .identity-strip nav: padding 5px */
-		--gl-button-group-gap: 3px; /* .identity-strip nav: gap 3px */
+		--gl-button-group-pad: 5px;
+		--gl-button-group-gap: 3px;
 		--gl-button-group-text-h: var(--size-control-sm);
 		--gl-button-group-text-px: var(--space-sm);
 		position: relative;
 		display: inline-flex;
 		align-items: stretch;
-		/* The track hugs its buttons even where a grid or flex parent would stretch it; fullWidth opts in. */
 		width: fit-content;
 		max-width: 100%;
 		vertical-align: middle;
@@ -43,12 +38,10 @@
 		z-index: 1;
 		outline-offset: 2px;
 	}
-
-	/* glass: the nav track (glass-faint, #ffffffc9 edge, 5px padding, 3px gap) with nav-weight items. */
 	.gl-button-group-glass {
 		gap: var(--gl-button-group-gap);
 		padding: var(--gl-button-group-pad);
-		border: 1px solid #ffffffc9; /* .identity-strip nav */
+		border: 1px solid #ffffffc9;
 		border-radius: var(--radius-pill);
 		background: var(--glass-faint);
 		box-shadow: var(--shadow-control);
@@ -59,7 +52,7 @@
 		min-height: var(--gl-button-group-h);
 		padding: 0 var(--gl-button-group-px);
 		border-color: transparent;
-		border-radius: 23px; /* .identity-strip nav a */
+		border-radius: 23px;
 		background: transparent;
 		box-shadow: none;
 		-webkit-backdrop-filter: none;
@@ -67,8 +60,6 @@
 		font-size: var(--gl-button-group-font);
 		font-weight: 400;
 	}
-
-	/* primary: one ink pill (.btn-primary) split by 1px on-ink hairlines at 20%. */
 	.gl-button-group-primary {
 		border-radius: var(--radius-pill);
 		background: var(--color-ink);
@@ -96,8 +87,6 @@
 		background: color-mix(in srgb, var(--on-ink) 20%, transparent);
 		pointer-events: none;
 	}
-
-	/* text: link-weight actions (.replink) split by short hairlines. */
 	.gl-button-group-text {
 		gap: 0;
 	}
@@ -123,8 +112,6 @@
 		background: var(--color-line-strong);
 		pointer-events: none;
 	}
-
-	/* vertical: the track turns into the side selector's shape (radius-well = item pill + 5px padding). */
 	.gl-button-group-vertical {
 		flex-direction: column;
 	}
@@ -168,8 +155,6 @@
 		flex: 1 1 0;
 		min-width: 0;
 	}
-
-	/* disabled: the whole track dims once, instead of every button on top of it. */
 	.gl-button-group-disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
@@ -180,8 +165,6 @@
 	.gl-button-group-primary.gl-button-group-disabled {
 		box-shadow: none;
 	}
-
-	/* Phones: the site's nav tightens under 700px (.identity-strip nav a: 12px, less side padding). */
 	@media (max-width: 700px) {
 		.gl-button-group-md {
 			--gl-button-group-px: var(--space-sm);
@@ -197,7 +180,7 @@
 		.gl-button-group-glass
 			.gl-button:hover:not(:disabled):not([aria-disabled="true"]) {
 			background: #fff7;
-		} /* .identity-strip nav a:hover */
+		}
 		.gl-button-group-primary
 			.gl-button:hover:not(:disabled):not([aria-disabled="true"]) {
 			background: var(--ink-hover);

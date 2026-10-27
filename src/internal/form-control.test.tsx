@@ -15,8 +15,6 @@ afterEach(() => {
 	cleanup();
 });
 
-// The ports' CSS draws the control; without it the span has no size, and Playwright won't press
-// an element it can't see.
 const box: React.CSSProperties = {
 	display: "inline-block",
 	width: 20,
@@ -32,9 +30,6 @@ type ChangeCall<Value> = {
 	value: Value;
 };
 
-/**
-Records what onChange saw at call time: the input's state then, not after.
-*/
 function recorder<Value>() {
 	const calls: Array<ChangeCall<Value>> = [];
 	const onChange = vi.fn<ControlChangeHandler<Value>>((event, value) => {
@@ -208,7 +203,6 @@ describe.each(checkedControls)("$kind", ({ role, Control }) => {
 	test("a wrapping label and an htmlFor label toggle it", async () => {
 		render(
 			<>
-				{/* The rule can't tell that Control is a form control. */}
 				{/* eslint-disable-next-line jsx-a11y-x/label-has-associated-control */}
 				<label>
 					<Control name="wrapped" style={box} />
@@ -310,7 +304,6 @@ describe.each(checkedControls)("$kind", ({ role, Control }) => {
 
 	test("autoFocus focuses the span on mount", () => {
 		render(
-			// The documented autoFocus is what's under test.
 			// eslint-disable-next-line jsx-a11y-x/no-autofocus
 			<Control autoFocus name="news" aria-label="News" style={box} />,
 		);

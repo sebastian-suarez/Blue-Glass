@@ -25,11 +25,6 @@ function must<T>(value: T | null | undefined): T {
 	return value;
 }
 
-/**
-The text a screen reader reads inside an element, in document order: what is aria-hidden or not
-displayed is left out, and an element with an aria-label reads as its label. Text runs are
-joined with spaces, so it checks the words and their order, not the spacing between them.
-*/
 function spoken(element: Element): string {
 	const parts: string[] = [];
 	const walk = (node: Node) => {
@@ -68,9 +63,6 @@ function spoken(element: Element): string {
 	return parts.join(" ").replaceAll(/\s+/gv, " ").trim();
 }
 
-/**
-Read by screen readers but not seen: a box of a pixel or less, as gl-sr-only clips it.
-*/
 function isVisuallyHidden(element: Element): boolean {
 	const box = element.getBoundingClientRect();
 	return (
@@ -80,9 +72,6 @@ function isVisuallyHidden(element: Element): boolean {
 	);
 }
 
-/**
-The markup of a glyph as Icon draws it, to compare with what the alert shows.
-*/
 function glyph(name: string): string {
 	const { container, unmount } = render(<Icon name={name} />);
 	const markup = container.querySelector("svg")?.getHTML() ?? "";
@@ -90,9 +79,6 @@ function glyph(name: string): string {
 	return markup;
 }
 
-/**
-The colour a token resolves to, read from a probe element styled with it.
-*/
 function resolvedColour(token: string): string {
 	const probe = document.createElement("div");
 	probe.style.color = `var(${token})`;
@@ -297,7 +283,6 @@ describe("Alert", () => {
 				status.textContent.includes("Couldn't reach the bucket."),
 			);
 		expect(statuses).toHaveLength(1);
-		// The word still leads what is read.
 		expect(spoken(must(statuses[0]))).toMatch(/^Error: /v);
 	});
 
@@ -315,7 +300,6 @@ describe("Alert", () => {
 				status.textContent.includes("Cache invalidation queued."),
 			);
 		expect(statuses).toHaveLength(1);
-		// The word still leads what is read.
 		expect(spoken(must(statuses[0]))).toMatch(/^Info: /v);
 	});
 
@@ -517,9 +501,6 @@ describe("Alert keyboard", () => {
 			</Around>,
 		);
 		const onInk = resolvedColour("--on-ink");
-		/**
-		The focus ring's colour, or none when no ring is drawn.
-		*/
 		const ring = (element: Element) => {
 			const style = getComputedStyle(element);
 			return style.outlineStyle === "none" ? "none" : style.outlineColor;
@@ -533,7 +514,6 @@ describe("Alert keyboard", () => {
 		await userEvent.tab();
 		await expect.element(must(closes[0])).toHaveFocus();
 		expect(ring(must(closes[0]))).toBe(onInk);
-		// On the standard variant the ring keeps the page's focus colour.
 		await userEvent.tab();
 		await expect.element(must(closes[1])).toHaveFocus();
 		expect(ring(must(closes[1]))).not.toBe("none");

@@ -1,9 +1,3 @@
-/**
-Specimens for the tokens page, generated from design-system/tokens/tokens.json. Every sample is
-drawn with the stylesheet's own custom properties and classes, so the page shows what ships.
-The blocks sit in Unstyled: the docs page's typography is unlayered, so it would beat the
-.text-* classes, which live in the gl-base cascade layer.
-*/
 import { Unstyled } from "@storybook/addon-docs/blocks";
 import type { CSSProperties, ReactNode } from "react";
 import tokens from "../../design-system/tokens/tokens.json" with { type: "json" };
@@ -16,9 +10,6 @@ type Token = {
 
 const alias = /^\{(?<target>[^\{\}]+)\}$/v;
 
-/**
-A token's value as written, with an alias followed to the value it stands for.
-*/
 function describe(token: Token, family: readonly Token[]): string {
 	const target = alias.exec(token.value)?.groups?.target;
 	if (target === undefined) {
@@ -48,9 +39,6 @@ const note: CSSProperties = {
 	color: "var(--color-muted)",
 };
 
-/**
-Every colour as a swatch over the canvas, with its name, value and note.
-*/
 export function ColorSwatches() {
 	const family = tokens.color.tokens;
 	return (
@@ -115,9 +103,6 @@ const typeGroups: ReadonlyArray<{
 const fallbackSample =
 	"Cut PDF generation from about 6 seconds to 10–20 milliseconds.";
 
-/**
-Every type style set in its own .text-* class, grouped as in tokens.json.
-*/
 export function TypeStyles() {
 	return (
 		<Unstyled style={{ ...block, display: "grid", gap: 40 }}>
@@ -167,7 +152,6 @@ type Family =
 	| "zIndex"
 	| "size";
 
-// The families with something to draw: a bar as long as the space, a corner, a lift.
 const samples: Partial<Record<Family, (variable: string) => ReactNode>> = {
 	spacing: (variable) => (
 		<div
@@ -203,7 +187,6 @@ const samples: Partial<Record<Family, (variable: string) => ReactNode>> = {
 	),
 };
 
-// One 20px line in every cell, so names, values and notes share a baseline.
 const cell: CSSProperties = {
 	padding: "12px 16px 12px 0",
 	borderTop: "1px solid var(--color-line)",
@@ -213,14 +196,10 @@ const cell: CSSProperties = {
 	verticalAlign: "top",
 };
 
-/**
-One token family as a table: name, value, a sample where one helps, and the note.
-*/
 export function TokenTable({ family }: { readonly family: Family }) {
 	const group: { readonly note?: string; readonly tokens: readonly Token[] } =
 		tokens[family];
 	const sample = samples[family];
-	// The sample column is a strip of canvas, so it and the note after it get an inner gutter.
 	const gutter = (column: string) =>
 		column === "Sample" || (column === "Note" && sample !== undefined) ? 16 : 0;
 	return (

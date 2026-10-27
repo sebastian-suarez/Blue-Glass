@@ -1,15 +1,3 @@
-/**
-Writes the API gate's type checks (tests/api/README.md): for every documented type and value
-in the phase's scope, one line per check that compiles only while the package keeps the
-documented API. Each line ends in `// @check <id> — <what it checks>`, which
-scripts/api/compile.ts reads back to name the checks that fail.
-
-Usage: node scripts/api/generate.ts (BLUE_GLASS_PHASE overrides the manifest's phase).
-
-The checks import the documented types as "#api/documented" and the package as
-"#api/package"; the tsconfig that compiles them maps both, so the same checks run against
-dist/index.d.ts or a test fixture.
-*/
 import fs from "node:fs";
 import path from "node:path";
 import { currentPhase, scope } from "../lib/phases.ts";
@@ -37,9 +25,6 @@ class Writer {
 		return `_${this.#count}`;
 	}
 
-	/**
-	A type-level check: the alias compiles only if the check holds.
-	*/
 	type(id: string, description: string, expression: string) {
 		this.checks.push({
 			id,
@@ -48,9 +33,6 @@ class Writer {
 		});
 	}
 
-	/**
-	A value-level check: JSX or a call that must compile.
-	*/
 	value(id: string, description: string, expression: string, type = "") {
 		this.checks.push({
 			id,
@@ -59,9 +41,6 @@ class Writer {
 		});
 	}
 
-	/**
-	A documented value to feed the checks, typed from the documentation.
-	*/
 	declare(type: string): string {
 		const name = this.name();
 		this.declarations.push(`declare const ${name}: ${type};`);
@@ -71,11 +50,6 @@ class Writer {
 
 const quote = (key: string) => JSON.stringify(key);
 
-/**
-The type arguments each generic is checked with: its defaults, when it has them, and the
-Probe, which nothing else is assignable to. A type can leave its defaults implicit, so each
-side's own defaults apply; a component's instantiation expression needs them spelled out.
-*/
 function instantiations(
 	parameters: TypeParameter[],
 	{ spellDefaults }: { spellDefaults: boolean },
@@ -244,9 +218,6 @@ function checkValue(writer: Writer, value: DocumentedValue) {
 				"has no any that the documentation doesn't, in its parameters, their refs and callbacks, or its return type",
 				`Never<AnyIn<${quote(name)}, typeof Doc.${name}, typeof Pkg.${name}>>`,
 			);
-			// The package's function in the documented one's place: it must take every
-			// documented call and return what the documentation promises. The reverse
-			// would let a narrower parameter through.
 			writer.type(
 				`${name}#signature`,
 				"can stand in for the documented function",
@@ -284,9 +255,6 @@ function checkValue(writer: Writer, value: DocumentedValue) {
 	}
 }
 
-/**
-The checks for one component folder, as the text of a .tsx module.
-*/
 function moduleText(
 	folder: string,
 	names: { types: string[]; values: string[] },
@@ -332,10 +300,6 @@ function moduleText(
 
 export type Generated = { phase: number; files: string[]; checks: number };
 
-/**
-Writes the checks for everything in scope at `phase` to `directory` (emptied first), one
-.tsx file per component folder.
-*/
 export function generate({
 	phase = currentPhase(),
 	directory = generatedDirectory,

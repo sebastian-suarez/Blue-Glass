@@ -1,21 +1,3 @@
-/**
-The parity gate (docs/package-plan.md, acceptance suite item 1). Every preview in scope runs
-unchanged on two runtimes, the reference and the package, on the same React 19 production
-build. Their frozen screenshots are compared section by section, and the opened states in
-tests/parity/states.ts are compared too.
-
-A preview fails when the package page logs an error, its size differs from the reference
-page, or a region has more differing pixels than its budget (tests/parity/thresholds.json).
-The report, with the three images per preview, goes to reports/parity/.
-
-Usage:
-  node scripts/parity/run.ts             the gate, for the phase in scope
-  node scripts/parity/run.ts --self      the reference against itself, every preview, at rest
-                                         and in the opened states
-  node scripts/parity/run.ts --mutate    proves planted defects fail the gate
-  --only components/Button,sections/Hero  limits the previews
-  --phase N                               overrides the phase (as BLUE_GLASS_PHASE does)
-*/
 import type { Buffer } from "node:buffer";
 import fs from "node:fs";
 import path from "node:path";
@@ -135,9 +117,6 @@ type Comparison = {
 	label?: string;
 };
 
-/**
-A comparison that can't run (an action fails, a page crashes) fails instead of stopping the run.
-*/
 async function compareSafely(
 	browser: Browser,
 	server: Server,
@@ -171,7 +150,6 @@ async function compare(
 	const referenceUrl = writePage(preview, "reference");
 	const candidateUrl = writePage(preview, candidate, {
 		css,
-		// One page per mutation: two mutations of one preview run side by side in the pool.
 		variant:
 			css === undefined
 				? undefined
@@ -230,9 +208,6 @@ async function compare(
 	};
 }
 
-/**
-Runs jobs a few at a time. The results come back in the order of the jobs.
-*/
 async function pool<T>(
 	jobs: Array<() => Promise<T>>,
 	size: number,
@@ -243,7 +218,6 @@ async function pool<T>(
 		while (next < jobs.length) {
 			const index = next++;
 			const job = jobs[index];
-			// Each worker runs its jobs one after another; the workers run side by side.
 			// eslint-disable-next-line no-await-in-loop
 			results.set(index, await job());
 		}
@@ -282,9 +256,6 @@ ${rows}</table>`;
 	);
 }
 
-/**
-Planted defects the gate must catch, each on a preview that shows the mutated rule.
-*/
 const mutations = [
 	{
 		name: "radius",
@@ -292,7 +263,6 @@ const mutations = [
 		css: ".gl-button-primary { border-radius: 12px !important; }",
 	},
 	{
-		// Only the fill changes, to the hover token: the subtlest colour defect a port is likely to make.
 		name: "ink at rest",
 		preview: "components/Button",
 		css: ".gl-button-primary { background-color: var(--ink-hover) !important; }",
@@ -357,8 +327,6 @@ async function main(): Promise<number> {
 				only === undefined
 					? available
 					: available.filter((preview) => only.includes(preview.id));
-			// The self-test runs the gate's opened states too, so their budgets come from the
-			// reference against itself, plus its own states that prove the mechanism.
 			const statesOf = (id: string): State[] => {
 				const gate = states[id] ?? [];
 				if (mode !== "self") {

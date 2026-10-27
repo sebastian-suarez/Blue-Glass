@@ -1,9 +1,3 @@
-// Behaviour specs for TransferList, from design-system/components/TransferList/README.md and
-// api.d.ts. The port keeps its selection in Base UI's CheckboxGroup, so the specs find the wells
-// as listboxes and the rows as options, by role and name. The row the keys act on is the
-// focused option, or the option the focused listbox points at with aria-activedescendant (the
-// reference's way), whichever the port uses. Where the README is silent, the reference is the
-// spec, and the test says so.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import * as React from "react";
 import { afterEach, describe, expect, type Mock, test, vi } from "vitest";
@@ -20,9 +14,6 @@ afterEach(() => {
 	cleanup();
 });
 
-/**
-The element with an id, through a selector, as the lint rules prefer.
-*/
 function byId(id: string): HTMLElement | null {
 	return document.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
 }
@@ -30,7 +21,6 @@ function byId(id: string): HTMLElement | null {
 const stack = ["MongoDB", "React", "Rust", "Terraform", "Cloudflare"];
 const highlights = ["Node.js", "TypeScript", "AWS", "PostgreSQL"];
 
-// The preview's locked row: it stays on the résumé, and says why.
 const locked = {
 	value: "Node.js",
 	label: "Node.js",
@@ -54,10 +44,6 @@ function box(element: Element): DOMRect {
 	return element.getBoundingClientRect();
 }
 
-/**
-Whether the element is drawn: a box, and no display none, visibility hidden or opacity 0 on it
-or an ancestor.
-*/
 function isShown(element: Element): boolean {
 	const { width, height } = box(element);
 	return (
@@ -67,9 +53,6 @@ function isShown(element: Element): boolean {
 	);
 }
 
-/**
-Disabled natively, or through aria-disabled, which keeps the element focusable.
-*/
 function isDisabled(element: HTMLElement): boolean {
 	return (
 		element.matches(":disabled") ||
@@ -77,9 +60,6 @@ function isDisabled(element: HTMLElement): boolean {
 	);
 }
 
-/**
-Whether the elements come in this order in the document.
-*/
 function isInOrder(...elements: Element[]): boolean {
 	const all = [...document.querySelectorAll("*")];
 	const positions = elements.map((element) => all.indexOf(element));
@@ -88,10 +68,6 @@ function isInOrder(...elements: Element[]): boolean {
 	);
 }
 
-/**
-What a token resolves to, read from a probe element styled with it. A blur token goes through
-blur(), as backdrop-filter takes it.
-*/
 function resolved(
 	property:
 		"backgroundColor" | "borderTopLeftRadius" | "boxShadow" | "backdropFilter",
@@ -106,9 +82,6 @@ function resolved(
 	return value;
 }
 
-/**
-The alpha of a computed colour: rgb() is opaque, rgba() carries its own.
-*/
 function alphaOf(color: string): number {
 	const channels = color.match(/[\d.]+/gv) ?? [];
 	return channels.length === 4 ? Number(channels[3]) : 1;
@@ -120,9 +93,6 @@ async function pause(ms: number): Promise<void> {
 	});
 }
 
-/**
-Moves the pointer to the page's bottom-left corner, off every row, so no row is hovered.
-*/
 async function parkPointer(): Promise<void> {
 	const spot = document.createElement("div");
 	spot.style.cssText =
@@ -143,18 +113,12 @@ function well(name: string): HTMLElement {
 	return screen.getByRole("listbox", { name });
 }
 
-/**
-The row named by this label. An object item's secondary line may join its name, after the label.
-*/
 function option(label: string): HTMLElement {
 	return screen.getByRole("option", {
 		name: (name) => name === label || name.startsWith(`${label} `),
 	});
 }
 
-/**
-The texts of a well's rows, in order: a string item's label.
-*/
 function rowsOf(name: string): string[] {
 	return within(well(name))
 		.queryAllByRole("option")
@@ -181,10 +145,6 @@ function expectMoveButtons(names: readonly string[]): void {
 
 const countPattern = /^\d+\/\d+ selected$/v;
 
-/**
-The count a well shows, as "2/5 selected", and the well around it: the nearest ancestor of the
-listbox that holds a shown count of its own.
-*/
 function countAndPane(name: string): { count: string; pane: HTMLElement } {
 	const list = well(name);
 	for (let node = list.parentElement; node; node = node.parentElement) {
@@ -210,9 +170,6 @@ function paneOf(name: string): HTMLElement {
 	return countAndPane(name).pane;
 }
 
-/**
-The box a well's rows scroll in: the listbox, or its nearest scrolling ancestor.
-*/
 function scroller(name: string): HTMLElement {
 	for (
 		let node: HTMLElement | null = well(name);
@@ -237,9 +194,6 @@ function isWithin(inner: Element, outer: Element): boolean {
 	return a.top >= b.top - 1 && a.bottom <= b.bottom + 1;
 }
 
-/**
-The row the keys act on: the focused option, or the option the focused listbox points at.
-*/
 function activeRow(): Element | null {
 	const focused = document.activeElement;
 	if (!focused || focused === document.body) {
@@ -258,17 +212,11 @@ async function expectActive(label: string): Promise<void> {
 	await expect.poll(() => activeRow()).toBe(option(label));
 }
 
-/**
-Where focus is, counting a focused option as its listbox.
-*/
 function focusTarget(): Element | null {
 	const focused = document.activeElement;
 	return focused?.closest('[role="listbox"]') ?? focused;
 }
 
-/**
-Presses each key in turn and waits for the row named next to it to be the active one.
-*/
 async function walk(
 	steps: ReadonlyArray<readonly [key: string, label: string]>,
 ): Promise<void> {
@@ -291,30 +239,18 @@ function sorted(selection: TransferListSelection): TransferListSelection {
 	};
 }
 
-/**
-The selection onSelectionChange got last, in a fixed order: the order of its values isn't
-documented.
-*/
 function lastSelection(
 	onSelectionChange: Mock<OnSelectionChange>,
 ): TransferListSelection {
 	return sorted(must(onSelectionChange.mock.lastCall?.[0]));
 }
 
-/**
-A React click event, as onChange gets from a move button.
-*/
 function expectClick(event: React.SyntheticEvent | undefined): void {
 	expect(event).not.toBeInstanceOf(Event);
 	expect(event?.type).toBe("click");
 	expect(event?.nativeEvent).toBeInstanceOf(MouseEvent);
 }
 
-/**
-Which way the arrow drawn in a control points on screen, however it's turned. An arrow's open
-ends spread along its back, so it points away from the side of its outline where the drawn
-points spread widest.
-*/
 function pointing(control: Element): Direction {
 	const points: DOMPoint[] = [];
 	for (const path of control.querySelectorAll("path")) {
@@ -377,9 +313,6 @@ type SkillsProps = TransferListProps & {
 	readonly ref?: React.Ref<HTMLDivElement>;
 };
 
-/**
-The preview's résumé: the stack on the left, the highlights on the right.
-*/
 function Skills(props: SkillsProps) {
 	return (
 		<TransferList
@@ -401,9 +334,6 @@ function Around({ children }: { readonly children: React.ReactNode }) {
 	);
 }
 
-/**
-Renders the résumé between two buttons and tabs into the Stack well, on its first row.
-*/
 async function tabIntoStack(props: SkillsProps = {}): Promise<void> {
 	render(
 		<Around>
@@ -522,8 +452,6 @@ describe("TransferList: the wells", () => {
 		await expect.poll(() => countOf("Highlights")).toBe("1/4 selected");
 	});
 
-	// The README asks for the count so a selection out of view isn't lost; the reference also
-	// describes each listbox by it, so a screen reader hears it too.
 	test("each listbox is described by its count", async () => {
 		render(<Skills defaultSelected={{ left: ["Rust", "Terraform"] }} />);
 		expect(well("Stack")).toHaveAccessibleDescription(
@@ -723,7 +651,6 @@ describe("TransferList: moving rows", () => {
 		]);
 	});
 
-	// The README doesn't say where moved rows land; the reference adds them to the end, in order.
 	test.each(moves)(
 		"$name moves its rows to the end of the other list, and onChange gets the click event and both lists",
 		async ({ name, left, right }) => {
@@ -769,7 +696,6 @@ describe("TransferList: moving rows", () => {
 		});
 	});
 
-	// The words are the reference's: the README asks for how many items went where.
 	test("the status region is in the page from the start, empty, and after a move it says how many items went where", async () => {
 		render(
 			<Skills
@@ -788,7 +714,6 @@ describe("TransferList: moving rows", () => {
 		await expect.poll(() => status.textContent).toBe("Moved 5 items to Stack.");
 	});
 
-	// The README is silent on the selection after a move; the reference drops the moved rows from it.
 	test("moved rows arrive unselected and leave the selection, which onSelectionChange reports, and both counts follow", async () => {
 		const onSelectionChange = vi.fn<OnSelectionChange>();
 		render(
@@ -809,7 +734,6 @@ describe("TransferList: moving rows", () => {
 		});
 	});
 
-	// The README is silent; the reference disables a move button that has nothing to move.
 	test("a move button with nothing to move is disabled", async () => {
 		render(<Skills defaultValue={{ left: stack, right: [] }} />);
 		expect(isDisabled(button("Move selected to Highlights"))).toBe(true);
@@ -1011,7 +935,6 @@ describe("TransferList: disabled rows and disabled", () => {
 		expect(isDisabled(button("Move all to Stack"))).toBe(true);
 	});
 
-	// "Dims everything": the reference sets the root at half opacity.
 	test("disabled dims everything, and marks both listboxes aria-disabled", () => {
 		const ref = React.createRef<HTMLDivElement>();
 		render(<Skills ref={ref} disabled />);
@@ -1053,7 +976,6 @@ describe("TransferList: disabled rows and disabled", () => {
 		expect(onSelectionChange).not.toHaveBeenCalled();
 	});
 
-	// The README is silent; in the reference neither the wells nor the disabled buttons are tab stops.
 	test("disabled takes it out of the tab order", async () => {
 		render(
 			<Around>
@@ -1098,7 +1020,6 @@ describe("TransferList: keyboard", () => {
 		}
 	});
 
-	// The README is silent on where the keys start; the reference starts on the first enabled row.
 	test("Tab into a well puts the keys on its first enabled row, without selecting it", async () => {
 		render(
 			<Around>
@@ -1115,8 +1036,6 @@ describe("TransferList: keyboard", () => {
 		expect(selectedIn("Highlights")).toEqual([]);
 	});
 
-	// The README doesn't say whether the arrows wrap; the reference stops at the ends. Each stop is
-	// followed by a move that only lands right if the stop held.
 	test("Down and Up move between rows without selecting them, and stop at the first and the last", async () => {
 		await tabIntoStack();
 		await walk([
@@ -1146,7 +1065,6 @@ describe("TransferList: keyboard", () => {
 		expect(selectedIn("Stack")).toEqual([]);
 	});
 
-	// The README is silent; the reference's keys pass over disabled rows.
 	test("the arrows, Home and End pass over disabled rows", async () => {
 		render(
 			<Around>
@@ -1210,12 +1128,10 @@ describe("TransferList: keyboard", () => {
 		]);
 	});
 
-	// The README gives no timing; the reference's letters build one match for 500ms.
 	test("after a pause, typing starts a new match", async () => {
 		await tabIntoStack();
 		await walk([["r", "React"]]);
 		await pause(1000);
-		// "ru" would be Rust; "u" alone matches nothing.
 		await walk([["u", "React"]]);
 	});
 
@@ -1277,8 +1193,6 @@ describe("TransferList: keyboard", () => {
 		});
 	});
 
-	// The README is silent on the ends and on disabled rows; the reference toggles only a row it
-	// moves to, and passes over disabled rows as the plain arrows do.
 	test("Shift+Down at the last row toggles nothing, and Shift+Down and Shift+Up pass over disabled rows", async () => {
 		render(
 			<Around>
@@ -1304,7 +1218,6 @@ describe("TransferList: keyboard", () => {
 		expect(option("Rust")).toHaveAttribute("aria-selected", "false");
 	});
 
-	// The README is silent; in the reference a click also puts the keys on the row it toggles.
 	test("a click puts the keys on the row it toggles", async () => {
 		render(<Skills />);
 		await userEvent.click(option("Rust"));
@@ -1356,7 +1269,6 @@ describe("TransferList: keyboard", () => {
 		await expect.poll(() => selectedIn("Highlights")).toEqual([]);
 	});
 
-	// The README is silent; the reference scrolls the row into view inside its list.
 	test("the row the keys are on scrolls into view inside the well", async () => {
 		render(
 			<Around>
@@ -1380,7 +1292,6 @@ describe("TransferList: keyboard", () => {
 			.toBe(true);
 	});
 
-	// The README is silent; the reference keeps each well's row while focus is elsewhere.
 	test("Tab back into a well returns to the row the keys were on", async () => {
 		await tabIntoStack();
 		await walk([

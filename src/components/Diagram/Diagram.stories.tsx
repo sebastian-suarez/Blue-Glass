@@ -13,14 +13,10 @@ import {
 	type DiagramNodeLine,
 } from "./Diagram.js";
 
-/**
-A node's bold name line. Typed apart from the string case, which has a String#bold of its own.
-*/
 function boldLine(text: string): Exclude<DiagramNodeLine, string> {
 	return { text, bold: true };
 }
 
-// The site's datasets, as the preview draws them.
 const siteFlow: DiagramData = {
 	id: "site-flow",
 	width: 600,
@@ -759,10 +755,6 @@ const reviewGate: DiagramData = {
 	],
 };
 
-/**
-The inset well the README puts a diagram in: an inset Paper as a figure, with a text-micro
-caption.
-*/
 function Figure({
 	caption,
 	maxWidth,
@@ -796,25 +788,16 @@ const gates = [
 	{ name: "M3", note: "planned", isDone: false },
 ];
 
-/**
-The reveal's stagger index, the --i the README tells DiagramHost's children to set.
-*/
 function order(index: number): CSSProperties {
 	const style: CSSProperties & { "--i": number } = { "--i": index };
 	return style;
 }
 
-/**
-Where gate `index` sits on the line: 70 units in, then 153.3 apart.
-*/
 function gateX(index: number): number {
 	const offset = index * 153.3;
 	return 70 + offset;
 }
 
-/**
-The RS50 bridge's gates, drawn by hand inside DiagramHost with the gl-dg classes.
-*/
 function BridgeGates() {
 	return (
 		<DiagramHost

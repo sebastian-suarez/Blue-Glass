@@ -79,7 +79,6 @@ const roles: Role[] = [
 		location: "Remote",
 		paragraphs: [
 			"I worked on the web app for providers and the mobile app for patients, on a product for remote therapeutic monitoring and home exercises.",
-			// A word joiner keeps "10–20" on one line.
 			"I reworked PDF generation for training specifications. Before: about 6 seconds. After: 10–⁠20 milliseconds.",
 		],
 	},
@@ -149,9 +148,6 @@ const ownProjects = [
 	},
 ];
 
-/**
-One row of the career list: employer, title and dates, the paragraphs, then the location.
-*/
 function CareerRow({
 	role,
 	isOpen = false,
@@ -174,9 +170,6 @@ function CareerRow({
 	);
 }
 
-/**
-The site's own projects, one open at a time: expanded and onChange kept in this parent.
-*/
 function SingleOpenProjects() {
 	const [open, setOpen] = useState<string | false>("vsebcode");
 	return (
@@ -201,9 +194,6 @@ function SingleOpenProjects() {
 	);
 }
 
-/**
-A section heading with its note beside it, as the site's sections open.
-*/
 function SectionHead({
 	title,
 	note,
@@ -239,15 +229,11 @@ function SectionHead({
 	);
 }
 
-/**
-Default's rows: the args drive the first, and its own toggle sets the expanded arg.
-*/
 function CareerRowsWithArgs(
 	args: AccordionProps,
 	{ viewMode }: { readonly viewMode: string },
 ) {
 	const [, updateArgs] = useArgs<AccordionProps>();
-	// The args drive the first row; the others stay closed, as in the preview.
 	return (
 		<LiveArg
 			value={args.expanded}
@@ -422,8 +408,6 @@ export const Example: Story = {
 	),
 };
 
-// Variants at the phone size the layout gate checks: its axe test runs at 390px too, and the
-// tag keeps the copy off the docs page.
 export const VariantsOnPhone: Story = {
 	...Variants,
 	name: "Variants on a phone",

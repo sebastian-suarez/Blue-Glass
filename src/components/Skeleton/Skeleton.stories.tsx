@@ -23,7 +23,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// The preview's stack tags on the loaded card, and the card both states share.
 const tag: CSSProperties = {
 	fontSize: 12,
 	lineHeight: 1.5,
@@ -41,10 +40,6 @@ const card: CSSProperties = {
 	minHeight: 300,
 };
 
-/**
-A project card while it loads: busy, with a hidden status line, and skeletons in the shape of
-its figure, title, summary and tags.
-*/
 function LoadingCard() {
 	return (
 		<Paper component="article" style={card} aria-busy="true">
@@ -67,9 +62,6 @@ function LoadingCard() {
 	);
 }
 
-/**
-The same project card once it has loaded.
-*/
 function LoadedCard() {
 	return (
 		<Paper component="article" style={card}>
@@ -107,9 +99,6 @@ function LoadedCard() {
 	);
 }
 
-/**
-The preview's two cards: "Reload the second card" shows it loading for 1.8s.
-*/
 function ProjectCards() {
 	const [isReloading, setIsReloading] = useState(false);
 	useEffect(() => {
@@ -150,7 +139,6 @@ export const Default: Story = {
 	name: "Default",
 	args: { variant: "text", animation: "pulse" },
 	argTypes: {
-		// Storybook's docgen reads the false option as the string "false".
 		animation: { control: "inline-radio", options: ["pulse", "wave", false] },
 	},
 	parameters: {

@@ -1,19 +1,4 @@
 "use client";
-/**
-Tabs, Tab and TabPanel, ported from design-system/components/Tabs/reference.tsx onto Base UI's
-Tabs: its Root, List, Tab and Panel give the roles, aria-selected, the press that selects and the
-orientation. Tabs keeps the value and passes it to Base UI's root, which never picks one itself.
-
-Where Base UI and the documented API part ways, the API wins:
-- Server HTML. Base UI wires aria-controls, aria-labelledby and the roving tab stop in effects,
-  after hydration, the reference's defect (docs/reference-defects.md). Here the ids come from
-  useId and each tab's value, the tab stop from the selection, and a tab names its panel as
-  soon as Tabs' children hold it, or once a panel rendered deeper registers.
-- Keys. Base UI's list lands on disabled tabs and leaves the selection to Enter. The README skips
-  disabled tabs and selects as the arrows move, as the reference's own handler does.
-- Panels. A deselected panel hides at once (Base UI would wait for exit animations), and
-  keepMounted keeps a panel's content, not its element, so every aria-controls finds its panel.
-*/
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import type { BaseUIEvent } from "@base-ui/react/types";
 import * as React from "react";
@@ -36,37 +21,13 @@ export type TabsProps = Omit<
 	React.HTMLAttributes<HTMLDivElement>,
 	"onChange" | "defaultValue"
 > & {
-	/**
-	The selected tab's value (controlled). false selects none.
-	*/
 	value?: TabValue | false;
-	/**
-	The tab selected first (uncontrolled). Default: the first enabled tab.
-	*/
 	defaultValue?: TabValue | false;
-	/**
-	Called with the new value when a tab is chosen by click or by the arrow keys.
-	*/
 	onChange?: (event: React.SyntheticEvent, value: TabValue) => void;
-	/**
-	`underline`: tabs in a row over a sliding ink mark (default). `pill`: the site's nav pill. `side`: the client-work selector beside its panels.
-	*/
 	variant?: "underline" | "pill" | "side";
-	/**
-	Stretch the tabs to share the row (underline and pill).
-	*/
 	fullWidth?: boolean;
-	/**
-	Names the tab list.
-	*/
 	"aria-label"?: string;
-	/**
-	Names the tab list by another element's id.
-	*/
 	"aria-labelledby"?: string;
-	/**
-	Tab elements, then the TabPanels (wrapped in a Paper or not).
-	*/
 	children?: React.ReactNode;
 };
 
@@ -74,44 +35,17 @@ export type TabProps = Omit<
 	React.ButtonHTMLAttributes<HTMLButtonElement>,
 	"value" | "type"
 > & {
-	/**
-	Matches a TabPanel's value. Default: the tab's position (0, 1, 2…).
-	*/
 	value?: TabValue;
-	/**
-	The label; children work too.
-	*/
 	label?: React.ReactNode;
-	/**
-	Icon before the label, 16px. In the side variant it replaces the orb; null removes the orb.
-	*/
 	icon?: React.ReactNode;
-	/**
-	The side variant's orb tint, the site's orb-0, orb-1 and orb-2. Default: by position.
-	*/
 	orb?: 0 | 1 | 2;
-	/**
-	Can't be selected; the arrow keys skip it.
-	*/
 	disabled?: boolean;
-	/**
-	The label, when label isn't set.
-	*/
 	children?: React.ReactNode;
 };
 
 export type TabPanelProps = React.HTMLAttributes<HTMLDivElement> & {
-	/**
-	The value of the Tab that shows this panel.
-	*/
 	value: TabValue;
-	/**
-	Keep the content mounted while hidden, as the site does. false renders it only while selected. Default true.
-	*/
 	keepMounted?: boolean;
-	/**
-	The panel's content.
-	*/
 	children?: React.ReactNode;
 };
 
@@ -119,18 +53,9 @@ type TabsContextValue = {
 	variant: NonNullable<TabsProps["variant"]>;
 	baseId: string;
 	value: TabValue | false;
-	/**
-	The tab that holds tabindex 0: the selected tab, else the first enabled one.
-	*/
 	tabStop: TabValue | false;
 	hasPanel: (value: TabValue) => boolean;
-	/**
-	A tab's id: its own id prop, else one made from Tabs' id.
-	*/
 	tabId: (value: TabValue) => string;
-	/**
-	A panel's id, the same way.
-	*/
 	panelId: (value: TabValue) => string;
 	registerPanel: (value: TabValue, id: string | undefined) => () => void;
 };
@@ -139,9 +64,6 @@ const TabsContext = React.createContext<TabsContextValue | undefined>(
 	undefined,
 );
 
-// Values become id fragments: keep [A-Za-z0-9-] and encode the rest, so "a b" and "a-b" stay apart.
-// A number gets _n, which no string's fragment starts with (an encoded character is _ and hex),
-// so 1 and "1" get ids of their own.
 const slug = (value: TabValue) =>
 	(typeof value === "number" ? "_n" : "") +
 	String(value).replaceAll(
@@ -152,18 +74,10 @@ const tabIdOf = (baseId: string, value: TabValue) =>
 	`${baseId}-tab-${slug(value)}`;
 const panelIdOf = (baseId: string, value: TabValue) =>
 	`${baseId}-panel-${slug(value)}`;
-// 1 and "1" are different values, as Base UI compares them.
 const keyOf = (value: TabValue) => `${typeof value}:${value}`;
 
-/**
-A value key and the id it maps to, as one line of a key that changes only when they do: JSON
-never holds a raw line break.
-*/
 const idLine = (key: string, id: string | undefined) =>
 	JSON.stringify([key, id ?? null]);
-/**
-The ids a key of idLine lines holds, by value key.
-*/
 const idsOf = (key: string) =>
 	new Map(
 		key
@@ -175,23 +89,14 @@ const idsOf = (key: string) =>
 			}),
 	);
 
-/**
-The indicator's width: the site's mobile tab mark is 16px.
-*/
 const markWidth = 16;
 
-/**
-Where the indicator starts to sit centred under `tab`, to the pixel.
-*/
 function markLeft(tab: HTMLElement): number {
 	const halfTab = tab.offsetWidth / 2;
 	const halfMark = markWidth / 2;
 	return Math.round(tab.offsetLeft + halfTab - halfMark);
 }
 
-/**
-Room kept clear of the faded edge when a tab is scrolled into view.
-*/
 const edge = 40;
 
 const navigationKeys = new Set([
@@ -223,10 +128,6 @@ function revealTab(list: HTMLElement, tab: HTMLElement, isSmooth: boolean) {
 	}
 }
 
-/**
-Adds the TabPanels among `node`'s elements to `into`, by value key with any id of their own,
-without entering the panels, so the server HTML can point each tab at its panel.
-*/
 function collectPanels(
 	node: React.ReactNode,
 	into: Map<string, string | undefined>,
@@ -245,7 +146,6 @@ function collectPanels(
 			value?: TabValue;
 			id?: string;
 		}>(node) ||
-		// A nested Tabs names its own panels.
 		node.type === Tabs
 	) {
 		return;
@@ -262,9 +162,6 @@ function collectPanels(
 	collectPanels(node.props.children, into);
 }
 
-/**
-A set of tabs and their panels, where Tab children form the tab list and every other child is the panel area.
-*/
 export function Tabs({
 	value: valueProp,
 	defaultValue,
@@ -282,13 +179,9 @@ export function Tabs({
 	const baseId = useId(id);
 	const listRef = React.useRef<HTMLDivElement | null>(null);
 	const shouldReduceMotion = useShouldReduceMotion();
-	// Behaviour only: CSS lays the side selector out as a row on phones; its keys follow after
-	// hydration.
 	const isPhone = useMediaQuery(media.phone);
 	const isVertical = variant === "side" && !isPhone;
 
-	// Tab children go to the list, their value defaulting to their position; the rest is the
-	// panel area.
 	const items: Array<{ value: TabValue; isDisabled: boolean; id: string }> = [];
 	const tabs: React.ReactNode[] = [];
 	const panels: React.ReactNode[] = [];
@@ -335,9 +228,6 @@ export function Tabs({
 		},
 	);
 
-	// Ids come from a Tab's or TabPanel's own id prop when it has one, so the keys, the indicator
-	// and the ARIA wiring find the elements that are there. Keyed by content, so tabId stays the
-	// same function while the tabs do.
 	const tabIdKey = items
 		.map((item) => idLine(keyOf(item.value), item.id))
 		.join("\n");
@@ -348,8 +238,6 @@ export function Tabs({
 		[tabIds, baseId],
 	);
 
-	// A tab names its panel once the panel is known: among Tabs' children, or registered from
-	// deeper down after mount, as the reference registers every panel.
 	const childPanels = new Map<string, string | undefined>();
 	collectPanels(panels, childPanels);
 	const [registered, setRegistered] = React.useState<
@@ -377,7 +265,6 @@ export function Tabs({
 		},
 		[],
 	);
-	// Keyed by content, so hasPanel stays the same function while the panels do.
 	const panelKey = [...childPanels]
 		.map(([key, panelElementId]) => idLine(key, panelElementId))
 		.join("\n");
@@ -409,10 +296,6 @@ export function Tabs({
 		[variant, baseId, value, tabStop, hasPanel, tabId, panelId, registerPanel],
 	);
 
-	// Which edges overflow (fades and scroll buttons), and where the underline mark sits. Compared
-	// with what was rendered, outside React's update queue, and set only on a real change: an
-	// updater function here would be rebased onto stale state while a scroll-priority update is
-	// pending, and re-render forever (React error 185).
 	const [overflow, setOverflow] = React.useState({ start: false, end: false });
 	const [mark, setMark] = React.useState<number | undefined>(undefined);
 	const shownRef = React.useRef({ overflow, mark });
@@ -480,8 +363,6 @@ export function Tabs({
 		};
 	}, [measure, tabKey]);
 
-	// Keeps the selected tab in view in a scrolling row: at once on the first paint, smoothly
-	// after.
 	const hasPaintedRef = React.useRef(false);
 	useIsoLayoutEffect(() => {
 		const list = listRef.current;
@@ -501,7 +382,6 @@ export function Tabs({
 		hasPaintedRef.current = true;
 	}, [value, isVertical, tabId, shouldReduceMotion]);
 
-	// The next enabled tab from `from` (an index in `items`), wrapping at the ends.
 	const enabledFrom = (from: number, direction: 1 | -1) => {
 		const count = items.length;
 		for (let step = 1; step <= count; step++) {
@@ -523,7 +403,6 @@ export function Tabs({
 			return;
 		}
 
-		// Base UI's own navigation would land on disabled tabs and leave the selection behind.
 		event.preventBaseUIHandler();
 		const activeId = ownerDocument(list).activeElement?.id;
 		const current = items.findIndex((item) => item.id === activeId);
@@ -556,7 +435,6 @@ export function Tabs({
 		event.preventDefault();
 		// eslint-disable-next-line unicorn/prefer-query-selector -- An id needs no CSS escaping here.
 		ownerDocument(list).getElementById(tabId(target))?.focus();
-		// Automatic activation: the selection follows focus.
 		select(event, target);
 	};
 
@@ -588,8 +466,6 @@ export function Tabs({
 					className,
 				)}
 				onValueChange={(next: TabValue | null, details) => {
-					// Only presses come through: the root is controlled, so Base UI never picks a
-					// value of its own.
 					if (next !== null && details.reason === "none") {
 						select(documentedEvent(details.event), next);
 					}
@@ -659,9 +535,6 @@ export function Tabs({
 	);
 }
 
-/**
-One tab inside Tabs: a button with role="tab" that selects its panel.
-*/
 export function Tab({
 	value = 0,
 	label,
@@ -699,7 +572,6 @@ export function Tab({
 		</>
 	);
 	if (!context) {
-		// Outside Tabs there is no list to join: a lone tab, as in the reference.
 		return (
 			<button
 				ref={ref}
@@ -707,7 +579,6 @@ export function Tab({
 				role="tab"
 				aria-selected={false}
 				disabled={disabled}
-				// The stylesheet reads Base UI's data-disabled, which a lone tab sets itself.
 				data-disabled={disabled ? "" : undefined}
 				className={cx("gl-tab", className)}
 				onClick={onClick}
@@ -732,15 +603,12 @@ export function Tab({
 			onClick={(event) => {
 				rememberReactEvent(event);
 				onClick?.(event);
-				// As in the reference, a click your handler prevents doesn't select.
 				if (event.defaultPrevented) {
 					event.preventBaseUIHandler();
 				}
 			}}
 			onKeyDown={(event) => {
 				onKeyDown?.(event);
-				// A cancelled Space or Enter doesn't select, as on the reference's native button. Base
-				// UI selects on keydown and checks only its own flag.
 				if (event.defaultPrevented) {
 					event.preventBaseUIHandler();
 				}
@@ -752,9 +620,6 @@ export function Tab({
 	);
 }
 
-/**
-The content for one tab: hidden until its tab is selected, then faded in with the site's 280ms crossfade.
-*/
 export function TabPanel({
 	value,
 	keepMounted = true,
@@ -767,8 +632,6 @@ export function TabPanel({
 }: TabPanelProps & { ref?: React.Ref<HTMLDivElement> }) {
 	const context = React.use(TabsContext);
 	const isActive = context ? context.value === value : true;
-	// Fades in only when switched to, never on the first paint (project-tabs.ts animates only
-	// after a switch).
 	const [wasActive, setWasActive] = React.useState(isActive);
 	const [shouldAnimate, setShouldAnimate] = React.useState(false);
 	if (wasActive !== isActive) {
@@ -788,7 +651,6 @@ export function TabPanel({
 		shouldAnimate && "gl-tab-panel-animate",
 		className,
 	);
-	// A display in `style` would beat [hidden]: a hidden panel stays hidden whatever it's given.
 	const panelStyle: React.CSSProperties | undefined = isActive
 		? style
 		: { ...style, display: "none" };

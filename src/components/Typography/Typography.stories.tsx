@@ -21,10 +21,6 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-/**
-A row of the type scale: the variant, its metrics, a sample, and the sample's own font size
-where the token is too wide for a phone.
-*/
 type ScaleRow = readonly [TypographyVariant, string, string, string?];
 
 const scale: ReadonlyArray<{
@@ -139,9 +135,6 @@ const colors: readonly TypographyColor[] = [
 	"info",
 ];
 
-/**
-A token's class name over its metrics.
-*/
 function Metrics({
 	variant,
 	metrics,
@@ -161,9 +154,6 @@ function Metrics({
 	);
 }
 
-/**
-The preview's type scale: every token, grouped, each with its metrics and a sample.
-*/
 function TypeScale() {
 	return (
 		<Paper style={{ padding: "8px 28px" }}>
@@ -229,9 +219,6 @@ function TypeScale() {
 	);
 }
 
-/**
-The preview's client-work panel, set only with Typography.
-*/
 function ClientWorkPanel() {
 	return (
 		<Paper
@@ -301,7 +288,6 @@ function ClientWorkPanel() {
 					Outcome
 				</Typography>
 				<Typography variant="body-lg">
-					{/* A word joiner after the dash keeps the range on one line. */}
 					{
 						"Cut PDF generation time from about 6 seconds to 10–\u{2060}20 milliseconds."
 					}
