@@ -229,8 +229,10 @@ export function useContainingBlockPositioner(
 ) {
 	const [element, setElement] = React.useState<HTMLDivElement | null>(null);
 	const [position, setPosition] = React.useState<PositionResult | null>(null);
+	const updateRef = React.useRef<(() => void) | undefined>(undefined);
 	useIsoLayoutEffect(() => {
 		if (!isOpen || !element || !anchor) {
+			updateRef.current = undefined;
 			setPosition(null);
 			return;
 		}
@@ -303,14 +305,18 @@ export function useContainingBlockPositioner(
 			observer.observe(anchor);
 		}
 
-		update();
+		updateRef.current = update;
 		return () => {
+			updateRef.current = undefined;
 			cancelAnimationFrame(frame);
 			window.removeEventListener("scroll", onScroll, true);
 			window.removeEventListener("resize", refresh);
 			observer.disconnect();
 		};
 	}, [isOpen, element, anchor, placement, offset]);
+	useIsoLayoutEffect(() => {
+		updateRef.current?.();
+	});
 	const style: React.CSSProperties | undefined = position
 		? {
 				left: position.x,

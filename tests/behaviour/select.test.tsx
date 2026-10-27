@@ -2291,10 +2291,59 @@ describe("Select: open at mount, and inside a containing block", () => {
 		};
 
 		expect(isKeptFromAssistiveTech(before)).toBe(true);
+		expect(list.contains(document.activeElement)).toBe(false);
 		await userEvent.keyboard("{Tab}");
 		await frames();
-		expect(document.activeElement).not.toBe(before);
+		const focused = must(document.activeElement);
+		expect(focused).not.toBe(before);
+		expect(isKeptFromAssistiveTech(focused)).toBe(false);
 		expect(list.isConnected).toBe(true);
+		expect(
+			screen.getByRole("combobox", { name: "Primary stack", hidden: true }),
+		).toHaveAttribute("aria-expanded", "true");
+	});
+
+	test("an in-place list follows its trigger when a render moves the trigger without resizing anything", async () => {
+		function Stage({ shift }: { readonly shift: boolean }) {
+			return (
+				<div
+					style={{
+						height: 400,
+						padding: 8,
+						transform: "translateZ(0)",
+						overflow: "visible",
+					}}
+				>
+					{shift ? <div style={{ height: 80 }} /> : null}
+					<Select
+						defaultOpen
+						label="Hour"
+						options={hours}
+						defaultValue="00:00"
+						PopoverProps={{
+							disablePortal: true,
+							disableScrollLock: true,
+							disableEnforceFocus: true,
+						}}
+					/>
+				</div>
+			);
+		}
+
+		const view = render(<Stage shift={false} />);
+		const list = await vi.waitFor(() => listbox());
+		const surface = must(list.closest<HTMLElement>(".gl-popover"));
+		await expect
+			.poll(() => box(surface).height, { timeout: 2000 })
+			.toBeGreaterThanOrEqual(80);
+		await frames(8);
+		const triggerTop = box(trigger("Hour")).top;
+		const gap = box(surface).top - triggerTop;
+		view.rerender(<Stage shift />);
+		await frames(8);
+		const movedTop = box(trigger("Hour")).top;
+		expect(movedTop - triggerTop).toBeGreaterThan(70);
+		expect(Math.abs(box(surface).top - movedTop - gap)).toBeLessThanOrEqual(1);
 	});
 
 	referenceDefectTest(

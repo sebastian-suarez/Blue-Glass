@@ -687,11 +687,7 @@ export function Select({
 	const { restoreFocus } = layer;
 	const preserveInitialFocus = React.useCallback(
 		(surfaceElement: HTMLDivElement | null) => {
-			if (
-				!surfaceElement ||
-				hasOpened ||
-				(!popoverProps?.disablePortal && !popoverProps?.disableEnforceFocus)
-			) {
+			if (!surfaceElement || hasOpened) {
 				return;
 			}
 
@@ -724,12 +720,7 @@ export function Select({
 				cancelAnimationFrame(frame);
 			};
 		},
-		[
-			hasOpened,
-			popoverProps?.disablePortal,
-			popoverProps?.disableEnforceFocus,
-			restoreFocus,
-		],
+		[hasOpened, restoreFocus],
 	);
 	const handleSurfaceRef = useForkRef(layer.surfaceRef, preserveInitialFocus);
 	const onDocumentKeyDown = useEventCallback((event: KeyboardEvent) => {
